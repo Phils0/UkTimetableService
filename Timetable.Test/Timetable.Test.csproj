@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="8.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
         <PackageReference Include="NSubstitute" Version="4.0.0" />
         <PackageReference Include="Serilog" Version="2.8.0" />
@@ -19,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Timetable.Web\Timetable.Web.csproj" />
+      <ProjectReference Include="..\Timetable\Timetable.csproj" />
     </ItemGroup>
 
 </Project>

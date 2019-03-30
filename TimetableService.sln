@@ -8,6 +8,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CifParserTest", "..\CifPars
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timetable.Web.Test", "Timetable.Web.Test\Timetable.Web.Test.csproj", "{BDB0F858-2473-4A76-9F6C-86CA37A7278C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CifExtractor", "..\CifParser\CifExtractor\CifExtractor.csproj", "{4CADE6E5-9684-4FFB-A845-968B22014933}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CifExtractorTest", "..\CifParser\CifExtractorTest\CifExtractorTest.csproj", "{096DCEE7-17F1-4B11-80D7-85C8C1E3249C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timetable", "Timetable\Timetable.csproj", "{17F7F15D-6E1C-4BBB-BD3C-3085A44F55CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timetable.Test", "Timetable.Test\Timetable.Test.csproj", "{FCB1FA7C-06BB-4D9E-88AF-F3DB33D35CA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +38,21 @@ Global
 		{BDB0F858-2473-4A76-9F6C-86CA37A7278C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDB0F858-2473-4A76-9F6C-86CA37A7278C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDB0F858-2473-4A76-9F6C-86CA37A7278C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CADE6E5-9684-4FFB-A845-968B22014933}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CADE6E5-9684-4FFB-A845-968B22014933}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CADE6E5-9684-4FFB-A845-968B22014933}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CADE6E5-9684-4FFB-A845-968B22014933}.Release|Any CPU.Build.0 = Release|Any CPU
+		{096DCEE7-17F1-4B11-80D7-85C8C1E3249C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{096DCEE7-17F1-4B11-80D7-85C8C1E3249C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{096DCEE7-17F1-4B11-80D7-85C8C1E3249C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{096DCEE7-17F1-4B11-80D7-85C8C1E3249C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17F7F15D-6E1C-4BBB-BD3C-3085A44F55CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17F7F15D-6E1C-4BBB-BD3C-3085A44F55CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17F7F15D-6E1C-4BBB-BD3C-3085A44F55CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17F7F15D-6E1C-4BBB-BD3C-3085A44F55CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCB1FA7C-06BB-4D9E-88AF-F3DB33D35CA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCB1FA7C-06BB-4D9E-88AF-F3DB33D35CA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCB1FA7C-06BB-4D9E-88AF-F3DB33D35CA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCB1FA7C-06BB-4D9E-88AF-F3DB33D35CA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
