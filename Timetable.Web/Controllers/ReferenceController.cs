@@ -26,13 +26,8 @@ namespace Timetable.Web.Controllers
         {
             var locations = await _service.GetLocationsAsync(CancellationToken.None).
                 ConfigureAwait(false);
-            var model = _mapper.Map<ICollection<Timetable.Station>, Model.Station[]>(locations.Values);
+            var model = _mapper.Map<IEnumerable<Timetable.Station>, Model.Station[]>(locations);
             return Ok(model);
         }
-    }
-
-    public class ReferenceService
-    {
-        
     }
 }
