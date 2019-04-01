@@ -21,7 +21,7 @@ namespace Timetable
 
         public async Task<IEnumerable<Station>> GetLocationsAsync(CancellationToken cancellationToken)
         {
-            return await Task.FromResult(_data.Locations.Select(p => p.Value));
+            return await Task.FromResult(_data.Locations.Select(p => p.Value)).ConfigureAwait(false);
         }
     }
 }
