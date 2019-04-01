@@ -36,15 +36,17 @@ namespace Timetable.Web
 
         internal IMapper CreateMapper() => _mapperConfiguration.CreateMapper();
         
-        internal Loader CreateDataLoader()
+        internal IDataLoader CreateDataLoader()
         {
             var extractor = new RdgZipExtractor(_logger);
             
-            var factory = new TtisParserFactory(_logger);
-            var parser = factory.CreateStationParser();            
+            var cifFactory = new ConsolidatorFactory(_logger);
+            var cifParser = cifFactory.CreateParser();
+            
+            var ttisFactory = new TtisParserFactory(_logger);
+            var stationParser = ttisFactory.CreateStationParser();            
     
-            var loader = new DataLoader(extractor, parser, CreateMapper(), Configuration);
-            return new Loader(loader);
+            return new DataLoader(extractor, cifParser, stationParser, CreateMapper(), Configuration, _logger);
         }
         
         internal IReference CreateReferenceService(Data data) => new ReferenceService(data);

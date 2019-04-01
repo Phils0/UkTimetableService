@@ -15,6 +15,11 @@ namespace Timetable.Web.Model
         public string ThreeLetterCode { get; set; }
         
         /// <summary>
+        /// National Location Code
+        /// </summary>
+        public string Nlc { get; set; }
+        
+        /// <summary>
         /// Name
         /// </summary>
         public string Name { get; set; }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AutoMapper;
+using Timetable.Test.Data;
 using Timetable.Web.Mapping;
 using Xunit;
 
@@ -34,6 +35,16 @@ namespace Timetable.Web.Test.Mapping
             var output = mapper.Map<Timetable.Location,  Model.Location>(TestLocations.Surbiton);
             
             Assert.Equal("SURBITN", output.Tiploc);
+        }
+        
+        [Fact]
+        public void LocationMapNlc()
+        {
+            var mapper = _config.CreateMapper();
+
+            var output = mapper.Map<Timetable.Location,  Model.Location>(TestLocations.Surbiton);
+            
+            Assert.Equal("557100", output.Nlc);
         }
         
         [Fact]
@@ -80,6 +91,16 @@ namespace Timetable.Web.Test.Mapping
             var output = mapper.Map<Timetable.Station,  Model.Station>(TestStations.Surbiton);
             
             Assert.Equal("SUR", output.ThreeLetterCode);
+        }
+        
+        [Fact]
+        public void StationMapNlc()
+        {
+            var mapper = _config.CreateMapper();
+
+            var output = mapper.Map<Timetable.Station,  Model.Station>(TestStations.Surbiton);
+            
+            Assert.Equal("5571", output.Nlc);
         }
         
         [Fact]

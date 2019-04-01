@@ -1,8 +1,8 @@
-namespace Timetable.Web.Test
+namespace Timetable.Test.Data
 {
-    internal static class TestStations
+    public static class TestStations
     {
-        internal static Station Surbiton
+        public static Station Surbiton
         {
             get
             {
@@ -12,7 +12,7 @@ namespace Timetable.Web.Test
             }
         }
         
-        internal static Station Waterloo
+        public static Station Waterloo
         {
             get
             {

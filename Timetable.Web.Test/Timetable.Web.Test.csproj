@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Timetable.Test.Data\Timetable.Test.Data.csproj" />
       <ProjectReference Include="..\Timetable.Web\Timetable.Web.csproj" />
     </ItemGroup>
 

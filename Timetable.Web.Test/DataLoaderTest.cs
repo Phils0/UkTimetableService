@@ -6,6 +6,7 @@ using AutoMapper;
 using CifExtractor;
 using CifParser;
 using NSubstitute;
+using Serilog;
 using Timetable.Web.Mapping;
 using Xunit;
 
@@ -25,26 +26,36 @@ namespace Timetable.Web.Test
             config.IsRdgZip.Returns(true);
             config.TimetableArchiveFile.Returns(TestArchive);
 
+            var loader = CreateLoader(config);
+
+            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None);
+            
+            Assert.Equal(3, locations.Count());
+        }
+
+        private DataLoader CreateLoader(ILoaderConfig config, IParser cifParser = null)
+        {
             var reader = Substitute.For<TextReader>();
             var extractor = Substitute.For<IArchiveFileExtractor>();
             extractor.ExtractFile(TestArchive, RdgZipExtractor.StationExtension).Returns(reader);
-            
-            var parser = Substitute.For<IParser>();
-            parser.Read(reader)
-                .Returns(new []
+
+            cifParser = cifParser ?? Substitute.For<IParser>();
+
+            var stationParser = Substitute.For<IParser>();
+            stationParser.Read(reader)
+                .Returns(new[]
                 {
                     Cif.TestStations.Surbiton,
                     Cif.TestStations.WaterlooMain,
                     Cif.TestStations.WaterlooWindsor
-                }); 
-            
-            var loader = new DataLoader(extractor, parser, _mapperConfig.CreateMapper(), config);
+                });
 
-            var locations = await loader.GetStationMasterListAsync(CancellationToken.None);
-            
-            Assert.Equal(3, locations.Count());
+            var logger = Substitute.For<ILogger>();
+
+            var loader = new DataLoader(extractor, cifParser, stationParser, _mapperConfig.CreateMapper(), config, logger);
+            return loader;
         }
-        
+
         [Fact]
         public async Task LoadStationsThrowsExceptionIfNotRdgArchive()
         {
@@ -52,24 +63,50 @@ namespace Timetable.Web.Test
             config.IsRdgZip.Returns(false);
             config.TimetableArchiveFile.Returns(TestArchive);
 
-            var reader = Substitute.For<TextReader>();
-            var extractor = Substitute.For<IArchiveFileExtractor>();
-            extractor.ExtractFile(TestArchive, RdgZipExtractor.StationExtension).Returns(reader);
-            
-            var parser = Substitute.For<IParser>();
-            parser.Read(reader)
-                .Returns(new []
-                {
-                    Cif.TestStations.Surbiton,
-                    Cif.TestStations.WaterlooMain,
-                    Cif.TestStations.WaterlooWindsor
-                }); 
-            
-            var loader = new DataLoader(extractor, parser, _mapperConfig.CreateMapper(), config);
+            var loader = CreateLoader(config);
   
-            var ex = await Assert.ThrowsAnyAsync<InvalidDataException>(() =>  loader.GetStationMasterListAsync(CancellationToken.None));
+            var ex = await Assert.ThrowsAnyAsync<InvalidDataException>(() =>  loader.LoadStationMasterListAsync(CancellationToken.None));
             
             Assert.Contains(TestArchive , ex.Message);
+        }
+        
+        [Fact]
+        public async Task LoadTimetableSetsLocations()
+        {
+            var config = Substitute.For<ILoaderConfig>();
+            config.IsRdgZip.Returns(true);
+            config.TimetableArchiveFile.Returns(TestArchive);
+
+            var loader = CreateLoader(config);
+
+            var data = await loader.LoadAsync(CancellationToken.None);
+            
+            Assert.NotEmpty(data.Locations);
+            Assert.NotEmpty(data.LocationsByTiploc);          
+        }
+            
+        [Fact]
+        public async Task LoadTimetableDataSetsNlcs()
+        {
+            var config = Substitute.For<ILoaderConfig>();
+            config.IsRdgZip.Returns(true);
+            config.TimetableArchiveFile.Returns(TestArchive);
+
+            var parser = Substitute.For<IParser>();
+            parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
+            {
+                Cif.TestCif.Surbiton,
+                Cif.TestCif.WaterlooMain,
+                Cif.TestCif.WaterlooWindsor
+            });
+            
+            var loader = CreateLoader(config, parser);
+
+            var data = await loader.LoadAsync(CancellationToken.None);
+
+            var location = data.LocationsByTiploc["SURBITN"];
+            
+            Assert.Equal("557100", location.Nlc);            
         }
     }
 }

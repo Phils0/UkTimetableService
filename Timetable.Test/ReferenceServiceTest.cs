@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Timetable.Test.Data;
 using Xunit;
 
 namespace Timetable.Test

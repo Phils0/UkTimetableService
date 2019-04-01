@@ -21,16 +21,27 @@ namespace Timetable.Web.Test
         public async Task LoadStations()
         {
             var config = new LoaderConfig(ConfigurationHelper.GetIConfigurationRoot("."));
-            var extractor = new RdgZipExtractor(Log.Logger);
             
-            var factory = new TtisParserFactory(Log.Logger);
-            var parser = factory.CreateStationParser();            
-            
-            var loader = new DataLoader(extractor, parser, _mapperConfig.CreateMapper(), config);
+            var factory = new Factory(_mapperConfig, config, Substitute.For<ILogger>());
+            var loader = factory.CreateDataLoader();
 
-            var locations = await loader.GetStationMasterListAsync(CancellationToken.None);
+            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None);
             
             Assert.NotEmpty(locations);
+        }
+        
+        [Fact]
+        public async Task LoadCif()
+        {
+            var config = new LoaderConfig(ConfigurationHelper.GetIConfigurationRoot("."));
+            
+            var factory = new Factory(_mapperConfig, config, Substitute.For<ILogger>());
+            var loader = factory.CreateDataLoader();
+
+            var data = await loader.LoadAsync(CancellationToken.None);
+            
+            Assert.NotEmpty(data.Locations);
+            Assert.NotEmpty(data.LocationsByTiploc);
         }
     }
 }

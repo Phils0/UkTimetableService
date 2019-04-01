@@ -2,6 +2,7 @@ using System.Linq;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.TestCorrelator;
+using Timetable.Test.Data;
 using Xunit;
 
 namespace Timetable.Test
@@ -71,6 +72,16 @@ namespace Timetable.Test
             station.Add(waterloo);
 
             Assert.Equal(waterloo.ThreeLetterCode, station.ThreeLetterCode);
+        }
+        
+        [Fact]
+        public void NlcIsMainNlc()
+        {
+            var waterloo = TestLocations.WaterlooMain;
+            var station = new Station();
+            station.Add(waterloo);
+
+            Assert.Equal("5598", station.Nlc);
         }
         
         [Fact]

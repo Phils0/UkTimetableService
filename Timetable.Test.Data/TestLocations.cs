@@ -1,11 +1,12 @@
-namespace Timetable.Web.Test
+namespace Timetable.Test.Data
 {
-    internal static class TestLocations
+    public static class TestLocations
     {
-        internal static Location Surbiton => new Location()
+        public static Location Surbiton => new Location()
         {
             Tiploc = "SURBITN",
             ThreeLetterCode = "SUR",
+            Nlc = "557100",
             Name = "SURBITON",
             InterchangeStatus = InterchangeStatus.Normal,
             Coordinates = new Coordinates()
@@ -15,11 +16,12 @@ namespace Timetable.Web.Test
                 IsEstimate = false
             }
         };
-        
-        internal static Location WaterlooMain => new Location()
+
+        public static Location WaterlooMain => new Location()
         {
             Tiploc = "WATRLMN",
             ThreeLetterCode = "WAT",
+            Nlc = "559801",
             Name = "LONDON WATERLOO",
             InterchangeStatus = InterchangeStatus.Main,
             Coordinates = new Coordinates()
@@ -29,11 +31,12 @@ namespace Timetable.Web.Test
                 IsEstimate = false
             }
         };
-        
-        internal static Location WaterlooWindsor => new Location()
+
+        public static Location WaterlooWindsor => new Location()
         {
             Tiploc = "WATRLOW",
             ThreeLetterCode = "WAT",
+            Nlc = "559803",
             Name = "LONDON WATERLOO",
             InterchangeStatus = InterchangeStatus.SubsidiaryLocation,
             Coordinates = new Coordinates()

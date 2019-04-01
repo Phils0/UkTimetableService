@@ -34,6 +34,11 @@ namespace Timetable
         /// CRS code
         /// </summary>
         public string ThreeLetterCode { get; set; }
+
+        /// <summary>
+        /// National Location Code - full 6 character code
+        /// </summary>
+        public string Nlc { get; set; } = "";
         
         /// <summary>
         /// Name

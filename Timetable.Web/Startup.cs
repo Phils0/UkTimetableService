@@ -25,7 +25,7 @@ namespace Timetable.Web
 {
     public class Startup
     {
-        private static readonly TimeSpan Timeout = new TimeSpan(0, 0, 30);
+        private static readonly TimeSpan Timeout = new TimeSpan(0, 2, 0);
         
         public Startup(IConfiguration configuration)
         {
@@ -56,7 +56,7 @@ namespace Timetable.Web
             try
             {
                     var loader = factory.CreateDataLoader();
-                    var loaderTask = loader.Load(CancellationToken.None);
+                    var loaderTask = loader.LoadAsync(CancellationToken.None);
                     
                     var loaded = Task.WaitAll(new[]
                     {

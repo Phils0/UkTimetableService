@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using Timetable.Test.Data;
 using Timetable.Web.Controllers;
 using Timetable.Web.Mapping;
 using Xunit;
