@@ -53,7 +53,7 @@ namespace Timetable.Test
             var data = TestData.Instance;
             data.UpdateNlc("NOTFOUND", "123456");
          
-            Assert.False(data.LocationsByTiploc.Values.Any(l => l.Nlc == "123456"));
+            Assert.DoesNotContain(data.LocationsByTiploc.Values, l => l.Nlc == "123456");
         }
     }
 }

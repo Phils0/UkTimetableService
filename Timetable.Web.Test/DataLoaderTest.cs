@@ -95,9 +95,9 @@ namespace Timetable.Web.Test
             var parser = Substitute.For<IParser>();
             parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
             {
-                Cif.TestCif.Surbiton,
-                Cif.TestCif.WaterlooMain,
-                Cif.TestCif.WaterlooWindsor
+                Cif.TestCifLocations.Surbiton,
+                Cif.TestCifLocations.WaterlooMain,
+                Cif.TestCifLocations.WaterlooWindsor
             });
             
             var loader = CreateLoader(config, parser);

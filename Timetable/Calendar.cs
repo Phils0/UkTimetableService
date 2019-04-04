@@ -10,13 +10,13 @@ namespace Timetable
     public enum DaysFlag
     {
         None = 0,
-        Monday = 1,
-        Tuesday = 2,
-        Wednesday = 4,
-        Thursday = 8,
-        Friday = 16,
-        Saturday = 32,
-        Sunday = 64,
+        Monday = 1 << 0,
+        Tuesday = 1 << 1,
+        Wednesday = 1 << 2,
+        Thursday = 1 << 3,
+        Friday = 1 << 4,
+        Saturday = 1 << 5,
+        Sunday = 1 << 6,
         Weekdays = Monday | Tuesday | Wednesday | Thursday | Friday,
         Weekend = Saturday | Sunday,
         Everyday = Weekdays | Weekend 
@@ -40,6 +40,13 @@ namespace Timetable
         /// <param name="date">Date to check</param>
         /// <returns></returns>
         bool IsActiveOn(DateTime date);
+
+        /// <summary>
+        /// THe calendar contains data for the date
+        /// </summary>
+        /// <param name="date">Date to check</param>
+        /// <returns></returns>
+        bool IsWithinCalendar(DateTime date);
     }
 
     /// <summary>
@@ -99,7 +106,7 @@ namespace Timetable
             return _calendarMask[dayIdx];
         }
 
-        private bool IsWithinCalendar(DateTime date)
+        public bool IsWithinCalendar(DateTime date)
         {
             return RunsFrom <= date && date <= RunsTo;
         }

@@ -2,7 +2,7 @@ using CifParser.Records;
 
 namespace Timetable.Web.Test.Cif
 {
-    internal class TestCif
+    internal class TestCifLocations
     {
         internal static TiplocInsertAmend Surbiton => new TiplocInsertAmend()
         {
@@ -14,7 +14,7 @@ namespace Timetable.Web.Test.Cif
 
         };
         
-        public static TiplocInsertAmend WaterlooMain => new TiplocInsertAmend()
+        internal static TiplocInsertAmend WaterlooMain => new TiplocInsertAmend()
         {
             Action = RecordAction.Create,
             Code = "WATRLMN",
@@ -23,7 +23,7 @@ namespace Timetable.Web.Test.Cif
             Description = "LONDON WATERLOO",
         };
 
-        public static TiplocInsertAmend WaterlooWindsor => new TiplocInsertAmend()
+        internal static TiplocInsertAmend WaterlooWindsor => new TiplocInsertAmend()
         {
             Action = RecordAction.Create,
             Code = "WATRLOW",

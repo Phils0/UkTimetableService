@@ -45,6 +45,16 @@ namespace Timetable.Test
         
         [Theory]
         [MemberData(nameof(CalendarBoundaries))]
+        public void IsWithinCalendar(DateTime day, bool expected)
+        {
+            var calendar = CreateCalendar();
+            
+            Assert.Equal(expected, calendar.IsWithinCalendar(day));
+        }
+        
+        
+        [Theory]
+        [MemberData(nameof(CalendarBoundaries))]
         public void IsActiveWhenWithinCalendarRange(DateTime day, bool expected)
         {
             var calendar = CreateCalendar();

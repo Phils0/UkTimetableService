@@ -80,10 +80,6 @@ namespace Timetable.Web
         {
             options.SwaggerDoc("v0", new Info {Title = "Seatbox", Version = "v0"});
 
-            var modelAssembly = $"{typeof(Timetable.Station).Assembly.GetName().Name}.xml";
-            var modelPath = Path.Combine(AppContext.BaseDirectory, modelAssembly);
-            options.IncludeXmlComments(modelPath);
-
             var controllerAssembly = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var controllerPath = Path.Combine(AppContext.BaseDirectory, controllerAssembly);
             options.IncludeXmlComments(controllerPath);
