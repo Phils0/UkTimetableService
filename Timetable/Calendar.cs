@@ -54,18 +54,30 @@ namespace Timetable
     /// </summary>
     public class Calendar : ICalendar, IEquatable<Calendar>
     {
-        public DateTime RunsFrom { get; set; }
+        public DateTime RunsFrom { get; }
         
-        public DateTime RunsTo { get; set; }
+        public DateTime RunsTo { get; }
         
-        public DaysFlag DayMask { get; set; }
+        public DaysFlag DayMask { get; }
 
-        public BankHolidayRunning BankHolidays { get; set; } = BankHolidayRunning.RunsOnBankHoliday;
+        public BankHolidayRunning BankHolidays { get; } = BankHolidayRunning.RunsOnBankHoliday;
 
         private BitArray _calendarMask;
+
+        public Calendar(DateTime runsFrom, DateTime runsTo, DaysFlag days, BankHolidayRunning bankHolidays)
+        {
+            RunsFrom = runsFrom;
+            RunsTo = runsTo;
+            DayMask = days;
+            BankHolidays = bankHolidays;
+        }      
         
         public void Generate()
         {
+            // Make idempotent, don't regenerate mask
+            if (_calendarMask != null)
+                return;
+            
             var days = (int) ((RunsTo.Date - RunsFrom.Date).TotalDays) + 1;
             
             if(days <= 0)

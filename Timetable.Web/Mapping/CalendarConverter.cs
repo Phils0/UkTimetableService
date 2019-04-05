@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AutoMapper;
 using CifParser.Records;
@@ -8,18 +9,18 @@ namespace Timetable.Web.Mapping
 {
     public class CalendarConverter : IValueConverter<ScheduleDetails, Calendar>
     {
-        private HashSet<Calendar> _lookup = new HashSet<Calendar>();
+        private ConcurrentDictionary<Calendar, Calendar> _lookup = new ConcurrentDictionary<Calendar, Calendar>();
 
         public Calendar Convert(ScheduleDetails source, ResolutionContext context)
         {
-            var calendar = context.Mapper.Map<ScheduleDetails, Calendar>(source);
-
-            if (!_lookup.TryGetValue(calendar, out var actual))
-            {
-                _lookup.Add(calendar);
-                actual = calendar;
-            }
-
+            var calendar = new Calendar(
+                    source.RunsFrom,
+                    source.RunsTo.Value,
+                    MapMask(source.DayMask),
+                    MapBankHoliday(source.BankHolidayRunning))
+                ;
+            var actual = _lookup.GetOrAdd(calendar, calendar);
+            actual.Generate();
             return actual;
         }
 
@@ -28,16 +29,16 @@ namespace Timetable.Web.Mapping
             var flags = 0;
 
             var values = mask.ToCharArray();
-            
+
             for (int i = 0; i < 7; i++)
             {
                 if (values[i] == 'Y')
                     flags = flags + (1 << i);
             }
-            
+
             return (DaysFlag) flags;
         }
-        
+
         internal static BankHolidayRunning MapBankHoliday(string bankHoliday)
         {
             switch (bankHoliday)
@@ -52,6 +53,6 @@ namespace Timetable.Web.Mapping
                 default:
                     throw new ArgumentOutOfRangeException($"Unknown bank holiday value: {bankHoliday}");
             }
-         }
+        }
     }
 }

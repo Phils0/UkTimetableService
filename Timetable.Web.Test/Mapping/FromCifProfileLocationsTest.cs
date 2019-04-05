@@ -8,7 +8,7 @@ namespace Timetable.Web.Test.Mapping
     {
         public static readonly MapperConfiguration FromCifProfileConfiguration = new MapperConfiguration(
             cfg => cfg.AddProfile<FromCifProfile>());
-
+        
         [Fact]
         public void ValidMapping()
         {
@@ -72,6 +72,5 @@ namespace Timetable.Web.Test.Mapping
             
             Assert.Equal("Normal", output.InterchangeStatus.ToString());
         }
-
     }
 }

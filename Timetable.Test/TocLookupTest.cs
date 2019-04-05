@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NSubstitute;
 using Serilog;
 using Xunit;
@@ -11,8 +12,11 @@ namespace Timetable.Test
         {
             var vt = new Toc() {Code = "VT"};
             
-            var lookup = new TocLookup(Substitute.For<ILogger>());
-            lookup.Add("VT", vt);
+            var lookup = new TocLookup(Substitute.For<ILogger>(),
+                new Dictionary<string, Toc>()
+                {
+                    {"VT", vt}
+                });
 
             var toc = lookup.Find("VT");
             Assert.Same(vt, toc);
@@ -21,7 +25,7 @@ namespace Timetable.Test
         [Fact]
         public void CreatesNewToc()
         {         
-            var lookup = new TocLookup(Substitute.For<ILogger>());
+            var lookup = new TocLookup(Substitute.For<ILogger>(), new Dictionary<string, Toc>());
 
             var toc = lookup.Find("VT");
             Assert.Equal("VT", toc.Code);
@@ -30,7 +34,7 @@ namespace Timetable.Test
         [Fact]
         public void ReturnsSameTocOnSebsequentCalls()
         {         
-            var lookup = new TocLookup(Substitute.For<ILogger>());
+            var lookup = new TocLookup(Substitute.For<ILogger>(), new Dictionary<string, Toc>());
 
             var toc1 = lookup.Find("VT");
             var toc2 = lookup.Find("VT");

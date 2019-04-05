@@ -12,7 +12,7 @@ namespace Timetable.Web.Test.Mapping
             FromCifProfileLocationsTest.FromCifProfileConfiguration;
      
         [Fact]
-        public void ScheduleMapReusesExistingCalendar()
+        public void ConverterReusesExistingCalendar()
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
             var context = new ResolutionContext(null, (IRuntimeMapper) mapper);
@@ -23,6 +23,20 @@ namespace Timetable.Web.Test.Mapping
             var output2 = converter.Convert(TestSchedules.CreateScheduleDetails(), context);
 
             Assert.Same(output1, output2);
+        }
+        
+        [Fact]
+        public void ConverterCreatesWorkingCalendar()
+        {
+            var mapper = FromCifProfileConfiguration.CreateMapper();
+            var context = new ResolutionContext(null, (IRuntimeMapper) mapper);
+           
+            var converter = new CalendarConverter();
+
+            var output = converter.Convert(TestSchedules.CreateScheduleDetails(), context);
+
+            Assert.True(output.IsActiveOn(new DateTime(2019, 8, 1)));
+            Assert.False(output.IsActiveOn(new DateTime(2019, 8, 3)));
         }
 
         [Theory]

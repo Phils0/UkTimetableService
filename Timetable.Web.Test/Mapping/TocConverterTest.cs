@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AutoMapper;
 using NSubstitute;
 using Serilog;
@@ -19,8 +20,11 @@ namespace Timetable.Web.Test.Mapping
         public void ConvertUsesExistingToc()
         {
             var logger = Substitute.For<ILogger>();
-            var lookup = new TocLookup(logger);
-            lookup.Add(VT.Code, VT);
+            var lookup = new TocLookup(Substitute.For<ILogger>(),
+                new Dictionary<string, Toc>()
+                {
+                    {"VT", VT}
+                });
             var context = new ResolutionContext(null, null);
 
             var converter = new TocConverter(lookup);
@@ -34,8 +38,11 @@ namespace Timetable.Web.Test.Mapping
         public void ConvertCreatesNewToc()
         {
             var logger = Substitute.For<ILogger>();
-            var lookup = new TocLookup(logger);
-            lookup.Add(VT.Code, VT);
+            var lookup = new TocLookup(Substitute.For<ILogger>(),
+                new Dictionary<string, Toc>()
+                {
+                    {"VT", new Toc() {Code = "VT"}}
+                });
             var context = new ResolutionContext(null, null);
 
             var converter = new TocConverter(lookup);
