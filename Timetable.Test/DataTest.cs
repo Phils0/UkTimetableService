@@ -11,7 +11,7 @@ namespace Timetable.Test
         {
             var data = TestData.Instance;
             
-            Assert.Equal(2, data.Locations.Count);
+            Assert.Equal(3, data.Locations.Count);
 
             var surbiton = data.Locations["SUR"];
             Assert.Equal(1, surbiton.Locations.Count);
@@ -25,7 +25,7 @@ namespace Timetable.Test
         {
             var data = TestData.Instance;
             
-            Assert.Equal(3, data.LocationsByTiploc.Count);
+            Assert.Equal(5, data.LocationsByTiploc.Count);
 
             var surbiton = data.LocationsByTiploc["SURBITN"];
             Assert.Equal("SUR", surbiton.ThreeLetterCode);
@@ -38,7 +38,7 @@ namespace Timetable.Test
         public void UpdateNlc()
         {
             var data = TestData.Instance;
-            data.UpdateNlc("SURBITN", "123456");
+            data.UpdateLocationNlc("SURBITN", "123456");
             
             var surbiton = data.LocationsByTiploc["SURBITN"];
             Assert.Equal("123456", surbiton.Nlc);
@@ -51,7 +51,7 @@ namespace Timetable.Test
         public void DoNotUpdateAnythingIfCannotFindTiploc()
         {
             var data = TestData.Instance;
-            data.UpdateNlc("NOTFOUND", "123456");
+            data.UpdateLocationNlc("NOTFOUND", "123456");
          
             Assert.DoesNotContain(data.LocationsByTiploc.Values, l => l.Nlc == "123456");
         }

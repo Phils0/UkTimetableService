@@ -22,5 +22,16 @@ namespace Timetable.Test.Data
                 return s;
             }
         }
+        
+        public static Station ClaphamJunction
+        {
+            get
+            {
+                var s = new Station();
+                s.Add(TestLocations.ClaphamJunction1);
+                s.Add(TestLocations.ClaphamJunction2);
+                return s;
+            }
+        }
     }
 }

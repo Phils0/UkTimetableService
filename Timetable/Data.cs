@@ -3,10 +3,23 @@ using System.Linq;
 
 namespace Timetable
 {
+    public interface IData
+    {
+        /// <summary>
+        /// Stations by Three Letter Code (CRS)
+        /// </summary>
+        IReadOnlyDictionary<string, Station> Locations { get; }
+
+        /// <summary>
+        /// Locations by TIPLOC
+        /// </summary>
+        IReadOnlyDictionary<string, Location> LocationsByTiploc { get; }
+    }
+
     /// <summary>
     /// Data container to hold loaded timetable
     /// </summary>
-    public class Data
+    public class Data : IData
     {
         /// <summary>
         /// Constructor
@@ -36,13 +49,13 @@ namespace Timetable
         /// <summary>
         /// Stations by Three Letter Code (CRS)
         /// </summary>
-        public IDictionary<string, Station> Locations { get; set; }
+        public IReadOnlyDictionary<string, Station> Locations { get; }
         /// <summary>
         /// Locations by TIPLOC
         /// </summary>
-        public IDictionary<string, Location> LocationsByTiploc { get; set; }
+        public IReadOnlyDictionary<string, Location> LocationsByTiploc { get; }
 
-        public void UpdateNlc(string tiploc, string nlc)
+        public void UpdateLocationNlc(string tiploc, string nlc)
         {
             if (LocationsByTiploc.TryGetValue(tiploc, out var location))
             {

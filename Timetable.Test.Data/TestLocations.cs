@@ -46,5 +46,35 @@ namespace Timetable.Test.Data
                 IsEstimate = true
             }
         };
+        
+        public static Location ClaphamJunction1 => new Location()
+        {
+            Tiploc = "CLPHMJN",
+            ThreeLetterCode = "CLJ",
+            Nlc = "559500",
+            Name = "CLAPHAM JUNCTION",
+            InterchangeStatus = InterchangeStatus.SubsidiaryLocation,
+            Coordinates = new Coordinates()
+            {
+                Eastings = 15272,
+                Northings = 61755,
+                IsEstimate = false
+            }
+        };
+        
+        public static Location ClaphamJunction2 => new Location()
+        {
+            Tiploc = "CLPHMJC",
+            ThreeLetterCode = "CLJ",
+            Nlc = "559569",
+            Name = "CLAPHAM JUNCTION",
+            InterchangeStatus = InterchangeStatus.Normal,
+            Coordinates = new Coordinates()
+            {
+                Eastings = 15272,
+                Northings = 61755,
+                IsEstimate = false
+            }
+        };
     }
 }

@@ -7,7 +7,9 @@ namespace Timetable.Test.Data
             {
                 TestLocations.Surbiton,
                 TestLocations.WaterlooMain,
-                TestLocations.WaterlooWindsor
+                TestLocations.WaterlooWindsor,
+                TestLocations.ClaphamJunction1,
+                TestLocations.ClaphamJunction2
             });
     }
 }
