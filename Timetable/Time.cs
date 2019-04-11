@@ -9,7 +9,7 @@ namespace Timetable
     {
         public TimeSpan Value { get; }
         public int PlusDay { get; }
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -21,6 +21,9 @@ namespace Timetable
             PlusDay = plusDay;
         }
 
+        public Time Add(TimeSpan ts) => new Time(this.Value.Add(ts), PlusDay);
+        public Time Subtract(TimeSpan ts) => new Time(this.Value.Subtract(ts), PlusDay);
+        
         public bool Equals(Time other)
         {
             return Value.Equals(other.Value) && PlusDay == other.PlusDay;
@@ -42,9 +45,9 @@ namespace Timetable
 
         public override string ToString()
         {
-            return PlusDay == 0 ?
-                $"{Value:hh\\:mm}" :
-                $"{Value:hh\\:mm} (+{PlusDay})";
+            var timeString = Value.Seconds == 0 ? $"{Value:hh\\:mm}" : $"{Value:hh\\:mm\\:ss}";
+            
+            return PlusDay == 0 ? timeString : $"{timeString} (+{PlusDay})";
         }
     }
 }

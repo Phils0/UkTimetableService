@@ -17,14 +17,34 @@ namespace Timetable
     /// <summary>
     /// Location from the Master Station List
     /// </summary>
-    public class Location
+    public class Location : IEquatable<Location>
     {
+        public bool Equals(Location other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(Tiploc, other.Tiploc);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Location) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Tiploc.GetHashCode();
+        }
+
         public static Location NotSet = new Location()
         {
             Tiploc = "",
             ThreeLetterCode = "",
         };
-        
+               
         /// <summary>
         /// Tiploc code
         /// </summary>
@@ -66,6 +86,12 @@ namespace Timetable
         /// Containing station
         /// </summary>
         public Station Station { get; set; }
+        
+        /// <summary>
+        /// Whether known (in the Station Master list)
+        /// </summary>
+        /// <returns></returns>
+        //public bool Unknown { get; set; }
         
         public override string ToString()
         {

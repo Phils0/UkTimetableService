@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using AutoMapper;
+using CifParser.Records;
+using Microsoft.EntityFrameworkCore.Design;
 using Serilog;
 
 namespace Timetable.Web.Mapping
@@ -19,14 +22,34 @@ namespace Timetable.Web.Mapping
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.Schedule>()
                 .ForMember(d => d.On, o => o.ConvertUsing(new CalendarConverter(), s => s))
                 .ForMember(d => d.RetailServiceId, o => o.Ignore())
-                .ForMember(d => d.Toc, o => o.Ignore());            
+                .ForMember(d => d.Toc, o => o.Ignore())
+                .ForMember(d => d.Locations, o => o.Ignore());
             CreateMap<CifParser.Records.ScheduleExtraData, Timetable.Schedule>()
                 .ForMember(d => d.RetailServiceId, o => o.MapFrom(s => s.RetailServiceId))
-                .ForMember(d => d.Toc, 
-                    o => o.ConvertUsing(new TocConverter(new TocLookup(Log.Logger, new Dictionary<string, Toc>())), s => s.Toc))
-                .ForAllOtherMembers(o => o.Ignore());         
-            
+                .ForMember(d => d.Toc, o => o.ConvertUsing(new TocConverter(), s => s.Toc))
+                .ForAllOtherMembers(o => o.Ignore());
+
+            CreateMap<TimeSpan, Time>()
+                .ConvertUsing(t => new Time(t, 0));
             // Schedule location records
+            var locationConverter = new LocationsConverter();
+            CreateMap<CifParser.Records.OriginLocation, ScheduleOrigin>()
+                .ForMember(d => d.Departure, o => o.MapFrom(s => s.PublicDeparture))
+                .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
+                .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)));
+            CreateMap<CifParser.Records.IntermediateLocation, ScheduleStop>()
+                .ForMember(d => d.Arrival, o => o.MapFrom(s => s.PublicArrival))
+                .ForMember(d => d.Departure, o => o.MapFrom(s => s.PublicDeparture))
+                .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
+                .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)));
+            CreateMap<CifParser.Records.IntermediateLocation, SchedulePass>()
+                .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
+                .ForMember(d => d.PassesAt, o => o.MapFrom(s => s.WorkingPass))
+                .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)));
+            CreateMap<CifParser.Records.TerminalLocation, ScheduleDestination>()
+                .ForMember(d => d.Arrival, o => o.MapFrom(s => s.PublicArrival))
+                .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
+                .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)));
             
             CreateMap<CifParser.Schedule, Timetable.Schedule>()
                 .ConvertUsing((s, d, c) => MapSchedule(s, c));
@@ -44,12 +67,13 @@ namespace Timetable.Web.Mapping
                 }
                 else
                 {
-                    context.Mapper.Map(extra, schedule);
+                    context.Mapper.Map(extra, schedule, context);
                 }
             }
+      
+            var destination = context.
+                Mapper.Map<CifParser.Records.ScheduleDetails, Timetable.Schedule>(source.GetScheduleDetails());
             
-            var destination = context.Mapper.
-                Map<CifParser.Records.ScheduleDetails, Timetable.Schedule>(source.GetScheduleDetails());
             SetExtraDetails(destination);
 
             return destination;

@@ -28,8 +28,8 @@ namespace Timetable.Test.Data
             get
             {
                 var s = new Station();
-                s.Add(TestLocations.ClaphamJunction1);
-                s.Add(TestLocations.ClaphamJunction2);
+                s.Add(TestLocations.CLPHMJN);
+                s.Add(TestLocations.CLPHMJC);
                 return s;
             }
         }

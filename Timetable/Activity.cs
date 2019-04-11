@@ -1,6 +1,6 @@
 namespace Timetable
 {
-    public static class Activities
+    public static class Activity
     {
         public const string SetDownOnlyStop = "D";
         public const string DetachVehicles = "-D";

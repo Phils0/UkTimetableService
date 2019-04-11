@@ -47,7 +47,7 @@ namespace Timetable.Test.Data
             }
         };
         
-        public static Location ClaphamJunction1 => new Location()
+        public static Location CLPHMJN => new Location()
         {
             Tiploc = "CLPHMJN",
             ThreeLetterCode = "CLJ",
@@ -62,7 +62,7 @@ namespace Timetable.Test.Data
             }
         };
         
-        public static Location ClaphamJunction2 => new Location()
+        public static Location CLPHMJC => new Location()
         {
             Tiploc = "CLPHMJC",
             ThreeLetterCode = "CLJ",

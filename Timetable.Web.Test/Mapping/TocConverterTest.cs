@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using AutoMapper;
 using NSubstitute;
@@ -19,15 +20,15 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void ConvertUsesExistingToc()
         {
-            var logger = Substitute.For<ILogger>();
             var lookup = new TocLookup(Substitute.For<ILogger>(),
                 new Dictionary<string, Toc>()
                 {
                     {"VT", VT}
                 });
-            var context = new ResolutionContext(null, null);
-
-            var converter = new TocConverter(lookup);
+            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), null);
+            context.Items.Add("Tocs", lookup);
+            
+            var converter = new TocConverter();
 
             var output = converter.Convert("VT", context);
 
@@ -37,20 +38,29 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void ConvertCreatesNewToc()
         {
-            var logger = Substitute.For<ILogger>();
             var lookup = new TocLookup(Substitute.For<ILogger>(),
                 new Dictionary<string, Toc>()
                 {
                     {"VT", new Toc() {Code = "VT"}}
                 });
-            var context = new ResolutionContext(null, null);
+            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), null);
+            context.Items.Add("Tocs", lookup);
 
-            var converter = new TocConverter(lookup);
-
+            var converter = new TocConverter();
             var output = converter.Convert("SW", context);
 
             Assert.NotSame(VT, output);
             Assert.Equal("SW", output.Code);
+        }
+        
+        [Fact]
+        public void ThrowsExceptionIfDoNotPassTocs()
+        {
+            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), null);
+            
+            var converter = new TocConverter();
+
+            Assert.Throws<ArgumentException>(() => converter.Convert("VT", context)) ;
         }
     }
 }

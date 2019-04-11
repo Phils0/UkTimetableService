@@ -14,6 +14,25 @@ namespace Timetable.Web.Test.Cif
 
         };
         
+        internal static TiplocInsertAmend ClaphamJunction1 => new TiplocInsertAmend()
+        {
+            Action = RecordAction.Create,
+            Code = "CLPHMJN",
+            ThreeLetterCode = "CLJ",
+            Nalco = "559500",
+            Description = "CLAPHAM JUNCTION",
+
+        };
+        
+        internal static TiplocInsertAmend ClaphamJunction2 => new TiplocInsertAmend()
+        {
+            Action = RecordAction.Create,
+            Code = "CLPHMJC",
+            ThreeLetterCode = "CLJ",
+            Nalco = "559569",
+            Description = "CLAPHAM JUNCTION",
+        };
+        
         internal static TiplocInsertAmend WaterlooMain => new TiplocInsertAmend()
         {
             Action = RecordAction.Create,

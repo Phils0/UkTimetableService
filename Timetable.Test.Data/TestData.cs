@@ -1,3 +1,6 @@
+using NSubstitute;
+using Serilog;
+
 namespace Timetable.Test.Data
 {
     public static class TestData
@@ -8,8 +11,8 @@ namespace Timetable.Test.Data
                 TestLocations.Surbiton,
                 TestLocations.WaterlooMain,
                 TestLocations.WaterlooWindsor,
-                TestLocations.ClaphamJunction1,
-                TestLocations.ClaphamJunction2
-            });
+                TestLocations.CLPHMJN,
+                TestLocations.CLPHMJC
+            }, Substitute.For<ILogger>());
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 
 namespace Timetable
 {
@@ -38,17 +39,20 @@ namespace Timetable
     /// </summary>
     public class LocationData : ILocationData
     {
+        private readonly ILogger _logger;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="masterLocations">Master list of locations (used as a filter)</param>
-        public LocationData(ICollection<Location> masterLocations)
+        public LocationData(ICollection<Location> masterLocations, ILogger logger)
         {
+            _logger = logger;
+            
+            LocationsByTiploc = masterLocations.ToDictionary(l => l.Tiploc, l => l);
             Locations = masterLocations.
                 GroupBy(l => l.ThreeLetterCode, l => l).
                 ToDictionary(g => g.Key, CreateStation);
-
-            LocationsByTiploc = masterLocations.ToDictionary(l => l.Tiploc, l => l);
         }
         
         private Station CreateStation(IGrouping<string, Location> locations)
@@ -74,7 +78,7 @@ namespace Timetable
 
         public void UpdateLocationNlc(string tiploc, string nlc)
         {
-            if (LocationsByTiploc.TryGetValue(tiploc, out var location))
+            if (TryGetLocation(tiploc, out var location))
             {
                 location.Nlc = nlc;
             }
@@ -82,7 +86,11 @@ namespace Timetable
 
         public bool TryGetLocation(string tiploc, out Location location)
         {
-            return LocationsByTiploc.TryGetValue(tiploc, out location);
+            if(LocationsByTiploc.TryGetValue(tiploc, out location))
+                return true;
+            
+            _logger.Information("Did not find location {tiploc}", tiploc);
+            return false;
         }
     }
 }

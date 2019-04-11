@@ -5,6 +5,18 @@ using CifParser.Records;
 
 namespace Timetable.Web.Test.Cif
 {
+    internal static class TestTime
+    {
+        internal static readonly TimeSpan Ten = new TimeSpan(10, 0, 0);
+        internal static readonly TimeSpan TenFifteen = new TimeSpan(10, 15, 0);
+        internal static readonly TimeSpan TenTwenty = new TimeSpan(10, 20, 0);
+        internal static readonly TimeSpan TenTwentyFive = new TimeSpan(10, 25, 0);
+        internal static readonly TimeSpan TenThirty = new TimeSpan(10, 30, 0);
+        
+        internal static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
+        internal static readonly TimeSpan ThirtySeconds = new TimeSpan(0, 0, 30);     
+    }
+    
     internal static class TestSchedules
     {
         internal static CifParser.Schedule Test => new CifParser.Schedule()
@@ -15,7 +27,8 @@ namespace Timetable.Web.Test.Cif
                 CreateScheduleExtraDetails(),
                 CreateOriginLocation(),
                 CreateIntermediateLocation(),
-                CreateIntermediateLocation(),
+                CreatePassLocation(pass: TestTime.TenTwenty),
+                CreateIntermediateLocation(departure: TestTime.TenTwentyFive, sequence: 2),
                 CreateTerminalLocation()
             })
         };
@@ -50,20 +63,65 @@ namespace Timetable.Web.Test.Cif
                 Toc = toc
             };
         }
-
-        internal static OriginLocation CreateOriginLocation()
+        internal static OriginLocation CreateOriginLocation(string tiploc= "SURBITN", TimeSpan? departure = null)
         {
-            return new OriginLocation();
+            departure = departure ?? TestTime.Ten;
+            
+            return new OriginLocation()
+            {
+                Location = tiploc,
+                Sequence = 1,
+                PublicDeparture = departure,
+                WorkingDeparture =  departure.Value.Add(TestTime.ThirtySeconds),
+                Platform = "1",
+                Activities = "TB"
+            };
+        }
+        
+        internal static IntermediateLocation CreateIntermediateLocation(string tiploc= "CLPHMJC", TimeSpan? departure = null, int sequence = 1)
+        {
+            departure = departure ?? TestTime.TenFifteen;
+
+            return new IntermediateLocation()
+            {
+                Location = tiploc,
+                Sequence = sequence,
+                PublicArrival = departure.Value.Subtract(TestTime.OneMinute),
+                WorkingArrival =  departure.Value.Subtract(TestTime.ThirtySeconds),
+                PublicDeparture = departure,
+                WorkingDeparture =  departure.Value.Add(TestTime.ThirtySeconds),
+                Platform = "10",
+                Activities = "T"               
+            };
         }
 
-        internal static IntermediateLocation CreateIntermediateLocation()
+        internal static IntermediateLocation CreatePassLocation(string tiploc= "CLPHMJN", TimeSpan? pass = null)
         {
-            return new IntermediateLocation();
-        }
+            pass = pass ?? TestTime.TenFifteen;
 
-        internal static TerminalLocation CreateTerminalLocation()
+            return new IntermediateLocation()
+            {
+                Location = tiploc,
+                Sequence = 1,
+                WorkingPass = pass,
+                Platform = "2",
+                Activities = ""               
+            };
+        }
+        
+        internal static TerminalLocation CreateTerminalLocation(string tiploc= "WATRLMN", TimeSpan? arrival = null)
         {
-            return new TerminalLocation();
+            arrival = arrival ?? TestTime.TenThirty;
+            
+            return new TerminalLocation()
+            {
+                Location = tiploc,
+                Sequence = 1,
+                PublicArrival = arrival,
+                WorkingArrival =  arrival.Value.Subtract(TestTime.ThirtySeconds),
+                Platform = "5",
+                Activities = "TF"               
+            };
         }
 
         internal static ScheduleChange CreateScheduleChange()

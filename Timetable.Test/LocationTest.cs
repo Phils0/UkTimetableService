@@ -10,7 +10,7 @@ namespace Timetable.Test
         {
             Assert.Equal("Not Set", Location.NotSet.ToString());
         }
-        
+                
         [Fact]
         public void ToStringReturnsCrsAndTiploc()
         {

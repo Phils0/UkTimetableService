@@ -19,6 +19,34 @@ namespace Timetable.Web.Test.Cif
             SubsidiaryThreeLetterCode = "SUR"
         };
 
+        internal static CifStation ClaphamJunction1 => new CifStation()
+        {
+            RecordType = "A",
+            Tiploc = "CLPHMJN",
+            ThreeLetterCode = "CLJ",
+            Name = "CLAPHAM JUNCTION",
+            InterchangeStatus = CifStatus.SubsidiaryLocation,
+            East = 15272,
+            North = 61755,
+            PositionIsEstimated = false,
+            MinimumChangeTime = 10,
+            SubsidiaryThreeLetterCode = "CLJ"
+        };
+        
+        internal static CifStation ClaphamJunction2 => new CifStation()
+        {
+            RecordType = "A",
+            Tiploc = "CLPHMJC",
+            ThreeLetterCode = "CLJ",
+            Name = "CLAPHAM JUNCTION",
+            InterchangeStatus = CifStatus.Normal,
+            East = 15272,
+            North = 61755,
+            PositionIsEstimated = false,
+            MinimumChangeTime = 10,
+            SubsidiaryThreeLetterCode = "CLJ"
+        };
+        
         internal static CifStation WaterlooMain => new CifStation()
         {
             RecordType = "A",

@@ -53,7 +53,7 @@ namespace Timetable.Web
         public async Task<ILocationData> LoadAsync(CancellationToken token)
         {
             var masterLocations = await LoadStationMasterListAsync(token).ConfigureAwait(false);
-            var data = new LocationData(masterLocations.ToArray());
+            var data = new LocationData(masterLocations.ToArray(), _logger);
             return await LoadCif(data, token);
         }
 
