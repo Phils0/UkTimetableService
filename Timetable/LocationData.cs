@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Timetable
 {
-    public interface IData
+    public interface ILocationData
     {
         /// <summary>
         /// Stations by Three Letter Code (CRS)
@@ -14,18 +14,35 @@ namespace Timetable
         /// Locations by TIPLOC
         /// </summary>
         IReadOnlyDictionary<string, Location> LocationsByTiploc { get; }
+
+
+        /// <summary>
+        /// Update a location with its NLC
+        /// </summary>
+        /// <param name="tiploc">Tiploc for Location to update</param>
+        /// <param name="nlc">NLC to set</param>
+        void UpdateLocationNlc(string tiploc, string nlc);
+
+
+        /// <summary>
+        /// Try find location
+        /// </summary>
+        /// <param name="tiploc">Tiploc for Location to find</param>
+        /// <param name="location">Found location</param>
+        /// <returns></returns>
+        bool TryGetLocation(string tiploc, out Location location);
     }
 
     /// <summary>
     /// Data container to hold loaded timetable
     /// </summary>
-    public class Data : IData
+    public class LocationData : ILocationData
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="masterLocations">Master list of locations (used as a filter)</param>
-        public Data(ICollection<Location> masterLocations)
+        public LocationData(ICollection<Location> masterLocations)
         {
             Locations = masterLocations.
                 GroupBy(l => l.ThreeLetterCode, l => l).
@@ -61,6 +78,11 @@ namespace Timetable
             {
                 location.Nlc = nlc;
             }
+        }
+
+        public bool TryGetLocation(string tiploc, out Location location)
+        {
+            return LocationsByTiploc.TryGetValue(tiploc, out location);
         }
     }
 }

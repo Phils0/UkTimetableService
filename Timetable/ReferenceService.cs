@@ -12,9 +12,9 @@ namespace Timetable
 
     public class ReferenceService : IReference
     {
-        private readonly Data _data;
+        private readonly ILocationData _data;
 
-        public ReferenceService(Data data)
+        public ReferenceService(ILocationData data)
         {
             _data = data;
         }

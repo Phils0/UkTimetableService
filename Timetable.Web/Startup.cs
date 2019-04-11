@@ -41,7 +41,7 @@ namespace Timetable.Web
             var data = LoadData(factory);
 
             services.
-                AddSingleton<Data>(data).
+                AddSingleton<ILocationData>(data).
                 AddSingleton<IMapper>(factory.CreateMapper()).
                 AddSingleton<IReference>(factory.CreateReferenceService(data)).
                 AddSwaggerGen(ConfigureSwagger).
@@ -49,7 +49,7 @@ namespace Timetable.Web
                 SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
-        private static Data LoadData(Factory factory)
+        private static ILocationData LoadData(Factory factory)
         {
             var config = factory.Configuration;
             

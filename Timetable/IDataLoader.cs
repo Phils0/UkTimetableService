@@ -13,7 +13,7 @@ namespace Timetable
         /// Load Station Master List
         /// </summary>
         /// <param name="token"></param>
-        /// <returns>Returns list of locatios loaded from the master station list</returns>
+        /// <returns>Returns list of locations loaded from the master station list</returns>
         Task<IEnumerable<Location>> LoadStationMasterListAsync(CancellationToken token);
         
         /// <summary>
@@ -22,6 +22,6 @@ namespace Timetable
         /// <param name="cancellationToken"></param>
         /// <param name="locations">Timetable Data structure with station master list locations already loaded</param>
         /// <returns></returns>
-        Task<Data> LoadAsync(CancellationToken cancellationToken);       
+        Task<ILocationData> LoadAsync(CancellationToken cancellationToken);       
     }
 }

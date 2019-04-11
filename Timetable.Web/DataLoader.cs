@@ -50,14 +50,14 @@ namespace Timetable.Web
             }, token).ConfigureAwait(false);
         }
 
-        public async Task<Data> LoadAsync(CancellationToken token)
+        public async Task<ILocationData> LoadAsync(CancellationToken token)
         {
             var masterLocations = await LoadStationMasterListAsync(token).ConfigureAwait(false);
-            var data = new Data(masterLocations.ToArray());
+            var data = new LocationData(masterLocations.ToArray());
             return await LoadCif(data, token);
         }
 
-        private async Task<Data> LoadCif(Data data, CancellationToken token)
+        private async Task<LocationData> LoadCif(LocationData data, CancellationToken token)
         {
             return await Task.Run(() =>
             {
@@ -70,7 +70,7 @@ namespace Timetable.Web
             }, token).ConfigureAwait(false);
         }
 
-        private Data Add(IEnumerable<IRecord> records, Data data)
+        private LocationData Add(IEnumerable<IRecord> records, LocationData data)
         {
             int count = 0;
             
@@ -79,7 +79,7 @@ namespace Timetable.Web
                 switch (record)
                 {
                     case TiplocInsertAmend tiploc:
-                        data.UpdateNlc(tiploc.Code, tiploc.Nalco);
+                        data.UpdateLocationNlc(tiploc.Code, tiploc.Nalco);
                         break;
                     case Association association:
                         break;

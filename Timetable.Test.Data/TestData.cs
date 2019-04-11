@@ -2,7 +2,7 @@ namespace Timetable.Test.Data
 {
     public static class TestData
     {
-        public static readonly Timetable.Data Instance = new Timetable.Data(
+        public static Timetable.ILocationData Instance => new Timetable.LocationData(
             new []
             {
                 TestLocations.Surbiton,

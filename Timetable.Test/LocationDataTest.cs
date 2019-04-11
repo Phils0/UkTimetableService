@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Timetable.Test
 {
-    public class DataTest
+    public class LocationDataTest
     {
         [Fact]
         public void LoadMasterStations()
@@ -54,6 +54,20 @@ namespace Timetable.Test
             data.UpdateLocationNlc("NOTFOUND", "123456");
          
             Assert.DoesNotContain(data.LocationsByTiploc.Values, l => l.Nlc == "123456");
+        }
+
+        [Theory]
+        [InlineData("SURBITN", true)]
+        [InlineData("NOT_EXIST", false)]
+        [InlineData("WATRLOW", true)]
+        public void FindLocation(string tiploc, bool found)
+        {
+            var data = TestData.Instance;
+            var find = data.TryGetLocation(tiploc, out var location);
+            
+            Assert.Equal(found, find);
+            if(found)
+                Assert.Equal(tiploc, location.Tiploc);
         }
     }
 }

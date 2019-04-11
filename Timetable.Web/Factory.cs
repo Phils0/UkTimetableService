@@ -49,6 +49,6 @@ namespace Timetable.Web
             return new DataLoader(extractor, cifParser, stationParser, CreateMapper(), Configuration, _logger);
         }
         
-        internal IReference CreateReferenceService(Data data) => new ReferenceService(data);
+        internal IReference CreateReferenceService(ILocationData data) => new ReferenceService(data);
     }
 }
