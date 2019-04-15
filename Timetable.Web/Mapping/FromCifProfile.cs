@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
 using AutoMapper;
-using CifParser.Records;
-using Microsoft.EntityFrameworkCore.Design;
 using Serilog;
 
 namespace Timetable.Web.Mapping
@@ -52,31 +49,8 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)));
             
             CreateMap<CifParser.Schedule, Timetable.Schedule>()
-                .ConvertUsing((s, d, c) => MapSchedule(s, c));
+                .ConvertUsing(new ScheduleConverter(Log.Logger));
         }
 
-        private Schedule MapSchedule(CifParser.Schedule source, ResolutionContext context)
-        {
-            void SetExtraDetails(Schedule schedule)
-            {
-                var extra = source.GetScheduleExtraDetails();
-                if (extra == null)
-                {
-                    schedule.Toc = Toc.Unknown;
-                    schedule.RetailServiceId = "";
-                }
-                else
-                {
-                    context.Mapper.Map(extra, schedule, context);
-                }
-            }
-      
-            var destination = context.
-                Mapper.Map<CifParser.Records.ScheduleDetails, Timetable.Schedule>(source.GetScheduleDetails());
-            
-            SetExtraDetails(destination);
-
-            return destination;
-        }
     }
 }

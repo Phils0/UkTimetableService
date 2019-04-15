@@ -84,7 +84,7 @@ namespace Timetable
         public ReservationIndicator ReservationIndicator { get; set; }
 
         /// <summary>
-        /// Status - values incorporates transport mode and whether its permanant or STP
+        /// Status - values incorporates transport mode and whether its permanent or STP
         /// </summary>
         /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Status </remarks>
         public string Status { get; set; }

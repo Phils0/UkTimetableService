@@ -4,6 +4,7 @@ using AutoMapper;
 using CifParser;
 using NSubstitute;
 using Serilog;
+using Timetable.Test.Data;
 using Timetable.Web.Mapping;
 using Timetable.Web.Test.Cif;
 using Xunit;
@@ -32,11 +33,15 @@ namespace Timetable.Web.Test.Mapping
             Substitute.For<ILogger>(),
             new Dictionary<string, Toc>());
         
-        private static Schedule MapSchedule(CifParser.Schedule input = null)
+        public static Schedule MapSchedule(CifParser.Schedule input = null)
         {
             input = input ?? TestSchedules.Test;
             var mapper = FromCifProfileConfiguration.CreateMapper();
-            return mapper.Map<CifParser.Schedule, Timetable.Schedule>(input, o => o.Items.Add("Tocs", CreateLookup()));
+            return mapper.Map<CifParser.Schedule, Timetable.Schedule>(input, o =>
+            {
+                o.Items.Add("Tocs", CreateLookup());
+                o.Items.Add("Locations", TestData.Instance);
+            });
         }
 
         [Fact]
@@ -126,8 +131,16 @@ namespace Timetable.Web.Test.Mapping
             var lookup = CreateLookup();
             var mapper = FromCifProfileConfiguration.CreateMapper();
             
-            var output1 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(TestSchedules.Test, o => o.Items.Add("Tocs", lookup));
-            var output2 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(TestSchedules.Test, o => o.Items.Add("Tocs", lookup));
+            var output1 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(TestSchedules.Test, o =>
+                {
+                    o.Items.Add("Tocs", lookup);
+                    o.Items.Add("Locations", TestData.Instance);
+                });
+            var output2 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(TestSchedules.Test, o => 
+                {
+                    o.Items.Add("Tocs", lookup);
+                    o.Items.Add("Locations", TestData.Instance);
+                });
 
             Assert.NotSame(output1, output2);
             Assert.Same(output1.Toc, output2.Toc);
