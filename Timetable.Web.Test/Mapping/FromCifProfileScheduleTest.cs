@@ -162,11 +162,7 @@ namespace Timetable.Web.Test.Mapping
             {
                 Records = new List<IRecord>(new IRecord[]
                 {
-                    TestSchedules.CreateScheduleDetails(),
-                    TestSchedules.CreateOriginLocation(),
-                    TestSchedules.CreateIntermediateLocation(),
-                    TestSchedules.CreateIntermediateLocation(),
-                    TestSchedules.CreateTerminalLocation()
+                    TestSchedules.CreateScheduleDetails()
                 })
             };
 
@@ -184,17 +180,41 @@ namespace Timetable.Web.Test.Mapping
                 Records = new List<IRecord>(new IRecord[]
                 {
                     TestSchedules.CreateScheduleDetails(),
-                    TestSchedules.CreateScheduleExtraDetails(retailServieId: ""),
-                    TestSchedules.CreateOriginLocation(),
-                    TestSchedules.CreateIntermediateLocation(),
-                    TestSchedules.CreateIntermediateLocation(),
-                    TestSchedules.CreateTerminalLocation()
+                    TestSchedules.CreateScheduleExtraDetails(retailServieId: "")
                 })
             };
 
             var output = MapSchedule(schedule);
 
             Assert.Equal("", output.RetailServiceId);
+        }
+        
+        [Fact]
+        public void ScheduleMapLocations()
+        {
+            var output = MapSchedule();
+            Assert.NotEmpty(output.Locations);
+        }
+        
+        [Fact]
+        public void DoNotMapUnknownLocations()
+        {
+            var schedule = new CifParser.Schedule()
+            {
+                Records = new List<IRecord>(new IRecord[]
+                {
+                    TestSchedules.CreateScheduleDetails(),
+                    TestSchedules.CreateScheduleExtraDetails(),
+                    TestSchedules.CreateOriginLocation(tiploc: "UNKNOWN1"),
+                    TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN"),
+                    TestSchedules.CreatePassLocation(tiploc: "UNKNOWN2"),
+                    TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN", sequence: 2),
+                    TestSchedules.CreateTerminalLocation(tiploc: "UNKNOWN3")
+                })
+            };
+            
+            var output = MapSchedule(schedule);
+            Assert.Empty(output.Locations);
         }
     }
 }

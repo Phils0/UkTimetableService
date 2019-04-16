@@ -39,16 +39,18 @@ namespace Timetable.Web.Mapping
                 var locations = new List<IScheduleLocation>();
                 foreach (var record in records)
                 {
+                    IScheduleLocation working = null;
+                    
                     switch (record)
                     {
                         case IntermediateLocation il:
-                            locations.Add(MapLocation(il));
+                            working = MapLocation(il);
                             break;
                         case OriginLocation ol:
-                            locations.Add(MapOrigin(ol));
+                            working = MapOrigin(ol);
                             break;
                         case TerminalLocation tl:
-                            locations.Add(MapDestination(tl));
+                            working = MapDestination(tl);
                             break;
                         case ScheduleChange sc:
                             _logger.Debug("Unhandled ScheduleChange : {record}", sc);
@@ -57,6 +59,9 @@ namespace Timetable.Web.Mapping
                             _logger.Warning("Unhandled record {recordType} : {record}", record.GetType(), record);
                             break;
                     }
+                    
+                    if(working?.Location != null)
+                        locations.Add(working);
                 }
 
                 return locations;
