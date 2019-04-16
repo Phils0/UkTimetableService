@@ -7,6 +7,8 @@ namespace Timetable.Test.Data
 {
     public static class TestData
     {
+        private static readonly Toc VirginTrains = new Toc() { Code = "VT" , Name = "Virgin Trains"};
+
         public static ILocationData Locations => new Timetable.LocationData(
             new []
             {
@@ -24,6 +26,7 @@ namespace Timetable.Test.Data
                 TimetableUid = id,
                 StpIndicator = indicator,
                 RetailServiceId = $"VT{id.Substring(1, 4)}00",
+                Toc = VirginTrains,
                 Status = ServiceStatus.PermanentPassenger,
                 Category = ServiceCategory.ExpressPassenger,
                 ReservationIndicator = ReservationIndicator.Supported,

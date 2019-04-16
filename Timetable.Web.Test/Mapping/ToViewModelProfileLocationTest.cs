@@ -6,21 +6,21 @@ using Xunit;
 
 namespace Timetable.Web.Test.Mapping
 {
-    public class ToViewModelProfileTest
+    public class ToViewModelProfileLocationTest
     {
-        private static readonly MapperConfiguration _config = new MapperConfiguration(
+        public static readonly MapperConfiguration ToViewProfileConfiguration = new MapperConfiguration(
             cfg => cfg.AddProfile<ToViewModelProfile>());
 
         [Fact]
         public void ValidMapping()
         {
-            _config.AssertConfigurationIsValid();
+            ToViewProfileConfiguration.AssertConfigurationIsValid();
         }
 
         [Fact]
         public void LocationMapThreeLetterCode()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var output = mapper.Map<Timetable.Location, Model.Location>(TestLocations.Surbiton);
             
@@ -30,7 +30,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void LocationMapTiploc()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var output = mapper.Map<Timetable.Location,  Model.Location>(TestLocations.Surbiton);
             
@@ -40,7 +40,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void LocationMapNlc()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var output = mapper.Map<Timetable.Location,  Model.Location>(TestLocations.Surbiton);
             
@@ -50,7 +50,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void LocationMapName()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var output = mapper.Map<Timetable.Location,  Model.Location>(TestLocations.Surbiton);
             
@@ -60,7 +60,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void LocationMapCoordinates()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var output = mapper.Map<Timetable.Location,  Model.Location>(TestLocations.Surbiton);
 
@@ -76,7 +76,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void LocationMapInterchangeStatus()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var output = mapper.Map<Timetable.Location, Model.Location>(TestLocations.Surbiton);
             
@@ -86,7 +86,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void StationMapThreeLetterCode()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var output = mapper.Map<Timetable.Station,  Model.Station>(TestStations.Surbiton);
             
@@ -96,7 +96,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void StationMapNlc()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var output = mapper.Map<Timetable.Station,  Model.Station>(TestStations.Surbiton);
             
@@ -106,7 +106,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void StationMapLocations()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var output = mapper.Map<Timetable.Station,  Model.Station>(TestStations.Waterloo);
             
@@ -116,7 +116,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void StationArrayMap()
         {
-            var mapper = _config.CreateMapper();
+            var mapper = ToViewProfileConfiguration.CreateMapper();
 
             var stationDictionary = new Dictionary<string, Timetable.Station>()
             {

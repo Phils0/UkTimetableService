@@ -67,7 +67,7 @@ namespace Timetable.Test.Data
                 Arrival = arrival,
                 WorkingArrival = arrival.Subtract(ThirtySeconds),
                 Platform = "2",
-                Activities = CreateActivities("T")
+                Activities = CreateActivities("TF")
             };
         }
     }

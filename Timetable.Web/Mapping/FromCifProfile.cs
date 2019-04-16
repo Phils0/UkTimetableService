@@ -50,9 +50,7 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)));
             
             CreateMap<CifParser.Schedule, Timetable.Schedule>()
-                .ConvertUsing(new ScheduleConverter(Log.Logger));
-            
-            
+                .ConvertUsing(new ScheduleConverter(Log.Logger));            
         }
 
     }

@@ -1,7 +1,10 @@
 using System;
 
 namespace Timetable.Web.Model
-{    
+{ 
+    /// <summary>
+    /// Location
+    /// </summary>
     public class Location
     {
         /// <summary>
