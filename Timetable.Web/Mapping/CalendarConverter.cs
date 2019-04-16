@@ -32,7 +32,7 @@ namespace Timetable.Web.Mapping
 
             for (int i = 0; i < 7; i++)
             {
-                if (values[i] == 'Y')
+                if (values[i] == '1')
                     flags = flags + (1 << i);
             }
 

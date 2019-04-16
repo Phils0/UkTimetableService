@@ -40,15 +40,15 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Theory]
-        [InlineData("NNNNNNN", DaysFlag.None)]
-        [InlineData("YNNNNNN", DaysFlag.Monday)]
-        [InlineData("NYNNNNN", DaysFlag.Tuesday)]
-        [InlineData("NNYNNNN", DaysFlag.Wednesday)]
-        [InlineData("NNNYNNN", DaysFlag.Thursday)]
-        [InlineData("NNNNYNN", DaysFlag.Friday)]
-        [InlineData("NNNNNYN", DaysFlag.Saturday)]
-        [InlineData("NNNNNNY", DaysFlag.Sunday)]
-        [InlineData("YYYYYYY", DaysFlag.Everyday)]
+        [InlineData("0000000", DaysFlag.None)]
+        [InlineData("1000000", DaysFlag.Monday)]
+        [InlineData("0100000", DaysFlag.Tuesday)]
+        [InlineData("0010000", DaysFlag.Wednesday)]
+        [InlineData("0001000", DaysFlag.Thursday)]
+        [InlineData("0000100", DaysFlag.Friday)]
+        [InlineData("0000010", DaysFlag.Saturday)]
+        [InlineData("0000001", DaysFlag.Sunday)]
+        [InlineData("1111111", DaysFlag.Everyday)]
         public void MapDaysMask(string source, DaysFlag expected)
         {
             Assert.Equal(expected, CalendarConverter.MapMask(source));
