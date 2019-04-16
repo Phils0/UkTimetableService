@@ -42,6 +42,7 @@ namespace Timetable.Web
 
             services.
                 AddSingleton<ILocationData>(data.Locations).
+                AddSingleton<ITimetable>(data.Timetable).
                 AddSingleton<IMapper>(factory.CreateMapper()).
                 AddSingleton<IReference, ReferenceService>().
                 AddSwaggerGen(ConfigureSwagger).

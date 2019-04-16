@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Timetable.Test
 {
-    public class ServicesTest
+    public class TimetableDataTest
     {
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
 
@@ -17,7 +17,7 @@ namespace Timetable.Test
             var service1 = TestData.CreateSchedule(id: "A00001");
             var service2 = TestData.CreateSchedule(id: "A00002");
             
-            var services = new Services();
+            var services = new TimetableData();
             services.Add(service1);
             services.Add(service2);
 
@@ -32,7 +32,7 @@ namespace Timetable.Test
             var schedule = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule2 = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Tuesday));
             
-            var services = new Services();           
+            var services = new TimetableData();           
             services.Add(schedule);
             services.Add(schedule2);
 

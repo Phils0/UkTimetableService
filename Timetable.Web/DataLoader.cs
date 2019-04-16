@@ -84,7 +84,7 @@ namespace Timetable.Web
             }
             
             int count = 0;
-            var services = new Services();
+            var services = new TimetableData();
 
             foreach (var record in records)
             {
@@ -112,7 +112,7 @@ namespace Timetable.Web
             return new Data()
             {
                 Locations = locations,
-                Services = services
+                Timetable = services
             };
         }
     }

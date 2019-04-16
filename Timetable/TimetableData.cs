@@ -3,7 +3,12 @@ using System.Collections.Generic;
 
 namespace Timetable
 {
-    public class Services
+    public interface ITimetable
+    {
+        Schedule GetSchedule(string timetableUid, DateTime date);
+    }
+
+    public class TimetableData : ITimetable
     {
         private Dictionary<string, Service> _data { get; } = new Dictionary<string, Service>(10000);
 

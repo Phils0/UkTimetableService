@@ -42,7 +42,7 @@ namespace Timetable.Web.Test
             Assert.NotEmpty(locationData.Locations);
             Assert.NotEmpty(locationData.LocationsByTiploc);
 
-            var services = data.Services.AsDynamic()._data.RealObject as Dictionary<string, Service>;
+            var services = data.Timetable.AsDynamic()._data.RealObject as Dictionary<string, Service>;
             Assert.NotEmpty(services);
         }
     }

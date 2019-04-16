@@ -45,7 +45,7 @@ namespace Timetable.Web.Test.Cif
                 StpIndicator = stp,
                 RunsFrom = new DateTime(2019, 8, 1),
                 RunsTo = new DateTime(2019, 8, 31),
-                DayMask = "YYYYYNN",
+                DayMask = "1111100",
                 BankHolidayRunning = "",
                 Status =  ServiceStatus.PermanentPassenger,
                 Category = ServiceCategory.ExpressPassenger,

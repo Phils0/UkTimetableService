@@ -128,7 +128,7 @@ namespace Timetable.Web.Test
             var loader = CreateLoader(config, parser);
 
             var data = await loader.LoadAsync(CancellationToken.None);
-            var services = data.Services;
+            var services = data.Timetable;
 
             var schedule = services.GetSchedule(Cif.TestSchedules.X12345, new DateTime(2019, 8, 1));
             
