@@ -40,15 +40,24 @@ namespace Timetable.Web.Test.Mapping
             return mapper.Map<CifParser.Schedule, Timetable.Schedule>(input, o =>
             {
                 o.Items.Add("Tocs", CreateLookup());
-                o.Items.Add("Locations", TestData.Instance);
+                o.Items.Add("Locations", TestData.Locations);
             });
         }
-
-        [Fact]
-        public void ScheduleMapStpIndicator()
+       
+        [Theory]
+        [InlineData(CifParser.Records.StpIndicator.P, StpIndicator.Permanent)]
+        [InlineData(CifParser.Records.StpIndicator.O, StpIndicator.Override)]
+        [InlineData(CifParser.Records.StpIndicator.N, StpIndicator.New)]
+        [InlineData(CifParser.Records.StpIndicator.C, StpIndicator.Cancelled)]
+        public void ScheduleMapStpIndicator(CifParser.Records.StpIndicator input, StpIndicator expected)
         {
-            var output = MapSchedule();
-            Assert.Equal(Timetable.StpIndicator.Permanent, output.StpIndicator);
+            var schedule = TestSchedules.Test;
+            var details = schedule.GetScheduleDetails();
+            details.StpIndicator = input;
+
+            var output = MapSchedule(schedule);
+
+            Assert.Equal(expected, output.StpIndicator);
         }
 
         [Fact]
@@ -90,7 +99,7 @@ namespace Timetable.Web.Test.Mapping
         public void ScheduleMapCalendar()
         {
             var output = MapSchedule();
-            var calendar = output.On as Calendar;
+            var calendar = output.Calendar as Calendar;
             Assert.Equal(new DateTime(2019, 8, 1), calendar.RunsFrom);
             Assert.Equal(new DateTime(2019, 8, 31), calendar.RunsTo);
             Assert.Equal(DaysFlag.Weekdays, calendar.DayMask);
@@ -106,7 +115,7 @@ namespace Timetable.Web.Test.Mapping
             var output2 = MapSchedule();
 
             Assert.NotSame(output1, output2);
-            Assert.Same(output1.On, output2.On);
+            Assert.Same(output1.Calendar, output2.Calendar);
         }
 
         [Fact]
@@ -134,12 +143,12 @@ namespace Timetable.Web.Test.Mapping
             var output1 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(TestSchedules.Test, o =>
                 {
                     o.Items.Add("Tocs", lookup);
-                    o.Items.Add("Locations", TestData.Instance);
+                    o.Items.Add("Locations", TestData.Locations);
                 });
             var output2 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(TestSchedules.Test, o => 
                 {
                     o.Items.Add("Tocs", lookup);
-                    o.Items.Add("Locations", TestData.Instance);
+                    o.Items.Add("Locations", TestData.Locations);
                 });
 
             Assert.NotSame(output1, output2);

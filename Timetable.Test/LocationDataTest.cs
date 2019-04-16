@@ -9,7 +9,7 @@ namespace Timetable.Test
         [Fact]
         public void LoadMasterStations()
         {
-            var data = TestData.Instance;
+            var data = TestData.Locations;
             
             Assert.Equal(3, data.Locations.Count);
 
@@ -23,7 +23,7 @@ namespace Timetable.Test
         [Fact]
         public void LoadMasterLocations()
         {
-            var data = TestData.Instance;
+            var data = TestData.Locations;
             
             Assert.Equal(5, data.LocationsByTiploc.Count);
 
@@ -37,7 +37,7 @@ namespace Timetable.Test
         [Fact]
         public void UpdateNlc()
         {
-            var data = TestData.Instance;
+            var data = TestData.Locations;
             data.UpdateLocationNlc("SURBITN", "123456");
             
             var surbiton = data.LocationsByTiploc["SURBITN"];
@@ -50,7 +50,7 @@ namespace Timetable.Test
         [Fact]
         public void DoNotUpdateAnythingIfCannotFindTiploc()
         {
-            var data = TestData.Instance;
+            var data = TestData.Locations;
             data.UpdateLocationNlc("NOTFOUND", "123456");
          
             Assert.DoesNotContain(data.LocationsByTiploc.Values, l => l.Nlc == "123456");
@@ -62,7 +62,7 @@ namespace Timetable.Test
         [InlineData("WATRLOW", true)]
         public void FindLocation(string tiploc, bool found)
         {
-            var data = TestData.Instance;
+            var data = TestData.Locations;
             var find = data.TryGetLocation(tiploc, out var location);
             
             Assert.Equal(found, find);

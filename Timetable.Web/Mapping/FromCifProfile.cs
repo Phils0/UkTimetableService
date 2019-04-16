@@ -17,7 +17,7 @@ namespace Timetable.Web.Mapping
                        
             // Schedule records
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.Schedule>()
-                .ForMember(d => d.On, o => o.ConvertUsing(new CalendarConverter(), s => s))
+                .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
                 .ForMember(d => d.RetailServiceId, o => o.Ignore())
                 .ForMember(d => d.Toc, o => o.Ignore())
                 .ForMember(d => d.Locations, o => o.Ignore());
@@ -27,7 +27,7 @@ namespace Timetable.Web.Mapping
                 .ForAllOtherMembers(o => o.Ignore());
 
             CreateMap<TimeSpan, Time>()
-                .ConvertUsing(t => new Time(t, 0));
+                .ConvertUsing(t => new Time(t));
             // Schedule location records
             var locationConverter = new LocationsConverter();
             CreateMap<CifParser.Records.OriginLocation, ScheduleOrigin>()

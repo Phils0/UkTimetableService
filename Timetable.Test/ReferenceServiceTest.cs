@@ -10,7 +10,7 @@ namespace Timetable.Test
         [Fact]
         public async Task GetLocations()
         {
-            var service = new ReferenceService(TestData.Instance);
+            var service = new ReferenceService(TestData.Locations);
 
             var locations = await service.GetLocationsAsync(CancellationToken.None);
             

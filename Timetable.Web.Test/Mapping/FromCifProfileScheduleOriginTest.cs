@@ -34,7 +34,7 @@ namespace Timetable.Web.Test.Mapping
             var mapper = FromCifProfileConfiguration.CreateMapper();
             return mapper.Map<CifParser.Records.OriginLocation, Timetable.ScheduleOrigin>(
                 TestSchedules.CreateOriginLocation(),
-                o => o.Items.Add("Locations", TestData.Instance));
+                o => o.Items.Add("Locations", TestData.Locations));
         }
 
         [Fact]

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Timetable
 {
@@ -19,20 +20,20 @@ namespace Timetable
         Sunday = 1 << 6,
         Weekdays = Monday | Tuesday | Wednesday | Thursday | Friday,
         Weekend = Saturday | Sunday,
-        Everyday = Weekdays | Weekend 
+        Everyday = Weekdays | Weekend
     }
-    
+
     /// <summary>
     /// Service runs on bank holidays?
     /// </summary>
     public enum BankHolidayRunning
     {
         RunsOnBankHoliday = 0,
-        DoesNotRunOnEnglishBankHolidays = 1,   // X 
-        DoesNotRunOnScotishBankHolidays = 2    // G
+        DoesNotRunOnEnglishBankHolidays = 1, // X 
+        DoesNotRunOnScotishBankHolidays = 2 // G
     }
 
-    public interface ICalendar
+    public interface ICalendar : IComparable<ICalendar>
     {
         /// <summary>
         /// The calendar container is active on the day
@@ -54,10 +55,36 @@ namespace Timetable
     /// </summary>
     public class Calendar : ICalendar, IEquatable<Calendar>
     {
+        private sealed class CalendarRangeComparer : IComparer<Calendar>
+        {
+            public int Compare(Calendar x, Calendar y)
+            {
+                if (ReferenceEquals(null, x) && ReferenceEquals(null, y)) return 0;
+                if (ReferenceEquals(null, x)) return -1;
+                if (ReferenceEquals(null, y)) return 1;
+
+                var compare = x.RunsFrom.CompareTo(y.RunsFrom);
+                if (compare != 0)
+                    return compare;
+
+                compare = x.RunsTo.CompareTo(y.RunsTo);
+                if (compare != 0)
+                    return compare;
+
+                compare = x.DayMask.CompareTo(y.DayMask);
+                if (compare != 0)
+                    return compare;               
+                
+                return x.BankHolidays.CompareTo(y.BankHolidays);
+            }
+        }
+
+        public static IComparer<Calendar> CalendarComparer { get; } = new CalendarRangeComparer();
+
         public DateTime RunsFrom { get; }
-        
+
         public DateTime RunsTo { get; }
-        
+
         public DaysFlag DayMask { get; }
 
         public BankHolidayRunning BankHolidays { get; } = BankHolidayRunning.RunsOnBankHoliday;
@@ -70,29 +97,29 @@ namespace Timetable
             RunsTo = runsTo;
             DayMask = days;
             BankHolidays = bankHolidays;
-        }      
-        
+        }
+
         public void Generate()
         {
             // Make idempotent, don't regenerate mask
             if (_calendarMask != null)
                 return;
-            
+
             var days = (int) ((RunsTo.Date - RunsFrom.Date).TotalDays) + 1;
-            
-            if(days <= 0)
+
+            if (days <= 0)
                 throw new ArgumentOutOfRangeException($"Negative calendar range {nameof(RunsFrom)} > {nameof(RunsTo)}");
-            
+
             _calendarMask = new BitArray(days);
             for (int i = 0; i < days; i++)
             {
                 _calendarMask[i] = IsActiveOnDay(RunsFrom.AddDays(i));
-            }            
+            }
         }
 
         private bool IsActiveOnDay(DateTime day)
         {
-            if(!DayMask.IsActiveOnDay(day))
+            if (!DayMask.IsActiveOnDay(day))
                 return false;
 
             switch (BankHolidays)
@@ -105,13 +132,13 @@ namespace Timetable
                     return !Timetable.BankHolidays.IsScotishBankHoliday(day);
                 default:
                     throw new ArgumentOutOfRangeException($"Unhandled BankHolidayRunning enum value: {BankHolidays}");
-            }    
+            }
         }
 
         public bool IsActiveOn(DateTime date)
         {
             date = date.Date;
-            if(!IsWithinCalendar(date))
+            if (!IsWithinCalendar(date))
                 return false;
 
             var dayIdx = (int) (date - RunsFrom).TotalDays;
@@ -127,7 +154,13 @@ namespace Timetable
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return RunsFrom.Equals(other.RunsFrom) && RunsTo.Equals(other.RunsTo) && DayMask == other.DayMask && BankHolidays == other.BankHolidays;
+            return RunsFrom.Equals(other.RunsFrom) && RunsTo.Equals(other.RunsTo) && DayMask == other.DayMask &&
+                   BankHolidays == other.BankHolidays;
+        }
+
+        public int CompareTo(ICalendar other)
+        {
+            return CalendarComparer.Compare(this, other as Calendar);
         }
 
         public override bool Equals(object obj)
@@ -152,9 +185,9 @@ namespace Timetable
 
         public override string ToString()
         {
-            return BankHolidays == BankHolidayRunning.RunsOnBankHoliday ?
-                $"{RunsFrom:d}-{RunsTo:d} {DayMask.ToStringEx()}" :
-                $"{RunsFrom:d}-{RunsTo:d} {DayMask.ToStringEx()} ({BankHolidays.ToStringEx()})";
+            return BankHolidays == BankHolidayRunning.RunsOnBankHoliday
+                ? $"{RunsFrom:d}-{RunsTo:d} {DayMask.ToStringEx()}"
+                : $"{RunsFrom:d}-{RunsTo:d} {DayMask.ToStringEx()} ({BankHolidays.ToStringEx()})";
         }
     }
 }

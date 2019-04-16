@@ -1,3 +1,5 @@
+using System;
+
 namespace Timetable
 {
     /// <summary>
@@ -28,10 +30,10 @@ namespace Timetable
     /// </summary>
     public enum StpIndicator
     {
-        Permanent,    // P - Permanent schedule
-        Cancelled,    // C - STP Cancellation of Permanent schedule
-        New,          // N - New STP schedule (not an overlay)
-        Override,     // O - STP overlay of Permanent schedule
+        Permanent = 0,    // P - Permanent schedule
+        Override = 1,     // O - STP overlay of Permanent schedule
+        New = 2,          // N - New STP schedule (not an overlay)
+        Cancelled = 3,    // C - STP Cancellation of Permanent schedule
     }
 
     public static class ServiceStatus
@@ -71,7 +73,7 @@ namespace Timetable
         
         public StpIndicator StpIndicator { get; set; }
         
-        public ICalendar On { get; set; }
+        public ICalendar Calendar { get; set; }
         
         public string RetailServiceId { get; set; }
         
@@ -95,10 +97,15 @@ namespace Timetable
         public string Category { get; set; }
         
         public IScheduleLocation[] Locations { get; set; }
+
+        public bool RunsOn(DateTime date)
+        {
+            return Calendar.IsActiveOn(date);
+        }
         
         public override string ToString()
         {
-            return $"{TimetableUid} -{StpIndicator} {On}";
+            return $"{TimetableUid} -{StpIndicator} {Calendar}";
         }
     }
 }

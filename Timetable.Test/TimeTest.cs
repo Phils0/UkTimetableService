@@ -27,9 +27,9 @@ namespace Timetable.Test
         [Fact]
         public void ToStingNextDay()
         {
-            var t = new Time(TenThirty, 1);
+            var t = new Time(new TimeSpan(25, 10 ,0));
             
-            Assert.Equal("10:30 (+1)", t.ToString());
+            Assert.Equal("01:10 (+1)", t.ToString());
         }
 
         // Add and Subtract helper methods, not fully tested e.g. when goes negative
