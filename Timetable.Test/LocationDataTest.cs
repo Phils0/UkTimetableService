@@ -48,12 +48,13 @@ namespace Timetable.Test
         }
         
         [Fact]
-        public void DoNotUpdateAnythingIfCannotFindTiploc()
+        public void AddUnknownTiplocsAsNotActive()
         {
             var data = TestData.Locations;
             data.UpdateLocationNlc("NOTFOUND", "123456");
-         
-            Assert.DoesNotContain(data.LocationsByTiploc.Values, l => l.Nlc == "123456");
+
+            var location = data.LocationsByTiploc["NOTFOUND"];
+            Assert.False(location.IsActive);
         }
 
         [Theory]

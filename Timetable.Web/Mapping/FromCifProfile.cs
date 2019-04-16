@@ -13,7 +13,8 @@ namespace Timetable.Web.Mapping
                 ForPath(d => d.Coordinates.Northings, o => o.MapFrom(s => s.North)).
                 ForPath(d => d.Coordinates.IsEstimate, o => o.MapFrom(s => s.PositionIsEstimated)).
                 ForMember(d => d.Station, o => o.Ignore()).
-                ForMember(d => d.Nlc, o => o.Ignore());
+                ForMember(d => d.Nlc, o => o.Ignore()).
+                ForMember(d => d.IsActive, o => o.Ignore());
                        
             // Schedule records
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.Schedule>()
