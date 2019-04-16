@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -80,9 +81,10 @@ namespace Timetable.Web.Test
             var loader = CreateLoader(config);
 
             var data = await loader.LoadAsync(CancellationToken.None);
-            
-            Assert.NotEmpty(data.Locations);
-            Assert.NotEmpty(data.LocationsByTiploc);          
+
+            var locationData = data.Locations;
+            Assert.NotEmpty(locationData.Locations);
+            Assert.NotEmpty(locationData.LocationsByTiploc);          
         }
             
         [Fact]
@@ -103,10 +105,34 @@ namespace Timetable.Web.Test
             var loader = CreateLoader(config, parser);
 
             var data = await loader.LoadAsync(CancellationToken.None);
+            var locationData = data.Locations;
 
-            var location = data.LocationsByTiploc["SURBITN"];
+            var location = locationData.LocationsByTiploc["SURBITN"];
             
             Assert.Equal("557100", location.Nlc);            
+        }
+        
+        [Fact]
+        public async Task LoadSchedules()
+        {
+            var config = Substitute.For<ILoaderConfig>();
+            config.IsRdgZip.Returns(true);
+            config.TimetableArchiveFile.Returns(TestArchive);
+
+            var parser = Substitute.For<IParser>();
+            parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
+            {
+                Cif.TestSchedules.Test
+            });
+            
+            var loader = CreateLoader(config, parser);
+
+            var data = await loader.LoadAsync(CancellationToken.None);
+            var services = data.Services;
+
+            var schedule = services.GetSchedule(Cif.TestSchedules.X12345, new DateTime(2019, 8, 1));
+            
+            Assert.NotNull(schedule);            
         }
     }
 }

@@ -80,6 +80,8 @@ namespace Timetable
         /// Stations which have more than one TIPLOC always have the same principal 3-Letter Code.</remarks>
         public InterchangeStatus InterchangeStatus { get; set; }
 
+        public bool IsActive { get; set; } = true;
+        
         public bool IsSubsidiary => InterchangeStatus.SubsidiaryLocation.Equals(InterchangeStatus);
                 
         /// <summary>

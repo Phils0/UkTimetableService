@@ -50,40 +50,54 @@ namespace Timetable.Web
             }, token).ConfigureAwait(false);
         }
 
-        public async Task<ILocationData> LoadAsync(CancellationToken token)
+        public async Task<Data> LoadAsync(CancellationToken token)
         {
             var masterLocations = await LoadStationMasterListAsync(token).ConfigureAwait(false);
             var data = new LocationData(masterLocations.ToArray(), _logger);
             return await LoadCif(data, token);
         }
 
-        private async Task<LocationData> LoadCif(LocationData data, CancellationToken token)
+        private async Task<Data> LoadCif(LocationData locations, CancellationToken token)
         {
             return await Task.Run(() =>
             {
                 _logger.Information("Loading Cif timetable in {file}", _config.TimetableArchiveFile);
                 var reader = _extractor.ExtractFile(_config.TimetableArchiveFile, RdgZipExtractor.CifExtension);
                 var records = _cifParser.Read(reader);
-                data = Add(records, data);
+                var data = Add(records, locations);
                 _logger.Information("Loaded timetable");
                 return data;
             }, token).ConfigureAwait(false);
         }
 
-        private LocationData Add(IEnumerable<IRecord> records, LocationData data)
+        private Data Add(IEnumerable<IRecord> records, LocationData locations)
         {
-            int count = 0;
+            var tocLookup = new TocLookup(_logger, new Dictionary<string, Toc>());
             
+            Schedule MapSchedule(CifParser.Schedule schedule)
+            {
+                return _mapper.Map<CifParser.Schedule, Timetable.Schedule>(schedule, o =>
+                {
+                    o.Items.Add("Tocs", tocLookup);
+                    o.Items.Add("Locations", locations);
+                });
+            }
+            
+            int count = 0;
+            var services = new Services();
+
             foreach (var record in records)
             {
                 switch (record)
                 {
                     case TiplocInsertAmend tiploc:
-                        data.UpdateLocationNlc(tiploc.Code, tiploc.Nalco);
+                        locations.UpdateLocationNlc(tiploc.Code, tiploc.Nalco);
                         break;
                     case Association association:
                         break;
-                    case Schedule schedule:
+                    case CifParser.Schedule schedule:
+                        var s = MapSchedule(schedule);
+                        services.Add(s);
                         break;
                     default:
                         _logger.Warning("Unhandled record {recordType}: {record}", record.GetType(), record);
@@ -91,11 +105,15 @@ namespace Timetable.Web
                 }
 
                 count++;
-                if(count % LogAfter == 0)
-                    _logger.Debug("Loaded records: {count}", count);
+                if (count % LogAfter == 0)
+                    _logger.Information("Loaded records: {count}", count);
             }
 
-            return data;
+            return new Data()
+            {
+                Locations = locations,
+                Services = services
+            };
         }
     }
 }

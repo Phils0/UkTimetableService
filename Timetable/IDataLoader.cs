@@ -22,6 +22,6 @@ namespace Timetable
         /// <param name="cancellationToken"></param>
         /// <param name="locations">Timetable Data structure with station master list locations already loaded</param>
         /// <returns></returns>
-        Task<ILocationData> LoadAsync(CancellationToken cancellationToken);       
+        Task<Data> LoadAsync(CancellationToken cancellationToken);       
     }
 }

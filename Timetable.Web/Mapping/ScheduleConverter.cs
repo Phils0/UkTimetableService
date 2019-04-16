@@ -51,7 +51,7 @@ namespace Timetable.Web.Mapping
                             locations.Add(MapDestination(tl));
                             break;
                         case ScheduleChange sc:
-                            _logger.Information("Unhandled ScheduleChange : {record}", sc);
+                            _logger.Debug("Unhandled ScheduleChange : {record}", sc);
                             break;
                         default:
                             _logger.Warning("Unhandled record {recordType} : {record}", record.GetType(), record);

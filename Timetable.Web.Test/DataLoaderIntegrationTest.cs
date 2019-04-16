@@ -1,11 +1,9 @@
-using System.IO;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using CifExtractor;
-using CifParser;
 using NSubstitute;
+using ReflectionMagic;
 using Serilog;
 using Timetable.Web.Mapping;
 using Xunit;
@@ -39,9 +37,13 @@ namespace Timetable.Web.Test
             var loader = factory.CreateDataLoader();
 
             var data = await loader.LoadAsync(CancellationToken.None);
+            var locationData = data.Locations;
             
-            Assert.NotEmpty(data.Locations);
-            Assert.NotEmpty(data.LocationsByTiploc);
+            Assert.NotEmpty(locationData.Locations);
+            Assert.NotEmpty(locationData.LocationsByTiploc);
+
+            var services = data.Services.AsDynamic()._data.RealObject as Dictionary<string, Service>;
+            Assert.NotEmpty(services);
         }
     }
 }

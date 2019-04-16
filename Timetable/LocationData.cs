@@ -47,9 +47,9 @@ namespace Timetable
         /// <param name="masterLocations">Master list of locations (used as a filter)</param>
         public LocationData(ICollection<Location> masterLocations, ILogger logger)
         {
-            _logger = logger;
+            _logger = logger;            
+            _locations = masterLocations.ToDictionary(l => l.Tiploc, l => l);
             
-            LocationsByTiploc = masterLocations.ToDictionary(l => l.Tiploc, l => l);
             Locations = masterLocations.
                 GroupBy(l => l.ThreeLetterCode, l => l).
                 ToDictionary(g => g.Key, CreateStation);
@@ -71,10 +71,13 @@ namespace Timetable
         /// Stations by Three Letter Code (CRS)
         /// </summary>
         public IReadOnlyDictionary<string, Station> Locations { get; }
+
         /// <summary>
         /// Locations by TIPLOC
         /// </summary>
-        public IReadOnlyDictionary<string, Location> LocationsByTiploc { get; }
+        public IReadOnlyDictionary<string, Location> LocationsByTiploc => _locations;
+
+        private Dictionary<string, Location> _locations;
 
         public void UpdateLocationNlc(string tiploc, string nlc)
         {
@@ -82,12 +85,22 @@ namespace Timetable
             {
                 location.Nlc = nlc;
             }
+            else
+            {
+                location = new Location()
+                {
+                    Tiploc = tiploc,
+                    Nlc = nlc,
+                    IsActive = false
+                };
+                _locations.Add(tiploc, location);
+            }
         }
 
         public bool TryGetLocation(string tiploc, out Location location)
         {
             if(LocationsByTiploc.TryGetValue(tiploc, out location))
-                return true;
+                return location.IsActive;
             
             _logger.Information("Did not find location {tiploc}", tiploc);
             return false;

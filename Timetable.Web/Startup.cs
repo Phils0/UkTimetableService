@@ -25,7 +25,7 @@ namespace Timetable.Web
 {
     public class Startup
     {
-        private static readonly TimeSpan Timeout = new TimeSpan(0, 2, 0);
+        private static readonly TimeSpan Timeout = new TimeSpan(0, 5, 0);
         
         public Startup(IConfiguration configuration)
         {
@@ -41,15 +41,15 @@ namespace Timetable.Web
             var data = LoadData(factory);
 
             services.
-                AddSingleton<ILocationData>(data).
+                AddSingleton<ILocationData>(data.Locations).
                 AddSingleton<IMapper>(factory.CreateMapper()).
-                AddSingleton<IReference>(factory.CreateReferenceService(data)).
+                AddSingleton<IReference, ReferenceService>().
                 AddSwaggerGen(ConfigureSwagger).
                 AddMvc().
                 SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
-        private static ILocationData LoadData(Factory factory)
+        private static Data LoadData(Factory factory)
         {
             var config = factory.Configuration;
             

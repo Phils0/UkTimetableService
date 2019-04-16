@@ -50,6 +50,8 @@ namespace Timetable.Web.Mapping
             
             CreateMap<CifParser.Schedule, Timetable.Schedule>()
                 .ConvertUsing(new ScheduleConverter(Log.Logger));
+            
+            
         }
 
     }

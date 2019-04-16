@@ -19,6 +19,8 @@ namespace Timetable.Web.Test.Cif
     
     internal static class TestSchedules
     {
+        internal const string X12345 = "X12345";
+
         internal static CifParser.Schedule Test => new CifParser.Schedule()
         {
             Records = new List<IRecord>(new IRecord[]
@@ -34,7 +36,7 @@ namespace Timetable.Web.Test.Cif
         };
 
         internal static ScheduleDetails CreateScheduleDetails(
-            string timetableUid = "X12345", 
+            string timetableUid = X12345, 
             CifParser.Records.StpIndicator stp = CifParser.Records.StpIndicator.P)
         {
             return new ScheduleDetails()
