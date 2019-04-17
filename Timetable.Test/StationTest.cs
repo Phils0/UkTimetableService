@@ -85,6 +85,16 @@ namespace Timetable.Test
         }
         
         [Fact]
+        public void NlcIsNullIfNoMain()
+        {
+            var waterloo = TestLocations.WaterlooWindsor;
+            var station = new Station();
+            station.Add(waterloo);
+
+            Assert.Null(station.Nlc);
+        }
+        
+        [Fact]
         public void ToStringWhenNoMainReturnsNotSet()
         {
             var station = new Station();

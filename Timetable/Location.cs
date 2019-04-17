@@ -58,7 +58,7 @@ namespace Timetable
         /// <summary>
         /// National Location Code - full 6 character code
         /// </summary>
-        public string Nlc { get; set; } = "";
+        public string Nlc { get; set; }
         
         /// <summary>
         /// Name

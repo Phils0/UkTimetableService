@@ -44,7 +44,6 @@ namespace Timetable.Web
                 AddSingleton<ILocationData>(data.Locations).
                 AddSingleton<ITimetable>(data.Timetable).
                 AddSingleton<IMapper>(factory.CreateMapper()).
-                AddSingleton<IReference, ReferenceService>().
                 AddSwaggerGen(ConfigureSwagger).
                 AddMvc().
                 SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

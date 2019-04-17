@@ -11,12 +11,12 @@ namespace Timetable.Web.Controllers
     [ApiController]
     public class ReferenceController : ControllerBase
     {
-        private readonly IReference _service;
+        private readonly ILocationData _data;
         private readonly IMapper _mapper;
 
-        public ReferenceController(IReference service, IMapper mapper)
+        public ReferenceController(ILocationData data, IMapper mapper)
         {
-            _service = service;
+            _data = data;
             _mapper = mapper;
         }
 
@@ -24,9 +24,7 @@ namespace Timetable.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> LocationAsync()
         {
-            var locations = await _service.GetLocationsAsync(CancellationToken.None).
-                ConfigureAwait(false);
-            var model = _mapper.Map<IEnumerable<Timetable.Station>, Model.Station[]>(locations);
+            var model = _mapper.Map<IEnumerable<Timetable.Station>, Model.Station[]>(_data.Locations.Values);
             return Ok(model);
         }
     }

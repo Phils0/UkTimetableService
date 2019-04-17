@@ -1,4 +1,4 @@
-using System.Threading;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +18,15 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ReturnsLocations()
         {
-            var service = Substitute.For<IReference>();
-            service.GetLocationsAsync(Arg.Any<CancellationToken>()).Returns(
-                new[]
+            var data = Substitute.For<ILocationData>();
+            data.Locations.Returns(
+                new Dictionary<string, Station>()
                 {
-                    TestStations.Surbiton,
-                    TestStations.Waterloo
+                    {"SUR", TestStations.Surbiton},
+                    {"WAT", TestStations.Waterloo}
                 });
 
-            var controller = new ReferenceController(service, _config.CreateMapper());
+            var controller = new ReferenceController(data, _config.CreateMapper());
             var response = await controller.LocationAsync() as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
