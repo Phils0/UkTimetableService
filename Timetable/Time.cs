@@ -8,12 +8,14 @@ namespace Timetable
     public struct Time : IEquatable<Time>
     {
         private static readonly TimeSpan OneDay = new TimeSpan(24, 0, 0);
+       
+        public static readonly Time NotValid = new Time(TimeSpan.Zero); 
 
-        public static readonly Time MinValue = new Time(TimeSpan.MinValue); 
-        
         public TimeSpan Value { get; }
         public bool IsNextDay => Value > OneDay;
 
+        public bool IsValid => !Equals(NotValid);
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -28,7 +30,7 @@ namespace Timetable
             return Value < other.Value;
         }
              
-        public Time MakeAfterByAddingADay(Time start) => IsBefore(start) ? Add(OneDay) : this;
+        public Time MakeAfterByAddingADay(Time start) => IsBefore(start) && IsValid ? Add(OneDay) : this;
 
         public Time Add(TimeSpan ts) => new Time(this.Value.Add(ts));
         public Time Subtract(TimeSpan ts) => new Time(this.Value.Subtract(ts));

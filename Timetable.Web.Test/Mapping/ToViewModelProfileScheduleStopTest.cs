@@ -118,5 +118,19 @@ namespace Timetable.Web.Test.Mapping
             Assert.Null(output.Arrival);
             Assert.Null(output.Departure);
         }
+        
+        [Fact]
+        public void ReturnNullWhenInvalidTime()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var input = TestScheduleLocations.CreateStop(
+                TestLocations.Surbiton,
+                Time.NotValid);
+            
+            var output = Map(input);
+            
+            Assert.Null(output.Arrival);
+        }
     }
 }

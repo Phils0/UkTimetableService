@@ -47,7 +47,7 @@ namespace Timetable.Web.Mapping
             List<IScheduleLocation> MapLocations(IEnumerable<IRecord> records)
             {
                 var locations = new List<IScheduleLocation>();
-                var start = Time.MinValue;
+                var start = Time.NotValid;
  
                 foreach (var record in records)
                 {
@@ -75,7 +75,7 @@ namespace Timetable.Web.Mapping
                     // Only add stops that we care about i.e. in the MSL
                     if (working?.Location != null)
                     {
-                        if(start.Equals(Time.MinValue))
+                        if(start.Equals(Time.NotValid))
                             _logger.Warning($"Have not set start: {schedule.TimetableUid}");
                         working.AddDay(start);
                         locations.Add(working);                        

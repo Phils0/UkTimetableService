@@ -36,8 +36,11 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Stops, o => o.MapFrom(s => s.Locations));
         }
 
-        private DateTime ResolveTime(Time time, ResolutionContext context)
+        private DateTime? ResolveTime(Time time, ResolutionContext context)
         {
+            if (!time.IsValid)
+                return null;
+            
             var date = (DateTime) context.Items["On"];
             return date.Add(time.Value);
         }

@@ -58,6 +58,7 @@ namespace Timetable.Test
         public static TheoryData<Time, Time> TimeAddDay =>
             new TheoryData<Time, Time>()
             {
+                {Time.NotValid, Time.NotValid },
                 {new Time(TenThirty), new Time(TenThirty) },
                 {new Time(TenThirty.Add(OneMinute)), new Time(TenThirty.Add(OneMinute)) },
                 {new Time(TenThirty.Subtract(OneMinute)), new Time(TenThirty.Subtract(OneMinute).Add(OneDay)) },
@@ -91,6 +92,21 @@ namespace Timetable.Test
         public void IsBefore(Time time, bool expected)
         {
             Assert.Equal(expected, time.IsBefore(Start));
+        }
+
+        public static TheoryData<Time, bool> IsValidTests =>
+            new TheoryData<Time, bool>()
+            {
+                {Time.NotValid, false },
+                {new Time(TimeSpan.Zero), false },
+                {new Time(TenThirty), true },
+            };
+        
+        [Theory]
+        [MemberData(nameof(IsValidTests))]
+        public void IsValid(Time time, bool expected)
+        {
+            Assert.Equal(expected, time.IsValid);
         }
     }
 }
