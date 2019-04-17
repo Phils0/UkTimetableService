@@ -12,17 +12,22 @@ namespace Timetable.Web.Mapping
             CreateMap<Timetable.Station, Model.Station>();
 
             CreateMap<Timetable.Location, Model.ScheduleLocation>();
-            CreateMap<Timetable.ScheduleOrigin, Model.ScheduledStop>()
+            CreateMap<Timetable.ScheduleOrigin, Model.ScheduledStop>()               
                 .ForMember(d => d.Arrival, o => o.Ignore())
+                .ForMember(d => d.Departure,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.Departure, c)))
                 .ForMember(d => d.PassesAt, o => o.Ignore());
             CreateMap<Timetable.ScheduleStop, Model.ScheduledStop>()
+                .ForMember(d => d.Arrival,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.Arrival, c)))
+                .ForMember(d => d.Departure,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.Departure, c)))
                 .ForMember(d => d.PassesAt, o => o.Ignore());
             CreateMap<Timetable.ScheduleDestination, Model.ScheduledStop>()
+                .ForMember(d => d.Arrival,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.Arrival, c)))
                 .ForMember(d => d.Departure, o => o.Ignore())
                 .ForMember(d => d.PassesAt, o => o.Ignore());
             CreateMap<Timetable.SchedulePass, Model.ScheduledStop>()
                 .ForMember(d => d.Arrival, o => o.Ignore())
-                .ForMember(d => d.Departure, o => o.Ignore());
+                .ForMember(d => d.Departure, o => o.Ignore())
+                .ForMember(d => d.PassesAt,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.PassesAt, c)));
             CreateMap<Timetable.IScheduleLocation, Model.ScheduledStop>()
                 .ConvertUsing((s, d, c) => ConvertToStop(s, c));
             CreateMap<Timetable.Schedule, Model.Service>()
@@ -31,10 +36,17 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Stops, o => o.MapFrom(s => s.Locations));
         }
 
+        private DateTime ResolveTime(Time time, ResolutionContext context)
+        {
+            var date = (DateTime) context.Items["On"];
+            return date.Add(time.Value);
+        }
+
         private Model.ScheduledStop ConvertToStop(IScheduleLocation scheduleLocation, ResolutionContext context)
         {
             return (Model.ScheduledStop) context.Mapper
-                .Map(scheduleLocation, scheduleLocation.GetType(), typeof(Model.ScheduledStop));
+                .Map(scheduleLocation, scheduleLocation.GetType(), typeof(Model.ScheduledStop),
+                    o => { o.Items["On"] = context.Items["On"]; });
         }
     }
 }

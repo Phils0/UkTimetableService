@@ -7,11 +7,11 @@ namespace Timetable.Web.Model
     {
         public Timetable.Web.Model.ScheduleLocation Location { get; set; }
 
-        public string Arrival { get; set; }
+        public DateTime? Arrival { get; set; }
 
-        public string Departure { get; set; }
+        public DateTime? Departure { get; set; }
 
-        public string PassesAt { get; set; }
+        public DateTime? PassesAt { get; set; }
 
         public string Platform { get; set; }
 

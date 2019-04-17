@@ -14,7 +14,9 @@ namespace Timetable.Web.Test.Cif
         internal static readonly TimeSpan TenThirty = new TimeSpan(10, 30, 0);
         
         internal static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
-        internal static readonly TimeSpan ThirtySeconds = new TimeSpan(0, 0, 30);     
+        internal static readonly TimeSpan ThirtySeconds = new TimeSpan(0, 0, 30); 
+        
+        internal static readonly DateTime August1 = new DateTime(2019, 8, 1);
     }
     
     internal static class TestSchedules
