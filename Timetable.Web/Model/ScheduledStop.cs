@@ -16,5 +16,7 @@ namespace Timetable.Web.Model
         public string Platform { get; set; }
 
         public string[] Activities { get; set; }
+        
+        public string AdvertisedStop { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace Timetable.Test.Data
 
         public static ScheduleOrigin CreateOrigin(Location location, Time departure)
         {
-            return new ScheduleOrigin()
+            var origin = new ScheduleOrigin()
             {
                 Location = location,
                 Sequence = 1,
@@ -19,6 +19,8 @@ namespace Timetable.Test.Data
                 Platform = "1",
                 Activities = CreateActivities("TB")
             };
+            origin.UpdateAdvertisedStop();
+            return origin;
         }
 
         private static ISet<string> CreateActivities(string activity)
@@ -31,9 +33,9 @@ namespace Timetable.Test.Data
             return new HashSet<string>(activities);
         }
         
-        public static ScheduleStop CreateStop(Location location, Time arrival)
+        public static ScheduleStop CreateStop(Location location, Time arrival, string activity = "T")
         {
-            return new ScheduleStop()
+            var stop = new ScheduleStop()
             {
                 Location = location,
                 Sequence = 1,
@@ -42,13 +44,15 @@ namespace Timetable.Test.Data
                 Departure = arrival.Add(OneMinute),
                 WorkingDeparture = arrival.Add(ThirtySeconds),
                 Platform = "10",
-                Activities = CreateActivities("T")
+                Activities = CreateActivities(activity)
             };
+            stop.UpdateAdvertisedStop();
+            return stop;
         }
         
         public static SchedulePass CreatePass(Location location, Time pass)
         {
-            return new SchedulePass()
+            var schedulePass = new SchedulePass()
             {
                 Location = location,
                 Sequence = 1,
@@ -56,11 +60,13 @@ namespace Timetable.Test.Data
                 Platform = "",
                 Activities = new HashSet<string>()
             };
+            schedulePass.UpdateAdvertisedStop();
+            return schedulePass;
         }
         
         public static ScheduleDestination CreateDestination(Location location, Time arrival)
         {
-            return new ScheduleDestination()
+            var destination = new ScheduleDestination()
             {
                 Location = location,
                 Sequence = 1,
@@ -69,6 +75,8 @@ namespace Timetable.Test.Data
                 Platform = "2",
                 Activities = CreateActivities("TF")
             };
+            destination.UpdateAdvertisedStop();
+            return destination;
         }
     }
 }

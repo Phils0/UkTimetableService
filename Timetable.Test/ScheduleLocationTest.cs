@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -90,5 +91,54 @@ namespace Timetable.Test
             
             Assert.Equal(Expected, scheduleLocation.PassesAt);
         }
+
+        [Fact]
+        public void ScheduleOriginStopTypeIsOrigin()
+        {
+            var scheduleLocation = TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, Test);
+            Assert.Equal(StopType.PickUpOnly, scheduleLocation.AdvertisedStop);
+        }
+        
+        [Fact]
+        public void ScheduleDestinationStopTypeIsDestination()
+        {
+            var scheduleLocation = TestScheduleLocations.CreateDestination(TestLocations.Surbiton, Test);
+            Assert.Equal(StopType.SetDownOnly, scheduleLocation.AdvertisedStop);
+        }
+        
+        [Fact]
+        public void SchedulePassIsNotAStop()
+        {
+            var scheduleLocation = TestScheduleLocations.CreatePass(TestLocations.Surbiton, Test);            
+            Assert.Equal(StopType.NotAPublicStop, scheduleLocation.AdvertisedStop);
+        }
+        
+        [Theory]
+        [InlineData("T", StopType.Normal)]
+        [InlineData("D", StopType.SetDownOnly)]
+        [InlineData("U", StopType.PickUpOnly)]
+        [InlineData("R", StopType.Request)]
+        public void SchedulePassSetsStopTypeBasedUponAttributes(string activity, StopType expected)
+        {
+            var scheduleLocation = TestScheduleLocations.CreateStop(TestLocations.Surbiton, Test, activity);            
+            Assert.Equal(expected, scheduleLocation.AdvertisedStop);
+        }
+
+        [Fact]
+        public void SchedulePassSetsStopTypeWhenMultipleAttributes()
+        {
+            var scheduleLocation =  new ScheduleStop()
+            {
+                Location = TestLocations.Surbiton,
+                Sequence = 1,
+                Activities = new HashSet<string>(new []
+                {
+                    "-U",
+                    "T"
+                })
+            };
+            scheduleLocation.UpdateAdvertisedStop();
+            Assert.Equal(StopType.Normal, scheduleLocation.AdvertisedStop);
+        }     
     }
 }

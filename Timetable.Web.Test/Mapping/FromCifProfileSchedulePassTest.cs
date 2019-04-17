@@ -21,7 +21,7 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapLocation()
+        public void MapLocation()
         {
             var output = Map();
 
@@ -38,7 +38,7 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapPass()
+        public void MapPass()
         {
             var output = Map();
 
@@ -46,7 +46,7 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapPlatform()
+        public void MapPlatform()
         {
             var output = Map();
 
@@ -54,10 +54,19 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapActivities()
+        public void MapActivities()
         {
             var output = Map();
 
             Assert.Empty(output.Activities);
-        }    }
+        }    
+        
+        [Fact]
+        public void SetAdvertisedStop()
+        {
+            var output = Map();
+
+            Assert.Equal(StopType.NotAPublicStop, output.AdvertisedStop);
+        } 
+    }
 }
