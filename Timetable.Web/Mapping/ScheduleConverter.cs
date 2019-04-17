@@ -65,7 +65,7 @@ namespace Timetable.Web.Mapping
                             working = MapDestination(tl);
                             break;
                         case ScheduleChange sc:
-                            _logger.Debug("Unhandled ScheduleChange : {record}", sc);
+                            // _logger.Debug("Unhandled ScheduleChange : {record}", sc);
                             break;
                         default:
                             _logger.Warning("Unhandled record {recordType} : {record}", record.GetType(), record);

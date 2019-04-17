@@ -10,7 +10,7 @@ namespace Timetable
 
     public class TimetableData : ITimetable
     {
-        private Dictionary<string, Service> _data { get; } = new Dictionary<string, Service>(10000);
+        private Dictionary<string, Service> _data { get; } = new Dictionary<string, Service>(400000);
 
         public void Add(Schedule schedule)
         {

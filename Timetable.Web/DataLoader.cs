@@ -109,6 +109,8 @@ namespace Timetable.Web
                     _logger.Information("Loaded records: {count}", count);
             }
 
+            _logger.Information("Loaded records: {count}", count);
+
             return new Data()
             {
                 Locations = locations,

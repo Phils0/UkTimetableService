@@ -16,14 +16,16 @@ namespace Timetable
                 return compare != 0 ? compare : x.calendar.CompareTo(y.calendar);
             }
         }
+        
         public string TimetableUid { get; }
 
-        private readonly SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> _schedules =
-            new SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>(new StpDescendingComparer());
+        private Schedule _schedule;
+        
+        private SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> _multipleSchedules;
 
         public Service(Schedule schedule)
         {
-            _schedules.Add((schedule.StpIndicator, schedule.Calendar), schedule);
+            _schedule = schedule;
             TimetableUid = schedule.TimetableUid;
         }
 
@@ -33,12 +35,28 @@ namespace Timetable
                 throw new ArgumentException(
                     $"Service: {TimetableUid}  TimetableUID does not match. Failed to add schedule: {schedule}");
 
-            _schedules.Add((schedule.StpIndicator, schedule.Calendar), schedule);
+            if (_schedule != null)
+                MoveToSortedList();
+            _multipleSchedules.Add((schedule.StpIndicator, schedule.Calendar), schedule);
+        }
+
+        private void MoveToSortedList()
+        {
+            _multipleSchedules =
+                new SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>(new StpDescendingComparer());
+            _multipleSchedules.Add((_schedule.StpIndicator, _schedule.Calendar), _schedule);
+            _schedule = null;
         }
 
         public Schedule GetScheduleOn(DateTime date)
         {
-            foreach (var schedule in _schedules.Values)
+            if (_schedule != null)
+            {
+                if (_schedule.RunsOn(date))
+                    return _schedule;
+            }
+            
+            foreach (var schedule in _multipleSchedules.Values)
             {
                 if (schedule.RunsOn(date))
                     return schedule;
