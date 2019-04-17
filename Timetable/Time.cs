@@ -8,6 +8,8 @@ namespace Timetable
     public struct Time : IEquatable<Time>
     {
         private static readonly TimeSpan OneDay = new TimeSpan(24, 0, 0);
+
+        public static readonly Time MinValue = new Time(TimeSpan.MinValue); 
         
         public TimeSpan Value { get; }
         public bool IsNextDay => Value > OneDay;
@@ -20,6 +22,13 @@ namespace Timetable
         {
             Value = time;
         }
+
+        public bool IsBefore(Time other)
+        {
+            return Value < other.Value;
+        }
+             
+        public Time MakeAfterByAddingADay(Time start) => IsBefore(start) ? Add(OneDay) : this;
 
         public Time Add(TimeSpan ts) => new Time(this.Value.Add(ts));
         public Time Subtract(TimeSpan ts) => new Time(this.Value.Subtract(ts));
@@ -44,7 +53,7 @@ namespace Timetable
         {
             var timeString = Value.Seconds == 0 ? $"{Value:hh\\:mm}" : $"{Value:hh\\:mm\\:ss}";
 
-            return IsNextDay ?  $"{timeString} (+1)" : timeString;
+            return IsNextDay ? $"{timeString} (+1)" : timeString;
         }
     }
 }

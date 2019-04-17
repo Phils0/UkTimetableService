@@ -3,16 +3,13 @@ using System.Collections.Generic;
 
 namespace Timetable
 {
-    public class SchedulePass : IScheduleLocation
+    public class SchedulePass : ScheduleLocation
     {
-        public Location Location { get; set; }
-
-        public int Sequence { get; set; }
-
         public Time PassesAt { get; set; }
 
-        public string Platform { get; set; }
-
-        public ISet<string> Activities { get; set; }
+        public override void AddDay(Time start)
+        {
+            PassesAt = PassesAt.MakeAfterByAddingADay(start);
+        }
     }
 }

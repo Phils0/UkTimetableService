@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AutoMapper;
 using CifParser;
+using CifParser.Records;
 using NSubstitute;
 using Serilog;
 using Timetable.Test.Data;
@@ -215,6 +216,41 @@ namespace Timetable.Web.Test.Mapping
             
             var output = MapSchedule(schedule);
             Assert.Empty(output.Locations);
+        }
+        
+        [Fact]
+        public void AddADayToTimesWhenGoIntoNextDay()
+        {
+            var schedule = new CifParser.Schedule()
+            {
+                Records = new List<IRecord>(new IRecord[]
+                {
+                    TestSchedules.CreateScheduleDetails(),
+                    TestSchedules.CreateScheduleExtraDetails(),
+                    TestSchedules.CreateOriginLocation(departure: new TimeSpan(23, 30, 0)),
+                    TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(23, 45, 0)),
+                    TestSchedules.CreatePassLocation(pass: new TimeSpan(0, 15, 0)),
+                    TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(0, 30, 0), sequence: 2),
+                    TestSchedules.CreateTerminalLocation(arrival: new TimeSpan(0, 45, 0))
+                })
+            };
+            
+            var output = MapSchedule(schedule);
+
+            var origin = output.Locations[0] as ScheduleOrigin;
+            Assert.False(origin.Departure.IsNextDay);
+
+            var stop = output.Locations[1] as ScheduleStop;
+            Assert.False(stop.Arrival.IsNextDay);
+            
+            var pass = output.Locations[2] as SchedulePass;
+            Assert.True(pass.PassesAt.IsNextDay);
+            
+            var stop2 = output.Locations[3] as ScheduleStop;
+            Assert.True(stop2.Arrival.IsNextDay);
+
+            var destination = output.Locations[4] as ScheduleDestination;
+            Assert.True(destination.Arrival.IsNextDay);
         }
     }
 }
