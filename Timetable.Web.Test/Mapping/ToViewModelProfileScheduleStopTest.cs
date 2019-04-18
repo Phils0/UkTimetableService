@@ -50,7 +50,7 @@ namespace Timetable.Web.Test.Mapping
             Assert.Null(output.Arrival);
         }
         
-        private static Model.ScheduledStop Map(IScheduleLocation stop)
+        private static Model.ScheduledStop Map(ScheduleLocation stop)
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
 

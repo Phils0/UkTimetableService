@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Timetable
 {
@@ -14,19 +13,7 @@ namespace Timetable
         NotAPublicStop
     }
     
-    public interface IScheduleLocation
-    {
-        Location Location { get; }
-        int Sequence { get; }     
-        StopType AdvertisedStop { get; }       
-        Schedule Parent { get; }        
-        /// <summary>
-        /// Unique Id to allow deterministic ordering
-        /// </summary>
-        int Id { get; }
-    }
-
-    public abstract class ScheduleLocation : IScheduleLocation
+    public abstract class ScheduleLocation
     {
         public Location Location { get; set; }
 

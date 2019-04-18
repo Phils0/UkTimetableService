@@ -75,7 +75,7 @@ namespace Timetable
         /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Category </remarks>
         public string Category { get; set; }
         
-        public IScheduleLocation[] Locations { get; set; }
+        public ScheduleLocation[] Locations { get; set; }
 
         public bool RunsOn(DateTime date)
         {

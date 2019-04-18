@@ -47,9 +47,9 @@ namespace Timetable.Web.Mapping
                 }
             }
 
-            List<IScheduleLocation> MapLocations(IEnumerable<IRecord> records)
+            List<ScheduleLocation> MapLocations(IEnumerable<IRecord> records)
             {
-                var locations = new List<IScheduleLocation>(16);
+                var locations = new List<ScheduleLocation>(16);
                 var start = Time.NotValid;
  
                 foreach (var record in records)

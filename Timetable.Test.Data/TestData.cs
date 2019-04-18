@@ -19,7 +19,7 @@ namespace Timetable.Test.Data
                 TestLocations.CLPHMJC
             }, Substitute.For<ILogger>());
 
-        public static Schedule CreateSchedule(string id = "X12345", StpIndicator indicator = StpIndicator.Permanent, ICalendar calendar = null, IScheduleLocation[] locations = null)
+        public static Schedule CreateSchedule(string id = "X12345", StpIndicator indicator = StpIndicator.Permanent, ICalendar calendar = null, ScheduleLocation[] locations = null)
         {
             return new Schedule()
             {
@@ -63,7 +63,7 @@ namespace Timetable.Test.Data
 
         public static ICalendar EverydayAugust2019 => CreateAugust2019Calendar();
 
-        public static IScheduleLocation[] DefaultLocations => new[]
+        public static ScheduleLocation[] DefaultLocations => new[]
         {
             TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, new Time())
         };

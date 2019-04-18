@@ -28,7 +28,7 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Arrival, o => o.Ignore())
                 .ForMember(d => d.Departure, o => o.Ignore())
                 .ForMember(d => d.PassesAt,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.PassesAt, c)));
-            CreateMap<Timetable.IScheduleLocation, Model.ScheduledStop>()
+            CreateMap<Timetable.ScheduleLocation, Model.ScheduledStop>()
                 .ConvertUsing((s, d, c) => ConvertToStop(s, c));
             CreateMap<Timetable.Schedule, Model.Service>()
                 .ForMember(d => d.Date, 
@@ -45,7 +45,7 @@ namespace Timetable.Web.Mapping
             return date.Add(time.Value);
         }
 
-        private Model.ScheduledStop ConvertToStop(IScheduleLocation scheduleLocation, ResolutionContext context)
+        private Model.ScheduledStop ConvertToStop(ScheduleLocation scheduleLocation, ResolutionContext context)
         {
             return (Model.ScheduledStop) context.Mapper
                 .Map(scheduleLocation, scheduleLocation.GetType(), typeof(Model.ScheduledStop),
