@@ -17,8 +17,15 @@ namespace Timetable
     /// <summary>
     /// Location from the Master Station List
     /// </summary>
-    public class Location : IEquatable<Location>
+    public class Location : IEquatable<Location>, IComparable<Location>
     {
+        public int CompareTo(Location other)
+        {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+            return string.Compare(Tiploc, other.Tiploc, StringComparison.Ordinal);
+        }
+
         public bool Equals(Location other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -80,6 +87,10 @@ namespace Timetable
         /// Stations which have more than one TIPLOC always have the same principal 3-Letter Code.</remarks>
         public InterchangeStatus InterchangeStatus { get; set; }
 
+        /// <summary>
+        /// Whether known (in the Station Master list)
+        /// </summary>
+        /// <returns></returns>
         public bool IsActive { get; set; } = true;
         
         public bool IsSubsidiary => InterchangeStatus.SubsidiaryLocation.Equals(InterchangeStatus);
@@ -88,12 +99,6 @@ namespace Timetable
         /// Containing station
         /// </summary>
         public Station Station { get; set; }
-        
-        /// <summary>
-        /// Whether known (in the Station Master list)
-        /// </summary>
-        /// <returns></returns>
-        //public bool Unknown { get; set; }
         
         public override string ToString()
         {

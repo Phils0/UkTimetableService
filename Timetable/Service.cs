@@ -26,7 +26,13 @@ namespace Timetable
         public Service(Schedule schedule)
         {
             _schedule = schedule;
+            SetParent(schedule);
             TimetableUid = schedule.TimetableUid;
+        }
+
+        private void SetParent(Schedule schedule)
+        {
+            schedule.Parent = this;
         }
 
         public void Add(Schedule schedule)
@@ -38,6 +44,7 @@ namespace Timetable
             if (_schedule != null)
                 MoveToSortedList();
             _multipleSchedules.Add((schedule.StpIndicator, schedule.Calendar), schedule);
+            SetParent(schedule);
         }
 
         private void MoveToSortedList()

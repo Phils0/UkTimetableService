@@ -8,20 +8,23 @@ using Serilog;
 
 namespace Timetable.Web.Mapping
 {
-    public class ScheduleConverter : ITypeConverter<CifParser.Schedule, Timetable.Schedule>
+    internal class ScheduleConverter : ITypeConverter<CifParser.Schedule, Timetable.Schedule>
     {
         private readonly ILogger _logger;
+        private readonly Sequence _sequence;
 
-        public ScheduleConverter(ILogger logger)
+        internal ScheduleConverter(ILogger logger, Sequence sequence)
         {
             _logger = logger;
+            _sequence = sequence;
         }
 
         public Schedule Convert(CifParser.Schedule source, Schedule destination, ResolutionContext context)
         {
             var schedule = context.Mapper
                     .Map<CifParser.Records.ScheduleDetails, Timetable.Schedule>(source.GetScheduleDetails());
-
+            schedule.Id = _sequence.GetNext();
+            
             var skipTwo = SetExtraDetails();
             var l = MapLocations(source.Records.Skip(skipTwo ? 2 : 1));
             schedule.Locations = l.ToArray();
@@ -46,12 +49,12 @@ namespace Timetable.Web.Mapping
 
             List<IScheduleLocation> MapLocations(IEnumerable<IRecord> records)
             {
-                var locations = new List<IScheduleLocation>();
+                var locations = new List<IScheduleLocation>(16);
                 var start = Time.NotValid;
  
                 foreach (var record in records)
                 {
-                    IScheduleLocation working = null;
+                    ScheduleLocation working = null;
                     
                     switch (record)
                     {
@@ -75,33 +78,41 @@ namespace Timetable.Web.Mapping
                     // Only add stops that we care about i.e. in the MSL
                     if (working?.Location != null)
                     {
-                        if(start.Equals(Time.NotValid))
-                            _logger.Warning($"Have not set start: {schedule.TimetableUid}");
-                        working.AddDay(start);
-                        locations.Add(working);                        
+                        EnsureTimesGoToTheFuture(working);
+                        working.Parent = schedule;
+                        working.Id = _sequence.GetNext();
+                        locations.Add(working);
                     }
                 }
 
                 return locations;
                 
-                IScheduleLocation MapLocation(IntermediateLocation il)
+                ScheduleLocation MapLocation(IntermediateLocation il)
                 {
                     return il.WorkingPass == null
-                        ? (IScheduleLocation) context.Mapper.Map<IntermediateLocation, ScheduleStop>(il, null, context)
+                        ? (ScheduleLocation) context.Mapper.Map<IntermediateLocation, ScheduleStop>(il, null, context)
                         : context.Mapper.Map<IntermediateLocation, SchedulePass>(il, null, context);
                 }
 
-                IScheduleLocation MapOrigin(OriginLocation ol)
+                ScheduleLocation MapOrigin(OriginLocation ol)
                 {
                     var origin = context.Mapper.Map<OriginLocation, ScheduleOrigin>(ol, null, context);
                     start = origin.Departure.IsBefore(origin.WorkingDeparture) ? origin.Departure : origin.WorkingDeparture;
                     return origin;
                 }
 
-                IScheduleLocation MapDestination(TerminalLocation tl)
+                ScheduleLocation MapDestination(TerminalLocation tl)
                 {
                     return context.Mapper.Map<TerminalLocation, ScheduleDestination>(tl, null, context);
                 }
+                
+                void EnsureTimesGoToTheFuture(ScheduleLocation scheduleLocation)
+                {
+                    if (start.Equals(Time.NotValid))
+                        _logger.Warning($"Have not set start: {schedule.TimetableUid}");
+                    scheduleLocation.AddDay(start);
+                }
+
             }
         }
     }

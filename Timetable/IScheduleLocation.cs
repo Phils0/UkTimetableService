@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,11 +18,14 @@ namespace Timetable
     {
         Location Location { get; }
         int Sequence { get; }     
-        StopType AdvertisedStop { get; }
-        
-        void AddDay(Time start);
+        StopType AdvertisedStop { get; }       
+        Schedule Parent { get; }        
+        /// <summary>
+        /// Unique Id to allow deterministic ordering
+        /// </summary>
+        int Id { get; }
     }
-    
+
     public abstract class ScheduleLocation : IScheduleLocation
     {
         public Location Location { get; set; }
@@ -62,7 +66,11 @@ namespace Timetable
         }
 
         public StopType AdvertisedStop { get; private set; } = StopType.NotSet;
+        
+        public Schedule Parent { get; set; }
+        
+        public int Id { get; set; }
 
-        public abstract void AddDay(Time start);       
+        public abstract void AddDay(Time start);  
     }
 }

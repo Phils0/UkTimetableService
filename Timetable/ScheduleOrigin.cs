@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Timetable
 {
-    public class ScheduleOrigin : ScheduleLocation
+    public class ScheduleOrigin : ScheduleLocation, IDeparture
     {
         public Time Departure { get; set; }
 

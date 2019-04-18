@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Timetable
 {
@@ -7,6 +8,28 @@ namespace Timetable
     /// </summary>
     public struct Time : IEquatable<Time>
     {
+        private sealed class HourMinuteSecondComparer : IComparer<Time>
+        {
+            public int Compare(Time x, Time y)
+            {
+                var compare = x.Value.Hours.CompareTo(y.Value.Hours);
+                if (compare != 0)
+                    return compare;
+                
+                compare = x.Value.Minutes.CompareTo(y.Value.Minutes);
+                if (compare != 0)
+                    return compare;
+
+                return x.Value.Seconds.CompareTo(y.Value.Seconds);
+            }
+        }
+        
+        /// <summary>
+        /// Time of Day comparer
+        /// </summary>
+        /// <remarks>Ignores going over into the next day, therefore 00:10+1day is less than 23:50 </remarks>
+        public static IComparer<Time> TimeOfDayComparer => new HourMinuteSecondComparer();
+
         private static readonly TimeSpan OneDay = new TimeSpan(24, 0, 0);
        
         public static readonly Time NotValid = new Time(TimeSpan.Zero); 
@@ -50,7 +73,7 @@ namespace Timetable
         {
             return Value.GetHashCode();
         }
-
+        
         public override string ToString()
         {
             var timeString = Value.Seconds == 0 ? $"{Value:hh\\:mm}" : $"{Value:hh\\:mm\\:ss}";

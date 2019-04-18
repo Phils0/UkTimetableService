@@ -24,40 +24,70 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapLocation()
+        public void MapLocation()
         {
-            var output = FromCifProfileScheduleTest.MapSchedule();
+            var output = MapSchedule();
             Assert.NotEmpty(output.Locations);
         }
 
-        [Fact]
-        public void ScheduleMapOriginLocation()
+        private static Schedule MapSchedule()
         {
-            var output = FromCifProfileScheduleTest.MapSchedule();
+            return FromCifProfileScheduleTest.MapSchedule();
+        }
+        
+        [Fact]
+        public void MapOriginLocation()
+        {
+            var output = MapSchedule();
             var location = output.Locations.First();
             Assert.IsType<ScheduleOrigin>(location);
         }
         
         [Fact]
-        public void ScheduleMapTerminalLocation()
+        public void MapTerminalLocation()
         {
-            var output = FromCifProfileScheduleTest.MapSchedule();
+            var output = MapSchedule();
             var location = output.Locations.Last();
             Assert.IsType<ScheduleDestination>(location);
         }
         
         [Fact]
-        public void ScheduleMapPassingLocation()
+        public void MapPassingLocation()
         {
-            var output = FromCifProfileScheduleTest.MapSchedule();
+            var output = MapSchedule();
             Assert.NotEmpty(output.Locations.OfType<SchedulePass>());
         }
         
         [Fact]
-        public void ScheduleMapStoppingLocation()
+        public void MapStoppingLocation()
         {
-            var output = FromCifProfileScheduleTest.MapSchedule();
+            var output = MapSchedule();
             Assert.NotEmpty(output.Locations.OfType<ScheduleStop>());
+        }
+        
+        [Fact]
+        public void UniqueIds()
+        {
+            var output = MapSchedule();
+
+            var uniqueIds = output.Locations
+                .Select(l => l.Id)
+                .Distinct()
+                .Count();
+            
+            Assert.Equal(output.Locations.Count(), uniqueIds);
+            Assert.DoesNotContain(output.Id, output.Locations.Select(l => l.Id));
+        }
+        
+        [Fact]
+        public void ParentInScheduleLocationSetToSchedule()
+        {
+            var output = MapSchedule();
+
+            var first = output.Locations.First();            
+            Assert.Same(output, first.Parent);
+            var last = output.Locations.First();            
+            Assert.Same(output, last.Parent);
         }
     }
 }

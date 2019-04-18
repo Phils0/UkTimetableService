@@ -28,6 +28,7 @@ namespace Timetable
     /// <summary>
     /// Short Term Plan (STP) 
     /// </summary>
+    /// <remarks>Order is by priority</remarks>
     public enum StpIndicator
     {
         Permanent = 0,    // P - Permanent schedule
@@ -35,40 +36,18 @@ namespace Timetable
         New = 2,          // N - New STP schedule (not an overlay)
         Cancelled = 3,    // C - STP Cancellation of Permanent schedule
     }
-
-    public static class ServiceStatus
-    {
-        public const string PermanentBus = "B";
-        public const string PermanentFreight = "F";
-        public const string PermanentPassenger = "P";
-        public const string PermanentShip = "S";
-        public const string PermanentTrip = "T";
-        public const string StpPassenger = "1";
-        public const string StpFreight = "2";
-        public const string StpTrip = "3";
-        public const string StpShip = "4";
-        public const string StpBus = "5";
-    }
-    
-    public static class ServiceCategory
-    {
-        public const string LondonUndergroundService = "OL";
-        public const string UnadvertisedOrdinaryPassenger = "OU";
-        public const string OrdinaryPassenger = "OO";
-        public const string ChannelTunnel = "XC";
-        public const string UnadvertisedExpress = "XU";
-        public const string ExpressPassenger = "XX";
-        public const string Sleeper = "XZ";
-        public const string BusReplacement = "BR";
-        public const string BusPermanent = "BS";
-        public const string Ship = "SS";    // Not used?        
-    }
         
     /// <summary>
     /// An indivdual schedule
     /// </summary>
     public class Schedule
     {
+        /// <summary>
+        /// Unique internal id
+        /// </summary>
+        public int Id { get; set; }
+        public Service Parent { get; set; }
+        
         public string TimetableUid { get; set; }
         
         public StpIndicator StpIndicator { get; set; }

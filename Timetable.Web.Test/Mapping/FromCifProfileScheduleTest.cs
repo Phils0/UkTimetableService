@@ -24,7 +24,7 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapTimetableUid()
+        public void MapTimetableUid()
         {
             var output = MapSchedule();
             Assert.Equal("X12345", output.TimetableUid);
@@ -50,7 +50,7 @@ namespace Timetable.Web.Test.Mapping
         [InlineData(CifParser.Records.StpIndicator.O, StpIndicator.Override)]
         [InlineData(CifParser.Records.StpIndicator.N, StpIndicator.New)]
         [InlineData(CifParser.Records.StpIndicator.C, StpIndicator.Cancelled)]
-        public void ScheduleMapStpIndicator(CifParser.Records.StpIndicator input, StpIndicator expected)
+        public void MapStpIndicator(CifParser.Records.StpIndicator input, StpIndicator expected)
         {
             var schedule = TestSchedules.Test;
             var details = schedule.GetScheduleDetails();
@@ -62,42 +62,42 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapStatus()
+        public void MapStatus()
         {
             var output = MapSchedule();
             Assert.Equal(ServiceStatus.PermanentPassenger, output.Status);
         }
 
         [Fact]
-        public void ScheduleMapCategory()
+        public void MapCategory()
         {
             var output = MapSchedule();
             Assert.Equal(ServiceCategory.ExpressPassenger, output.Category);
         }
 
         [Fact]
-        public void ScheduleMapSeatClass()
+        public void MapSeatClass()
         {
             var output = MapSchedule();
             Assert.Equal(AccomodationClass.Both, output.SeatClass);
         }
 
         [Fact]
-        public void ScheduleMapSleeperClass()
+        public void MapSleeperClass()
         {
             var output = MapSchedule();
             Assert.Equal(AccomodationClass.None, output.SleeperClass);
         }
 
         [Fact]
-        public void ScheduleMapReservationIndicator()
+        public void MapReservationIndicator()
         {
             var output = MapSchedule();
             Assert.Equal(ReservationIndicator.Recommended, output.ReservationIndicator);
         }
 
         [Fact]
-        public void ScheduleMapCalendar()
+        public void MapCalendar()
         {
             var output = MapSchedule();
             var calendar = output.Calendar as Calendar;
@@ -108,7 +108,7 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapReusesExistingCalendar()
+        public void MapReusesExistingCalendar()
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
 
@@ -120,14 +120,14 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapRetailServiceId()
+        public void MapRetailServiceId()
         {
             var output = MapSchedule();
             Assert.Equal("SW123400", output.RetailServiceId);
         }
 
         [Fact]
-        public void ScheduleMapToc()
+        public void MapToc()
         {
             var output = MapSchedule();
             var toc = output.Toc;
@@ -136,7 +136,7 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapReusesExistingToc()
+        public void MapReusesExistingToc()
         {
             var lookup = CreateLookup();
             var mapper = FromCifProfileConfiguration.CreateMapper();
@@ -157,7 +157,7 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
-        public void ScheduleMapNoExtraDataRecord()
+        public void MapNoExtraDataRecord()
         {
             var schedule = new CifParser.Schedule()
             {
@@ -174,7 +174,7 @@ namespace Timetable.Web.Test.Mapping
         }
         
         [Fact]
-        public void ScheduleMapNoRetailServiceIdSet()
+        public void MapNoRetailServiceIdSet()
         {
             var schedule = new CifParser.Schedule()
             {
@@ -191,7 +191,7 @@ namespace Timetable.Web.Test.Mapping
         }
         
         [Fact]
-        public void ScheduleMapLocations()
+        public void MapLocations()
         {
             var output = MapSchedule();
             Assert.NotEmpty(output.Locations);
@@ -251,6 +251,15 @@ namespace Timetable.Web.Test.Mapping
 
             var destination = output.Locations[4] as ScheduleDestination;
             Assert.True(destination.Arrival.IsNextDay);
+        }
+        
+        [Fact]
+        public void SetUniqueIds()
+        {
+            var schedule1 = MapSchedule();
+            var schedule2 = MapSchedule();
+            
+            Assert.NotEqual(schedule1.Id, schedule2.Id);
         }
     }
 }

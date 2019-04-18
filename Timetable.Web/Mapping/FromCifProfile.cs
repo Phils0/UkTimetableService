@@ -19,6 +19,8 @@ namespace Timetable.Web.Mapping
             // Schedule records
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.Schedule>()
                 .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
+                .ForMember(d => d.Parent, o => o.Ignore())
+                .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.RetailServiceId, o => o.Ignore())
                 .ForMember(d => d.Toc, o => o.Ignore())
                 .ForMember(d => d.Locations, o => o.Ignore());
@@ -36,6 +38,8 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
                 .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)))
                 .ForMember(d => d.AdvertisedStop, o => o.Ignore())
+                .ForMember(d => d.Parent, o => o.Ignore())
+                .ForMember(d => d.Id, o => o.Ignore())
                 .AfterMap((s, d) => d.UpdateAdvertisedStop());
             CreateMap<CifParser.Records.IntermediateLocation, ScheduleStop>()
                 .ForMember(d => d.Arrival, o => o.MapFrom(s => s.PublicArrival))
@@ -43,22 +47,29 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
                 .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)))
                 .ForMember(d => d.AdvertisedStop, o => o.Ignore())
+                .ForMember(d => d.Parent, o => o.Ignore())
+                .ForMember(d => d.Id, o => o.Ignore())
                 .AfterMap((s, d) => d.UpdateAdvertisedStop());
             CreateMap<CifParser.Records.IntermediateLocation, SchedulePass>()
                 .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
                 .ForMember(d => d.PassesAt, o => o.MapFrom(s => s.WorkingPass))
                 .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)))
                 .ForMember(d => d.AdvertisedStop, o => o.Ignore())
+                .ForMember(d => d.Parent, o => o.Ignore())
+                .ForMember(d => d.Id, o => o.Ignore())
                 .AfterMap((s, d) => d.UpdateAdvertisedStop());
             CreateMap<CifParser.Records.TerminalLocation, ScheduleDestination>()
                 .ForMember(d => d.Arrival, o => o.MapFrom(s => s.PublicArrival))
                 .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
                 .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)))
                 .ForMember(d => d.AdvertisedStop, o => o.Ignore())
+                .ForMember(d => d.Parent, o => o.Ignore())
+                .ForMember(d => d.Id, o => o.Ignore())
                 .AfterMap((s, d) => d.UpdateAdvertisedStop());
-            
+
+            var scheduleConverter = new ScheduleConverter(Log.Logger, new Sequence());
             CreateMap<CifParser.Schedule, Timetable.Schedule>()
-                .ConvertUsing(new ScheduleConverter(Log.Logger));            
+                .ConvertUsing(scheduleConverter);            
         }
 
     }

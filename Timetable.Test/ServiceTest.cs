@@ -86,5 +86,18 @@ namespace Timetable.Test
             var found = service.GetScheduleOn(MondayAugust12);
             Assert.Equal(high, found);
         }
+        
+        [Fact]
+        public void ParentSetToService()
+        {
+            var schedule = TestData.CreateSchedule();
+            var schedule2 = TestData.CreateSchedule(indicator: StpIndicator.Cancelled);
+
+            var service = new Service(schedule);
+            service.Add(schedule2);
+            
+            Assert.Same(service, schedule.Parent);
+            Assert.Same(service, schedule2.Parent);
+        }
     }
 }
