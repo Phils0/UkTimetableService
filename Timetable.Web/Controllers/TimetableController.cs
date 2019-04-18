@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using Timetable.Web.Model;
 
 namespace Timetable.Web.Controllers
 {
@@ -18,15 +21,27 @@ namespace Timetable.Web.Controllers
             _mapper = mapper;
         }
 
-        [Route("{service}/{date}")]
+        /// <summary>
+        /// Returns a scheduled service on a particular day
+        /// </summary>
+        /// <param name="serviceId"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        [Route("service/{serviceId}/{date}")]
         [HttpGet]
-        public async Task<IActionResult> GetService(string service, DateTime date)
+        public async Task<IActionResult> GetService(string serviceId, DateTime date)
         {
-            var schedule =  _timetable.GetSchedule(service, date);
-            if (schedule == null)
-                return NotFound((service, date));
-            
-            var model = _mapper.Map<Timetable.Schedule, Model.Service>(schedule, o => { o.Items["On"] = date; });
+            var service =  _timetable.GetSchedule(serviceId, date);
+            if (service.schedule == null)
+                return NotFound( 
+                    new ServiceNotFound()
+                    {
+                        TimetableUid = serviceId,
+                        Date = date,
+                        Reason = service.reason
+                    });
+       
+            var model = _mapper.Map<Timetable.Schedule, Model.Service>(service.schedule, o => { o.Items["On"] = date; });
             return Ok(model);
         }
     }

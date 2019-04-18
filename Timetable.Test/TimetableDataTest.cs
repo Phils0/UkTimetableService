@@ -17,13 +17,13 @@ namespace Timetable.Test
             var service1 = TestData.CreateSchedule(id: "A00001");
             var service2 = TestData.CreateSchedule(id: "A00002");
             
-            var services = new TimetableData();
-            services.Add(service1);
-            services.Add(service2);
+            var timetable = new TimetableData();
+            timetable.Add(service1);
+            timetable.Add(service2);
 
-            var schedule = services.GetSchedule(timetableUid, MondayAugust12);
+            var service = timetable.GetSchedule(timetableUid, MondayAugust12);
             
-            Assert.Equal(expected, schedule?.TimetableUid);
+            Assert.Equal(expected, service.schedule?.TimetableUid);
         }
         
         [Fact]
@@ -32,18 +32,62 @@ namespace Timetable.Test
             var schedule = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule2 = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Tuesday));
             
-            var services = new TimetableData();           
-            services.Add(schedule);
-            services.Add(schedule2);
+            var timetable = new TimetableData();           
+            timetable.Add(schedule);
+            timetable.Add(schedule2);
 
-            var found = services.GetSchedule("X12345", MondayAugust12);
-            Assert.Equal(schedule, found);
+            var found = timetable.GetSchedule("X12345", MondayAugust12);
+            Assert.Equal(schedule, found.schedule);
             
-            found = services.GetSchedule("X12345", MondayAugust12.AddDays(1));
-            Assert.Equal(schedule2, found);
+            found = timetable.GetSchedule("X12345", MondayAugust12.AddDays(1));
+            Assert.Equal(schedule2, found.schedule);
+        }
+        
+        [Fact]
+        public void ScheduleNotFound()
+        {
+            var schedule = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Monday));
             
-            found = services.GetSchedule("X12345", MondayAugust12.AddDays(2));
-            Assert.Null(found);
+            var timetable = new TimetableData();           
+            timetable.Add(schedule);
+            
+            var found = timetable.GetSchedule("Z98765", MondayAugust12);
+            Assert.Null(found.schedule);
+            Assert.Equal("Z98765 not found in timetable", found.reason);
+        }
+        
+        [Fact]
+        public void ScheduleNotRunningOnDate()
+        {
+            var schedule = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Monday));
+            var schedule2 = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Tuesday));
+            
+            var timetable = new TimetableData();           
+            timetable.Add(schedule);
+            timetable.Add(schedule2);
+            
+            var found = timetable.GetSchedule("X12345", MondayAugust12.AddDays(2));
+            Assert.Null(found.schedule);
+            Assert.Equal("X12345 does not run on 14/08/2019", found.reason);
+        }
+        
+        [Fact]
+        public void ScheduleCancelledOnDate()
+        {
+            var schedule = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Weekdays));
+            var schedule2 = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Tuesday));
+            schedule2.StpIndicator = StpIndicator.Cancelled;
+            
+            var timetable = new TimetableData();           
+            timetable.Add(schedule);
+            timetable.Add(schedule2);
+
+            var found = timetable.GetSchedule("X12345", MondayAugust12);
+            Assert.Equal(schedule, found.schedule);
+            
+            found = timetable.GetSchedule("X12345", MondayAugust12.AddDays(1));
+            Assert.Null(found.schedule);
+            Assert.Equal("X12345 cancelled in STP on 13/08/2019", found.reason);
         }
     }
 }

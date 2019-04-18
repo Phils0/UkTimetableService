@@ -5,7 +5,7 @@ namespace Timetable
 {
     public interface ITimetable
     {
-        Schedule GetSchedule(string timetableUid, DateTime date);
+        (Schedule schedule, string reason) GetSchedule(string timetableUid, DateTime date);
     }
 
     public class TimetableData : ITimetable
@@ -25,9 +25,21 @@ namespace Timetable
             }
         }
 
-        public Schedule GetSchedule(string timetableUid, DateTime date)
+        public (Schedule schedule, string reason) GetSchedule(string timetableUid, DateTime date)
         {
-            return _data.TryGetValue(timetableUid, out var service) ? service.GetScheduleOn(date) : null;
+            if (!_data.TryGetValue(timetableUid, out var service))
+                return (null, $"{timetableUid} not found in timetable");
+
+            var schedule = service.GetScheduleOn(date);
+            
+            if(schedule == null)
+                return (null, $"{timetableUid} does not run on {date:d}");
+ 
+            if(schedule.StpIndicator == StpIndicator.Cancelled)
+                return (null, $"{timetableUid} cancelled in STP on {date:d}");
+
+            
+            return (schedule, "");
         }
     }
 }
