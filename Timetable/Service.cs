@@ -38,7 +38,7 @@ namespace Timetable
             
         }
 
-        public void Add(Schedule schedule)
+        internal void Add(Schedule schedule)
         {
             if (schedule.TimetableUid != TimetableUid)
                 throw new ArgumentException(

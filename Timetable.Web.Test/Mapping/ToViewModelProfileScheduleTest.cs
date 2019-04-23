@@ -29,7 +29,7 @@ namespace Timetable.Web.Test.Mapping
         private static Model.Service MapSchedule(Timetable.Schedule schedule = null)
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
-            schedule = schedule ?? TestData.CreateSchedule();
+            schedule = schedule ?? TestData.CreateScheduleWithService();
 
             return mapper.Map<Timetable.Schedule, Model.Service>(
                 schedule, 

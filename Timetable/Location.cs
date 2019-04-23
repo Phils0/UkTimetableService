@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Timetable
 {
@@ -11,9 +13,9 @@ namespace Timetable
         Minor = 1,
         Normal = 2,
         Main = 3,
-        SubsidiaryLocation = 9      
+        SubsidiaryLocation = 9
     }
-    
+
     /// <summary>
     /// Location from the Master Station List
     /// </summary>
@@ -51,12 +53,12 @@ namespace Timetable
             Tiploc = "",
             ThreeLetterCode = "",
         };
-               
+
         /// <summary>
         /// Tiploc code
         /// </summary>
         public string Tiploc { get; set; }
-        
+
         /// <summary>
         /// CRS code
         /// </summary>
@@ -66,7 +68,7 @@ namespace Timetable
         /// National Location Code - full 6 character code
         /// </summary>
         public string Nlc { get; set; }
-        
+
         /// <summary>
         /// Name
         /// </summary>
@@ -92,14 +94,63 @@ namespace Timetable
         /// </summary>
         /// <returns></returns>
         public bool IsActive { get; set; } = true;
-        
+
         public bool IsSubsidiary => InterchangeStatus.SubsidiaryLocation.Equals(InterchangeStatus);
-                
+
         /// <summary>
         /// Containing station
         /// </summary>
         public Station Station { get; set; }
-        
+
+        private readonly SortedList<Time, Service[]> _arrivals =
+            new SortedList<Time, Service[]>(256, Time.LaterEarlierComparer);
+
+        private readonly SortedList<Time, Service[]> _departures =
+            new SortedList<Time, Service[]>(256, Time.EarlierLaterComparer);
+
+        internal void AddService(ScheduleLocation stop)
+        {
+            if (stop is IArrival arrival)
+            {
+                var time = arrival.GetTime();
+                if (!_arrivals.ContainsKey(time))
+                    _arrivals.Add(time, new[] {arrival.Service});
+                else
+                    AddSchedule(time, arrival.Service, _arrivals);
+            }
+
+            if (stop is IDeparture departure)
+            {
+                var time = departure.GetTime();
+                if (!_departures.TryGetValue(time, out var services))
+                    _departures.Add(time, new[] {departure.Service});
+                else
+                    AddSchedule(time, departure.Service, _departures);
+            }
+
+            void AddSchedule(Time time, Service service, SortedList<Time, Service[]> appendTo)
+            {
+                var services = appendTo[time];
+                if (!services.Contains(service))
+                {
+                    var length = services.Length;
+                    Array.Resize(ref services, length + 1);
+                    services[length] = service;
+                    appendTo[time] = services;
+                }
+            }
+        }
+
+        public Service[] FindExactDepartures(Time time)
+        {
+            return _departures.TryGetValue(time, out var services) ? services : new Service[0];
+        }
+
+        public Service[] FindExactArrivals(Time time)
+        {
+            return _arrivals.TryGetValue(time, out var services) ? services : new Service[0];
+        }
+
         public override string ToString()
         {
             return String.IsNullOrEmpty(Tiploc) ? "Not Set" : $"{ThreeLetterCode}-{Tiploc}";

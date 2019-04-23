@@ -5,8 +5,8 @@ namespace Timetable.Test.Data
 {
     public static class TestScheduleLocations
     {
-        internal static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
-        internal static readonly TimeSpan ThirtySeconds = new TimeSpan(0, 0, 30);     
+        public static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
+        public static readonly TimeSpan ThirtySeconds = new TimeSpan(0, 0, 30);     
 
         public static ScheduleOrigin CreateOrigin(Location location, Time departure)
         {
@@ -67,6 +67,22 @@ namespace Timetable.Test.Data
             return stop;
         }
         
+        public static ScheduleStop CreateSetdownOnlyStop(Location location, Time arrival)
+        {
+            var stop = new ScheduleStop()
+            {
+                Location = location,
+                Sequence = 1,
+                Arrival = arrival,
+                WorkingArrival = arrival.Subtract(ThirtySeconds),
+                Departure = Time.NotValid,
+                WorkingDeparture = arrival.Add(ThirtySeconds),
+                Platform = "10",
+                Activities = CreateActivities("D")
+            };
+            stop.UpdateAdvertisedStop();
+            return stop;
+        }
         public static SchedulePass CreatePass(Location location, Time pass)
         {
             var schedulePass = new SchedulePass()

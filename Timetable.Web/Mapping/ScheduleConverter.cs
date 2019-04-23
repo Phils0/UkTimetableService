@@ -29,8 +29,7 @@ namespace Timetable.Web.Mapping
             timetable.AddSchedule(schedule);
             
             var skipTwo = SetExtraDetails();
-            var l = MapLocations(source.Records.Skip(skipTwo ? 2 : 1));
-            schedule.Locations = l.ToArray();
+            MapLocations(source.Records.Skip(skipTwo ? 2 : 1));
 
             return schedule;
             
@@ -50,7 +49,7 @@ namespace Timetable.Web.Mapping
                 }
             }
 
-            List<ScheduleLocation> MapLocations(IEnumerable<IRecord> records)
+            void MapLocations(IEnumerable<IRecord> records)
             {
                 var locations = new List<ScheduleLocation>(16);
                 var start = Time.NotValid;
@@ -82,14 +81,11 @@ namespace Timetable.Web.Mapping
                     if (working?.Location != null)
                     {
                         EnsureTimesGoToTheFuture(working);
-                        working.Parent = schedule;
+                        working.SetParent(schedule);
                         working.Id = _sequence.GetNext();
-                        locations.Add(working);
                     }
                 }
 
-                return locations;
-                
                 ScheduleLocation MapLocation(IntermediateLocation il)
                 {
                     return il.WorkingPass == null
@@ -112,7 +108,7 @@ namespace Timetable.Web.Mapping
                 void EnsureTimesGoToTheFuture(ScheduleLocation scheduleLocation)
                 {
                     if (start.Equals(Time.NotValid))
-                        _logger.Warning($"Have not set start: {schedule.TimetableUid}");
+                        _logger.Warning($"ID: {scheduleLocation.Id} Have not set start: {schedule.TimetableUid}");
                     scheduleLocation.AddDay(start);
                 }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Timetable
 {
@@ -87,9 +88,13 @@ namespace Timetable
             service.Add(this);            
             Parent = service;
         }
-        
-        public ScheduleLocation[] Locations { get; set; }
 
+        public IReadOnlyList<ScheduleLocation> Locations => _locations;
+        
+        private List<ScheduleLocation> _locations = new List<ScheduleLocation>(8);
+
+        internal void AddLocation(ScheduleLocation location) => _locations.Add(location);
+        
         public bool RunsOn(DateTime date)
         {
             return Calendar.IsActiveOn(date);

@@ -8,7 +8,7 @@ namespace Timetable
     /// </summary>
     public struct Time : IEquatable<Time>
     {
-        private sealed class HourMinuteSecondComparer : IComparer<Time>
+        private sealed class EarlierToLaterComparer : IComparer<Time>
         {
             public int Compare(Time x, Time y)
             {
@@ -24,12 +24,29 @@ namespace Timetable
             }
         }
         
+        private sealed class LaterToEarlierComparer : IComparer<Time>
+        {
+            private readonly IComparer<Time> _comparer = new EarlierToLaterComparer();
+            
+            public int Compare(Time x, Time y)
+            {
+                return _comparer.Compare(y, x);
+            }
+        }
+        
         /// <summary>
-        /// Time of Day comparer
+        /// Earlier to Later comparer
         /// </summary>
         /// <remarks>Ignores going over into the next day, therefore 00:10+1day is less than 23:50 </remarks>
-        public static IComparer<Time> TimeOfDayComparer => new HourMinuteSecondComparer();
+        public static IComparer<Time> EarlierLaterComparer => new EarlierToLaterComparer();
 
+        /// <summary>
+        /// Later to Earlier comparer
+        /// </summary>
+        /// <remarks>Ignores going over into the next day, therefore 00:10+1day is less than 23:50 </remarks>
+        public static IComparer<Time> LaterEarlierComparer => new LaterToEarlierComparer();
+        
+        
         private static readonly TimeSpan OneDay = new TimeSpan(24, 0, 0);
        
         public static readonly Time NotValid = new Time(TimeSpan.Zero); 
