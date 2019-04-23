@@ -7,6 +7,13 @@ namespace Timetable
 {
     public class Service
     {
+        private enum Multiplicity
+        {
+            None,
+            SingleSchedule,
+            MultipleSchedules
+        }
+        
         private sealed class StpDescendingComparer : IComparer<(StpIndicator indicator, ICalendar calendar)>
         {
             public int Compare((StpIndicator indicator, ICalendar calendar) x,
@@ -23,16 +30,12 @@ namespace Timetable
         
         private SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> _multipleSchedules;
 
-        public Service(Schedule schedule)
-        {
-            _schedule = schedule;
-            SetParent(schedule);
-            TimetableUid = schedule.TimetableUid;
-        }
+        private Multiplicity _stateType = Multiplicity.None;
 
-        private void SetParent(Schedule schedule)
+        public Service(string timetableUid)
         {
-            schedule.Parent = this;
+            TimetableUid = timetableUid;
+            
         }
 
         public void Add(Schedule schedule)
@@ -41,18 +44,32 @@ namespace Timetable
                 throw new ArgumentException(
                     $"Service: {TimetableUid}  TimetableUID does not match. Failed to add schedule: {schedule}");
 
-            if (_schedule != null)
-                MoveToSortedList();
+            if (_stateType == Multiplicity.None)
+            {
+                SetSingleSchedule();
+                return;
+            }                    
+            else if (_stateType == Multiplicity.SingleSchedule)
+            {
+                MoveToMultipleSchedules();                
+            }
+            
             _multipleSchedules.Add((schedule.StpIndicator, schedule.Calendar), schedule);
-            SetParent(schedule);
-        }
 
-        private void MoveToSortedList()
-        {
-            _multipleSchedules =
-                new SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>(new StpDescendingComparer());
-            _multipleSchedules.Add((_schedule.StpIndicator, _schedule.Calendar), _schedule);
-            _schedule = null;
+            void SetSingleSchedule()
+            {
+                _schedule = schedule;
+                _stateType = Multiplicity.SingleSchedule;
+            }
+            
+            void MoveToMultipleSchedules()
+            {
+                _multipleSchedules =
+                    new SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>(new StpDescendingComparer());
+                _multipleSchedules.Add((_schedule.StpIndicator, _schedule.Calendar), _schedule);
+                _schedule = null;
+                _stateType = Multiplicity.MultipleSchedules;
+            }
         }
 
         public Schedule GetScheduleOn(DateTime date)

@@ -18,6 +18,7 @@ namespace Timetable.Web.Mapping
                        
             // Schedule records
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.Schedule>()
+                .DisableCtorValidation()
                 .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
                 .ForMember(d => d.Parent, o => o.Ignore())
                 .ForMember(d => d.Id, o => o.Ignore())
@@ -25,6 +26,7 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Toc, o => o.Ignore())
                 .ForMember(d => d.Locations, o => o.Ignore());
             CreateMap<CifParser.Records.ScheduleExtraData, Timetable.Schedule>()
+                .DisableCtorValidation()
                 .ForMember(d => d.RetailServiceId, o => o.MapFrom(s => s.RetailServiceId))
                 .ForMember(d => d.Toc, o => o.ConvertUsing(new TocConverter(), s => s.Toc))
                 .ForAllOtherMembers(o => o.Ignore());

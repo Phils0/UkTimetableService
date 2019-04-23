@@ -12,17 +12,14 @@ namespace Timetable
     {
         private Dictionary<string, Service> _data { get; } = new Dictionary<string, Service>(400000);
 
-        public void Add(Schedule schedule)
+        public void AddSchedule(Schedule schedule)
         {
-            if (_data.TryGetValue(schedule.TimetableUid, out var service))
+            if (!_data.TryGetValue(schedule.TimetableUid, out var service))
             {
-                service.Add(schedule);
-            }
-            else
-            {
-                service = new Service(schedule);
+                service = new Service(schedule.TimetableUid);
                 _data.Add(service.TimetableUid, service);
             }
+            schedule.AddToService(service);
         }
 
         public (Schedule schedule, string reason) GetSchedule(string timetableUid, DateTime date)

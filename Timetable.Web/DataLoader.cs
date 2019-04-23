@@ -73,6 +73,7 @@ namespace Timetable.Web
         private Data Add(IEnumerable<IRecord> records, LocationData locations)
         {
             var tocLookup = new TocLookup(_logger, new Dictionary<string, Toc>());
+            var timetable = new TimetableData();
             
             Schedule MapSchedule(CifParser.Schedule schedule)
             {
@@ -80,11 +81,11 @@ namespace Timetable.Web
                 {
                     o.Items.Add("Tocs", tocLookup);
                     o.Items.Add("Locations", locations);
+                    o.Items.Add("Timetable", timetable);
                 });
             }
             
             int count = 0;
-            var services = new TimetableData();
 
             foreach (var record in records)
             {
@@ -97,7 +98,6 @@ namespace Timetable.Web
                         break;
                     case CifParser.Schedule schedule:
                         var s = MapSchedule(schedule);
-                        services.Add(s);
                         break;
                     default:
                         _logger.Warning("Unhandled record {recordType}: {record}", record.GetType(), record);
@@ -114,7 +114,7 @@ namespace Timetable.Web
             return new Data()
             {
                 Locations = locations,
-                Timetable = services
+                Timetable = timetable
             };
         }
     }

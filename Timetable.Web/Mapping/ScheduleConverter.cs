@@ -21,9 +21,12 @@ namespace Timetable.Web.Mapping
 
         public Schedule Convert(CifParser.Schedule source, Schedule destination, ResolutionContext context)
         {
-            var schedule = context.Mapper
-                    .Map<CifParser.Records.ScheduleDetails, Timetable.Schedule>(source.GetScheduleDetails());
-            schedule.Id = _sequence.GetNext();
+            var timetable = context.Items["Timetable"] as TimetableData;
+
+            var schedule = new Schedule(_sequence.GetNext());           
+            schedule = context.Mapper
+                    .Map<CifParser.Records.ScheduleDetails, Timetable.Schedule>(source.GetScheduleDetails(), schedule);
+            timetable.AddSchedule(schedule);
             
             var skipTwo = SetExtraDetails();
             var l = MapLocations(source.Records.Skip(skipTwo ? 2 : 1));

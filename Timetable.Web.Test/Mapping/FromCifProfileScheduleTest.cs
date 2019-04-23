@@ -34,6 +34,8 @@ namespace Timetable.Web.Test.Mapping
             Substitute.For<ILogger>(),
             new Dictionary<string, Toc>());
         
+        private static TimetableData CreateTimetable() => new TimetableData();
+        
         public static Schedule MapSchedule(CifParser.Schedule input = null)
         {
             input = input ?? TestSchedules.Test;
@@ -42,6 +44,7 @@ namespace Timetable.Web.Test.Mapping
             {
                 o.Items.Add("Tocs", CreateLookup());
                 o.Items.Add("Locations", TestData.Locations);
+                o.Items.Add("Timetable", CreateTimetable());
             });
         }
        
@@ -145,11 +148,13 @@ namespace Timetable.Web.Test.Mapping
                 {
                     o.Items.Add("Tocs", lookup);
                     o.Items.Add("Locations", TestData.Locations);
+                    o.Items.Add("Timetable", CreateTimetable());
                 });
             var output2 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(TestSchedules.Test, o => 
                 {
                     o.Items.Add("Tocs", lookup);
                     o.Items.Add("Locations", TestData.Locations);
+                    o.Items.Add("Timetable", CreateTimetable());
                 });
 
             Assert.NotSame(output1, output2);

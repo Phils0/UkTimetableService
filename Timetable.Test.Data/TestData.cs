@@ -7,10 +7,10 @@ namespace Timetable.Test.Data
 {
     public static class TestData
     {
-        private static readonly Toc VirginTrains = new Toc() { Code = "VT" , Name = "Virgin Trains"};
+        private static readonly Toc VirginTrains = new Toc() {Code = "VT", Name = "Virgin Trains"};
 
         public static ILocationData Locations => new Timetable.LocationData(
-            new []
+            new[]
             {
                 TestLocations.Surbiton,
                 TestLocations.WaterlooMain,
@@ -19,13 +19,17 @@ namespace Timetable.Test.Data
                 TestLocations.CLPHMJC
             }, Substitute.For<ILogger>());
 
-        public static Schedule CreateSchedule(string id = "X12345", StpIndicator indicator = StpIndicator.Permanent, ICalendar calendar = null, ScheduleLocation[] locations = null)
+        public static Schedule CreateSchedule(string timetableId = "X12345",
+            StpIndicator indicator = StpIndicator.Permanent,
+            ICalendar calendar = null, ScheduleLocation[] locations = null,
+            int id = 1,
+            Service service = null)
         {
-            return new Schedule()
+            var schedule = new Schedule(id)
             {
-                TimetableUid = id,
+                TimetableUid = timetableId,
                 StpIndicator = indicator,
-                RetailServiceId = $"VT{id.Substring(1, 4)}00",
+                RetailServiceId = $"VT{timetableId.Substring(1, 4)}00",
                 Toc = VirginTrains,
                 Status = ServiceStatus.PermanentPassenger,
                 Category = ServiceCategory.ExpressPassenger,
@@ -35,8 +39,35 @@ namespace Timetable.Test.Data
                 Calendar = calendar ?? EverydayAugust2019,
                 Locations = locations ?? DefaultLocations
             };
+
+            if (service != null)
+                schedule.AddToService(service);
+            return schedule;
         }
-        
+
+        public static Schedule CreateScheduleWithService(string timetableId = "X12345",
+            StpIndicator indicator = StpIndicator.Permanent,
+            ICalendar calendar = null, ScheduleLocation[] locations = null,
+            int id = 1,
+            Service service = null)
+        {
+            service = service ?? new Service(timetableId);
+
+            return CreateSchedule(timetableId, indicator, calendar, locations, id, service);
+        }
+
+        public static Schedule CreateScheduleInTimetable(TimetableData timetable, string timetableId = "X12345",
+            StpIndicator indicator = StpIndicator.Permanent,
+            ICalendar calendar = null, ScheduleLocation[] locations = null,
+            int id = 1)
+        {
+            var schedule = CreateSchedule(timetableId, indicator, calendar, locations, id);
+
+            timetable.AddSchedule(schedule);
+
+            return schedule;
+        }
+
         public static ICalendar CreateEverydayCalendar(DateTime runsFrom,
             DateTime runsTo)
         {
@@ -47,8 +78,8 @@ namespace Timetable.Test.Data
                 BankHolidayRunning.RunsOnBankHoliday);
             calendar.Generate();
             return calendar;
-        }       
-        
+        }
+
         public static ICalendar CreateAugust2019Calendar(DaysFlag dayMask = DaysFlag.Everyday,
             BankHolidayRunning bankHolidays = BankHolidayRunning.RunsOnBankHoliday)
         {
@@ -67,7 +98,5 @@ namespace Timetable.Test.Data
         {
             TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, new Time())
         };
-
-
     }
 }
