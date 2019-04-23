@@ -14,5 +14,10 @@ namespace Timetable
             Arrival = Arrival.MakeAfterByAddingADay(start);
             WorkingArrival = WorkingArrival.MakeAfterByAddingADay(start);
         }
+
+        public override string ToString()
+        {
+            return $"{Arrival} {base.ToString()}";
+        }
     }
 }

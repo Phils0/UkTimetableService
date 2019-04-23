@@ -55,9 +55,18 @@ namespace Timetable
         public StopType AdvertisedStop { get; private set; } = StopType.NotSet;
         
         public Schedule Parent { get; set; }
+
+        public Service Service => Parent.Parent;
         
         public int Id { get; set; }
 
-        public abstract void AddDay(Time start);  
+        public abstract void AddDay(Time start);
+
+        public override string ToString()
+        {
+            return Sequence > 1 ? 
+                $"{Location} {Sequence} ({Id})" :
+                $"{Location} ({Id})";
+        }
     }
 }

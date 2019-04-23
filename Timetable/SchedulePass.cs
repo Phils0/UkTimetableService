@@ -11,5 +11,10 @@ namespace Timetable
         {
             PassesAt = PassesAt.MakeAfterByAddingADay(start);
         }
+        
+        public override string ToString()
+        {
+            return $"{PassesAt} {base.ToString()}";
+        }
     }
 }

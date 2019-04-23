@@ -15,5 +15,10 @@ namespace Timetable
             Departure = Departure.MakeAfterByAddingADay(start);
             WorkingDeparture = WorkingDeparture.MakeAfterByAddingADay(start);
         }
+        
+        public override string ToString()
+        {
+            return $"{Departure} {base.ToString()}";
+        }
     }
 }

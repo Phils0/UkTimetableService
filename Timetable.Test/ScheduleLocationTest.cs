@@ -14,6 +14,23 @@ namespace Timetable.Test
         private static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
         private static readonly TimeSpan ThirtySeconds = new TimeSpan(0, 0, 30);     
         
+        public static TheoryData<ScheduleLocation, string> Locations =>
+            new TheoryData<ScheduleLocation, string>()
+            {
+                {TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreateDestination(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreatePass(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreateStop(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreatePickupOnlyStop(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+            };
+        
+        [Theory]
+        [MemberData(nameof(Locations))]
+        public void ToStringOutputsTimePlusLocation(ScheduleLocation location, string expected)
+        {
+            Assert.Equal(expected, location.ToString());
+        }
+        
         [Fact]
         public void AddDayToScheduleOrigin()
         {

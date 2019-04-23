@@ -20,5 +20,11 @@ namespace Timetable
             Departure = Departure.MakeAfterByAddingADay(start);
             WorkingDeparture = WorkingDeparture.MakeAfterByAddingADay(start);
         }
+        
+        public override string ToString()
+        {
+            var time = AdvertisedStop == StopType.PickUpOnly ? Departure : Arrival;
+            return $"{time} {base.ToString()}";
+        }
     }
 }

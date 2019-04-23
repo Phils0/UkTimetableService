@@ -50,6 +50,23 @@ namespace Timetable.Test.Data
             return stop;
         }
         
+        public static ScheduleStop CreatePickupOnlyStop(Location location, Time departure)
+        {
+            var stop = new ScheduleStop()
+            {
+                Location = location,
+                Sequence = 1,
+                Arrival = Time.NotValid,
+                WorkingArrival = departure.Subtract(ThirtySeconds),
+                Departure = departure,
+                WorkingDeparture = departure.Add(ThirtySeconds),
+                Platform = "10",
+                Activities = CreateActivities("U")
+            };
+            stop.UpdateAdvertisedStop();
+            return stop;
+        }
+        
         public static SchedulePass CreatePass(Location location, Time pass)
         {
             var schedulePass = new SchedulePass()

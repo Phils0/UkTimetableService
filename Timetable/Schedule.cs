@@ -97,7 +97,7 @@ namespace Timetable
 
         public override string ToString()
         {
-            return $"{TimetableUid} -{StpIndicator} {Calendar}";
+            return $"{TimetableUid} -{StpIndicator} {Calendar} ({Id})";
         }
     }
 }
