@@ -16,8 +16,8 @@ namespace Timetable.Test
         {
             var timetable = new TimetableData();
             
-            TestData.CreateScheduleInTimetable(timetable, timetableId: "A00001");
-            TestData.CreateScheduleInTimetable(timetable, timetableId: "A00002");
+            TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A00001");
+            TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A00002");
             
             var service = timetable.GetSchedule(timetableUid, MondayAugust12);
             
@@ -29,8 +29,8 @@ namespace Timetable.Test
         {
             var timetable = new TimetableData();           
 
-            var schedule = TestData.CreateScheduleInTimetable(timetable, calendar: TestData.CreateAugust2019Calendar(DaysFlag.Monday));
-            var schedule2 = TestData.CreateScheduleInTimetable(timetable, calendar: TestData.CreateAugust2019Calendar(DaysFlag.Tuesday));
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
             
             var found = timetable.GetSchedule("X12345", MondayAugust12);
             Assert.Equal(schedule, found.schedule);
@@ -43,7 +43,7 @@ namespace Timetable.Test
         public void ScheduleNotFound()
         {
             var timetable = new TimetableData();           
-            TestData.CreateScheduleInTimetable(timetable, calendar: TestData.CreateAugust2019Calendar(DaysFlag.Monday));
+            TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
             var found = timetable.GetSchedule("Z98765", MondayAugust12);
             Assert.Null(found.schedule);
@@ -54,8 +54,8 @@ namespace Timetable.Test
         public void ScheduleNotRunningOnDate()
         {
             var timetable = new TimetableData();           
-            var schedule = TestData.CreateScheduleInTimetable(timetable, calendar: TestData.CreateAugust2019Calendar(DaysFlag.Monday));
-            var schedule2 = TestData.CreateScheduleInTimetable(timetable, calendar: TestData.CreateAugust2019Calendar(DaysFlag.Tuesday));
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
                        
             var found = timetable.GetSchedule("X12345", MondayAugust12.AddDays(2));
             Assert.Null(found.schedule);
@@ -66,8 +66,8 @@ namespace Timetable.Test
         public void ScheduleCancelledOnDate()
         {
             var timetable = new TimetableData();           
-            var schedule = TestData.CreateScheduleInTimetable(timetable, calendar: TestData.CreateAugust2019Calendar(DaysFlag.Weekdays));
-            var schedule2 = TestData.CreateScheduleInTimetable(timetable, calendar: TestData.CreateAugust2019Calendar(DaysFlag.Tuesday));
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Weekdays));
+            var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
             schedule2.StpIndicator = StpIndicator.Cancelled;
             
             var found = timetable.GetSchedule("X12345", MondayAugust12);

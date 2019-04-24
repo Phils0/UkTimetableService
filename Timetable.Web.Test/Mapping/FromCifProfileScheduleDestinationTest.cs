@@ -1,15 +1,14 @@
 using System;
 using AutoMapper;
 using Timetable.Test.Data;
-using Timetable.Web.Mapping;
-using Timetable.Web.Test.Cif;
+using Cif = Timetable.Web.Test.Cif;
 using Xunit;
 
 namespace Timetable.Web.Test.Mapping
 {
     public class FromCifProfileScheduleDestinationTest
     {
-        private static readonly Time TenThirty = new Time(TestTime.TenThirty);
+        private static readonly Time TenThirty = new Time(Cif.TestTime.TenThirty);
 
         private static readonly MapperConfiguration FromCifProfileConfiguration =
             FromCifProfileLocationsTest.FromCifProfileConfiguration;
@@ -33,7 +32,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
             return mapper.Map<CifParser.Records.TerminalLocation, Timetable.ScheduleDestination>(
-                TestSchedules.CreateTerminalLocation(),
+                Cif.TestSchedules.CreateTerminalLocation(),
                 o => o.Items.Add("Locations", TestData.Locations));
         }
 
@@ -43,7 +42,7 @@ namespace Timetable.Web.Test.Mapping
             var output = Map();
 
             Assert.Equal(TenThirty, output.Arrival);
-            Assert.Equal(TenThirty.Subtract(TestTime.ThirtySeconds), output.WorkingArrival);
+            Assert.Equal(TenThirty.Subtract(Cif.TestTime.ThirtySeconds), output.WorkingArrival);
         }
         
         [Fact]

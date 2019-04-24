@@ -7,7 +7,7 @@ using NSubstitute;
 using Serilog;
 using Timetable.Test.Data;
 using Timetable.Web.Mapping;
-using Timetable.Web.Test.Cif;
+using Cif = Timetable.Web.Test.Cif;
 using Xunit;
 
 namespace Timetable.Web.Test.Mapping
@@ -38,7 +38,7 @@ namespace Timetable.Web.Test.Mapping
         
         public static Schedule MapSchedule(CifParser.Schedule input = null)
         {
-            input = input ?? TestSchedules.Test;
+            input = input ?? Cif.TestSchedules.Test;
             var mapper = FromCifProfileConfiguration.CreateMapper();
             return mapper.Map<CifParser.Schedule, Timetable.Schedule>(input, o =>
             {
@@ -55,7 +55,7 @@ namespace Timetable.Web.Test.Mapping
         [InlineData(CifParser.Records.StpIndicator.C, StpIndicator.Cancelled)]
         public void MapStpIndicator(CifParser.Records.StpIndicator input, StpIndicator expected)
         {
-            var schedule = TestSchedules.Test;
+            var schedule = Cif.TestSchedules.Test;
             var details = schedule.GetScheduleDetails();
             details.StpIndicator = input;
 
@@ -144,13 +144,13 @@ namespace Timetable.Web.Test.Mapping
             var lookup = CreateLookup();
             var mapper = FromCifProfileConfiguration.CreateMapper();
             
-            var output1 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(TestSchedules.Test, o =>
+            var output1 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(Cif.TestSchedules.Test, o =>
                 {
                     o.Items.Add("Tocs", lookup);
                     o.Items.Add("Locations", TestData.Locations);
                     o.Items.Add("Timetable", CreateTimetable());
                 });
-            var output2 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(TestSchedules.Test, o => 
+            var output2 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(Cif.TestSchedules.Test, o => 
                 {
                     o.Items.Add("Tocs", lookup);
                     o.Items.Add("Locations", TestData.Locations);
@@ -168,7 +168,7 @@ namespace Timetable.Web.Test.Mapping
             {
                 Records = new List<IRecord>(new IRecord[]
                 {
-                    TestSchedules.CreateScheduleDetails()
+                    Cif.TestSchedules.CreateScheduleDetails()
                 })
             };
 
@@ -185,8 +185,8 @@ namespace Timetable.Web.Test.Mapping
             {
                 Records = new List<IRecord>(new IRecord[]
                 {
-                    TestSchedules.CreateScheduleDetails(),
-                    TestSchedules.CreateScheduleExtraDetails(retailServieId: "")
+                    Cif.TestSchedules.CreateScheduleDetails(),
+                    Cif.TestSchedules.CreateScheduleExtraDetails(retailServieId: "")
                 })
             };
 
@@ -209,13 +209,13 @@ namespace Timetable.Web.Test.Mapping
             {
                 Records = new List<IRecord>(new IRecord[]
                 {
-                    TestSchedules.CreateScheduleDetails(),
-                    TestSchedules.CreateScheduleExtraDetails(),
-                    TestSchedules.CreateOriginLocation(tiploc: "UNKNOWN1"),
-                    TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN"),
-                    TestSchedules.CreatePassLocation(tiploc: "UNKNOWN2"),
-                    TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN", sequence: 2),
-                    TestSchedules.CreateTerminalLocation(tiploc: "UNKNOWN3")
+                    Cif.TestSchedules.CreateScheduleDetails(),
+                    Cif.TestSchedules.CreateScheduleExtraDetails(),
+                    Cif.TestSchedules.CreateOriginLocation(tiploc: "UNKNOWN1"),
+                    Cif.TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN"),
+                    Cif.TestSchedules.CreatePassLocation(tiploc: "UNKNOWN2"),
+                    Cif.TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN", sequence: 2),
+                    Cif.TestSchedules.CreateTerminalLocation(tiploc: "UNKNOWN3")
                 })
             };
             
@@ -230,13 +230,13 @@ namespace Timetable.Web.Test.Mapping
             {
                 Records = new List<IRecord>(new IRecord[]
                 {
-                    TestSchedules.CreateScheduleDetails(),
-                    TestSchedules.CreateScheduleExtraDetails(),
-                    TestSchedules.CreateOriginLocation(departure: new TimeSpan(23, 30, 0)),
-                    TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(23, 45, 0)),
-                    TestSchedules.CreatePassLocation(pass: new TimeSpan(0, 15, 0)),
-                    TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(0, 30, 0), sequence: 2),
-                    TestSchedules.CreateTerminalLocation(arrival: new TimeSpan(0, 45, 0))
+                    Cif.TestSchedules.CreateScheduleDetails(),
+                    Cif.TestSchedules.CreateScheduleExtraDetails(),
+                    Cif.TestSchedules.CreateOriginLocation(departure: new TimeSpan(23, 30, 0)),
+                    Cif.TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(23, 45, 0)),
+                    Cif.TestSchedules.CreatePassLocation(pass: new TimeSpan(0, 15, 0)),
+                    Cif.TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(0, 30, 0), sequence: 2),
+                    Cif.TestSchedules.CreateTerminalLocation(arrival: new TimeSpan(0, 45, 0))
                 })
             };
             

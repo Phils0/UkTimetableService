@@ -23,7 +23,7 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetSchedule(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((TestData.CreateSchedule(), ""));
+                .Returns((TestSchedules.CreateSchedule(), ""));
 
             var controller = new TimetableController(data, _config.CreateMapper());
             var response = await controller.GetService("X12345", April1) as ObjectResult;;

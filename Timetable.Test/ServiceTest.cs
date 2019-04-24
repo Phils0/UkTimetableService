@@ -11,7 +11,7 @@ namespace Timetable.Test
         public void ParentSetToService()
         {
             var service = new Service("X12345");
-            var schedule = TestData.CreateSchedule();
+            var schedule = TestSchedules.CreateSchedule();
             schedule.AddToService(service);
 
             Assert.Same(service, schedule.Parent);
@@ -21,8 +21,8 @@ namespace Timetable.Test
         public void CanAddSchedulesWithDifferentStpIndicator()
         {
             var service = new Service("X12345");
-            var permanent = TestData.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestData.EverydayAugust2019);
-            var overlay = TestData.CreateSchedule(indicator: StpIndicator.Override, calendar: TestData.EverydayAugust2019);
+            var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
+            var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.EverydayAugust2019);
             
             permanent.AddToService(service);
             overlay.AddToService(service);
@@ -36,8 +36,8 @@ namespace Timetable.Test
         public void CanAddSchedulesWithSameStpIndicator()
         {
             var service = new Service("X12345");
-            var permanent = TestData.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestData.EverydayAugust2019);
-            var permanent2 = TestData.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestData.CreateAugust2019Calendar(DaysFlag.Monday));
+            var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
+            var permanent2 = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
             permanent.AddToService(service);
             permanent2.AddToService(service);
@@ -55,7 +55,7 @@ namespace Timetable.Test
         [Fact]
         public void CannotAddScheduleWithDifferentTimetableUid()
         {
-            var schedule = TestData.CreateSchedule(timetableId: "A00002", indicator: StpIndicator.Permanent);
+            var schedule = TestSchedules.CreateSchedule(timetableId: "A00002", indicator: StpIndicator.Permanent);
             
             var service = new Service("A00001");
             
@@ -67,10 +67,10 @@ namespace Timetable.Test
         [Fact]
         public void GetsScheduleRunningOnDate()
         {
-            var schedule = TestData.CreateScheduleWithService(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Wednesday));
+            var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
             var service = schedule.Parent;
             
-            var schedule2 = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Thursday), service: service);
+            var schedule2 = TestSchedules.CreateSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Thursday), service: service);
             
             var found = service.GetScheduleOn(MondayAugust12.AddDays(2));
             Assert.Equal(schedule, found);
@@ -82,9 +82,9 @@ namespace Timetable.Test
         [Fact]
         public void NullReturnedIfNoSchedulesRunOnDate()
         {
-            var schedule = TestData.CreateScheduleWithService(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Wednesday));
+            var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
             var service = schedule.Parent;
-            var schedule2 = TestData.CreateSchedule(calendar: TestData.CreateAugust2019Calendar(DaysFlag.Thursday), service: service);
+            var schedule2 = TestSchedules.CreateSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Thursday), service: service);
             
             var found = service.GetScheduleOn(MondayAugust12);
             Assert.Null(found);
@@ -99,10 +99,10 @@ namespace Timetable.Test
         [InlineData(StpIndicator.Permanent, StpIndicator.Override)]
         public void HighIndicatorsTakePriorityOverLow(StpIndicator lowIndicator, StpIndicator highIndicator)
         {
-            var low = TestData.CreateScheduleWithService(indicator: lowIndicator, calendar: TestData.EverydayAugust2019);
+            var low = TestSchedules.CreateScheduleWithService(indicator: lowIndicator, calendar: TestSchedules.EverydayAugust2019);
             var service = low.Parent;
-            var high = TestData.CreateSchedule(indicator: highIndicator, calendar: TestData.EverydayAugust2019, service: service);
-            var low2 = TestData.CreateSchedule(indicator: lowIndicator, calendar: TestData.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
+            var high = TestSchedules.CreateSchedule(indicator: highIndicator, calendar: TestSchedules.EverydayAugust2019, service: service);
+            var low2 = TestSchedules.CreateSchedule(indicator: lowIndicator, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
 
             var found = service.GetScheduleOn(MondayAugust12);
             Assert.Equal(high, found);

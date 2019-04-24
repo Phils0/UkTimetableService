@@ -9,7 +9,7 @@ namespace Timetable.Test
         [Fact]
         public void ToStringRunsOnBankHolidays()
         {
-            var calendar = TestData.EverydayAugust2019;
+            var calendar = TestSchedules.EverydayAugust2019;
 
             Assert.Equal("01/08/2019-31/08/2019 MoTuWeThFrSaSu", calendar.ToString());
         }
@@ -17,7 +17,7 @@ namespace Timetable.Test
         [Fact]
         public void ToStringDoesNotRunOnBankHolidays()
         {
-            var calendar = TestData.CreateAugust2019Calendar(bankHolidays: BankHolidayRunning.DoesNotRunOnEnglishBankHolidays);
+            var calendar = TestSchedules.CreateAugust2019Calendar(bankHolidays: BankHolidayRunning.DoesNotRunOnEnglishBankHolidays);
 
             Assert.Equal("01/08/2019-31/08/2019 MoTuWeThFrSaSu (E)", calendar.ToString());
         }
@@ -35,7 +35,7 @@ namespace Timetable.Test
         [MemberData(nameof(CalendarBoundaries))]
         public void IsWithinCalendar(DateTime day, bool expected)
         {
-            var calendar = TestData.EverydayAugust2019;
+            var calendar = TestSchedules.EverydayAugust2019;
 
             Assert.Equal(expected, calendar.IsWithinCalendar(day));
         }
@@ -45,7 +45,7 @@ namespace Timetable.Test
         [MemberData(nameof(CalendarBoundaries))]
         public void IsActiveWhenWithinCalendarRange(DateTime day, bool expected)
         {
-            var calendar = TestData.EverydayAugust2019;
+            var calendar = TestSchedules.EverydayAugust2019;
 
             Assert.Equal(expected, calendar.IsActiveOn(day));
         }
@@ -65,7 +65,7 @@ namespace Timetable.Test
         [MemberData(nameof(CalendarDays))]
         public void IsActiveWhenOnDay(DateTime day, bool expected)
         {
-            var calendar = TestData.CreateAugust2019Calendar(dayMask: DaysFlag.Weekend);
+            var calendar = TestSchedules.CreateAugust2019Calendar(dayMask: DaysFlag.Weekend);
 
             Assert.Equal(expected, calendar.IsActiveOn(day));
         }
@@ -100,7 +100,7 @@ namespace Timetable.Test
         [MemberData(nameof(BankHolidays))]
         public void IsActiveWhenRunsOnBankHolidays(BankHolidayRunning bankHolidays, DateTime day, bool expected)
         {
-            var calendar = TestData.CreateAugust2019Calendar(bankHolidays: bankHolidays);
+            var calendar = TestSchedules.CreateAugust2019Calendar(bankHolidays: bankHolidays);
 
             Assert.Equal(expected, calendar.IsActiveOn(day));
         }
@@ -142,20 +142,20 @@ namespace Timetable.Test
         public static TheoryData<ICalendar,int> OrderingTests =>
             new TheoryData<ICalendar, int>()
             {
-                {TestData.EverydayAugust2019, 0},
-                {TestData.CreateAugust2019Calendar(DaysFlag.Monday), 1},
-                {TestData.CreateAugust2019Calendar(bankHolidays: BankHolidayRunning.DoesNotRunOnEnglishBankHolidays), -1},
-                {TestData.CreateEverydayCalendar(new DateTime(2019, 8, 2), new DateTime(2019, 8, 31)), -1},
-                {TestData.CreateEverydayCalendar(new DateTime(2019, 7, 31), new DateTime(2019, 8, 31)), 1},
-                {TestData.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 8, 30)), 1},
-                {TestData.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 9, 1)), -1},
+                {TestSchedules.EverydayAugust2019, 0},
+                {TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), 1},
+                {TestSchedules.CreateAugust2019Calendar(bankHolidays: BankHolidayRunning.DoesNotRunOnEnglishBankHolidays), -1},
+                {TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 2), new DateTime(2019, 8, 31)), -1},
+                {TestSchedules.CreateEverydayCalendar(new DateTime(2019, 7, 31), new DateTime(2019, 8, 31)), 1},
+                {TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 8, 30)), 1},
+                {TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 9, 1)), -1},
             };
 
         [Theory]
         [MemberData(nameof(OrderingTests))]
         public void CalendarsAreOrdered(ICalendar calendar, int expected)
         {
-            var x = TestData.EverydayAugust2019;            
+            var x = TestSchedules.EverydayAugust2019;            
             Assert.Equal(expected, x.CompareTo(calendar));
         }
     }

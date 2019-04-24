@@ -3,6 +3,7 @@ using AutoMapper;
 using Timetable.Test.Data;
 using Timetable.Web.Test.Cif;
 using Xunit;
+using TestSchedules = Timetable.Test.Data.TestSchedules;
 
 namespace Timetable.Web.Test.Mapping
 {
@@ -29,7 +30,7 @@ namespace Timetable.Web.Test.Mapping
         private static Model.Service MapSchedule(Timetable.Schedule schedule = null)
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
-            schedule = schedule ?? TestData.CreateScheduleWithService();
+            schedule = schedule ?? TestSchedules.CreateScheduleWithService();
 
             return mapper.Map<Timetable.Schedule, Model.Service>(
                 schedule, 
