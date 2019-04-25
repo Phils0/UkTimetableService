@@ -102,55 +102,8 @@ namespace Timetable
         /// </summary>
         public Station Station { get; set; }
 
-        private readonly SortedList<Time, Service[]> _arrivals =
-            new SortedList<Time, Service[]>(256, Time.LaterEarlierComparer);
-
-        private readonly SortedList<Time, Service[]> _departures =
-            new SortedList<Time, Service[]>(256, Time.EarlierLaterComparer);
-
-        internal void AddService(ScheduleLocation stop)
-        {
-            if (stop is IArrival arrival)
-            {
-                var time = arrival.GetTime();
-                if (!_arrivals.ContainsKey(time))
-                    _arrivals.Add(time, new[] {arrival.Service});
-                else
-                    AddSchedule(time, arrival.Service, _arrivals);
-            }
-
-            if (stop is IDeparture departure)
-            {
-                var time = departure.GetTime();
-                if (!_departures.TryGetValue(time, out var services))
-                    _departures.Add(time, new[] {departure.Service});
-                else
-                    AddSchedule(time, departure.Service, _departures);
-            }
-
-            void AddSchedule(Time time, Service service, SortedList<Time, Service[]> appendTo)
-            {
-                var services = appendTo[time];
-                if (!services.Contains(service))
-                {
-                    var length = services.Length;
-                    Array.Resize(ref services, length + 1);
-                    services[length] = service;
-                    appendTo[time] = services;
-                }
-            }
-        }
-
-        public Service[] FindExactDepartures(Time time)
-        {
-            return _departures.TryGetValue(time, out var services) ? services : new Service[0];
-        }
-
-        public Service[] FindExactArrivals(Time time)
-        {
-            return _arrivals.TryGetValue(time, out var services) ? services : new Service[0];
-        }
-
+        public LocationTimetable Timetable { get; } = new LocationTimetable();
+        
         public override string ToString()
         {
             return String.IsNullOrEmpty(Tiploc) ? "Not Set" : $"{ThreeLetterCode}-{Tiploc}";

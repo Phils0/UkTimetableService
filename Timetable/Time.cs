@@ -75,6 +75,8 @@ namespace Timetable
         public Time Add(TimeSpan ts) => new Time(this.Value.Add(ts));
         public Time Subtract(TimeSpan ts) => new Time(this.Value.Subtract(ts));
 
+        public Time AddMinutes(int minutes) => Add(new TimeSpan(0, minutes, 0));
+
         public bool Equals(Time other)
         {
             return Value.Equals(other.Value);

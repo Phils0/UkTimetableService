@@ -60,7 +60,7 @@ namespace Timetable
         {
             Parent = schedule;
             schedule.AddLocation(this);
-            Location.AddService(this);
+            Location.Timetable.AddService(this);
         }
 
         public Service Service => Parent.Parent;

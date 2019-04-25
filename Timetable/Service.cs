@@ -74,6 +74,7 @@ namespace Timetable
 
         public Schedule GetScheduleOn(DateTime date)
         {
+            
             if (_schedule != null)
             {
                 if (_schedule.RunsOn(date))
@@ -88,6 +89,12 @@ namespace Timetable
             return null;
         }
 
+        public bool TryGetScheduleOn(DateTime date, out Schedule schedule)
+        {
+            schedule = GetScheduleOn(date);
+            return schedule != null;
+        }
+        
         public override string ToString()
         {
             return TimetableUid;
