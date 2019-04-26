@@ -3,9 +3,9 @@ using System;
 namespace Timetable.Web.Model
 {
     /// <summary>
-    /// Location in a schedule
+    /// Location Id
     /// </summary>
-    public class ScheduleLocation
+    public class LocationId
     {
         /// <summary>
         /// Tiploc code

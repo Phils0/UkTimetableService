@@ -23,12 +23,12 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Parent, o => o.Ignore())
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.RetailServiceId, o => o.Ignore())
-                .ForMember(d => d.Toc, o => o.Ignore())
+                .ForMember(d => d.Operator, o => o.Ignore())
                 .ForMember(d => d.Locations, o => o.Ignore());
             CreateMap<CifParser.Records.ScheduleExtraData, Timetable.Schedule>()
                 .DisableCtorValidation()
                 .ForMember(d => d.RetailServiceId, o => o.MapFrom(s => s.RetailServiceId))
-                .ForMember(d => d.Toc, o => o.ConvertUsing(new TocConverter(), s => s.Toc))
+                .ForMember(d => d.Operator, o => o.ConvertUsing(new TocConverter(), s => s.Toc))
                 .ForAllOtherMembers(o => o.Ignore());
 
             CreateMap<TimeSpan, Time>()

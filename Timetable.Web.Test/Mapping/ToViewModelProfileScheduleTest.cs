@@ -55,7 +55,7 @@ namespace Timetable.Web.Test.Mapping
         public void MapToc()
         {
             var output = MapSchedule();
-            Assert.Equal("VT", output.Toc);         
+            Assert.Equal("VT", output.Operator);         
         }
         
         [Fact]

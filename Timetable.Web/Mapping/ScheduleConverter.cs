@@ -38,7 +38,7 @@ namespace Timetable.Web.Mapping
                 var extra = source.GetScheduleExtraDetails();
                 if (extra == null)
                 {
-                    schedule.Toc = Toc.Unknown;
+                    schedule.Operator = Toc.Unknown;
                     schedule.RetailServiceId = "";
                     return false;
                 }

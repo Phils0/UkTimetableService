@@ -5,7 +5,7 @@ namespace Timetable.Web.Model
 {
     public class ScheduledStop
     {
-        public Timetable.Web.Model.ScheduleLocation Location { get; set; }
+        public LocationId Location { get; set; }
 
         public DateTime? Arrival { get; set; }
 

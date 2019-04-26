@@ -133,7 +133,7 @@ namespace Timetable.Web.Test.Mapping
         public void MapToc()
         {
             var output = MapSchedule();
-            var toc = output.Toc;
+            var toc = output.Operator;
             Assert.Equal("SW", toc.Code);
             Assert.Equal("", toc.Name);
         }
@@ -158,7 +158,7 @@ namespace Timetable.Web.Test.Mapping
                 });
 
             Assert.NotSame(output1, output2);
-            Assert.Same(output1.Toc, output2.Toc);
+            Assert.Same(output1.Operator, output2.Operator);
         }
 
         [Fact]
@@ -174,7 +174,7 @@ namespace Timetable.Web.Test.Mapping
 
             var output = MapSchedule(schedule);
 
-            Assert.Equal(Toc.Unknown, output.Toc);
+            Assert.Equal(Toc.Unknown, output.Operator);
             Assert.Equal("", output.RetailServiceId);
         }
         

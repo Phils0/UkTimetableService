@@ -58,7 +58,7 @@ namespace Timetable
 
         public string RetailServiceId { get; set; }
 
-        public Toc Toc { get; set; }
+        public Toc Operator { get; set; }
 
         public AccomodationClass SeatClass { get; set; }
 

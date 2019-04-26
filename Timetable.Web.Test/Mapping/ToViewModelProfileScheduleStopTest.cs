@@ -24,7 +24,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
 
-            var output = mapper.Map<Timetable.Location, Model.ScheduleLocation>(TestLocations.Surbiton);
+            var output = mapper.Map<Timetable.Location, Model.LocationId>(TestLocations.Surbiton);
             
             Assert.Equal("SURBITN", output.Tiploc);
             Assert.Equal("SUR", output.ThreeLetterCode);

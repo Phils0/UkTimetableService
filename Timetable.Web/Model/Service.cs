@@ -22,7 +22,7 @@ namespace Timetable.Web.Model
         /// <summary>
         /// Toc
         /// </summary>
-        public string Toc { get; set; }
+        public string Operator { get; set; }
         /// <summary>
         /// Seat Accomodation class
         /// </summary>
