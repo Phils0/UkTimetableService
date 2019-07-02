@@ -43,8 +43,11 @@ namespace Timetable.Web
             var cifFactory = new ConsolidatorFactory(_logger);
             var cifParser = cifFactory.CreateParser();
             
-            var ttisFactory = new TtisParserFactory(_logger);
-            var stationParser = ttisFactory.CreateStationParser();            
+            var ttisFactory = new StationParserFactory(_logger);
+            var ignoreLines = Configuration.IsDtdZip
+                ? StationParserFactory.DtdIgnoreLines
+                : StationParserFactory.TtisIgnoreLines;
+            var stationParser = ttisFactory.CreateStationParser(ignoreLines);         
     
             return new DataLoader(extractor, cifParser, stationParser, CreateMapper(), Configuration, _logger);
         }

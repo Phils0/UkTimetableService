@@ -7,6 +7,10 @@ namespace Timetable.Web
     {
         string TimetableArchiveFile { get; }
         bool IsRdgZip { get; }
+        
+        bool IsTtisZip { get; }
+        
+        bool IsDtdZip { get; }
     }
     
     internal class LoaderConfig : ILoaderConfig
@@ -18,8 +22,12 @@ namespace Timetable.Web
             _appSettings = appSettings;
         }
         
-        public bool IsRdgZip => TimetableArchiveFile.Contains("ttis");    // Initially just simple file name check
+        public bool IsRdgZip => IsDtdZip || IsTtisZip;
 
+        public bool IsTtisZip => TimetableArchiveFile.Contains("ttis");    // Initially just simple file name check
+        
+        public bool IsDtdZip => TimetableArchiveFile.Contains("RJTTF");    // Initially just simple file name check
+        
         public string TimetableArchiveFile
         {
             get
