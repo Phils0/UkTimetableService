@@ -42,8 +42,11 @@ namespace Timetable.Web.Test
             Assert.NotEmpty(locationData.Locations);
             Assert.NotEmpty(locationData.LocationsByTiploc);
 
-            var services = data.Timetable.AsDynamic()._data.RealObject as Dictionary<string, Service>;
+            var services = data.Timetable.AsDynamic()._timetableUidMap.RealObject as Dictionary<string, Service>;
             Assert.NotEmpty(services);
+            
+            var retailServiceIdMap = data.Timetable.AsDynamic()._retailServiceIdMap.RealObject as Dictionary<string, IList<Service>>;
+            Assert.NotEmpty(retailServiceIdMap);
         }
     }
 }

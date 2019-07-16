@@ -9,6 +9,10 @@ namespace Timetable.Web.Model
         /// </summary>
         public string TimetableUid { get; set; }
         /// <summary>
+        /// Timetable Id
+        /// </summary>
+        public string RetailServiceid { get; set; }
+        /// <summary>
         /// Running date
         /// </summary>
         public DateTime Date { get; set; }

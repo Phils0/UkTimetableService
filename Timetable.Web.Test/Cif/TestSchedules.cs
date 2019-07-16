@@ -22,7 +22,7 @@ namespace Timetable.Web.Test.Cif
     internal static class TestSchedules
     {
         internal const string X12345 = "X12345";
-
+        internal const string SW1234 = "SW123400";
         internal static CifParser.Schedule Test => new CifParser.Schedule()
         {
             Records = new List<IRecord>(new IRecord[]
@@ -58,12 +58,12 @@ namespace Timetable.Web.Test.Cif
         }
 
         internal static ScheduleExtraData CreateScheduleExtraDetails(
-            string retailServieId = "SW123400",
+            string retailServiceId = SW1234,
             string toc = "SW")
         {
             return new ScheduleExtraData()
             {
-                RetailServiceId = retailServieId,
+                RetailServiceId = retailServiceId,
                 Toc = toc
             };
         }

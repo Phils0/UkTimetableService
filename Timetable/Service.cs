@@ -79,6 +79,8 @@ namespace Timetable
             {
                 if (_schedule.RunsOn(date))
                     return _schedule;
+
+                return null;
             }
             
             foreach (var schedule in _multipleSchedules.Values)

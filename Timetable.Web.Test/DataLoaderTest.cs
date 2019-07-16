@@ -113,7 +113,7 @@ namespace Timetable.Web.Test
         }
         
         [Fact]
-        public async Task LoadSchedules()
+        public async Task LoadSchedulesSetsTimetableUidMap()
         {
             var config = Substitute.For<ILoaderConfig>();
             config.IsRdgZip.Returns(true);
@@ -130,9 +130,32 @@ namespace Timetable.Web.Test
             var data = await loader.LoadAsync(CancellationToken.None);
             var services = data.Timetable;
 
-            var schedule = services.GetSchedule(Cif.TestSchedules.X12345, new DateTime(2019, 8, 1));
+            var schedule = services.GetScheduleByTimetableUid(Cif.TestSchedules.X12345, new DateTime(2019, 8, 1));
             
-            Assert.NotNull(schedule);            
+            Assert.NotNull(schedule.schedule);            
+        }
+        
+        [Fact]
+        public async Task LoadSchedulesSetsRetailServiceIdMap()
+        {
+            var config = Substitute.For<ILoaderConfig>();
+            config.IsRdgZip.Returns(true);
+            config.TimetableArchiveFile.Returns(TestArchive);
+
+            var parser = Substitute.For<IParser>();
+            parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
+            {
+                Cif.TestSchedules.Test
+            });
+            
+            var loader = CreateLoader(config, parser);
+
+            var data = await loader.LoadAsync(CancellationToken.None);
+            var services = data.Timetable;
+
+            var schedule = services.GetScheduleByRetailServiceId(Cif.TestSchedules.SW1234, new DateTime(2019, 8, 1));
+            
+            Assert.NotEmpty(schedule.schedule);            
         }
     }
 }

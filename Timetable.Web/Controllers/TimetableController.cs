@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -24,14 +25,14 @@ namespace Timetable.Web.Controllers
         /// <summary>
         /// Returns a scheduled service on a particular day
         /// </summary>
-        /// <param name="serviceId"></param>
+        /// <param name="serviceId">Timetable Id</param>
         /// <param name="date"></param>
         /// <returns></returns>
         [Route("service/{serviceId}/{date}")]
         [HttpGet]
-        public async Task<IActionResult> GetService(string serviceId, DateTime date)
+        public async Task<IActionResult> GetServiceByTimetableId(string serviceId, DateTime date)
         {
-            var service =  _timetable.GetSchedule(serviceId, date);
+            var service =  _timetable.GetScheduleByTimetableUid(serviceId, date);
             if (service.schedule == null)
                 return NotFound( 
                     new ServiceNotFound()
@@ -42,6 +43,30 @@ namespace Timetable.Web.Controllers
                     });
        
             var model = _mapper.Map<Timetable.Schedule, Model.Service>(service.schedule, o => { o.Items["On"] = date; });
+            return Ok(model);
+        }
+        
+        /// <summary>
+        /// Returns a scheduled service on a particular day
+        /// </summary>
+        /// <param name="serviceId">Retail Service Id</param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        [Route("retailService/{serviceId}/{date}")]
+        [HttpGet]
+        public async Task<IActionResult> GetServiceByRetailServiceId(string serviceId, DateTime date)
+        {
+            var service =  _timetable.GetScheduleByRetailServiceId(serviceId, date);
+            if (!service.schedule.Any())
+                return NotFound( 
+                    new ServiceNotFound()
+                    {
+                        RetailServiceid = serviceId,
+                        Date = date,
+                        Reason = service.reason
+                    });
+       
+            var model = _mapper.Map<Timetable.Schedule[], Model.Service[]>(service.schedule, o => { o.Items["On"] = date; });
             return Ok(model);
         }
         

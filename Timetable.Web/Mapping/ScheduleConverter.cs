@@ -26,9 +26,12 @@ namespace Timetable.Web.Mapping
             var schedule = new Schedule(_sequence.GetNext());           
             schedule = context.Mapper
                     .Map<CifParser.Records.ScheduleDetails, Timetable.Schedule>(source.GetScheduleDetails(), schedule);
-            timetable.AddSchedule(schedule);
             
             var skipTwo = SetExtraDetails();
+
+            // Only add to timetable after set both TimetableUid and RetailServiceId
+            timetable.AddSchedule(schedule);
+
             MapLocations(source.Records.Skip(skipTwo ? 2 : 1));
 
             return schedule;

@@ -186,7 +186,7 @@ namespace Timetable.Web.Test.Mapping
                 Records = new List<IRecord>(new IRecord[]
                 {
                     Cif.TestSchedules.CreateScheduleDetails(),
-                    Cif.TestSchedules.CreateScheduleExtraDetails(retailServieId: "")
+                    Cif.TestSchedules.CreateScheduleExtraDetails(retailServiceId: "")
                 })
             };
 
