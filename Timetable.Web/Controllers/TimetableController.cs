@@ -42,21 +42,22 @@ namespace Timetable.Web.Controllers
                 return Ok(model);             
             }
 
-            return NotFound(CreateNotFoundResponse(service.status, serviceId, date));
+            return CreateNoServiceResponse(service.status, serviceId, date);
         }
 
-        private ServiceNotReturned CreateNotFoundResponse(LookupStatus serviceStatus, string serviceId, in DateTime date)
+        private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string serviceId, in DateTime date)
         {
             var reason = "";
             switch (serviceStatus)
             {
                 case LookupStatus.CancelledService:
-                    return new ServiceCancelled()
+                    // Cancelled returns 200
+                    return Ok(new ServiceCancelled()
                     {
                         Id = serviceId,
                         Date = date,
                         Reason = $"{serviceId} cancelled on {date:d}"
-                    };                    
+                    });                    
                 case LookupStatus.ServiceNotFound:
                     reason = $"{serviceId} not found in timetable";
                     break;
@@ -69,12 +70,13 @@ namespace Timetable.Web.Controllers
                     break;
             }
             
-            return new ServiceNotFound()
+            //Return 404
+            return  NotFound(new ServiceNotFound()
             {
                 Id = serviceId,
                 Date = date,
                 Reason = reason
-            };
+            });
         }
         
         /// <summary>
@@ -94,7 +96,7 @@ namespace Timetable.Web.Controllers
                  return Ok(model);               
             }    
 
-            return NotFound(CreateNotFoundResponse(service.status, serviceId, date));
+            return CreateNoServiceResponse(service.status, serviceId, date);
         }
         
         /// <summary>

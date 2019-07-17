@@ -51,6 +51,23 @@ namespace Timetable.Web.Test.Controllers
         }
         
         [Fact]
+        public async Task ServiceByTimetableUidReturnsCancelledWithReason()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Returns((LookupStatus.CancelledService, null));
+
+            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+            var notFound = response.Value as ServiceCancelled;
+            Assert.Equal("X12345", notFound.Id);
+            Assert.Equal(April1, notFound.Date);
+            Assert.Equal("X12345 cancelled on 01/04/2019", notFound.Reason);
+        }
+        
+        [Fact]
         public async Task ServiceByRetailServiceIdReturnsService()
         {
             var data = Substitute.For<ITimetable>();
@@ -81,6 +98,23 @@ namespace Timetable.Web.Test.Controllers
             Assert.Equal("VT1234", notFound.Id);
             Assert.Equal(April1, notFound.Date);
             Assert.Equal("VT1234 not found in timetable", notFound.Reason);
+        }
+        
+        [Fact]
+        public async Task ServiceByRetailServiceIdReturnsCancelledWithReason()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Returns((LookupStatus.CancelledService, null));
+
+            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetServiceByRetailServiceId("VT1234", April1) as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+            var notFound = response.Value as ServiceCancelled;
+            Assert.Equal("VT1234", notFound.Id);
+            Assert.Equal(April1, notFound.Date);
+            Assert.Equal("VT1234 cancelled on 01/04/2019", notFound.Reason);
         }
     }
 }
