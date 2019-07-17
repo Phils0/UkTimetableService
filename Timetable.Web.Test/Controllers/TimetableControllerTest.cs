@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using Serilog;
 using Timetable.Test.Data;
 using Timetable.Web.Controllers;
 using Timetable.Web.Mapping;
@@ -23,9 +24,9 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((TestSchedules.CreateSchedule(), ""));
+                .Returns((LookupStatus.Success, TestSchedules.CreateSchedule()));
 
-            var controller = new TimetableController(data, _config.CreateMapper());
+            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -37,26 +38,26 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((null, "Not found"));
+                .Returns((LookupStatus.ServiceNotFound, null));
 
-            var controller = new TimetableController(data, _config.CreateMapper());
+            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;;
             
             Assert.Equal(404, response.StatusCode);
             var notFound = response.Value as ServiceNotFound;
-            Assert.Equal("X12345", notFound.TimetableUid);
+            Assert.Equal("X12345", notFound.Id);
             Assert.Equal(April1, notFound.Date);
-            Assert.Equal("Not found", notFound.Reason);
+            Assert.Equal("X12345 not found in timetable", notFound.Reason);
         }
         
         [Fact]
         public async Task ServiceByRetailServiceIdReturnsService()
         {
             var data = Substitute.For<ITimetable>();
-            data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((TestSchedules.CreateSchedule(), ""));
+            data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateSchedule()}));
 
-            var controller = new TimetableController(data, _config.CreateMapper());
+            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByRetailServiceId("VT1234", April1) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -69,17 +70,17 @@ namespace Timetable.Web.Test.Controllers
         public async Task ServiceByRetailServiceIdReturnsNotFoundWithReason()
         {
             var data = Substitute.For<ITimetable>();
-            data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((null, "Not found"));
+            data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Returns((LookupStatus.ServiceNotFound, new Schedule[0]));
 
-            var controller = new TimetableController(data, _config.CreateMapper());
+            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByRetailServiceId("VT1234", April1) as ObjectResult;;
             
             Assert.Equal(404, response.StatusCode);
             var notFound = response.Value as ServiceNotFound;
-            Assert.Equal("VT1234", notFound.RetailServiceid);
+            Assert.Equal("VT1234", notFound.Id);
             Assert.Equal(April1, notFound.Date);
-            Assert.Equal("Not found", notFound.Reason);
+            Assert.Equal("VT1234 not found in timetable", notFound.Reason);
         }
     }
 }

@@ -20,6 +20,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using ILogger = Serilog.ILogger;
 
 namespace Timetable.Web
 {
@@ -44,6 +45,7 @@ namespace Timetable.Web
                 AddSingleton<ILocationData>(data.Locations).
                 AddSingleton<ITimetable>(data.Timetable).
                 AddSingleton<IMapper>(factory.CreateMapper()).
+                AddSingleton<ILogger>(Log.Logger).
                 AddSwaggerGen(ConfigureSwagger).
                 AddMvc().
                 SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

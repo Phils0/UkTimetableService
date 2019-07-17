@@ -47,7 +47,7 @@ namespace Timetable.Test
             
             var found = timetable.GetScheduleByTimetableUid("Z98765", MondayAugust12);
             Assert.Null(found.schedule);
-            Assert.Equal("Z98765 not found in timetable", found.reason);
+            Assert.Equal(LookupStatus.ServiceNotFound, found.status);
         }
         
         [Fact]
@@ -59,7 +59,7 @@ namespace Timetable.Test
                        
             var found = timetable.GetScheduleByTimetableUid("X12345", MondayAugust12.AddDays(2));
             Assert.Null(found.schedule);
-            Assert.Equal("X12345 does not run on 14/08/2019", found.reason);
+            Assert.Equal(LookupStatus.NoScheduleOnDate, found.status);
         }
         
         [Fact]
@@ -75,7 +75,7 @@ namespace Timetable.Test
             
             found = timetable.GetScheduleByTimetableUid("X12345", MondayAugust12.AddDays(1));
             Assert.Null(found.schedule);
-            Assert.Equal("X12345 cancelled in STP on 13/08/2019", found.reason);
+            Assert.Equal(LookupStatus.CancelledService, found.status);
         }
     }
 }

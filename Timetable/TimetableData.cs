@@ -4,10 +4,18 @@ using System.Linq;
 
 namespace Timetable
 {
+    public enum LookupStatus
+    {
+        Success,
+        ServiceNotFound,
+        NoScheduleOnDate,
+        CancelledService
+    }
+    
     public interface ITimetable
     {
-        (Schedule schedule, string reason) GetScheduleByTimetableUid(string timetableUid, DateTime date);
-        (Schedule[] schedule, string reason) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
+        (LookupStatus status, Schedule schedule) GetScheduleByTimetableUid(string timetableUid, DateTime date);
+        (LookupStatus status, Schedule[] schedule) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
     }
 
     public class TimetableData : ITimetable
@@ -41,27 +49,27 @@ namespace Timetable
             schedule.AddToService(service);
         }
 
-        public (Schedule schedule, string reason) GetScheduleByTimetableUid(string timetableUid, DateTime date)
+        public (LookupStatus status, Schedule schedule) GetScheduleByTimetableUid(string timetableUid, DateTime date)
         {
             if (!_timetableUidMap.TryGetValue(timetableUid, out var service))
-                return (null, $"{timetableUid} not found in timetable");
+                return (LookupStatus.ServiceNotFound, null);
 
             var schedule = service.GetScheduleOn(date);
             
             if(schedule == null)
-                return (null, $"{timetableUid} does not run on {date:d}");
+                return (LookupStatus.NoScheduleOnDate, null);
  
             if(schedule.StpIndicator == StpIndicator.Cancelled)
-                return (null, $"{timetableUid} cancelled in STP on {date:d}");
+                return (LookupStatus.CancelledService, null);
 
             
-            return (schedule, "");
+            return (LookupStatus.Success , schedule);
         }
 
-        public (Schedule[] schedule, string reason) GetScheduleByRetailServiceId(string retailServiceId, DateTime date)
+        public (LookupStatus status, Schedule[] schedule) GetScheduleByRetailServiceId(string retailServiceId, DateTime date)
         {
             if (!_retailServiceIdMap.TryGetValue(retailServiceId, out var services))
-                return (new Schedule[0], $"{retailServiceId} not found in timetable");
+                return (LookupStatus.ServiceNotFound, new Schedule[0]);
 
             var schedules = new List<Schedule>();
             
@@ -73,14 +81,14 @@ namespace Timetable
                     continue;
  
                 if(schedule.StpIndicator == StpIndicator.Cancelled)
-                    return (new Schedule[0], $"{retailServiceId} cancelled in STP on {date:d}");
+                    return (LookupStatus.CancelledService, new Schedule[0]);
  
                 schedules.Add(schedule);
             }
 
-            var reason = schedules.Any() ? "" : $"{retailServiceId} does not run on {date:d}";
+            var reason = schedules.Any() ? LookupStatus.Success : LookupStatus.NoScheduleOnDate;
             
-            return (schedules.ToArray(), reason);
+            return (reason, schedules.ToArray());
         }
     }
 }

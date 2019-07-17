@@ -124,7 +124,7 @@ namespace Timetable.Test
             var destination = permanent.Locations.Last().Location.Timetable;
 
             var services = destination.GetArrivals(TestSchedules.TenThirty);
-            Assert.Equal(1, services.Length);
+            Assert.Single(services);
         }
         
         [Fact]

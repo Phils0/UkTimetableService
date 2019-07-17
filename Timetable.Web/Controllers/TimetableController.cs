@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Serilog;
 using Timetable.Web.Model;
 
 namespace Timetable.Web.Controllers
@@ -15,11 +16,13 @@ namespace Timetable.Web.Controllers
     {
         private readonly ITimetable _timetable;
         private readonly IMapper _mapper;
-
-        public TimetableController(ITimetable timetable, IMapper mapper)
+        private readonly ILogger _logger;
+        
+        public TimetableController(ITimetable timetable, IMapper mapper, ILogger logger)
         {
             _timetable = timetable;
             _mapper = mapper;
+            _logger = logger;
         }
 
         /// <summary>
@@ -33,17 +36,45 @@ namespace Timetable.Web.Controllers
         public async Task<IActionResult> GetServiceByTimetableId(string serviceId, DateTime date)
         {
             var service =  _timetable.GetScheduleByTimetableUid(serviceId, date);
-            if (service.schedule == null)
-                return NotFound( 
-                    new ServiceNotFound()
+            if (service.status == LookupStatus.Success)
+            {
+                var model = _mapper.Map<Timetable.Schedule, Model.Service>(service.schedule, o => { o.Items["On"] = date; });
+                return Ok(model);             
+            }
+
+            return NotFound(CreateNotFoundResponse(service.status, serviceId, date));
+        }
+
+        private ServiceNotReturned CreateNotFoundResponse(LookupStatus serviceStatus, string serviceId, in DateTime date)
+        {
+            var reason = "";
+            switch (serviceStatus)
+            {
+                case LookupStatus.CancelledService:
+                    return new ServiceCancelled()
                     {
-                        TimetableUid = serviceId,
+                        Id = serviceId,
                         Date = date,
-                        Reason = service.reason
-                    });
-       
-            var model = _mapper.Map<Timetable.Schedule, Model.Service>(service.schedule, o => { o.Items["On"] = date; });
-            return Ok(model);
+                        Reason = $"{serviceId} cancelled on {date:d}"
+                    };                    
+                case LookupStatus.ServiceNotFound:
+                    reason = $"{serviceId} not found in timetable";
+                    break;
+                case LookupStatus.NoScheduleOnDate:
+                    reason = $"{serviceId} does not run on {date:d}";
+                    break;
+                default:
+                    reason = $"Unknown reason why could not find {serviceId} on {date:d}";
+                    _logger.Error(reason);
+                    break;
+            }
+            
+            return new ServiceNotFound()
+            {
+                Id = serviceId,
+                Date = date,
+                Reason = reason
+            };
         }
         
         /// <summary>
@@ -57,17 +88,13 @@ namespace Timetable.Web.Controllers
         public async Task<IActionResult> GetServiceByRetailServiceId(string serviceId, DateTime date)
         {
             var service =  _timetable.GetScheduleByRetailServiceId(serviceId, date);
-            if (!service.schedule.Any())
-                return NotFound( 
-                    new ServiceNotFound()
-                    {
-                        RetailServiceid = serviceId,
-                        Date = date,
-                        Reason = service.reason
-                    });
-       
-            var model = _mapper.Map<Timetable.Schedule[], Model.Service[]>(service.schedule, o => { o.Items["On"] = date; });
-            return Ok(model);
+            if (service.status == LookupStatus.Success)
+            {
+                 var model = _mapper.Map<Timetable.Schedule[], Model.Service[]>(service.schedule, o => { o.Items["On"] = date; });
+                 return Ok(model);               
+            }    
+
+            return NotFound(CreateNotFoundResponse(service.status, serviceId, date));
         }
         
         /// <summary>
