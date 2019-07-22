@@ -20,6 +20,10 @@ namespace Timetable.Web.Model
         /// </summary>
         public string RetailServiceId { get; set; }
         /// <summary>
+        /// Train Identity - sometimes called HeadCode
+        /// </summary>
+        public string TrainIdentity { get; set; }
+        /// <summary>
         /// Toc
         /// </summary>
         public string Operator { get; set; }

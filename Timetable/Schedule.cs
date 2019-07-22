@@ -49,21 +49,48 @@ namespace Timetable
         public int Id { get; }
 
         public Service Parent { get; private set;  }
-
+        /// <summary>
+        /// Timetable Id
+        /// </summary>
         public string TimetableUid { get; set; }
 
+        /// <summary>
+        /// STP (Short Term Plan) Indicator
+        /// </summary>
+        /// <remarks>
+        /// P - Permanent schedule
+        /// O - STP overlay of Permanent schedule
+        /// N - New STP schedule (not an overlay)
+        /// C - STP Cancellation of Permanent schedule
+        /// </remarks>
         public StpIndicator StpIndicator { get; set; }
 
         public ICalendar Calendar { get; set; }
-
+        /// <summary>
+        /// Retail Service ID - used by NRS
+        /// </summary>
         public string RetailServiceId { get; set; }
 
+        /// <summary>
+        /// Train Identity - sometimes called HeadCode
+        /// </summary>
+        public string TrainIdentity { get; set; }
+
+        /// <summary>
+        /// Toc
+        /// </summary>
         public Toc Operator { get; set; }
-
+        /// <summary>
+        /// Seat Accomodation class
+        /// </summary>
         public AccomodationClass SeatClass { get; set; }
-
+        /// <summary>
+        /// Sleeper Accomodation Class
+        /// </summary>
         public AccomodationClass SleeperClass { get; set; }
-
+        /// <summary>
+        ///  Reservation indicator
+        /// </summary>
         public ReservationIndicator ReservationIndicator { get; set; }
 
         /// <summary>

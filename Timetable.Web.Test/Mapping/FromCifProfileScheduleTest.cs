@@ -130,6 +130,13 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
+        public void MapTrainIdentity()
+        {
+            var output = MapSchedule();
+            Assert.Equal("9X12", output.TrainIdentity);
+        }
+        
+        [Fact]
         public void MapToc()
         {
             var output = MapSchedule();

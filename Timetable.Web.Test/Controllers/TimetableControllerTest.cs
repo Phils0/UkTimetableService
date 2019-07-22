@@ -104,8 +104,8 @@ namespace Timetable.Web.Test.Controllers
         public async Task ServiceByRetailServiceIdReturnsCancelledWithReason()
         {
             var data = Substitute.For<ITimetable>();
-            data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((LookupStatus.CancelledService, null));
+            data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Returns((LookupStatus.CancelledService, new Schedule[0]));
 
             var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByRetailServiceId("VT1234", April1) as ObjectResult;;

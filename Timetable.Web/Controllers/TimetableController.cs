@@ -52,6 +52,7 @@ namespace Timetable.Web.Controllers
             {
                 case LookupStatus.CancelledService:
                     // Cancelled returns 200
+                    //TODO Make change to return cancelled service
                     return Ok(new ServiceCancelled()
                     {
                         Id = serviceId,

@@ -17,6 +17,7 @@ namespace Timetable.Test.Data
                 TimetableUid = timetableId,
                 StpIndicator = indicator,
                 RetailServiceId = $"VT{timetableId.Substring(1, 4)}00",
+                TrainIdentity = $"9Z{timetableId.Substring(1, 2)}",
                 Operator = VirginTrains,
                 Status = ServiceStatus.PermanentPassenger,
                 Category = ServiceCategory.ExpressPassenger,

@@ -44,6 +44,7 @@ namespace Timetable.Web.Test.Cif
             return new ScheduleDetails()
             {
                 TimetableUid = timetableUid,
+                TrainIdentity = "9X12",
                 StpIndicator = stp,
                 RunsFrom = new DateTime(2019, 8, 1),
                 RunsTo = new DateTime(2019, 8, 31),
