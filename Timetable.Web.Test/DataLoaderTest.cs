@@ -15,30 +15,33 @@ namespace Timetable.Web.Test
 {
     public class DataLoaderTest
     {
-        private const string TestArchive = "TestArchive.zip";
-
         private static readonly MapperConfiguration _mapperConfig = new MapperConfiguration(
             cfg => cfg.AddProfile<FromCifProfile>());
         
         [Fact]
         public async Task LoadStations()
         {
-            var config = Substitute.For<ILoaderConfig>();
-            config.IsRdgZip.Returns(true);
-            config.TimetableArchiveFile.Returns(TestArchive);
-
-            var loader = CreateLoader(config);
-
+            var loader = CreateLoader(RdgArchive);
             var locations = await loader.LoadStationMasterListAsync(CancellationToken.None);
             
             Assert.Equal(3, locations.Count());
         }
 
-        private DataLoader CreateLoader(ILoaderConfig config, IParser cifParser = null)
+        private IArchive RdgArchive
+        {
+            get
+            {
+                var archive = Substitute.For<IArchive>();
+                archive.IsRdgZip.Returns(true);
+                return archive;
+            }
+        }
+
+        private DataLoader CreateLoader(IArchive archive, IParser cifParser = null)
         {
             var reader = Substitute.For<TextReader>();
             var extractor = Substitute.For<IArchiveFileExtractor>();
-            extractor.ExtractFile(TestArchive, RdgZipExtractor.StationExtension).Returns(reader);
+            extractor.ExtractFile(RdgZipExtractor.StationExtension).Returns(reader);
 
             cifParser = cifParser ?? Substitute.For<IParser>();
 
@@ -53,33 +56,25 @@ namespace Timetable.Web.Test
 
             var logger = Substitute.For<ILogger>();
 
-            var loader = new DataLoader(extractor, cifParser, stationParser, _mapperConfig.CreateMapper(), config, logger);
+            var loader = new DataLoader(extractor, cifParser, stationParser, _mapperConfig.CreateMapper(), archive, logger);
             return loader;
         }
 
         [Fact]
         public async Task LoadStationsThrowsExceptionIfNotRdgArchive()
         {
-            var config = Substitute.For<ILoaderConfig>();
-            config.IsRdgZip.Returns(false);
-            config.TimetableArchiveFile.Returns(TestArchive);
+            var archive = Substitute.For<IArchive>();
+            archive.IsRdgZip.Returns(false);
 
-            var loader = CreateLoader(config);
+            var loader = CreateLoader(archive);
   
             var ex = await Assert.ThrowsAnyAsync<InvalidDataException>(() =>  loader.LoadStationMasterListAsync(CancellationToken.None));
-            
-            Assert.Contains(TestArchive , ex.Message);
         }
         
         [Fact]
         public async Task LoadTimetableSetsLocations()
         {
-            var config = Substitute.For<ILoaderConfig>();
-            config.IsRdgZip.Returns(true);
-            config.TimetableArchiveFile.Returns(TestArchive);
-
-            var loader = CreateLoader(config);
-
+            var loader = CreateLoader(RdgArchive);
             var data = await loader.LoadAsync(CancellationToken.None);
 
             var locationData = data.Locations;
@@ -90,10 +85,6 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadTimetableDataSetsNlcs()
         {
-            var config = Substitute.For<ILoaderConfig>();
-            config.IsRdgZip.Returns(true);
-            config.TimetableArchiveFile.Returns(TestArchive);
-
             var parser = Substitute.For<IParser>();
             parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
             {
@@ -102,7 +93,7 @@ namespace Timetable.Web.Test
                 Cif.TestCifLocations.WaterlooWindsor
             });
             
-            var loader = CreateLoader(config, parser);
+            var loader = CreateLoader(RdgArchive, parser);
 
             var data = await loader.LoadAsync(CancellationToken.None);
             var locationData = data.Locations;
@@ -115,17 +106,13 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadSchedulesSetsTimetableUidMap()
         {
-            var config = Substitute.For<ILoaderConfig>();
-            config.IsRdgZip.Returns(true);
-            config.TimetableArchiveFile.Returns(TestArchive);
-
             var parser = Substitute.For<IParser>();
             parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
             {
                 Cif.TestSchedules.Test
             });
             
-            var loader = CreateLoader(config, parser);
+            var loader = CreateLoader(RdgArchive, parser);
 
             var data = await loader.LoadAsync(CancellationToken.None);
             var services = data.Timetable;
@@ -138,17 +125,13 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadSchedulesSetsRetailServiceIdMap()
         {
-            var config = Substitute.For<ILoaderConfig>();
-            config.IsRdgZip.Returns(true);
-            config.TimetableArchiveFile.Returns(TestArchive);
-
             var parser = Substitute.For<IParser>();
             parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
             {
                 Cif.TestSchedules.Test
             });
             
-            var loader = CreateLoader(config, parser);
+            var loader = CreateLoader(RdgArchive, parser);
 
             var data = await loader.LoadAsync(CancellationToken.None);
             var services = data.Timetable;

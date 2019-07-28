@@ -27,7 +27,7 @@ namespace Timetable.Web
     public class Startup
     {
         private static readonly TimeSpan Timeout = new TimeSpan(0, 5, 0);
-        
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -41,41 +41,40 @@ namespace Timetable.Web
             var factory = new Factory(Factory.MapperConfiguration, Configuration, Log.Logger);
             var data = LoadData(factory);
 
-            services.
-                AddSingleton<ILocationData>(data.Locations).
-                AddSingleton<ITimetable>(data.Timetable).
-                AddSingleton<IMapper>(factory.CreateMapper()).
-                AddSingleton<ILogger>(Log.Logger).
-                AddSwaggerGen(ConfigureSwagger).
-                AddMvc().
-                SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services
+                .AddSingleton<ILocationData>(data.Locations)
+                .AddSingleton<ITimetable>(data.Timetable)
+                .AddSingleton<IMapper>(factory.CreateMapper())    //TODO Swap to scoped
+                .AddSingleton<ILogger>(Log.Logger)
+                .AddSwaggerGen(ConfigureSwagger)
+                .AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         private static Data LoadData(Factory factory)
         {
-            var config = factory.Configuration;
-            
+            var archive = factory.Archive;
+
             try
             {
-                    var loader = factory.CreateDataLoader();
-                    var loaderTask = loader.LoadAsync(CancellationToken.None);
-                    
-                    var loaded = Task.WaitAll(new[]
-                    {
-                        loaderTask
-                    }, Timeout);
-        
-                    if (!loaded)
-                        throw new InvalidDataException($"Timeout loading file: {config.TimetableArchiveFile}");
-        
-                    return loaderTask.Result;
+                var loader = factory.CreateDataLoader();
+                var loaderTask = loader.LoadAsync(CancellationToken.None);
+
+                var loaded = Task.WaitAll(new[]
+                {
+                    loaderTask
+                }, Timeout);
+
+                if (!loaded)
+                    throw new InvalidDataException($"Timeout loading file: {archive.FullName}");
+
+                return loaderTask.Result;
             }
             catch (Exception e)
             {
-                Log.Fatal(e,"Timetable not loaded: {file}", config.TimetableArchiveFile);
+                Log.Fatal(e, "Timetable not loaded: {file}", archive.FullName);
                 throw;
             }
-
         }
 
         private void ConfigureSwagger(SwaggerGenOptions options)
@@ -86,7 +85,7 @@ namespace Timetable.Web
             var controllerPath = Path.Combine(AppContext.BaseDirectory, controllerAssembly);
             options.IncludeXmlComments(controllerPath);
         }
-        
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -110,7 +109,7 @@ namespace Timetable.Web
             app.UseHttpsRedirection();
             app.UseMvc();
         }
-        
+
         private void AddExceptionHandler(IApplicationBuilder app)
         {
             app.Run(async context =>

@@ -45,7 +45,7 @@ namespace Timetable.Web.Controllers
             return CreateNoServiceResponse(service.status, serviceId, date);
         }
 
-        private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string serviceId, in DateTime date)
+        private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string serviceId, DateTime date)
         {
             var reason = "";
             switch (serviceStatus)

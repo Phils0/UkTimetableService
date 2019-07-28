@@ -1,3 +1,4 @@
+using System;
 using AutoMapper;
 using CifExtractor;
 using CifParser;
@@ -19,9 +20,7 @@ namespace Timetable.Web
         
         private readonly IConfigurationProvider _mapperConfiguration;
         private readonly ILogger _logger;
-      
-        internal ILoaderConfig Configuration { get; }
-
+        
         internal Factory(IConfigurationProvider mapperConfiguration, IConfiguration config, ILogger logger) :
             this(mapperConfiguration, new LoaderConfig(config), logger)
         {
@@ -30,26 +29,33 @@ namespace Timetable.Web
         internal Factory(IConfigurationProvider mapperConfiguration, ILoaderConfig config, ILogger logger)
         {
             _mapperConfiguration = mapperConfiguration;
-            Configuration = config;
+            Archive = new Archive(config.TimetableArchiveFile, logger);
             _logger = logger;
         }
 
+        internal IArchive Archive { get; }
+        
         internal IMapper CreateMapper() => _mapperConfiguration.CreateMapper();
         
         internal IDataLoader CreateDataLoader()
         {
-            var extractor = new RdgZipExtractor(_logger);
+            var extractor = new RdgZipExtractor(Archive, _logger);
+            return new DataLoader(extractor, CreateCifParser(), CreateStationParser(), CreateMapper(), Archive, _logger);
             
-            var cifFactory = new ConsolidatorFactory(_logger);
-            var cifParser = cifFactory.CreateParser();
+            IParser CreateCifParser()
+            {
+                var cifFactory = new ConsolidatorFactory(_logger);
+                return cifFactory.CreateParser();
+            }
             
-            var ttisFactory = new StationParserFactory(_logger);
-            var ignoreLines = Configuration.IsDtdZip
-                ? StationParserFactory.DtdIgnoreLines
-                : StationParserFactory.TtisIgnoreLines;
-            var stationParser = ttisFactory.CreateStationParser(ignoreLines);         
-    
-            return new DataLoader(extractor, cifParser, stationParser, CreateMapper(), Configuration, _logger);
+            IParser CreateStationParser()
+            {
+                var stationParserFactory = new StationParserFactory(_logger);
+                var ignoreLines = Archive.IsDtdZip
+                    ? StationParserFactory.DtdIgnoreLines
+                    : StationParserFactory.TtisIgnoreLines;
+                return stationParserFactory.CreateParser(ignoreLines);
+            }
         }
     }
 }

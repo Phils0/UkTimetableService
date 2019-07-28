@@ -19,29 +19,29 @@ namespace Timetable.Web
         private readonly IParser _cifParser;
         private IParser _stationParser;
         private IMapper _mapper;
-        private readonly ILoaderConfig _config;
+        private readonly IArchive _archive;
         private readonly ILogger _logger;
 
         public DataLoader(IArchiveFileExtractor extractor, IParser cifParser, IParser stationParser, IMapper mapper,
-            ILoaderConfig config, ILogger logger)
+            IArchive archive, ILogger logger)
         {
             _extractor = extractor;
             _cifParser = cifParser;
             _stationParser = stationParser;
             _mapper = mapper;
-            _config = config;
+            _archive = archive;
             _logger = logger;
         }
 
         public async Task<IEnumerable<Location>> LoadStationMasterListAsync(CancellationToken token)
         {
-            if (!_config.IsRdgZip)
-                throw new InvalidDataException($"Not an RDG archive. {_config.TimetableArchiveFile}");
+            if (!_archive.IsRdgZip)
+                throw new InvalidDataException($"Not an RDG archive. {_archive.FullName}");
 
             return await Task.Run(() =>
             {
-                _logger.Information("Loading Master Station List in {file}", _config.TimetableArchiveFile);
-                var reader = _extractor.ExtractFile(_config.TimetableArchiveFile, RdgZipExtractor.StationExtension);
+                _logger.Information("Loading Master Station List in {file}", _archive.FullName);
+                var reader = _extractor.ExtractFile(RdgZipExtractor.StationExtension);
                 var stationRecords = _stationParser.Read(reader).OfType<CifParser.RdgRecords.Station>();
                 var locations = _mapper.Map<IEnumerable<CifParser.RdgRecords.Station>, IEnumerable<Timetable.Location>>(
                     stationRecords);
@@ -61,8 +61,8 @@ namespace Timetable.Web
         {
             return await Task.Run(() =>
             {
-                _logger.Information("Loading Cif timetable in {file}", _config.TimetableArchiveFile);
-                var reader = _extractor.ExtractFile(_config.TimetableArchiveFile, RdgZipExtractor.CifExtension);
+                _logger.Information("Loading Cif timetable in {file}", _archive.FullName);
+                var reader = _extractor.ExtractFile(RdgZipExtractor.CifExtension);
                 var records = _cifParser.Read(reader);
                 var data = Add(records, locations);
                 _logger.Information("Loaded timetable");
