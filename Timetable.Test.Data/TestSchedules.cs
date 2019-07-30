@@ -28,14 +28,13 @@ namespace Timetable.Test.Data
             };
 
             if (service != null)
-            {
                 schedule.AddToService(service);
-                locations = locations ?? DefaultLocations;
-                foreach (var location in locations)
-                {
-                    location.SetParent(schedule);
-                }               
-            }        
+            
+            locations = locations ?? DefaultLocations;
+            foreach (var location in locations)
+            {
+                location.SetParent(schedule);
+            }
 
             return schedule;
         }

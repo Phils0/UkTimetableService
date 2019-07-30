@@ -161,5 +161,24 @@ namespace Timetable.Web.Controllers
             
             return Ok(response);
         }
+        
+        /// <summary>
+        /// Returns all Toc services on a particular day
+        /// </summary>
+        /// <param name="toc">Timetable Id</param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        [Route("toc/{toc}/{date}")]
+        [HttpGet]
+        public async Task<IActionResult> GetTocServices(string toc, DateTime date)
+        {
+            var service =  _timetable.GetSchedulesByToc(toc, date);
+            if (service.status == LookupStatus.Success)
+            {
+                var model = _mapper.Map<Timetable.Schedule[], Model.ServiceSummary[]>(service.schedules, o => { o.Items["On"] = date; });
+                return Ok(model);               
+            }
+            return CreateNoServiceResponse(service.status, toc, date);
+        }
     }
 }

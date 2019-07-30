@@ -16,6 +16,8 @@ namespace Timetable
     {
         (LookupStatus status, Schedule schedule) GetScheduleByTimetableUid(string timetableUid, DateTime date);
         (LookupStatus status, Schedule[] schedule) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
+        
+        (LookupStatus status, Schedule[] schedules) GetSchedulesByToc(string toc, DateTime date);
     }
 
     public class TimetableData : ITimetable
@@ -89,6 +91,24 @@ namespace Timetable
 
             var reason = schedules.Any() ? LookupStatus.Success : LookupStatus.NoScheduleOnDate;
             
+            return (reason, schedules.ToArray());
+        }
+
+        public (LookupStatus status, Schedule[] schedules) GetSchedulesByToc(string toc, DateTime date)
+        {
+            var schedules = new List<Schedule>();
+
+            foreach (var service in _timetableUidMap.Values)
+            {
+                if (service.TryGetScheduleOn(date, out var schedule))
+                {
+                    if(schedule.Operator.Equals(toc))
+                        schedules.Add(schedule);
+                }
+            }
+
+            var reason = schedules.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
+
             return (reason, schedules.ToArray());
         }
     }

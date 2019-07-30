@@ -116,5 +116,38 @@ namespace Timetable.Web.Test.Controllers
             Assert.Equal(April1, notFound.Date);
             Assert.Equal("VT1234 cancelled on 01/04/2019", notFound.Reason);
         }
+        
+        [Fact]
+        public async Task ServicesByTocReturnsServices()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateSchedule()}));
+
+            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetTocServices("VT", April1) as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+
+            var services = response.Value as Model.ServiceSummary[];
+            Assert.NotEmpty(services);
+        }
+        
+        [Fact]
+        public async Task ServicesByTocReturnsNotFoundWithReason()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Returns((LookupStatus.ServiceNotFound, new Schedule[0]));
+
+            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetTocServices("VT", April1) as ObjectResult;;
+            
+            Assert.Equal(404, response.StatusCode);
+            var notFound = response.Value as ServiceNotFound;
+            Assert.Equal("VT", notFound.Id);
+            Assert.Equal(April1, notFound.Date);
+            Assert.Equal("VT not found in timetable", notFound.Reason);
+        }
     }
 }

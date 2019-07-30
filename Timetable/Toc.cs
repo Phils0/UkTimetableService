@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Serilog;
 
 namespace Timetable
 {
-    public class Toc
+    public class Toc : IEquatable<string>
     {
         public static readonly Toc Unknown = new Toc()
         {
@@ -15,6 +16,12 @@ namespace Timetable
         public string Code { get; set; }
 
         public string Name { get; set; } = "";
+
+
+        public bool Equals(string other)
+        {
+            return Code.Equals(other);
+        }
 
         public override string ToString()
         {

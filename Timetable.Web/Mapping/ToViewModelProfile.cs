@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AutoMapper;
 
 namespace Timetable.Web.Mapping
@@ -34,6 +35,11 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Date, 
                     o => o.MapFrom((s, d, dm, c) => c.Items["On"]))
                 .ForMember(d => d.Stops, o => o.MapFrom(s => s.Locations));
+            CreateMap<Timetable.Schedule, Model.ServiceSummary>()
+                .ForMember(d => d.Date, 
+                    o => o.MapFrom((s, d, dm, c) => c.Items["On"]))
+                .ForMember(d => d.Origin, o => o.MapFrom(s => s.Locations.First()))
+                .ForMember(d => d.Destination, o => o.MapFrom(s => s.Locations.Last()));
         }
 
         private DateTime? ResolveTime(Time time, ResolutionContext context)

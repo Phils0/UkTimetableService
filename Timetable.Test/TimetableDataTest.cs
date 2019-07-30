@@ -77,5 +77,37 @@ namespace Timetable.Test
             Assert.Null(found.schedule);
             Assert.Equal(LookupStatus.CancelledService, found.status);
         }
+        
+        [Fact]
+        public void GetsTocSchedulesRunningOnDate()
+        {
+            var timetable = new TimetableData();           
+
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
+            var schedule3 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "X98765", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+           
+            var found = timetable.GetSchedulesByToc("VT", MondayAugust12);
+            Assert.Contains<Schedule>(schedule, found.schedules);
+            Assert.Contains<Schedule>(schedule3, found.schedules);
+
+            
+            found = timetable.GetSchedulesByToc("VT", MondayAugust12.AddDays(1));
+            Assert.Contains<Schedule>(schedule2, found.schedules);
+        }
+        
+        [Fact]
+        public void TocScheduleNotFounds()
+        {
+            var timetable = new TimetableData();           
+
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
+            var schedule3 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "X98765", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+           
+            var found = timetable.GetSchedulesByToc("GR", MondayAugust12);
+            Assert.Empty(found.schedules);
+            Assert.Equal(LookupStatus.ServiceNotFound, found.status);
+        }
     }
 }
