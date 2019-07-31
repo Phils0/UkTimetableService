@@ -101,8 +101,6 @@ namespace Timetable
         /// Containing station
         /// </summary>
         public Station Station { get; set; }
-
-        public LocationTimetable Timetable { get; } = new LocationTimetable();
         
         public override string ToString()
         {

@@ -54,16 +54,18 @@ namespace Timetable
 
         public StopType AdvertisedStop { get; private set; } = StopType.NotSet;
         
-        public Schedule Parent { get; private set; }
+        public Schedule Schedule { get; private set; }
 
         public void SetParent(Schedule schedule)
         {
-            Parent = schedule;
-            schedule.AddLocation(this);
-            Location.Timetable.AddService(this);
+            Schedule = schedule;
+            Schedule.AddLocation(this);
+            Station.Add(this);
         }
 
-        public Service Service => Parent.Parent;
+        public Service Service => Schedule.Service;
+
+        public Station Station => Location.Station;
         
         public int Id { get; set; }
 

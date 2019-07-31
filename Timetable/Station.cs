@@ -30,7 +30,12 @@ namespace Timetable
         public ISet<Location> Locations { get; } = new HashSet<Location>();
         
         /// <summary>
-        /// Add a location to the statyion
+        /// Timetable for Station
+        /// </summary>
+        public LocationTimetable Timetable { get; } = new LocationTimetable();
+        
+        /// <summary>
+        /// Add a location to the station
         /// </summary>
         /// <param name="location"></param>
         public void Add(Location location)
@@ -47,6 +52,15 @@ namespace Timetable
             }
         }
 
+        /// <summary>
+        /// Add a service stop to the station
+        /// </summary>
+        /// <param name="stop">Service stop</param>
+        public void Add(ScheduleLocation stop)
+        {
+            Timetable.AddService(stop);
+        }
+        
         public override string ToString()
         {
             return  String.IsNullOrEmpty(ThreeLetterCode) ? "Not Set" : $"{ThreeLetterCode}";

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Timetable.Test.Data
 {
@@ -8,6 +9,11 @@ namespace Timetable.Test.Data
         public static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
         public static readonly TimeSpan ThirtySeconds = new TimeSpan(0, 0, 30);     
 
+        public static ScheduleOrigin CreateOrigin(Station location, Time departure)
+        {
+            return CreateOrigin(location.Locations.First(), departure);
+        }
+        
         public static ScheduleOrigin CreateOrigin(Location location, Time departure)
         {
             var origin = new ScheduleOrigin()
@@ -33,6 +39,11 @@ namespace Timetable.Test.Data
             return new HashSet<string>(activities);
         }
         
+        public static ScheduleStop CreateStop(Station location, Time arrival, string activity = "T")
+        {
+            return CreateStop(location.Locations.First(), arrival, activity);
+        }
+        
         public static ScheduleStop CreateStop(Location location, Time arrival, string activity = "T")
         {
             var stop = new ScheduleStop()
@@ -48,6 +59,11 @@ namespace Timetable.Test.Data
             };
             stop.UpdateAdvertisedStop();
             return stop;
+        }
+        
+        public static ScheduleStop CreatePickupOnlyStop(Station location, Time departure)
+        {
+            return CreatePickupOnlyStop(location.Locations.First(), departure);
         }
         
         public static ScheduleStop CreatePickupOnlyStop(Location location, Time departure)
@@ -67,6 +83,11 @@ namespace Timetable.Test.Data
             return stop;
         }
         
+        public static ScheduleStop CreateSetdownOnlyStop(Station location, Time arrival)
+        {
+            return CreateSetdownOnlyStop(location.Locations.First(), arrival);
+        }
+        
         public static ScheduleStop CreateSetdownOnlyStop(Location location, Time arrival)
         {
             var stop = new ScheduleStop()
@@ -83,6 +104,12 @@ namespace Timetable.Test.Data
             stop.UpdateAdvertisedStop();
             return stop;
         }
+        
+        public static SchedulePass CreatePass(Station location, Time pass)
+        {
+            return CreatePass(location.Locations.First(), pass);
+        }
+        
         public static SchedulePass CreatePass(Location location, Time pass)
         {
             var schedulePass = new SchedulePass()
@@ -95,6 +122,11 @@ namespace Timetable.Test.Data
             };
             schedulePass.UpdateAdvertisedStop();
             return schedulePass;
+        }
+        
+        public static ScheduleDestination CreateDestination(Station location, Time arrival)
+        {
+            return CreateDestination(location.Locations.First(), arrival);
         }
         
         public static ScheduleDestination CreateDestination(Location location, Time arrival)

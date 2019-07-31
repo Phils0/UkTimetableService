@@ -17,11 +17,11 @@ namespace Timetable.Test
         public static TheoryData<ScheduleLocation, string> Locations =>
             new TheoryData<ScheduleLocation, string>()
             {
-                {TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
-                {TestScheduleLocations.CreateDestination(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
-                {TestScheduleLocations.CreatePass(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
-                {TestScheduleLocations.CreateStop(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
-                {TestScheduleLocations.CreatePickupOnlyStop(TestLocations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreateOrigin(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreateDestination(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreatePass(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreateStop(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreatePickupOnlyStop(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
             };
         
         [Theory]
@@ -93,7 +93,7 @@ namespace Timetable.Test
         [Fact]
         public void AddDayToScheduleDestination()
         {
-            var scheduleLocation = TestScheduleLocations.CreateDestination(TestLocations.Surbiton, Test);
+            var scheduleLocation = TestScheduleLocations.CreateDestination(TestStations.Surbiton, Test);
             scheduleLocation.AddDay(Start);
             
             Assert.Equal(Expected, scheduleLocation.Arrival);
@@ -103,7 +103,7 @@ namespace Timetable.Test
         [Fact]
         public void AddDayToSchedulePass()
         {
-            var scheduleLocation = TestScheduleLocations.CreatePass(TestLocations.Surbiton, Test);
+            var scheduleLocation = TestScheduleLocations.CreatePass(TestStations.Surbiton, Test);
             scheduleLocation.AddDay(Start);
             
             Assert.Equal(Expected, scheduleLocation.PassesAt);
@@ -112,21 +112,21 @@ namespace Timetable.Test
         [Fact]
         public void ScheduleOriginStopTypeIsOrigin()
         {
-            var scheduleLocation = TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, Test);
+            var scheduleLocation = TestScheduleLocations.CreateOrigin(TestStations.Surbiton, Test);
             Assert.Equal(StopType.PickUpOnly, scheduleLocation.AdvertisedStop);
         }
         
         [Fact]
         public void ScheduleDestinationStopTypeIsDestination()
         {
-            var scheduleLocation = TestScheduleLocations.CreateDestination(TestLocations.Surbiton, Test);
+            var scheduleLocation = TestScheduleLocations.CreateDestination(TestStations.Surbiton, Test);
             Assert.Equal(StopType.SetDownOnly, scheduleLocation.AdvertisedStop);
         }
         
         [Fact]
         public void SchedulePassIsNotAStop()
         {
-            var scheduleLocation = TestScheduleLocations.CreatePass(TestLocations.Surbiton, Test);            
+            var scheduleLocation = TestScheduleLocations.CreatePass(TestStations.Surbiton, Test);            
             Assert.Equal(StopType.NotAPublicStop, scheduleLocation.AdvertisedStop);
         }
         
@@ -137,7 +137,7 @@ namespace Timetable.Test
         [InlineData("R", StopType.Request)]
         public void SchedulePassSetsStopTypeBasedUponAttributes(string activity, StopType expected)
         {
-            var scheduleLocation = TestScheduleLocations.CreateStop(TestLocations.Surbiton, Test, activity);            
+            var scheduleLocation = TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, activity);            
             Assert.Equal(expected, scheduleLocation.AdvertisedStop);
         }
 

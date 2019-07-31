@@ -14,7 +14,7 @@ namespace Timetable.Test
             var schedule = TestSchedules.CreateSchedule();
             schedule.AddToService(service);
 
-            Assert.Same(service, schedule.Parent);
+            Assert.Same(service, schedule.Service);
         }
         
         [Fact]
@@ -27,8 +27,8 @@ namespace Timetable.Test
             permanent.AddToService(service);
             overlay.AddToService(service);
             
-            Assert.Same(service, permanent.Parent);
-            Assert.Same(service, overlay.Parent);
+            Assert.Same(service, permanent.Service);
+            Assert.Same(service, overlay.Service);
         }
         
         // It happens we order by the calendar as need a unique order for the SortedList but could be anything that creates uniqueness
@@ -42,8 +42,8 @@ namespace Timetable.Test
             permanent.AddToService(service);
             permanent2.AddToService(service);
             
-            Assert.Same(service, permanent.Parent);
-            Assert.Same(service, permanent2.Parent);
+            Assert.Same(service, permanent.Service);
+            Assert.Same(service, permanent2.Service);
         }
         
         [Fact]
@@ -68,7 +68,7 @@ namespace Timetable.Test
         public void GetsScheduleRunningOnDate()
         {
             var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
-            var service = schedule.Parent;
+            var service = schedule.Service;
             
             var schedule2 = TestSchedules.CreateSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Thursday), service: service);
             
@@ -83,7 +83,7 @@ namespace Timetable.Test
         public void NullReturnedIfNoSchedulesRunOnDate()
         {
             var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
-            var service = schedule.Parent;
+            var service = schedule.Service;
             var schedule2 = TestSchedules.CreateSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Thursday), service: service);
             
             var found = service.GetScheduleOn(MondayAugust12);
@@ -100,7 +100,7 @@ namespace Timetable.Test
         public void HighIndicatorsTakePriorityOverLow(StpIndicator lowIndicator, StpIndicator highIndicator)
         {
             var low = TestSchedules.CreateScheduleWithService(indicator: lowIndicator, calendar: TestSchedules.EverydayAugust2019);
-            var service = low.Parent;
+            var service = low.Service;
             var high = TestSchedules.CreateSchedule(indicator: highIndicator, calendar: TestSchedules.EverydayAugust2019, service: service);
             var low2 = TestSchedules.CreateSchedule(indicator: lowIndicator, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
 

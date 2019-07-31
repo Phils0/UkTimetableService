@@ -12,10 +12,10 @@ namespace Timetable.Test
         {
             var testSchedule = TestSchedules.CreateScheduleWithService();
 
-            var origin = testSchedule.Locations.First().Location.Timetable;
+            var origin = testSchedule.Locations.First().Station.Timetable;
 
             var service = origin.GetDepartures(TestSchedules.Ten)[0];
-            Assert.Equal(testSchedule.Parent, service);
+            Assert.Equal(testSchedule.Service, service);
 
             Assert.Empty(origin.GetArrivals(TestSchedules.Ten));
         }
@@ -25,10 +25,10 @@ namespace Timetable.Test
         {
             var testSchedule = TestSchedules.CreateScheduleWithService();
 
-            var destination = testSchedule.Locations.Last().Location.Timetable;
+            var destination = testSchedule.Locations.Last().Station.Timetable;
 
             var service = destination.GetArrivals(TestSchedules.TenThirty)[0];
-            Assert.Equal(testSchedule.Parent, service);
+            Assert.Equal(testSchedule.Service, service);
 
             Assert.Empty(destination.GetDepartures(TestSchedules.TenThirty));
         }
@@ -41,20 +41,20 @@ namespace Timetable.Test
         {
             var locations = new[]
             {
-                (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, TestSchedules.Ten),
-                TestScheduleLocations.CreateStop(TestLocations.CLPHMJN, TenFifteen),
-                TestScheduleLocations.CreateDestination(TestLocations.WaterlooMain, TestSchedules.TenThirty)
+                (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, TestSchedules.Ten),
+                TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, TenFifteen),
+                TestScheduleLocations.CreateDestination(TestStations.Waterloo, TestSchedules.TenThirty)
             };
             
             var testSchedule = TestSchedules.CreateScheduleWithService(locations: locations);
 
-            var stop = locations[1].Location.Timetable;
+            var stop = locations[1].Station.Timetable;
 
             var service = stop.GetArrivals(TenFifteen)[0];
-            Assert.Equal(testSchedule.Parent, service);
+            Assert.Equal(testSchedule.Service, service);
 
             service = stop.GetDepartures(TenSixteen)[0];
-            Assert.Equal(testSchedule.Parent, service);
+            Assert.Equal(testSchedule.Service, service);
         }
         
         [Fact]
@@ -62,19 +62,19 @@ namespace Timetable.Test
         {
             var locations = new[]
             {
-                (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, TestSchedules.Ten),
-                TestScheduleLocations.CreatePickupOnlyStop(TestLocations.CLPHMJN, TenFifteen),
-                TestScheduleLocations.CreateDestination(TestLocations.WaterlooMain, TestSchedules.TenThirty)
+                (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, TestSchedules.Ten),
+                TestScheduleLocations.CreatePickupOnlyStop(TestStations.ClaphamJunction, TenFifteen),
+                TestScheduleLocations.CreateDestination(TestStations.Waterloo, TestSchedules.TenThirty)
             };
             
             var testSchedule = TestSchedules.CreateScheduleWithService(locations: locations);
 
-            var stop = locations[1].Location.Timetable;
+            var stop = locations[1].Station.Timetable;
 
             Assert.Empty(stop.GetArrivals(TenFifteen));
 
             var service = stop.GetDepartures(TenFifteen)[0];
-            Assert.Equal(testSchedule.Parent, service);
+            Assert.Equal(testSchedule.Service, service);
         }
         
         [Fact]
@@ -82,17 +82,17 @@ namespace Timetable.Test
         {
             var locations = new[]
             {
-                (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, TestSchedules.Ten),
-                TestScheduleLocations.CreateSetdownOnlyStop(TestLocations.CLPHMJN, TenFifteen),
-                TestScheduleLocations.CreateDestination(TestLocations.WaterlooMain, TestSchedules.TenThirty)
+                (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, TestSchedules.Ten),
+                TestScheduleLocations.CreateSetdownOnlyStop(TestStations.ClaphamJunction, TenFifteen),
+                TestScheduleLocations.CreateDestination(TestStations.Waterloo, TestSchedules.TenThirty)
             };
             
             var testSchedule = TestSchedules.CreateScheduleWithService(locations: locations);
 
-            var stop = locations[1].Location.Timetable;
+            var stop = locations[1].Station.Timetable;
 
             var service = stop.GetArrivals(TenFifteen)[0];
-            Assert.Equal(testSchedule.Parent, service);
+            Assert.Equal(testSchedule.Service, service);
             
             Assert.Empty(stop.GetDepartures(TenFifteen));
         }
@@ -102,14 +102,14 @@ namespace Timetable.Test
         {
             var locations = new[]
             {
-                (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, TestSchedules.Ten),
-                TestScheduleLocations.CreatePass(TestLocations.CLPHMJN, TenFifteen),
-                TestScheduleLocations.CreateDestination(TestLocations.WaterlooMain, TestSchedules.TenThirty)
+                (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, TestSchedules.Ten),
+                TestScheduleLocations.CreatePass(TestStations.ClaphamJunction, TenFifteen),
+                TestScheduleLocations.CreateDestination(TestStations.Waterloo, TestSchedules.TenThirty)
             };
             
             var testSchedule = TestSchedules.CreateScheduleWithService(locations: locations);
 
-            var passing = locations[1].Location.Timetable;
+            var passing = locations[1].Station.Timetable;
 
             Assert.Empty(passing.GetArrivals(TenFifteen));
             Assert.Empty(passing.GetDepartures(TenFifteen));
@@ -119,9 +119,9 @@ namespace Timetable.Test
         public void LocationHasOnlyOneEntryForMultipleSchedules()
         {
             var permanent = TestSchedules.CreateScheduleWithService();
-            var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, service: permanent.Parent);
+            var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, service: permanent.Service);
             
-            var destination = permanent.Locations.Last().Location.Timetable;
+            var destination = permanent.Locations.Last().Station.Timetable;
 
             var services = destination.GetArrivals(TestSchedules.TenThirty);
             Assert.Single(services);
@@ -130,8 +130,8 @@ namespace Timetable.Test
         [Fact]
         public void LocationHasMultipleServicesForWhenOnSameTime()
         {
-            var surbiton = TestLocations.Surbiton;
-            var waterloo = TestLocations.WaterlooMain;
+            var surbiton = TestStations.Surbiton;
+            var waterloo = TestStations.Waterloo;
             
             var locations1 = new[]
             {
@@ -147,7 +147,7 @@ namespace Timetable.Test
             };             
             var service2 = TestSchedules.CreateScheduleWithService(timetableId: "A00002", locations: locations2);
             
-            var destination = service1.Locations.Last().Location.Timetable;
+            var destination = service1.Locations.Last().Station.Timetable;
 
             var services = destination.GetArrivals(TestSchedules.TenThirty);
             Assert.Equal(2, services.Length);

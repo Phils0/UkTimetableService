@@ -16,7 +16,6 @@ namespace Timetable
     {
         (LookupStatus status, Schedule schedule) GetScheduleByTimetableUid(string timetableUid, DateTime date);
         (LookupStatus status, Schedule[] schedule) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
-        
         (LookupStatus status, Schedule[] schedules) GetSchedulesByToc(string toc, DateTime date);
     }
 

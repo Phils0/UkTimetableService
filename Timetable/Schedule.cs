@@ -48,7 +48,7 @@ namespace Timetable
         /// </summary>
         public int Id { get; }
 
-        public Service Parent { get; private set;  }
+        public Service Service { get; private set;  }
         /// <summary>
         /// Timetable Id
         /// </summary>
@@ -113,7 +113,7 @@ namespace Timetable
         public void AddToService(Service service)
         {
             service.Add(this);            
-            Parent = service;
+            Service = service;
         }
 
         public IReadOnlyList<ScheduleLocation> Locations => _locations;

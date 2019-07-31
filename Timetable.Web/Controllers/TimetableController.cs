@@ -132,7 +132,7 @@ namespace Timetable.Web.Controllers
         }
         
         /// <summary>
-        /// Returns arrivals at a location, optionally from another location
+        /// Returns departures at a location, optionally to another location
         /// </summary>
         /// <param name="location"></param>
         /// <param name="at"></param>

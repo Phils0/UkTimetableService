@@ -96,8 +96,8 @@ namespace Timetable.Test.Data
 
         public static ScheduleLocation[] DefaultLocations => new[]
         {
-            (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestLocations.Surbiton, Ten),
-            TestScheduleLocations.CreateDestination(TestLocations.WaterlooMain, TenThirty)
+            (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, Ten),
+            TestScheduleLocations.CreateDestination(TestStations.Waterloo, TenThirty)
         };
     }
 }

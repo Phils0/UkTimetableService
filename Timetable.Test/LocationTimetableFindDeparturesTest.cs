@@ -13,7 +13,7 @@ namespace Timetable.Test
         public void FindDepartures()
         {
             var locations = TestData.CreateTimetabledLocations();
-            var clapham = locations.LocationsByTiploc["CLPHMJN"];
+            var clapham = locations.Locations["CLJ"];
             
             var schedules = clapham.Timetable.FindDepartures(Aug1AtTen);
             
@@ -29,7 +29,7 @@ namespace Timetable.Test
         public void ReturnAllFoundDeparturesWhenRequestTooManyBefore()
         {
             var locations = TestData.CreateTimetabledLocations();
-            var clapham = locations.LocationsByTiploc["CLPHMJN"];
+            var clapham = locations.Locations["CLJ"];
             
             var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, 100, 1);
             
@@ -40,7 +40,7 @@ namespace Timetable.Test
         public void ReturnAllFoundDeparturesWhenRequestTooManyAfter()
         {
             var locations = TestData.CreateTimetabledLocations();
-            var clapham = locations.LocationsByTiploc["CLPHMJN"];
+            var clapham = locations.Locations["CLJ"];
             
             var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, 1, 100);
             
@@ -51,7 +51,7 @@ namespace Timetable.Test
         public void FindDeparturesNextDay()
         {
             var locations = TestData.CreateTimetabledLocations();
-            var clapham = locations.LocationsByTiploc["CLPHMJN"];
+            var clapham = locations.Locations["CLJ"];
             
             var schedules = clapham.Timetable.FindDepartures(new DateTime(2019, 8, 1, 23, 30 ,0));
             

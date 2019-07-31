@@ -85,9 +85,9 @@ namespace Timetable.Web.Test.Mapping
             var output = MapSchedule();
 
             var first = output.Locations.First();            
-            Assert.Same(output, first.Parent);
+            Assert.Same(output, first.Schedule);
             var last = output.Locations.First();            
-            Assert.Same(output, last.Parent);
+            Assert.Same(output, last.Schedule);
         }
     }
 }
