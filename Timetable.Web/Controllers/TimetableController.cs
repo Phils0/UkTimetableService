@@ -167,16 +167,25 @@ namespace Timetable.Web.Controllers
         /// </summary>
         /// <param name="toc">Timetable Id</param>
         /// <param name="date"></param>
+        /// <param name="fullSchedule">Whether to return a full schedule</param>
         /// <returns></returns>
         [Route("toc/{toc}/{date}")]
         [HttpGet]
-        public async Task<IActionResult> GetTocServices(string toc, DateTime date)
+        public async Task<IActionResult> GetTocServices(string toc, DateTime date, [FromQuery] bool fullSchedule = false)
         {
             var service =  _timetable.GetSchedulesByToc(toc, date);
             if (service.status == LookupStatus.Success)
             {
-                var model = _mapper.Map<Timetable.Schedule[], Model.ServiceSummary[]>(service.schedules, o => { o.Items["On"] = date; });
-                return Ok(model);               
+                if (fullSchedule)
+                {
+                    var model = _mapper.Map<Timetable.Schedule[], Model.Service[]>(service.schedules, o => { o.Items["On"] = date; });
+                    return Ok(model);                               
+                }
+                else
+                {
+                    var model = _mapper.Map<Timetable.Schedule[], Model.ServiceSummary[]>(service.schedules, o => { o.Items["On"] = date; });
+                    return Ok(model);                               
+                }
             }
             return CreateNoServiceResponse(service.status, toc, date);
         }

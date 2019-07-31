@@ -134,6 +134,22 @@ namespace Timetable.Web.Test.Controllers
         }
         
         [Fact]
+        public async Task ServicesByTocReturnsFullSchedulewsWhenSetFullScheduleParameter()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateSchedule()}));
+
+            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetTocServices("VT", April1, true) as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+
+            var services = response.Value as Model.Service[];
+            Assert.NotEmpty(services);
+        }
+        
+        [Fact]
         public async Task ServicesByTocReturnsNotFoundWithReason()
         {
             var data = Substitute.For<ITimetable>();
