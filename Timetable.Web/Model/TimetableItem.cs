@@ -5,7 +5,7 @@ namespace Timetable.Web.Model
         /// <summary>
         /// Service Details
         /// </summary>
-        public Service Service { get; set; }
+        public ServiceSummary Service { get; set; }
 
         /// <summary>
         /// Service times at

@@ -10,13 +10,14 @@ namespace Timetable.Test.Data
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, ScheduleLocation[] locations = null,
             int id = 1,
-            Service service = null)
+            Service service = null,
+            string retailServiceId = null)
         {
             var schedule = new Schedule(id)
             {
                 TimetableUid = timetableId,
                 StpIndicator = indicator,
-                RetailServiceId = $"VT{timetableId.Substring(1, 4)}00",
+                RetailServiceId = retailServiceId ?? $"VT{timetableId.Substring(1, 4)}00",
                 TrainIdentity = $"9Z{timetableId.Substring(1, 2)}",
                 Operator = VirginTrains,
                 Status = ServiceStatus.PermanentPassenger,
@@ -50,12 +51,15 @@ namespace Timetable.Test.Data
             return CreateSchedule(timetableId, indicator, calendar, locations, id, service);
         }
 
-        public static Schedule CreateScheduleInTimetable(TimetableData timetable, string timetableId = "X12345",
+        public static Schedule CreateScheduleInTimetable(TimetableData timetable, 
+            string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
-            ICalendar calendar = null, ScheduleLocation[] locations = null,
-            int id = 1)
+            ICalendar calendar = null, 
+            ScheduleLocation[] locations = null,
+            int id = 1,
+            string retailServiceId = null)
         {
-            var schedule = CreateSchedule(timetableId, indicator, calendar, locations, id);
+            var schedule = CreateSchedule(timetableId, indicator, calendar, locations, id, retailServiceId: retailServiceId);
 
             timetable.AddSchedule(schedule);
 

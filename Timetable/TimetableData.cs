@@ -85,8 +85,8 @@ namespace Timetable
                 if(schedule.StpIndicator == StpIndicator.Cancelled)
                     return (LookupStatus.CancelledService, new Schedule[0]);
  
-                //TODO Add check correct retailServiceId
-                schedules.Add(schedule);
+                if(schedule.HasRetailServiceId(retailServiceId))
+                    schedules.Add(schedule);
             }
 
             var reason = schedules.Any() ? LookupStatus.Success : LookupStatus.NoScheduleOnDate;

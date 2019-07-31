@@ -127,6 +127,11 @@ namespace Timetable
             return Calendar.IsActiveOn(date);
         }
 
+        public bool HasRetailServiceId(string retailServiceId)
+        {
+            return RetailServiceId == retailServiceId;
+        }
+        
         public override string ToString()
         {
             return $"{TimetableUid} -{StpIndicator} {Calendar} ({Id})";
