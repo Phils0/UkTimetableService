@@ -1,6 +1,6 @@
 namespace Timetable.Web.Model
 {
-    public class TimetableItem
+    public class LocationTimetableItem
     {
         /// <summary>
         /// Service Details

@@ -17,6 +17,6 @@ namespace Timetable.Web.Model
         /// <summary>
         /// Services arriving/departing
         /// </summary>
-        public TimetableItem[] Services { get; set; } = new TimetableItem[0];
+        public LocationTimetableItem[] Services { get; set; } = new LocationTimetableItem[0];
     }
 }
