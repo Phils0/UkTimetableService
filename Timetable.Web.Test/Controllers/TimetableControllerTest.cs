@@ -24,13 +24,15 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((LookupStatus.Success, TestSchedules.CreateSchedule()));
+                .Returns((LookupStatus.Success, TestSchedules.CreateService()));
 
             var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
-            Assert.NotNull(response.Value as Model.Service);
+            var service = response.Value as Model.Service;
+            Assert.Equal("X12345", service.TimetableUid);
+            Assert.False(service.IsCancelled);
         }
         
         [Fact]
@@ -55,16 +57,15 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((LookupStatus.CancelledService, null));
+                .Returns((LookupStatus.Success, TestSchedules.CreateService(isCancelled: true)));
 
             var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;;
+            var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;
             
             Assert.Equal(200, response.StatusCode);
-            var notFound = response.Value as ServiceCancelled;
-            Assert.Equal("X12345", notFound.Id);
-            Assert.Equal(April1, notFound.Date);
-            Assert.Equal("X12345 cancelled on 01/04/2019", notFound.Reason);
+            var service = response.Value as Model.Service;
+            Assert.Equal("X12345", service.TimetableUid);
+            Assert.True(service.IsCancelled);
         }
         
         [Fact]
@@ -72,7 +73,7 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateSchedule()}));
+                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
             var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByRetailServiceId("VT1234", April1) as ObjectResult;;
@@ -80,7 +81,9 @@ namespace Timetable.Web.Test.Controllers
             Assert.Equal(200, response.StatusCode);
 
             var services = response.Value as Model.Service[];
-            Assert.NotEmpty(services);
+            var service = services[0];
+            Assert.Equal("VT123400", service.RetailServiceId);
+            Assert.False(service.IsCancelled);
         }
         
         [Fact]
@@ -88,7 +91,7 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((LookupStatus.ServiceNotFound, new Schedule[0]));
+                .Returns((LookupStatus.ServiceNotFound, new ResolvedService[0]));
 
             var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByRetailServiceId("VT1234", April1) as ObjectResult;;
@@ -105,16 +108,17 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((LookupStatus.CancelledService, new Schedule[0]));
+                .Returns((LookupStatus.Success, new [] { TestSchedules.CreateService(isCancelled: true)}));
 
             var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByRetailServiceId("VT1234", April1) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
-            var notFound = response.Value as ServiceCancelled;
-            Assert.Equal("VT1234", notFound.Id);
-            Assert.Equal(April1, notFound.Date);
-            Assert.Equal("VT1234 cancelled on 01/04/2019", notFound.Reason);
+            
+            var services = response.Value as Model.Service[];
+            var service = services[0];
+            Assert.Equal("VT123400", service.RetailServiceId);
+            Assert.True(service.IsCancelled);
         }
         
         [Fact]
@@ -122,7 +126,7 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateSchedule()}));
+                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
             var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1) as ObjectResult;;
@@ -138,7 +142,7 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateSchedule()}));
+                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
             var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1, true) as ObjectResult;;
@@ -154,7 +158,7 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ITimetable>();
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
-                .Returns((LookupStatus.ServiceNotFound, new Schedule[0]));
+                .Returns((LookupStatus.ServiceNotFound, new ResolvedService[0]));
 
             var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1) as ObjectResult;;

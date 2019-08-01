@@ -27,14 +27,14 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal("X12345", output.TimetableUid);
         }
 
-        private static Model.ServiceSummary MapSchedule(Timetable.Schedule schedule = null)
+        private static Model.ServiceSummary MapSchedule(Timetable.Schedule schedule = null, bool isCancelled = false)
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
 
-            return mapper.Map<Timetable.Schedule, Model.ServiceSummary>(
-                schedule, 
-                o => { o.Items["On"] = TestDate; });
+            var resolved = new ResolvedService(schedule, TestDate, isCancelled);
+            
+            return mapper.Map<Timetable.ResolvedService, Model.ServiceSummary>(resolved);
         }
 
         [Fact]
@@ -113,6 +113,15 @@ namespace Timetable.Web.Test.Mapping
         {
             var output = MapSchedule();
             Assert.Equal("WAT", output.Destination.Location.ThreeLetterCode);         
+        }
+        
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void MapIsCancelled(bool isCancelled)
+        {
+            var output = MapSchedule(isCancelled: isCancelled);
+            Assert.Equal(isCancelled, output.IsCancelled);         
         }
     }
 }

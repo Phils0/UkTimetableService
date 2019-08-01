@@ -73,10 +73,10 @@ namespace Timetable.Test
             var schedule2 = TestSchedules.CreateSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Thursday), service: service);
             
             var found = service.GetScheduleOn(MondayAugust12.AddDays(2));
-            Assert.Equal(schedule, found);
+            Assert.Equal(schedule, found.Details);
             
             found = service.GetScheduleOn(MondayAugust12.AddDays(3));
-            Assert.Equal(schedule2, found);
+            Assert.Equal(schedule2, found.Details);
         }
         
         [Fact]
@@ -91,9 +91,6 @@ namespace Timetable.Test
         }
         
         [Theory]
-        [InlineData(StpIndicator.Permanent, StpIndicator.Cancelled)]
-        [InlineData(StpIndicator.Override, StpIndicator.Cancelled)]
-        [InlineData(StpIndicator.New, StpIndicator.Cancelled)]
         [InlineData(StpIndicator.Permanent, StpIndicator.New)]
         [InlineData(StpIndicator.Override, StpIndicator.New)]
         [InlineData(StpIndicator.Permanent, StpIndicator.Override)]
@@ -102,10 +99,38 @@ namespace Timetable.Test
             var low = TestSchedules.CreateScheduleWithService(indicator: lowIndicator, calendar: TestSchedules.EverydayAugust2019);
             var service = low.Service;
             var high = TestSchedules.CreateSchedule(indicator: highIndicator, calendar: TestSchedules.EverydayAugust2019, service: service);
-            var low2 = TestSchedules.CreateSchedule(indicator: lowIndicator, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
+            TestSchedules.CreateSchedule(indicator: lowIndicator, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
 
             var found = service.GetScheduleOn(MondayAugust12);
-            Assert.Equal(high, found);
+            Assert.Equal(high, found.Details);
+        }
+        
+        [Theory]
+        [InlineData(StpIndicator.Permanent)]
+        [InlineData(StpIndicator.Override)]
+        [InlineData(StpIndicator.New)]
+        public void CancelledScheduleReturned(StpIndicator lowIndicator)
+        {
+            var baseSchedule = TestSchedules.CreateScheduleWithService(indicator: lowIndicator, calendar: TestSchedules.EverydayAugust2019);
+            var service = baseSchedule.Service;
+            TestSchedules.CreateSchedule(indicator: StpIndicator.Cancelled, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
+
+            var found = service.GetScheduleOn(MondayAugust12);
+            Assert.True(found.IsCancelled);
+            Assert.Equal(baseSchedule,found.Details);
+        }
+        
+        [Fact]
+        public void MultipleScheduleRecordsWithCancelReturnsHighestPriority()
+        {
+            var baseSchedule = TestSchedules.CreateScheduleWithService(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
+            var service = baseSchedule.Service;
+            TestSchedules.CreateSchedule(indicator: StpIndicator.Cancelled, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
+            var overrideSchedule = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
+
+            var found = service.GetScheduleOn(MondayAugust12);
+            Assert.True(found.IsCancelled);
+            Assert.Equal(overrideSchedule,found.Details);
         }
     }
 }

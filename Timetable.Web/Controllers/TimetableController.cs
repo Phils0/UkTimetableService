@@ -38,7 +38,7 @@ namespace Timetable.Web.Controllers
             var service =  _timetable.GetScheduleByTimetableUid(serviceId, date);
             if (service.status == LookupStatus.Success)
             {
-                var model = _mapper.Map<Timetable.Schedule, Model.Service>(service.schedule, o => { o.Items["On"] = date; });
+                var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service);
                 return Ok(model);             
             }
 
@@ -50,15 +50,6 @@ namespace Timetable.Web.Controllers
             var reason = "";
             switch (serviceStatus)
             {
-                case LookupStatus.CancelledService:
-                    // Cancelled returns 200
-                    //TODO Make change to return cancelled service
-                    return Ok(new ServiceCancelled()
-                    {
-                        Id = serviceId,
-                        Date = date,
-                        Reason = $"{serviceId} cancelled on {date:d}"
-                    });                    
                 case LookupStatus.ServiceNotFound:
                     reason = $"{serviceId} not found in timetable";
                     break;
@@ -93,7 +84,7 @@ namespace Timetable.Web.Controllers
             var service =  _timetable.GetScheduleByRetailServiceId(serviceId, date);
             if (service.status == LookupStatus.Success)
             {
-                 var model = _mapper.Map<Timetable.Schedule[], Model.Service[]>(service.schedule, o => { o.Items["On"] = date; });
+                 var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services);
                  return Ok(model);               
             }    
 
@@ -178,12 +169,12 @@ namespace Timetable.Web.Controllers
             {
                 if (includeStops)
                 {
-                    var model = _mapper.Map<Timetable.Schedule[], Model.Service[]>(service.schedules, o => { o.Items["On"] = date; });
+                    var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services);
                     return Ok(model);                               
                 }
                 else
                 {
-                    var model = _mapper.Map<Timetable.Schedule[], Model.ServiceSummary[]>(service.schedules, o => { o.Items["On"] = date; });
+                    var model = _mapper.Map<Timetable.ResolvedService[], Model.ServiceSummary[]>(service.services);
                     return Ok(model);                               
                 }
             }

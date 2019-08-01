@@ -72,26 +72,32 @@ namespace Timetable
             }
         }
 
-        public Schedule GetScheduleOn(DateTime date)
+        public ResolvedService GetScheduleOn(DateTime date)
         {
             
             if (_schedule != null)
             {
                 if (_schedule.RunsOn(date))
-                    return _schedule;
+                    return new ResolvedService(_schedule, date,_schedule.IsCancelled());
 
                 return null;
             }
-            
+
+            var isCancelled = false;
             foreach (var schedule in _multipleSchedules.Values)
             {
                 if (schedule.RunsOn(date))
-                    return schedule;
+                {
+                    if (schedule.IsCancelled())
+                        isCancelled = true;
+                    else
+                        return new ResolvedService(schedule, date, isCancelled);
+                }
             }
             return null;
         }
 
-        public bool TryGetScheduleOn(DateTime date, out Schedule schedule)
+        public bool TryGetScheduleOn(DateTime date, out ResolvedService schedule)
         {
             schedule = GetScheduleOn(date);
             return schedule != null;

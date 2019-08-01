@@ -2,10 +2,25 @@ using System;
 
 namespace Timetable.Test.Data
 {
-    public class TestSchedules
+    public static class TestSchedules
     {
         private static readonly Toc VirginTrains = new Toc() {Code = "VT", Name = "Virgin Trains"};
-
+        private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
+        public static ResolvedService CreateService(
+            string timetableId = "X12345",
+            StpIndicator indicator = StpIndicator.Permanent,
+            ICalendar calendar = null, ScheduleLocation[] locations = null,
+            int id = 1,
+            Service service = null,
+            string retailServiceId = null,
+            DateTime on =  default(DateTime),
+            bool isCancelled = false)
+        {
+            on = on == default(DateTime) ? MondayAugust12 : on;
+            var schedule = CreateSchedule(timetableId, indicator, calendar, locations, id, service, retailServiceId);
+            return new ResolvedService(schedule, on, isCancelled);
+        }
+        
         public static Schedule CreateSchedule(string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, ScheduleLocation[] locations = null,

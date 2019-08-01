@@ -7,7 +7,7 @@ using TestSchedules = Timetable.Test.Data.TestSchedules;
 
 namespace Timetable.Web.Test.Mapping
 {
-    public class ToViewModelProfileScheduleTest
+    public class ToViewModelProfileScheduleToServiceTest
     {
         private static readonly DateTime TestDate = TestTime.August1;
         
@@ -27,14 +27,13 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal("X12345", output.TimetableUid);
         }
 
-        private static Model.Service MapSchedule(Timetable.Schedule schedule = null)
+        private static Model.Service MapSchedule(Timetable.Schedule schedule = null, bool isCancelled = false)
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
-
-            return mapper.Map<Timetable.Schedule, Model.Service>(
-                schedule, 
-                o => { o.Items["On"] = TestDate; });
+            var resolved = new ResolvedService(schedule, TestDate, isCancelled);
+            
+            return mapper.Map<Timetable.ResolvedService, Model.Service>(resolved);
         }
 
         [Fact]
@@ -106,6 +105,15 @@ namespace Timetable.Web.Test.Mapping
         {
             var output = MapSchedule();
             Assert.NotEmpty(output.Stops);         
+        }
+        
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void MapIsCancelled(bool isCancelled)
+        {
+            var output = MapSchedule(isCancelled: isCancelled);
+            Assert.Equal(isCancelled, output.IsCancelled);         
         }
     }
 }

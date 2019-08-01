@@ -28,5 +28,15 @@ namespace Timetable.Test
             Assert.False(schedule.RunsOn(MondayAugust12.AddDays(1)));
         }
         
+        [Theory]
+        [InlineData(StpIndicator.Cancelled, true)]
+        [InlineData(StpIndicator.New, false)]
+        [InlineData(StpIndicator.Override, false)]
+        [InlineData(StpIndicator.Permanent, false)]
+        public void IsCancelled(StpIndicator indicator, bool expected)
+        {
+            var schedule = TestSchedules.CreateSchedule(indicator: indicator);
+            Assert.Equal(expected, schedule.IsCancelled());
+        }
     }
 }

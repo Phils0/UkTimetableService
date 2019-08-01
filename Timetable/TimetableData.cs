@@ -8,15 +8,14 @@ namespace Timetable
     {
         Success,
         ServiceNotFound,
-        NoScheduleOnDate,
-        CancelledService
+        NoScheduleOnDate
     }
     
     public interface ITimetable
     {
-        (LookupStatus status, Schedule schedule) GetScheduleByTimetableUid(string timetableUid, DateTime date);
-        (LookupStatus status, Schedule[] schedule) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
-        (LookupStatus status, Schedule[] schedules) GetSchedulesByToc(string toc, DateTime date);
+        (LookupStatus status, ResolvedService service) GetScheduleByTimetableUid(string timetableUid, DateTime date);
+        (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
+        (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date);
     }
 
     public class TimetableData : ITimetable
@@ -50,7 +49,7 @@ namespace Timetable
             schedule.AddToService(service);
         }
 
-        public (LookupStatus status, Schedule schedule) GetScheduleByTimetableUid(string timetableUid, DateTime date)
+        public (LookupStatus status, ResolvedService service) GetScheduleByTimetableUid(string timetableUid, DateTime date)
         {
             if (!_timetableUidMap.TryGetValue(timetableUid, out var service))
                 return (LookupStatus.ServiceNotFound, null);
@@ -59,31 +58,23 @@ namespace Timetable
             
             if(schedule == null)
                 return (LookupStatus.NoScheduleOnDate, null);
- 
-            if(schedule.StpIndicator == StpIndicator.Cancelled)
-                return (LookupStatus.CancelledService, null);
-
             
-            return (LookupStatus.Success , schedule);
+            return (LookupStatus.Success ,schedule);
         }
 
-        public (LookupStatus status, Schedule[] schedule) GetScheduleByRetailServiceId(string retailServiceId, DateTime date)
+        public (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date)
         {
             if (!_retailServiceIdMap.TryGetValue(retailServiceId, out var services))
-                return (LookupStatus.ServiceNotFound, new Schedule[0]);
+                return (LookupStatus.ServiceNotFound, new ResolvedService[0]);
 
-            var schedules = new List<Schedule>();
+            var schedules = new List<ResolvedService>();
             
             foreach (var service in services)
             {
                 var schedule = service.GetScheduleOn(date);
-            
                 if(schedule == null)
                     continue;
- 
-                if(schedule.StpIndicator == StpIndicator.Cancelled)
-                    return (LookupStatus.CancelledService, new Schedule[0]);
- 
+                
                 if(schedule.HasRetailServiceId(retailServiceId))
                     schedules.Add(schedule);
             }
@@ -93,22 +84,22 @@ namespace Timetable
             return (reason, schedules.ToArray());
         }
 
-        public (LookupStatus status, Schedule[] schedules) GetSchedulesByToc(string toc, DateTime date)
+        public (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date)
         {
-            var schedules = new List<Schedule>();
+            var services = new List<ResolvedService>();
 
             foreach (var service in _timetableUidMap.Values)
             {
                 if (service.TryGetScheduleOn(date, out var schedule))
                 {
-                    if(schedule.Operator.Equals(toc))
-                        schedules.Add(schedule);
+                    if(schedule.OperatedBy(toc))
+                        services.Add(schedule);
                 }
             }
 
-            var reason = schedules.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
+            var reason = services.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
 
-            return (reason, schedules.ToArray());
+            return (reason, services.ToArray());
         }
     }
 }

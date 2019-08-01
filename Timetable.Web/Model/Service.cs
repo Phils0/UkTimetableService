@@ -50,9 +50,15 @@ namespace Timetable.Web.Model
         /// </summary>
         /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Category </remarks>
         public string Category { get; set; }
-        
+        /// <summary>
+        /// Service stops
+        /// </summary>
         public ScheduledStop[] Stops { get; set; }
-
+        /// <summary>
+        /// Service is cancelled on date
+        /// </summary>
+        public bool IsCancelled { get; set; }
+        
         public override string ToString()
         {
             return $"{TimetableUid} {Date:d}";

@@ -65,6 +65,8 @@ namespace Timetable
         /// </remarks>
         public StpIndicator StpIndicator { get; set; }
 
+        public bool IsCancelled() => StpIndicator.Cancelled == StpIndicator;
+        
         public ICalendar Calendar { get; set; }
         /// <summary>
         /// Retail Service ID - used by NRS
@@ -130,6 +132,11 @@ namespace Timetable
         public bool HasRetailServiceId(string retailServiceId)
         {
             return RetailServiceId == retailServiceId;
+        }
+
+        public bool OperatedBy(string toc)
+        {
+            return Operator.Equals(toc);
         }
         
         public override string ToString()

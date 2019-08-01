@@ -7,6 +7,7 @@ namespace Timetable.Test
 {
     public class LocationFindArrivalsTest
     {
+        private static readonly DateTime Aug1 = new DateTime(2019, 8, 1);
         private static readonly DateTime Aug1AtTen = new DateTime(2019, 8, 1, 10, 0 ,0);
         
         [Fact]
@@ -20,9 +21,11 @@ namespace Timetable.Test
             Assert.Equal(6, schedules.Length);
 
             var first = schedules.First();
-            Assert.Equal("X00600", first.TimetableUid);
+            Assert.Equal("X00600", first.Details.TimetableUid);
+            Assert.Equal(Aug1, first.On);
             var last = schedules.Last();
-            Assert.Equal("X00525", last.TimetableUid);        
+            Assert.Equal("X00525", last.Details.TimetableUid);        
+            Assert.Equal(Aug1, last.On);
         }
         
         [Fact]
@@ -57,7 +60,7 @@ namespace Timetable.Test
             
             Assert.Equal(6, schedules.Length);
 
-            var last = schedules.Last().Locations[1];
+            var last = schedules.Last().Details.Locations[1];
             //TODO check next day       
         }
     }

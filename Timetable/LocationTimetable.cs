@@ -73,7 +73,7 @@ namespace Timetable
         /// <param name="before">Number of services before to return</param>
         /// <param name="after">Number of services after to return</param>
         /// <returns>Schedules of running services.  If a service departs at time counts as first of after.</returns>
-        public Schedule[] FindDepartures(DateTime at, int before = 1, int after = 5)
+        public ResolvedService[] FindDepartures(DateTime at, int before = 1, int after = 5)
         {
             var on = at.Date;
             var time = new Time(at.TimeOfDay);
@@ -98,9 +98,9 @@ namespace Timetable
             return (0, true);
         }
 
-        private Schedule[] GetResults(int firstIdx, SortedList<Time, Service[]> timetable, int requiredBack, int requiredForward, DateTime date)
+        private ResolvedService[] GetResults(int firstIdx, SortedList<Time, Service[]> timetable, int requiredBack, int requiredForward, DateTime date)
         {
-            var schedules = new Dictionary<string, Schedule>(requiredBack + requiredForward);
+            var schedules = new Dictionary<string, ResolvedService>(requiredBack + requiredForward);
 
             bool checkedAll = false;           
             int lastCheckedIdx = FindResultsGoingBackwards(requiredBack, firstIdx - 1);
@@ -168,7 +168,7 @@ namespace Timetable
         /// <param name="before">Number of services before to return</param>
         /// <param name="after">Number of services after to return</param>
         /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
-        public Schedule[] FindArrivals(DateTime at, int before = 5, int after = 1)
+        public ResolvedService[] FindArrivals(DateTime at, int before = 5, int after = 1)
         {
             var on = at.Date;
             var time = new Time(at.TimeOfDay);

@@ -119,7 +119,7 @@ namespace Timetable.Web.Test
 
             var schedule = services.GetScheduleByTimetableUid(Cif.TestSchedules.X12345, new DateTime(2019, 8, 1));
             
-            Assert.NotNull(schedule.schedule);            
+            Assert.NotNull(schedule.service);            
         }
         
         [Fact]
@@ -138,7 +138,7 @@ namespace Timetable.Web.Test
 
             var schedule = services.GetScheduleByRetailServiceId(Cif.TestSchedules.SW1234, new DateTime(2019, 8, 1));
             
-            Assert.NotEmpty(schedule.schedule);            
+            Assert.NotEmpty(schedule.services);            
         }
     }
 }
