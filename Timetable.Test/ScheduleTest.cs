@@ -38,5 +38,16 @@ namespace Timetable.Test
             var schedule = TestSchedules.CreateSchedule(indicator: indicator);
             Assert.Equal(expected, schedule.IsCancelled());
         }
+        
+        [Theory]
+        [InlineData("VT", true)]
+        [InlineData("GW", false)]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        public void OperatedByToc(string toc, bool expected)
+        {
+            var schedule = TestSchedules.CreateSchedule();
+            Assert.Equal(expected, schedule.OperatedBy(toc));
+        }
     }
 }

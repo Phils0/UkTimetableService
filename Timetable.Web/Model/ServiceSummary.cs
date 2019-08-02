@@ -16,6 +16,10 @@ namespace Timetable.Web.Model
         /// </summary>
         public DateTime Date { get; set; }
         /// <summary>
+        /// Service is cancelled on date
+        /// </summary>
+        public bool IsCancelled { get; set; }
+        /// <summary>
         /// Retail Service ID - used by NRS
         /// </summary>
         public string RetailServiceId { get; set; }
@@ -58,10 +62,6 @@ namespace Timetable.Web.Model
         /// Service finsihing point
         /// </summary>
         public ScheduledStop Destination { get; set; }
-        /// <summary>
-        /// Service is cancelled on date
-        /// </summary>
-        public bool IsCancelled { get; set; }
         
         public override string ToString()
         {
