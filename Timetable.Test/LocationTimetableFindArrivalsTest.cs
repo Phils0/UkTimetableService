@@ -21,10 +21,10 @@ namespace Timetable.Test
             Assert.Equal(6, schedules.Length);
 
             var first = schedules.First();
-            Assert.Equal("X00600", first.Details.TimetableUid);
+            Assert.Equal("X00540", first.Details.TimetableUid);
             Assert.Equal(Aug1, first.On);
             var last = schedules.Last();
-            Assert.Equal("X00525", last.Details.TimetableUid);        
+            Assert.Equal("X00615", last.Details.TimetableUid);        
             Assert.Equal(Aug1, last.On);
         }
         
