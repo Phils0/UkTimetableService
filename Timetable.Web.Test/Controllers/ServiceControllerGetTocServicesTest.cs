@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Timetable.Web.Test.Controllers
 {
-    public class TimetableControllerGetTocServicesTest
+    public class ServiceControllerGetTocServicesTest
     {
         private static readonly MapperConfiguration _config = new MapperConfiguration(
             cfg => cfg.AddProfile<ToViewModelProfile>());
@@ -26,7 +26,7 @@ namespace Timetable.Web.Test.Controllers
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
-            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -42,7 +42,7 @@ namespace Timetable.Web.Test.Controllers
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
-            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1, true) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -58,7 +58,7 @@ namespace Timetable.Web.Test.Controllers
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.ServiceNotFound, new ResolvedService[0]));
 
-            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1) as ObjectResult;;
             
             Assert.Equal(404, response.StatusCode);

@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Timetable.Web.Test.Controllers
 {
-    public class TimetableControllerGetDeparturesTest
+    public class DeparturesControllerTest
     {
         private static readonly MapperConfiguration _config = new MapperConfiguration(
             cfg => cfg.AddProfile<ToViewModelProfile>());
@@ -22,11 +22,11 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task DeparturesReturnsServices()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ILocationData>();
 //            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
 //                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
-            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new DeparturesController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Serilog;
@@ -32,6 +33,28 @@ namespace Timetable
         /// <param name="location">Found location</param>
         /// <returns></returns>
         bool TryGetLocation(string tiploc, out Location location);
+
+        /// <summary>
+        /// Scheduled services departing from location on date near to time 
+        /// </summary>
+        /// <param name="location">Three Letter Code</param>
+        /// <param name="at">Date and Time</param>
+        /// <param name="before">Number of services before to return</param>
+        /// <param name="after">Number of services after to return</param>
+        /// <param name="to">Optional filter to location</param>
+        /// <returns>Schedules of running services.  If a service departs at time counts as first of after.</returns>
+        ResolvedService[] FindDepartures(string location, DateTime at, int before, int after, string to = "");
+
+        /// <summary>
+        /// Scheduled services arriving at location on date near to time
+        /// </summary>
+        /// <param name="location">Three Letter Code</param>
+        /// <param name="at">Date and Time</param>
+        /// <param name="before">Number of services before to return</param>
+        /// <param name="after">Number of services after to return</param>
+        /// <param name="from">Optional filter from location</param>
+        /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
+        ResolvedService[] FindArrivals(string location, DateTime at, int before, int after, string @from = "");
     }
 
     /// <summary>
@@ -104,6 +127,16 @@ namespace Timetable
             
             _logger.Information("Did not find location {tiploc}", tiploc);
             return false;
+        }
+
+        public ResolvedService[] FindDepartures(string location, DateTime at, int before, int after, string to = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        public ResolvedService[] FindArrivals(string location, DateTime at, int before, int after, string @from = "")
+        {
+            throw new NotImplementedException();
         }
     }
 }

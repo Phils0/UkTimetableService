@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Timetable.Web.Test.Controllers
 {
-    public class TimetableControllerGetServiceByTimetableIdTest
+    public class ServiceControllerGetServiceByTimetableIdTest
     {
         private static readonly MapperConfiguration _config = new MapperConfiguration(
             cfg => cfg.AddProfile<ToViewModelProfile>());
@@ -26,7 +26,7 @@ namespace Timetable.Web.Test.Controllers
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.Success, TestSchedules.CreateService()));
 
-            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -42,7 +42,7 @@ namespace Timetable.Web.Test.Controllers
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.ServiceNotFound, null));
 
-            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;;
             
             Assert.Equal(404, response.StatusCode);
@@ -59,7 +59,7 @@ namespace Timetable.Web.Test.Controllers
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.Success, TestSchedules.CreateService(isCancelled: true)));
 
-            var controller = new TimetableController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;
             
             Assert.Equal(200, response.StatusCode);

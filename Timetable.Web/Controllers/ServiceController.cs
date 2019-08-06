@@ -10,15 +10,18 @@ using Timetable.Web.Model;
 
 namespace Timetable.Web.Controllers
 {
-    [Route("api/[controller]/")]
+    /// <summary>
+    /// Service controller
+    /// </summary>
+    [Route("api/timetable/")]
     [ApiController]
-    public class TimetableController : ControllerBase
+    public class ServiceController : ControllerBase
     {
         private readonly ITimetable _timetable;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
         
-        public TimetableController(ITimetable timetable, IMapper mapper, ILogger logger)
+        public ServiceController(ITimetable timetable,  IMapper mapper, ILogger logger)
         {
             _timetable = timetable;
             _mapper = mapper;
@@ -89,68 +92,6 @@ namespace Timetable.Web.Controllers
             }    
 
             return CreateNoServiceResponse(service.status, serviceId, date);
-        }
-        
-        /// <summary>
-        /// Returns arrivals at a location, optionally from another location
-        /// </summary>
-        /// <param name="location"></param>
-        /// <param name="at"></param>
-        /// <returns></returns>
-        [Route("arrivals/{location}/{at}")]
-        [HttpGet]
-        public async Task<IActionResult> Arrivals(string location, DateTime? at, [FromQuery] string from = "", [FromQuery] ushort before = 5, [FromQuery] ushort after = 1)
-        {
-            var request = new LocationTimetableRequest()
-            {
-                Location = location,
-                At = new Window()
-                {
-                    At = at ?? DateTime.Now,
-                    Before = before,
-                    After = after
-                },
-                ComingFromGoingTo = from
-            };
-            
-            var response = new Model.LocationTimetable()
-            {
-                Request = request,
-                GeneratedAt = DateTime.Now
-            };
-            
-            return Ok(response);
-        }
-        
-        /// <summary>
-        /// Returns departures at a location, optionally to another location
-        /// </summary>
-        /// <param name="location"></param>
-        /// <param name="at"></param>
-        /// <returns></returns>
-        [Route("departures/{location}/{at}")]
-        [HttpGet]
-        public async Task<IActionResult> Departures(string location, DateTime? at, [FromQuery] string to = "", [FromQuery] ushort before = 1, [FromQuery] ushort after = 5)
-        {
-            var request = new LocationTimetableRequest()
-            {
-                Location = location,
-                At = new Window()
-                {
-                    At = at ?? DateTime.Now,
-                    Before = before,
-                    After = after
-                },
-                ComingFromGoingTo = to
-            };
-            
-            var response = new Model.LocationTimetable()
-            {
-                Request = request,
-                GeneratedAt = DateTime.Now
-            };
-            
-            return Ok(response);
         }
         
         /// <summary>
