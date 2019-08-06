@@ -31,7 +31,7 @@ namespace Timetable.Web.Test.Controllers
             
             Assert.Equal(200, response.StatusCode);
 
-            var services = response.Value as Model.LocationTimetable;
+            var services = response.Value as Model.FoundResponse;
             Assert.NotNull(services.Request);
             Assert.True(services.GeneratedAt > DateTime.Now.AddMinutes(-1));
             // Assert.NotEmpty(services.Services);

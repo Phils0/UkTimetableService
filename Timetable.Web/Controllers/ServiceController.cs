@@ -31,21 +31,21 @@ namespace Timetable.Web.Controllers
         /// <summary>
         /// Returns a scheduled service on a particular day
         /// </summary>
-        /// <param name="serviceId">Timetable Id</param>
-        /// <param name="date"></param>
+        /// <param name="serviceId">Timetable UID - letter plus 5 digits</param>
+        /// <param name="on">Date</param>
         /// <returns></returns>
         [Route("service/{serviceId}/{date}")]
         [HttpGet]
-        public async Task<IActionResult> GetServiceByTimetableId(string serviceId, DateTime date)
+        public async Task<IActionResult> GetServiceByTimetableId(string serviceId, DateTime @on)
         {
-            var service =  _timetable.GetScheduleByTimetableUid(serviceId, date);
+            var service =  _timetable.GetScheduleByTimetableUid(serviceId, @on);
             if (service.status == LookupStatus.Success)
             {
                 var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service);
                 return Ok(model);             
             }
 
-            return CreateNoServiceResponse(service.status, serviceId, date);
+            return CreateNoServiceResponse(service.status, serviceId, @on);
         }
 
         private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string serviceId, DateTime date)
@@ -77,35 +77,35 @@ namespace Timetable.Web.Controllers
         /// <summary>
         /// Returns a scheduled service on a particular day
         /// </summary>
-        /// <param name="serviceId">Retail Service Id</param>
-        /// <param name="date"></param>
+        /// <param name="serviceId">Retail Service Id, two letters plus 6 or 4 digits</param>
+        /// <param name="on">date</param>
         /// <returns></returns>
         [Route("retailService/{serviceId}/{date}")]
         [HttpGet]
-        public async Task<IActionResult> GetServiceByRetailServiceId(string serviceId, DateTime date)
+        public async Task<IActionResult> GetServiceByRetailServiceId(string serviceId, DateTime @on)
         {
-            var service =  _timetable.GetScheduleByRetailServiceId(serviceId, date);
+            var service =  _timetable.GetScheduleByRetailServiceId(serviceId, @on);
             if (service.status == LookupStatus.Success)
             {
                  var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services);
                  return Ok(model);               
             }    
 
-            return CreateNoServiceResponse(service.status, serviceId, date);
+            return CreateNoServiceResponse(service.status, serviceId, @on);
         }
         
         /// <summary>
         /// Returns all Toc services on a particular day
         /// </summary>
-        /// <param name="toc">Timetable Id</param>
-        /// <param name="date"></param>
+        /// <param name="toc">Two letter TOC code</param>
+        /// <param name="on">date</param>
         /// <param name="includeStops">Whether to return a full schedule</param>
         /// <returns></returns>
         [Route("toc/{toc}/{date}")]
         [HttpGet]
-        public async Task<IActionResult> GetTocServices(string toc, DateTime date, [FromQuery] bool includeStops = false)
+        public async Task<IActionResult> GetTocServices(string toc, DateTime @on, [FromQuery] bool includeStops = false)
         {
-            var service =  _timetable.GetSchedulesByToc(toc, date);
+            var service =  _timetable.GetSchedulesByToc(toc, @on);
             if (service.status == LookupStatus.Success)
             {
                 if (includeStops)
@@ -119,7 +119,7 @@ namespace Timetable.Web.Controllers
                     return Ok(model);                               
                 }
             }
-            return CreateNoServiceResponse(service.status, toc, date);
+            return CreateNoServiceResponse(service.status, toc, @on);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Timetable.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Arrivals(string location, DateTime? at, [FromQuery] string from = "", [FromQuery] ushort before = 3, [FromQuery] ushort after = 3)
         {
-            var request = new LocationTimetableRequest()
+            var request = new SearchRequest()
             {
                 Location = location,
                 At = new Window()
@@ -44,7 +44,7 @@ namespace Timetable.Web.Controllers
                 ComingFromGoingTo = from
             };
             
-            var response = new Model.LocationTimetable()
+            var response = new Model.FoundResponse()
             {
                 Request = request,
                 GeneratedAt = DateTime.Now
