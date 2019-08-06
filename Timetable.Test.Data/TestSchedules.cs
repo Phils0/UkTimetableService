@@ -107,11 +107,13 @@ namespace Timetable.Test.Data
 
         public static ICalendar EverydayAugust2019 => CreateAugust2019Calendar();
         public static Time Ten => new Time(new TimeSpan(10, 0,0 ));
+        public static Time TenFifteen => new Time(new TimeSpan(10, 15,0 ));
         public static Time TenThirty => new Time(new TimeSpan(10, 30,0 ));
 
         public static ScheduleLocation[] DefaultLocations => new[]
         {
             (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, Ten),
+            (ScheduleLocation) TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, TenFifteen),
             TestScheduleLocations.CreateDestination(TestStations.Waterloo, TenThirty)
         };
     }

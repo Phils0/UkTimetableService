@@ -10,11 +10,14 @@ namespace Timetable
     /// <remarks>Services are ordered by time</remarks>
     internal class PublicSchedule
     {
+        public Station At { get; }
+        
         private readonly SortedList<Time, Service[]> _services;
         private readonly IComparer<Time> _comparer;
 
-        internal PublicSchedule(IComparer<Time> comparer)
+        internal PublicSchedule(Station at, IComparer<Time> comparer)
         {
+            At = at;
             _comparer = comparer;
             _services = new SortedList<Time, Service[]>(comparer);
         }
@@ -42,7 +45,7 @@ namespace Timetable
             return _services.TryGetValue(time, out var services) ? services : new Service[0];
         }
 
-        internal ResolvedService[] FindServices(DateTime at, int before, int after)
+        internal ResolvedServiceStop[] FindServices(DateTime at, int before, int after)
         {
             if (before == 0 && after == 0)
                 after = 1;
@@ -78,9 +81,9 @@ namespace Timetable
             return (0, true);
         }
 
-        private ResolvedService[] GetResults(int firstIdx, int requiredBack, int requiredForward, DateTime date)
+        private ResolvedServiceStop[] GetResults(int firstIdx, int requiredBack, int requiredForward, DateTime date)
         {
-            var schedules = new List<ResolvedService>(requiredBack + requiredForward);
+            var schedules = new List<ResolvedServiceStop>(requiredBack + requiredForward);
 
             bool checkedAll = false;
             int lastCheckedIdx = FindResultsGoingBackwards(requiredBack, firstIdx - 1);
@@ -104,7 +107,7 @@ namespace Timetable
                     {
                         if (service.TryGetScheduleOn(date, out var schedule))
                         {
-                            schedules.Insert(0, schedule);
+                            schedules.Insert(0, new ResolvedServiceStop(schedule, null));
                             found++;
                         }
                     }
@@ -130,7 +133,7 @@ namespace Timetable
                     {
                         if (service.TryGetScheduleOn(date, out var schedule))
                         {
-                            schedules.Add(schedule);
+                            schedules.Add( new ResolvedServiceStop(schedule, null));
                             found++;
                         }
                     }

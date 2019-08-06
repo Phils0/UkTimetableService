@@ -14,7 +14,7 @@ namespace Timetable
         /// <param name="before">Number of services before to return</param>
         /// <param name="after">Number of services after to return</param>
         /// <returns>Schedules of running services.  If a service departs at time counts as first of after.</returns>
-        ResolvedService[] FindDepartures(DateTime at, int before, int after);
+        ResolvedServiceStop[] FindDepartures(DateTime at, int before, int after);
 
         /// <summary>
         /// Scheduled services arriving on date near to time
@@ -23,13 +23,21 @@ namespace Timetable
         /// <param name="before">Number of services before to return</param>
         /// <param name="after">Number of services after to return</param>
         /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
-        ResolvedService[] FindArrivals(DateTime at, int before, int after);
+        ResolvedServiceStop[] FindArrivals(DateTime at, int before, int after);
     }
 
     public class LocationTimetable : ILocationTimetable
     {
-        private readonly PublicSchedule _arrivals = new PublicSchedule(Time.EarlierLaterComparer);
-        private readonly PublicSchedule _departures = new PublicSchedule(Time.EarlierLaterComparer);
+        private readonly PublicSchedule _arrivals;
+        private readonly PublicSchedule _departures;
+
+
+        public LocationTimetable(Station at)
+        {
+            _arrivals = new PublicSchedule(at, Time.EarlierLaterComparer);
+            _departures = new PublicSchedule(at, Time.EarlierLaterComparer);
+            
+        }
 
         internal void AddService(ScheduleLocation stop)
         {
@@ -47,7 +55,7 @@ namespace Timetable
         /// <param name="before">Number of services before to return</param>
         /// <param name="after">Number of services after to return.  First found after or on time is always included in after</param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedService[] FindDepartures(DateTime at, int before, int after)
+        public ResolvedServiceStop[] FindDepartures(DateTime at, int before, int after)
         {
             return _departures.FindServices(at, before, after);
         }
@@ -59,7 +67,7 @@ namespace Timetable
         /// <param name="before">Number of services before to return</param>
         /// <param name="after">Number of services after to return.  First found after or on time is always included in after</param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedService[] FindArrivals(DateTime at, int before, int after)
+        public ResolvedServiceStop[] FindArrivals(DateTime at, int before, int after)
         {
             return _arrivals.FindServices(at, before, after);
         }

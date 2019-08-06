@@ -139,6 +139,21 @@ namespace Timetable
             return Operator.Equals(toc);
         }
         
+        public bool TryFindStop(Station location, Time time, out ScheduleLocation stop)
+        {
+            foreach (var l in Locations)
+            {
+                if (l.IsStopAt(location, time))
+                {
+                    stop = l;
+                    return true;
+                }
+            }
+
+            stop = null;
+            return false;
+        }
+        
         public override string ToString()
         {
             return $"{TimetableUid} -{StpIndicator} {Calendar} ({Id})";

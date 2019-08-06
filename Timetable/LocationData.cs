@@ -51,7 +51,7 @@ namespace Timetable
         /// <param name="after">Number of services after to return</param>
         /// <param name="to">Optional filter to location</param>
         /// <returns>Schedules of running services.  If a service departs at time counts as first of after.</returns>
-        (FindStatus status, ResolvedService[] services) FindDepartures(string location, DateTime at, int before, int after, string to = "");
+        (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, int before, int after, string to = "");
 
         /// <summary>
         /// Scheduled services arriving at location on date near to time
@@ -62,7 +62,7 @@ namespace Timetable
         /// <param name="after">Number of services after to return</param>
         /// <param name="from">Optional filter from location</param>
         /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
-        (FindStatus status, ResolvedService[] services) FindArrivals(string location, DateTime at, int before, int after, string @from = "");
+        (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, int before, int after, string @from = "");
     }
 
     /// <summary>
@@ -137,12 +137,12 @@ namespace Timetable
             return false;
         }
 
-        public (FindStatus status, ResolvedService[] services) FindDepartures(string location, DateTime at, int before, int after, string to = "")
+        public (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, int before, int after, string to = "")
         {
             throw new NotImplementedException();
         }
 
-        public (FindStatus status, ResolvedService[] services) FindArrivals(string location, DateTime at, int before, int after, string @from = "")
+        public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, int before, int after, string @from = "")
         {
             throw new NotImplementedException();
         }

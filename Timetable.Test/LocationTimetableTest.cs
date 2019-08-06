@@ -66,12 +66,7 @@ namespace Timetable.Test
         [Fact]
         public void LocationHasEntryForStop()
         {
-            var locations = new[]
-            {
-                (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, TestSchedules.Ten),
-                TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, TenFifteen),
-                TestScheduleLocations.CreateDestination(TestStations.Waterloo, TestSchedules.TenThirty)
-            };
+            var locations = TestSchedules.DefaultLocations;
             
             var testSchedule = TestSchedules.CreateScheduleWithService(locations: locations);
 

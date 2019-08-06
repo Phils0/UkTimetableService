@@ -32,8 +32,13 @@ namespace Timetable
         /// <summary>
         /// Timetable for Station
         /// </summary>
-        public LocationTimetable Timetable { get; } = new LocationTimetable();
-        
+        public LocationTimetable Timetable { get; }
+
+        public Station()
+        {
+            Timetable = new LocationTimetable(this);
+        }
+
         /// <summary>
         /// Add a location to the station
         /// </summary>

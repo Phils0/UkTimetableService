@@ -14,7 +14,7 @@ namespace Timetable.Test
             var workingStop = CreateScheduleStop(TestSchedules.TenThirty);
             workingStop.Arrival = Time.NotValid;
 
-            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton,  Time.EarlierLaterComparer);
             schedule.AddService(CreateServiceTime(publicStop));
             schedule.AddService(CreateServiceTime(workingStop));
 
@@ -40,7 +40,7 @@ namespace Timetable.Test
             var stop1 = CreateScheduleStop(TestSchedules.Ten);
             var stop2 = CreateScheduleStop(TestSchedules.TenThirty);
 
-            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
             schedule.AddService(CreateServiceTime(stop1));
             schedule.AddService(CreateServiceTime(stop2));
 
@@ -55,7 +55,7 @@ namespace Timetable.Test
             var stop1 = CreateScheduleStop(TestSchedules.Ten);
             var stop2 = CreateScheduleStop(TestSchedules.Ten);
 
-            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
             schedule.AddService(CreateServiceTime(stop1));
             schedule.AddService(CreateServiceTime(stop2));
 
@@ -88,7 +88,7 @@ namespace Timetable.Test
             };
 
 
-            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));
@@ -111,7 +111,7 @@ namespace Timetable.Test
                 CreateScheduleStop(TestSchedules.TenThirty),
             };
 
-            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));
@@ -132,7 +132,7 @@ namespace Timetable.Test
                 CreateScheduleStop(TestSchedules.TenThirty),
             };
 
-            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));
@@ -153,7 +153,7 @@ namespace Timetable.Test
                 CreateScheduleStop(TestSchedules.TenThirty),
             };
 
-            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));

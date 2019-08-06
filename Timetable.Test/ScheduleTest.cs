@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -48,6 +50,33 @@ namespace Timetable.Test
         {
             var schedule = TestSchedules.CreateSchedule();
             Assert.Equal(expected, schedule.OperatedBy(toc));
+        }
+
+        public static IEnumerable<object[]> Stops
+        {
+            get
+            {
+                var stops = TestSchedules.DefaultLocations;
+                var origin = stops[0] as ScheduleOrigin;
+                yield return new object[] {origin.Station, origin.Departure};
+                var intermediate = stops[1] as ScheduleStop;
+                yield return new object[] {intermediate.Station, intermediate.Departure};
+                var destination = stops[2] as ScheduleDestination;
+                yield return new object[] {destination.Station, destination.Arrival};
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(Stops))]
+        public void FindStop(Station station, Time time)
+        {
+            
+        }
+        
+        [Fact]
+        public void DoNotFindStop()
+        {
+            
         }
     }
 }
