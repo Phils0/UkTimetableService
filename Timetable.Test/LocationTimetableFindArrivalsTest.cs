@@ -16,15 +16,15 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindArrivals(Aug1AtTen);
+            var schedules = clapham.Timetable.FindArrivals(Aug1AtTen, 3, 3);
             
             Assert.Equal(6, schedules.Length);
 
             var first = schedules.First();
-            Assert.Equal("X00540", first.Details.TimetableUid);
+            Assert.Equal("X00555", first.Details.TimetableUid);
             Assert.Equal(Aug1, first.On);
             var last = schedules.Last();
-            Assert.Equal("X00615", last.Details.TimetableUid);        
+            Assert.Equal("X00630", last.Details.TimetableUid);        
             Assert.Equal(Aug1, last.On);
         }
         
@@ -56,7 +56,7 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindArrivals(new DateTime(2019, 8, 2, 0, 30 ,0));
+            var schedules = clapham.Timetable.FindArrivals(new DateTime(2019, 8, 2, 0, 30 ,0), 3, 3);
             
             Assert.Equal(6, schedules.Length);
 

@@ -4,12 +4,6 @@ using System.Linq;
 
 namespace Timetable
 {
-    internal enum IncludeFirst
-    {
-        InAfter,
-        InBefore
-    }
-    
     /// <summary>
     /// Represents the Public Arrivals or Departures for a location
     /// </summary>
@@ -51,16 +45,28 @@ namespace Timetable
             return _services.TryGetValue(time, out var services) ? services : new Service[0];
         }
 
-        internal ResolvedService[] FindServices(DateTime at, int before, int after, IncludeFirst includeFirst)
+        internal ResolvedService[] FindServices(DateTime at, int before, int after)
         {
+            if (before == 0 && after == 0)
+                after = 1;
+            
             var on = at.Date;
             var time = new Time(at.TimeOfDay);
 
             var first = FindStartIndex(time);
+
+            // If find service at specific time and only returning before ensure we return the service at the time
+            if (after == 0 && EqualsTime(first.index, time))
+                first.index = first.index + 1; 
+            
             if (first.changeDay) // Start on next day
                 on = on.AddDays(1);
-            var fistIndex = includeFirst.Equals(IncludeFirst.InAfter) ? first.index : first.index + 1;
-            return GetResults(fistIndex, before, after, on);
+            return GetResults(first.index, before, after, on);
+        }
+
+        private bool EqualsTime(int idx, Time time)
+        {
+            return time.Equals(_services.Keys[idx]);
         }
 
         private (int index, bool changeDay) FindStartIndex(Time time)

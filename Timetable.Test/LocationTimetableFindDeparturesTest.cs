@@ -16,7 +16,7 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindDepartures(Aug1AtTen);
+            var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, 1, 5);
             
             Assert.Equal(6, schedules.Length);
 
@@ -56,7 +56,7 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindDepartures(new DateTime(2019, 8, 1, 23, 30 ,0));
+            var schedules = clapham.Timetable.FindDepartures(new DateTime(2019, 8, 1, 23, 30 ,0), 1, 5);
             
             Assert.Equal(6, schedules.Length);
 

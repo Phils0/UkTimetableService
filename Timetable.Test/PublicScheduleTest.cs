@@ -95,10 +95,74 @@ namespace Timetable.Test
             }
 
             var searchAt = Aug5.Add(time);
-            var found = schedule.FindServices(searchAt, 0, 1, IncludeFirst.InAfter);
+            var found = schedule.FindServices(searchAt, 0, 1);
 
             var expected =  services[expectedIdx].Schedule;
             Assert.Equal(expected, found[0].Details);
+        }
+
+        // TODO This is an initial version, fix to return nearest time
+        [Fact]
+        public void AlwaysReturnOneResult()
+        {
+            var services = new[]
+            {
+                CreateScheduleStop(TestSchedules.Ten),
+                CreateScheduleStop(TestSchedules.TenThirty),
+            };
+
+            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            foreach (var service in services)
+            {
+                schedule.AddService(CreateServiceTime(service));
+            }
+
+            var searchAt = Aug5.AddHours(10).AddMinutes(1);
+            var found = schedule.FindServices(searchAt, 0, 0);
+            
+            Assert.Equal(services[1].Schedule, found[0].Details);
+        }
+        
+        [Fact]
+        public void CanReturnOnlyBeforeResults()
+        {
+            var services = new[]
+            {
+                CreateScheduleStop(TestSchedules.Ten),
+                CreateScheduleStop(TestSchedules.TenThirty),
+            };
+
+            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            foreach (var service in services)
+            {
+                schedule.AddService(CreateServiceTime(service));
+            }
+
+            var searchAt = Aug5.AddHours(10).AddMinutes(1);
+            var found = schedule.FindServices(searchAt, 1, 0);
+            
+            Assert.Equal(services[0].Schedule, found[0].Details);
+        }
+        
+        [Fact]
+        public void ReturnsOnTimeResultWhenAskOnlyForBeforeResults()
+        {
+            var services = new[]
+            {
+                CreateScheduleStop(TestSchedules.Ten),
+                CreateScheduleStop(TestSchedules.TenThirty),
+            };
+
+            var schedule = new PublicSchedule(Time.EarlierLaterComparer);
+            foreach (var service in services)
+            {
+                schedule.AddService(CreateServiceTime(service));
+            }
+
+            var searchAt = Aug5.AddHours(10);
+            var found = schedule.FindServices(searchAt, 1, 0);
+            
+            Assert.Equal(services[0].Schedule, found[0].Details);
         }
     }
 }
