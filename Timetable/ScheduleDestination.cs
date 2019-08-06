@@ -5,6 +5,10 @@ namespace Timetable
 {
     public class ScheduleDestination : ScheduleLocation, IArrival
     {
+        bool IArrival.IsPublic => Arrival.IsValid;
+        
+        Time IArrival.Time => ((IArrival) this).IsPublic ? Arrival : WorkingArrival;
+
         public Time Arrival { get; set; }
 
         public Time WorkingArrival { get; set; }
@@ -13,6 +17,11 @@ namespace Timetable
         {
             Arrival = Arrival.MakeAfterByAddingADay(start);
             WorkingArrival = WorkingArrival.MakeAfterByAddingADay(start);
+        }
+
+        public override bool IsStopAt(Station location, Time time)
+        {
+            return Station.Equals(location) && Arrival.Equals(time);
         }
 
         public override string ToString()

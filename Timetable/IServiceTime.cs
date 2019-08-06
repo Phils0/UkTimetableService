@@ -2,36 +2,31 @@ namespace Timetable
 {
     public interface IServiceTime
     {
-        bool IsPublic { get; }
         Time Time { get; }
         Service Service { get; }        
     }
     
     public class ArrivalServiceTime : IServiceTime
     {
-        public bool IsPublic { get; }
-        public Time Time { get; }
-        public Service Service { get; }
+        public IArrival Arrival { get; }
+        public Time Time => Arrival.Time;
+        public Service Service => Arrival.Service;
         
-        internal ArrivalServiceTime(IArrival a)
+        internal ArrivalServiceTime(IArrival arrival)
         {
-            IsPublic = a.Arrival.IsValid;
-            Time =  IsPublic ? a.Arrival : a.WorkingArrival;
-            Service = a.Service;
+            Arrival = arrival;
         }
     }
     
     public class DepartureServiceTime : IServiceTime
     {
-        public bool IsPublic { get; }
-        public Time Time { get; }
-        public Service Service { get; }
+        public IDeparture Departure { get; }
+        public Time Time => Departure.Time;
+        public Service Service => Departure.Service;
         
-        internal DepartureServiceTime(IDeparture a)
+        internal DepartureServiceTime(IDeparture departure)
         {
-            IsPublic = a.Departure.IsValid;
-            Time =  IsPublic ? a.Departure : a.WorkingDeparture;
-            Service = a.Service;
+            Departure = departure;
         }
     }
 

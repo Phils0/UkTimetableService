@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Timetable
 {
@@ -72,9 +73,11 @@ namespace Timetable
              
         public Time MakeAfterByAddingADay(Time start) => IsBefore(start) && IsValid ? Add(OneDay) : this;
 
+        [Pure]
         public Time Add(TimeSpan ts) => new Time(this.Value.Add(ts));
+        [Pure]
         public Time Subtract(TimeSpan ts) => new Time(this.Value.Subtract(ts));
-
+        [Pure]
         public Time AddMinutes(int minutes) => Add(new TimeSpan(0, minutes, 0));
 
         public bool Equals(Time other)

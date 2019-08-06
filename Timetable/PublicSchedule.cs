@@ -21,9 +21,6 @@ namespace Timetable
 
         internal void AddService(IServiceTime stop)
         {
-            if (!stop.IsPublic)
-                return;
-            
             var time = stop.Time;
             if (!_services.ContainsKey(time))
                 _services.Add(time, new[] {stop.Service});

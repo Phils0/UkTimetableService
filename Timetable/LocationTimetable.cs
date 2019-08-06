@@ -33,10 +33,10 @@ namespace Timetable
 
         internal void AddService(ScheduleLocation stop)
         {
-            if (stop is IArrival arrival)
+            if (stop is IArrival arrival && arrival.IsPublic)
                 _arrivals.AddService(new ArrivalServiceTime(arrival));
 
-            if (stop is IDeparture departure)
+            if (stop is IDeparture departure && departure.IsPublic)
                 _departures.AddService(new DepartureServiceTime(departure));
         }
 

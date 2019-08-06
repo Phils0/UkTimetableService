@@ -17,11 +17,12 @@ namespace Timetable.Test
         public static TheoryData<ScheduleLocation, string> Locations =>
             new TheoryData<ScheduleLocation, string>()
             {
-                {TestScheduleLocations.CreateOrigin(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
-                {TestScheduleLocations.CreateDestination(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
-                {TestScheduleLocations.CreatePass(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
-                {TestScheduleLocations.CreateStop(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
-                {TestScheduleLocations.CreatePickupOnlyStop(TestStations.Surbiton, Test), "00:12 SUR-SURBITN (0)" },
+                {TestScheduleLocations.CreateOrigin(TestStations.Surbiton, Test), "00:12 SUR-SURBITN" },
+                {TestScheduleLocations.CreateDestination(TestStations.Surbiton, Test), "00:12 SUR-SURBITN" },
+                {TestScheduleLocations.CreatePass(TestStations.Surbiton, Test), "00:12 SUR-SURBITN" },
+                {TestScheduleLocations.CreateStop(TestStations.Surbiton, Test), "00:12 SUR-SURBITN" },
+                {TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, sequence: 2), "00:12 SUR-SURBITN+2" },
+                {TestScheduleLocations.CreatePickupOnlyStop(TestStations.Surbiton, Test), "00:12 SUR-SURBITN" },
             };
         
         [Theory]

@@ -1,9 +1,9 @@
 namespace Timetable
 {
-    public interface IDeparture 
+    public interface IDeparture
     {
-        Time Departure { get; }
-        Time WorkingDeparture { get; }
-        Service Service { get; }
+        bool IsPublic { get; }
+        Time Time { get; }
+        Service Service { get; }   
     }
 }

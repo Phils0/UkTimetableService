@@ -39,17 +39,17 @@ namespace Timetable.Test.Data
             return new HashSet<string>(activities);
         }
         
-        public static ScheduleStop CreateStop(Station location, Time arrival, string activity = "T")
+        public static ScheduleStop CreateStop(Station location, Time arrival, string activity = "T", int sequence = 1)
         {
-            return CreateStop(location.Locations.First(), arrival, activity);
+            return CreateStop(location.Locations.First(), arrival, activity, sequence);
         }
         
-        public static ScheduleStop CreateStop(Location location, Time arrival, string activity = "T")
+        public static ScheduleStop CreateStop(Location location, Time arrival, string activity = "T" , int sequence = 1)
         {
             var stop = new ScheduleStop()
             {
                 Location = location,
-                Sequence = 1,
+                Sequence = sequence,
                 Arrival = arrival,
                 WorkingArrival = arrival.Subtract(ThirtySeconds),
                 Departure = arrival.Add(OneMinute),

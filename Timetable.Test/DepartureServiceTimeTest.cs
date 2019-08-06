@@ -20,15 +20,6 @@ namespace Timetable.Test
         }
         
         [Fact]
-        public void TimeIsPublished()
-        {
-            var stop = CreateScheduleStop();
-
-            var serviceTime = CreateServiceTime(stop);
-            Assert.True(serviceTime.IsPublic);
-        }
-        
-        [Fact]
         public void TimeIsSetToPublicArrival()
         {
             var stop = CreateScheduleStop();
@@ -44,16 +35,6 @@ namespace Timetable.Test
             
             var serviceTime = CreateServiceTime(stop);
             Assert.Equal(new Time(new TimeSpan(10, 00,30 )), serviceTime.Time);
-        }
-        
-        [Fact]
-        public void TimeIsRailwayOnly()
-        {
-            var stop = CreateScheduleStop();
-            stop.Departure = Time.NotValid;
-            
-            var serviceTime = CreateServiceTime(stop);
-            Assert.False(serviceTime.IsPublic);
         }
         
         [Fact]

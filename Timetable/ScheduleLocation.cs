@@ -71,11 +71,13 @@ namespace Timetable
 
         public abstract void AddDay(Time start);
 
+        public abstract bool IsStopAt(Station location, Time time);
+
         public override string ToString()
         {
             return Sequence > 1 ? 
-                $"{Location} {Sequence} ({Id})" :
-                $"{Location} ({Id})";
+                $"{Location}+{Sequence}" :
+                $"{Location}";           
         }
     }
 }
