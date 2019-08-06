@@ -4,20 +4,27 @@ using System.Linq;
 
 namespace Timetable
 {
+    public interface ISchedule
+    {
+        Station Location { get; }
+        (Time time, Service[] services) ValuesAt(int index);
+        int Count { get; }
+    }
+
     /// <summary>
     /// Represents the Public Arrivals or Departures for a location
     /// </summary>
     /// <remarks>Services are ordered by time</remarks>
-    internal class PublicSchedule
+    internal class PublicSchedule : ISchedule
     {
-        public Station At { get; }
-        
+        public Station Location { get; }
+
         private readonly SortedList<Time, Service[]> _services;
         private readonly IComparer<Time> _comparer;
 
         internal PublicSchedule(Station at, IComparer<Time> comparer)
         {
-            At = at;
+            Location = at;
             _comparer = comparer;
             _services = new SortedList<Time, Service[]>(comparer);
         }
@@ -45,31 +52,39 @@ namespace Timetable
             return _services.TryGetValue(time, out var services) ? services : new Service[0];
         }
 
+        public (Time time, Service[] services) ValuesAt(int index)
+        {
+            return (_services.Keys[index], _services.Values[index]);
+        }
+
+        public int Count => _services.Count;
+
         internal ResolvedServiceStop[] FindServices(DateTime at, int before, int after)
         {
+            // Ensure return at least one service
             if (before == 0 && after == 0)
                 after = 1;
             
             var on = at.Date;
             var time = new Time(at.TimeOfDay);
 
-            var first = FindStartIndex(time);
+            var first = FindNearestTime(time);
 
             // If find service at specific time and only returning before ensure we return the service at the time
             if (after == 0 && EqualsTime(first.index, time))
                 first.index = first.index + 1; 
             
-            if (first.changeDay) // Start on next day
-                on = on.AddDays(1);
-            return GetResults(first.index, before, after, on);
+            //TODO if need to change day do we go forward or backward
+            
+            return GatherServices(first.index, before, after, @on);
         }
-
+        
         private bool EqualsTime(int idx, Time time)
         {
             return time.Equals(_services.Keys[idx]);
         }
 
-        private (int index, bool changeDay) FindStartIndex(Time time)
+        private (int index, bool changeDay) FindNearestTime(Time time)
         {
             for (int i = 0; i < _services.Count; i++)
             {
@@ -77,71 +92,14 @@ namespace Timetable
                     return (i, false);
             }
 
-            // Last one is still before so therefore first is next\previous day
+            // Last one is still before so therefore first is next day
             return (0, true);
         }
-
-        private ResolvedServiceStop[] GetResults(int firstIdx, int requiredBack, int requiredForward, DateTime date)
+        
+        private ResolvedServiceStop[] GatherServices(int startIdx, int before, int after, DateTime @on)
         {
-            var schedules = new List<ResolvedServiceStop>(requiredBack + requiredForward);
-
-            bool checkedAll = false;
-            int lastCheckedIdx = FindResultsGoingBackwards(requiredBack, firstIdx - 1);
-            if (checkedAll) // Tried all, exit with what we found
-                return schedules.ToArray();
-            FindResultsGoingForward(requiredForward, firstIdx, lastCheckedIdx);
-
-            return schedules.ToArray();
-
-            int FindResultsGoingBackwards(int required, int startIdx)
-            {
-                int found = 0;
-                int idx = startIdx;
-                while (found < required && !checkedAll)
-                {
-                    if (idx < 0) // Previous loop checked first element, go to last
-                        idx = _services.Count - 1;
-
-                    var services = _services.Values[idx];
-                    foreach (var service in _services.Values[idx])
-                    {
-                        if (service.TryGetScheduleOn(date, out var schedule))
-                        {
-                            schedules.Insert(0, new ResolvedServiceStop(schedule, null));
-                            found++;
-                        }
-                    }
-
-                    idx--;
-                    checkedAll = (idx == startIdx); // Have we tried all
-                }
-
-                return ++idx; // Did not check last index
-            }
-
-            void FindResultsGoingForward(int required, int startIdx, int alreadyTriedIndex)
-            {
-                int found = 0;
-                int idx = startIdx;
-                while (found < required && !checkedAll)
-                {
-                    if (idx == _services.Count) // Last element  loop to first
-                        idx = 0;
-
-                    var services = _services.Values[idx];
-                    foreach (var service in _services.Values[idx])
-                    {
-                        if (service.TryGetScheduleOn(date, out var schedule))
-                        {
-                            schedules.Add( new ResolvedServiceStop(schedule, null));
-                            found++;
-                        }
-                    }
-
-                    idx++;
-                    checkedAll = (idx == alreadyTriedIndex || idx == startIdx); // We tried them all
-                }
-            }
+            var gatherer = new ScheduleGatherer(this);
+            return gatherer.Gather(startIdx, before, after, @on);
         }
     }
 }

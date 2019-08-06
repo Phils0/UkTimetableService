@@ -90,7 +90,7 @@ namespace Timetable
 
             foreach (var service in _timetableUidMap.Values)
             {
-                if (service.TryGetScheduleOn(date, out var schedule))
+                if (service.TryFindScheduleOn(date, out var schedule))
                 {
                     if(schedule.OperatedBy(toc))
                         services.Add(schedule);

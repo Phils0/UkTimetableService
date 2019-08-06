@@ -132,5 +132,55 @@ namespace Timetable.Test
             Assert.True(found.IsCancelled);
             Assert.Equal(overrideSchedule,found.Details);
         }
+        
+        [Fact]
+        public void TryFindScheduleOnRunningOnDate()
+        {
+            var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
+            var service = schedule.Service;
+            
+            Assert.True(service.TryFindScheduleOn(MondayAugust12.AddDays(2), out var found));
+            Assert.Equal(schedule, found.Details);
+        }
+        
+        [Fact]
+        public void TryFindScheduleReturnsFalseWhenNoSchedulesRunOnDate()
+        {
+            var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
+            var service = schedule.Service;
+
+            Assert.False(service.TryFindScheduleOn(MondayAugust12, out var found));
+            Assert.Null(found);
+        }
+        
+        [Fact]
+        public void TryFindScheduleStopOnRunningOnDate()
+        {
+            var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
+            var service = schedule.Service;
+            
+            Assert.True(service.TryFindScheduledStopOn(MondayAugust12.AddDays(2), TestStations.ClaphamJunction, TestSchedules.TenFifteen, out var found));
+            Assert.Equal(schedule, found.Details);
+        }
+        
+        [Fact]
+        public void TryFindScheduleStopReturnsFalseWhenNoSchedulesRunOnDate()
+        {
+            var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
+            var service = schedule.Service;
+            
+            Assert.False(service.TryFindScheduledStopOn(MondayAugust12, TestStations.ClaphamJunction, TestSchedules.TenFifteen, out var found));
+            Assert.Null(found);
+        }
+        
+        [Fact]
+        public void TryFindScheduleStopReturnsFalseWhenNoStopAtTime()
+        {
+            var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
+            var service = schedule.Service;
+            
+            Assert.False(service.TryFindScheduledStopOn(MondayAugust12.AddDays(2), TestStations.ClaphamJunction, TestSchedules.Ten, out var found));
+            Assert.Null(found);
+        }
     }
 }

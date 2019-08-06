@@ -37,7 +37,7 @@ namespace Timetable.Test
             var station = new Station();
             station.Add(waterloo);
             station.Add(surbiton);
-            
+
             Assert.Equal(surbiton, station.Main);
         }
 
@@ -47,7 +47,7 @@ namespace Timetable.Test
             using (var log = new LogHelper())
             {
                 Log.Logger = log.Logger;
-                
+
                 using (TestCorrelator.CreateContext())
                 {
                     var waterloo = TestLocations.WaterlooMain;
@@ -63,7 +63,7 @@ namespace Timetable.Test
                 }
             }
         }
-        
+
         [Fact]
         public void CodeIsMainCode()
         {
@@ -73,7 +73,7 @@ namespace Timetable.Test
 
             Assert.Equal(waterloo.ThreeLetterCode, station.ThreeLetterCode);
         }
-        
+
         [Fact]
         public void NlcIsMainNlc()
         {
@@ -83,7 +83,7 @@ namespace Timetable.Test
 
             Assert.Equal("5598", station.Nlc);
         }
-        
+
         [Fact]
         public void NlcIsNullIfNoMain()
         {
@@ -93,14 +93,14 @@ namespace Timetable.Test
 
             Assert.Null(station.Nlc);
         }
-        
+
         [Fact]
         public void ToStringWhenNoMainReturnsNotSet()
         {
             var station = new Station();
             Assert.Equal("Not Set", station.ToString());
         }
-        
+
         [Fact]
         public void ToStringReturnsCode()
         {
@@ -108,6 +108,48 @@ namespace Timetable.Test
             station.Add(TestLocations.WaterlooMain);
 
             Assert.Equal("WAT", station.ToString());
+        }
+
+        public static TheoryData<Station, bool> StationEquality =>
+            new TheoryData<Station, bool>()
+            {
+                {TestStations.Surbiton, false},
+                {TestStations.Waterloo, true},
+                {WaterlooWindsor, true},
+                {null, false}
+            };
+
+        private static Station WaterlooWindsor
+        {
+            get
+            {
+                var main = new Location()
+                {
+                    Tiploc = "WATRLOW",
+                    ThreeLetterCode = "WAT",
+                    Nlc = "559803",
+                    Name = "LONDON WATERLOO",
+                    InterchangeStatus = InterchangeStatus.Main,
+                    Coordinates = new Coordinates()
+                    {
+                        Eastings = 15312,
+                        Northings = 61798,
+                        IsEstimate = true
+                    }
+                };
+
+                var s = new Station();
+                s.Add(main);
+                return s;
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(StationEquality))]
+        public void EqualityUsesThreeLetterCode(Station other, bool expected)
+        {
+            var test = TestStations.Waterloo;
+            Assert.Equal(expected, test.Equals(other));
         }
     }
 }

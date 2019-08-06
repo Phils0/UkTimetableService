@@ -97,10 +97,19 @@ namespace Timetable
             return null;
         }
 
-        public bool TryGetScheduleOn(DateTime date, out ResolvedService schedule)
+        public bool TryFindScheduleOn(DateTime date, out ResolvedService schedule)
         {
             schedule = GetScheduleOn(date);
             return schedule != null;
+        }
+        
+        public bool TryFindScheduledStopOn(DateTime date, Station location, Time time, out ResolvedServiceStop stop)
+        {
+            if (TryFindScheduleOn(date, out var schedule))
+                return schedule.TryFindStop(location, time, out stop);
+
+            stop = null;
+            return false;
         }
         
         public override string ToString()

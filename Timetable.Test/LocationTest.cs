@@ -36,5 +36,22 @@ namespace Timetable.Test
             Assert.Equal(expected, test.CompareTo(other));
             Assert.Equal(expected * -1, other.CompareTo(test));
         }
+        
+        public static TheoryData<Location, bool> LocationEquality =>
+            new TheoryData<Location, bool>()
+            {
+                {TestLocations.Surbiton, false},
+                {TestLocations.WaterlooMain, true},
+                {TestLocations.WaterlooWindsor, false},
+                {null, false}
+            };
+        
+        [Theory]
+        [MemberData(nameof(LocationEquality))]
+        public void EqualityUsesTiploc(Location other, bool expected)
+        {
+            var test = TestLocations.WaterlooMain;
+            Assert.Equal(expected, test.Equals(other));
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -33,7 +34,7 @@ namespace Timetable.Test
         {
             return new ArrivalServiceTime(stop);
         }
-
+        
         [Fact]
         public void ReturnsServiceAtTime()
         {
@@ -63,6 +64,36 @@ namespace Timetable.Test
             Assert.Equal(2, services.Length);
         }
 
+        [Fact]
+        public void ReturnsTimeAndServicesAtIndex()
+        {
+            var stop1 = CreateScheduleStop(TestSchedules.Ten);
+            var stop2 = CreateScheduleStop(TestSchedules.TenThirty);
+
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            schedule.AddService(CreateServiceTime(stop1));
+            schedule.AddService(CreateServiceTime(stop2));
+
+            var pair = schedule.ValuesAt(1);
+            Assert.Equal(TestSchedules.TenThirty, pair.time);
+            Assert.Equal(stop2.Service, pair.services.Single());
+        }
+        
+        [Fact]
+        public void CountOfUniqueTimes()
+        {
+            var stop1 = CreateScheduleStop(TestSchedules.Ten);
+            var stop2 = CreateScheduleStop(TestSchedules.TenThirty);
+            var stop3 = CreateScheduleStop(TestSchedules.Ten);
+
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            schedule.AddService(CreateServiceTime(stop1));
+            schedule.AddService(CreateServiceTime(stop2));
+            schedule.AddService(CreateServiceTime(stop3));
+
+            Assert.Equal(2, schedule.Count);
+        }
+        
         public static IEnumerable<object[]> Times
         {
             get
@@ -162,6 +193,7 @@ namespace Timetable.Test
             var searchAt = Aug5.AddHours(10);
             var found = schedule.FindServices(searchAt, 1, 0);
             
+            Assert.Single(found);
             Assert.Equal(services[0].Schedule, found[0].Details);
         }
     }

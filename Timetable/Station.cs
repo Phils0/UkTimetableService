@@ -7,7 +7,7 @@ namespace Timetable
     /// <summary>
     /// Station, aggregate of locations from the Master Station List
     /// </summary>
-    public class Station
+    public class Station : IEquatable<Station>
     {
         /// <summary>
         /// Location CRS code
@@ -37,6 +37,26 @@ namespace Timetable
         public Station()
         {
             Timetable = new LocationTimetable(this);
+        }
+
+        public bool Equals(Station other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return ThreeLetterCode.Equals(other.ThreeLetterCode);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Station) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Main.GetHashCode();
         }
 
         /// <summary>
