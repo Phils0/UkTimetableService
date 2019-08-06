@@ -34,7 +34,7 @@ namespace Timetable.Web.Controllers
         /// <param name="serviceId">Timetable UID - letter plus 5 digits</param>
         /// <param name="on">Date</param>
         /// <returns></returns>
-        [Route("service/{serviceId}/{date}")]
+        [Route("service/{serviceId}/{on}")]
         [HttpGet]
         public async Task<IActionResult> GetServiceByTimetableId(string serviceId, DateTime @on)
         {
@@ -80,7 +80,7 @@ namespace Timetable.Web.Controllers
         /// <param name="serviceId">Retail Service Id, two letters plus 6 or 4 digits</param>
         /// <param name="on">date</param>
         /// <returns></returns>
-        [Route("retailService/{serviceId}/{date}")]
+        [Route("retailService/{serviceId}/{on}")]
         [HttpGet]
         public async Task<IActionResult> GetServiceByRetailServiceId(string serviceId, DateTime @on)
         {
@@ -101,7 +101,7 @@ namespace Timetable.Web.Controllers
         /// <param name="on">date</param>
         /// <param name="includeStops">Whether to return a full schedule</param>
         /// <returns></returns>
-        [Route("toc/{toc}/{date}")]
+        [Route("toc/{toc}/{on}")]
         [HttpGet]
         public async Task<IActionResult> GetTocServices(string toc, DateTime @on, [FromQuery] bool includeStops = false)
         {
