@@ -54,21 +54,32 @@ namespace Timetable.Web.Controllers
         public async Task<IActionResult> Departures(string location, DateTime at, [FromQuery] string to = "", [FromQuery] ushort before = 1, [FromQuery] ushort after = 5)
         {
             var request = CreateRequest(location, at, to, before, after);
+            FindStatus status;
             
-            var services = _timetable.FindDepartures(location, at, before, after, to);
-            
-            if (services.status == FindStatus.Success)
+            try
             {
-                var model = _mapper.Map<Timetable.ResolvedService[], Model.FoundItem[]>(services.services);
-                return Ok(new Model.FoundResponse()
+                var (findStatus, services) = _timetable.FindDepartures(location, at, before, after, to);
+                
+                if (findStatus == FindStatus.Success)
                 {
-                    Request = request,
-                    GeneratedAt = DateTime.Now,
-                    Services = model
-                });               
-            }  
+                    var departures = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundItem[]>(services);
+                    return Ok(new Model.FoundResponse()
+                    {
+                        Request = request,
+                        GeneratedAt = DateTime.Now,
+                        Services = departures
+                    });               
+                }  
+                
+                status = findStatus;
+            }
+            catch (Exception e)
+            {
+                status = FindStatus.Error;
+                _logger.Error(e, "Error when processing : {@request}", request);
+            }
             
-            return CreateNoServiceResponse(services.status, request);;
+            return CreateNoServiceResponse(status, request);;
         }
 
         private SearchRequest CreateRequest(string location, DateTime at, string to, ushort before, ushort after)
@@ -92,19 +103,30 @@ namespace Timetable.Web.Controllers
             var reason = "";
             switch (status)
             {
+                case FindStatus.LocationNotFound :
+                    reason = $"Did not find location {request.Location}";
+                    return  NotFound(CreateResponseObject());
+                case FindStatus.NoServicesForLocation :
+                    reason = $"Did not find services for location {request.Location} at {request.At}";
+                    return  NotFound(CreateResponseObject());
+                case FindStatus.Error :
+                    reason = $"Error while finding services for location {request.Location} at {request.At:G}";
+                    return StatusCode(500,  CreateResponseObject());
                 default:
                     reason = $"Unknown reason why could not find anything";
                     _logger.Error("{reason} : {@request}", reason, request);
-                    break;
+                    return StatusCode(500,  CreateResponseObject());
             }
-            
-            //Return 404
-            return  NotFound(new NotFoundResponse()
+
+            NotFoundResponse CreateResponseObject()
             {
-                Request = request,
-                GeneratedAt = DateTime.Now,
-                Reason = reason
-            });
+                return new NotFoundResponse()
+                {
+                    Request = request,
+                    GeneratedAt = DateTime.Now,
+                    Reason = reason
+                };
+            }
         }
     }
 }

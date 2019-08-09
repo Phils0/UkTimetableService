@@ -1,5 +1,8 @@
 namespace Timetable.Web.Model
 {
+    /// <summary>
+    /// Departure/Arrival
+    /// </summary>
     public class FoundItem
     {
         /// <summary>
@@ -10,16 +13,16 @@ namespace Timetable.Web.Model
         /// <summary>
         /// Service times at
         /// </summary>
-        public ScheduleStop At { get; set; }
+        public ScheduledStop At { get; set; }
 
         /// <summary>
         /// Details for Coming From location - Arrivals only
         /// </summary>
-        public ScheduleStop ComingFrom { get; set; }
+        public ScheduledStop ComingFrom { get; set; }
 
         /// <summary>
         /// Details for Going To location - Departures only
         /// </summary>
-        public ScheduleStop GoingTo { get; set; }
+        public ScheduledStop GoingTo { get; set; }
     }
 }

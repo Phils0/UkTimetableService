@@ -8,9 +8,9 @@ namespace Timetable
     public enum FindStatus
     {
         Success,
+        Error,
         LocationNotFound,
-        NoServicesForLocation,
-        NoServicesForLocationOnDate
+        NoServicesForLocation
     }
     
     public interface ILocationData
@@ -139,7 +139,18 @@ namespace Timetable
 
         public (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, int before, int after, string to = "")
         {
-            throw new NotImplementedException();
+            var status = FindStatus.LocationNotFound;
+            
+            if (Locations.TryGetValue(location, out var station))
+            {
+                var departures = station.Timetable.FindDepartures(at, before, after);
+                if (departures.Any())
+                    return (status: FindStatus.Success, services: departures);
+
+                status = FindStatus.NoServicesForLocation;
+            }
+
+            return (status: status, services: new ResolvedServiceStop[0]);
         }
 
         public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, int before, int after, string @from = "")

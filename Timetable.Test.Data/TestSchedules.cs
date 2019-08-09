@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Timetable.Test.Data
 {
@@ -6,6 +7,30 @@ namespace Timetable.Test.Data
     {
         private static readonly Toc VirginTrains = new Toc() {Code = "VT", Name = "Virgin Trains"};
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
+        
+        public static ResolvedServiceStop CreateResolvedStop(
+            string timetableId = "X12345",
+            StpIndicator indicator = StpIndicator.Permanent,
+            ICalendar calendar = null, ScheduleLocation[] locations = null,
+            int id = 1,
+            Service service = null,
+            string retailServiceId = null,
+            DateTime on =  default(DateTime),
+            bool isCancelled = false,
+            Station atLocation = null,
+            Time when = default(Time))
+        {
+            on = on == default(DateTime) ? MondayAugust12 : on;
+            var schedule = CreateSchedule(timetableId, indicator, calendar, locations, id, service, retailServiceId);
+            var resolved = new ResolvedService(schedule, on, isCancelled);
+
+            var origin = schedule.Locations.First() as ScheduleOrigin; 
+            atLocation = atLocation ?? origin.Station;
+            when = when.Equals(default(Time)) ? origin.Departure : when;
+            resolved.TryFindStop(atLocation, when, out var stop);
+            return stop;
+        }
+        
         public static ResolvedService CreateService(
             string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,

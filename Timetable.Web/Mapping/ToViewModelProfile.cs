@@ -45,7 +45,7 @@ namespace Timetable.Web.Mapping
                 .ConvertUsing(MapService);
             CreateMap<Timetable.ResolvedService, Model.ServiceSummary>()
                 .ConvertUsing(MapServiceSummary);        
-            CreateMap<(Model.SearchRequest request, Timetable.ResolvedService service), Model.FoundItem>()
+            CreateMap<Timetable.ResolvedServiceStop, Model.FoundItem>()
                 .ConvertUsing(MapFoundService);
         }
         
@@ -67,21 +67,21 @@ namespace Timetable.Web.Mapping
         
         private Model.Service MapService(Timetable.ResolvedService source, Model.Service notUsed, ResolutionContext context)
         {
-            SetContext(source, context);
+            SetDateInContext(source, context);
             var service = context.Mapper.Map<Model.Service>(source.Details);
             service.Date = source.On;
             service.IsCancelled = source.IsCancelled;
             return service;
         }
 
-        private void SetContext(ResolvedService source, ResolutionContext context)
+        private void SetDateInContext(ResolvedService source, ResolutionContext context)
         {
             context.Options.Items["On"] = source.On;
         }
 
         private Model.ServiceSummary MapServiceSummary(ResolvedService source, Model.ServiceSummary notUsed, ResolutionContext context)
         {
-            SetContext(source, context);
+            SetDateInContext(source, context);
             return CreateServiceSummary(source, context);
         }
 
@@ -93,12 +93,13 @@ namespace Timetable.Web.Mapping
             return service;
         }
 
-        private FoundItem MapFoundService((Model.SearchRequest request, Timetable.ResolvedService service) source, FoundItem notUsed, ResolutionContext context)
+        private FoundItem MapFoundService(Timetable.ResolvedServiceStop source, FoundItem notUsed, ResolutionContext context)
         {
-            SetContext(source.service, context);
+            SetDateInContext(source, context);
             return new FoundItem()
             {
-                Service = CreateServiceSummary(source.service, context)
+                Service = CreateServiceSummary(source, context),
+                At = context.Mapper.Map<Model.ScheduledStop>(source.Stop)
             };
         }
     }
