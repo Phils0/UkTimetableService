@@ -38,14 +38,22 @@ namespace Timetable.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetServiceByTimetableId(string serviceId, DateTime @on)
         {
-            var service =  _timetable.GetScheduleByTimetableUid(serviceId, @on);
-            if (service.status == LookupStatus.Success)
+            try
             {
-                var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service);
-                return Ok(model);             
+                var service =  _timetable.GetScheduleByTimetableUid(serviceId, @on);
+                if (service.status == LookupStatus.Success)
+                {
+                    var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service);
+                    return Ok(model);             
+                }
+                
+                return CreateNoServiceResponse(service.status, serviceId, @on);
             }
-
-            return CreateNoServiceResponse(service.status, serviceId, @on);
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error when processing : {serviceId} on {on:d}", serviceId, on);
+                throw;
+            }
         }
 
         private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string serviceId, DateTime date)
@@ -84,14 +92,23 @@ namespace Timetable.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetServiceByRetailServiceId(string serviceId, DateTime @on)
         {
-            var service =  _timetable.GetScheduleByRetailServiceId(serviceId, @on);
-            if (service.status == LookupStatus.Success)
+            try
             {
-                 var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services);
-                 return Ok(model);               
-            }    
+                var service =  _timetable.GetScheduleByRetailServiceId(serviceId, @on);
+                if (service.status == LookupStatus.Success)
+                {
+                     var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services);
+                     return Ok(model);               
+                }    
 
-            return CreateNoServiceResponse(service.status, serviceId, @on);
+                return CreateNoServiceResponse(service.status, serviceId, @on);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error when processing : {serviceId} on {on:d}", serviceId, on);
+                throw;
+            }
+
         }
         
         /// <summary>
@@ -105,21 +122,30 @@ namespace Timetable.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTocServices(string toc, DateTime @on, [FromQuery] bool includeStops = false)
         {
-            var service =  _timetable.GetSchedulesByToc(toc, @on);
-            if (service.status == LookupStatus.Success)
+            try
             {
-                if (includeStops)
+                var service =  _timetable.GetSchedulesByToc(toc, @on);
+                if (service.status == LookupStatus.Success)
                 {
-                    var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services);
-                    return Ok(model);                               
+                    if (includeStops)
+                    {
+                        var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services);
+                        return Ok(model);                               
+                    }
+                    else
+                    {
+                        var model = _mapper.Map<Timetable.ResolvedService[], Model.ServiceSummary[]>(service.services);
+                        return Ok(model);                               
+                    }
                 }
-                else
-                {
-                    var model = _mapper.Map<Timetable.ResolvedService[], Model.ServiceSummary[]>(service.services);
-                    return Ok(model);                               
-                }
+                return CreateNoServiceResponse(service.status, toc, @on);
             }
-            return CreateNoServiceResponse(service.status, toc, @on);
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error when processing : {toc} on {on:d}", toc, on);
+                throw;
+            }
+
         }
     }
 }

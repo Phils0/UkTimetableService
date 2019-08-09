@@ -50,7 +50,7 @@ namespace Timetable.Web.Test.Controllers
         }
 
         [InlineData(FindStatus.LocationNotFound,  "Did not find location SUR")]
-        [InlineData(FindStatus.NoServicesForLocation, "Did not find services for location SUR at 12/08/2019 10:00:00")]
+        [InlineData(FindStatus.NoServicesForLocation, "Did not find services for SUR@2019-08-12T10:00:00")]
         [Theory]
         public async Task DepartureReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
@@ -59,7 +59,7 @@ namespace Timetable.Web.Test.Controllers
                 .Returns((status, new ResolvedServiceStop[0]));
 
             var controller = new DeparturesController(data, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;;
+            var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;
             
             Assert.Equal(404, response.StatusCode);
 
@@ -76,12 +76,12 @@ namespace Timetable.Web.Test.Controllers
                 .Throws(new Exception("Something went wrong"));
 
             var controller = new DeparturesController(data, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;;
+            var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;
             
             Assert.Equal(500, response.StatusCode);
 
             var notFound = response.Value as Model.NotFoundResponse;
-            Assert.Equal("Error while finding services for location SUR at 12/08/2019 10:00:00", notFound.Reason);
+            Assert.Equal("Error while finding services for SUR@2019-08-12T10:00:00", notFound.Reason);
             AssertRequestSetInResponse(notFound);
         }
     }

@@ -19,7 +19,7 @@ namespace Timetable.Web.Model
 
         public override string ToString()
         {
-            return At?.ToString("G") ?? "Now";
+            return At?.ToString("s") ?? "Now";
         }      
     }
 }

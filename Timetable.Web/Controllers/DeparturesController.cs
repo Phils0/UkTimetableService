@@ -107,10 +107,10 @@ namespace Timetable.Web.Controllers
                     reason = $"Did not find location {request.Location}";
                     return  NotFound(CreateResponseObject());
                 case FindStatus.NoServicesForLocation :
-                    reason = $"Did not find services for location {request.Location} at {request.At}";
+                    reason = $"Did not find services for {request}";
                     return  NotFound(CreateResponseObject());
                 case FindStatus.Error :
-                    reason = $"Error while finding services for location {request.Location} at {request.At:G}";
+                    reason = $"Error while finding services for {request}";
                     return StatusCode(500,  CreateResponseObject());
                 default:
                     reason = $"Unknown reason why could not find anything";
