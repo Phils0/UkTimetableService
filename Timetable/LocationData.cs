@@ -47,22 +47,18 @@ namespace Timetable
         /// </summary>
         /// <param name="location">Three Letter Code</param>
         /// <param name="at">Date and Time</param>
-        /// <param name="before">Number of services before to return</param>
-        /// <param name="after">Number of services after to return</param>
-        /// <param name="to">Optional filter to location</param>
+        /// <param name="config">Configuration for gathering the results</param>
         /// <returns>Schedules of running services.  If a service departs at time counts as first of after.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, int before, int after, string to = "");
+        (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config);
 
         /// <summary>
         /// Scheduled services arriving at location on date near to time
         /// </summary>
         /// <param name="location">Three Letter Code</param>
         /// <param name="at">Date and Time</param>
-        /// <param name="before">Number of services before to return</param>
-        /// <param name="after">Number of services after to return</param>
-        /// <param name="from">Optional filter from location</param>
+        /// <param name="config">Configuration for gathering the results</param>
         /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, int before, int after, string @from = "");
+        (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config);
     }
 
     /// <summary>
@@ -137,13 +133,13 @@ namespace Timetable
             return false;
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, int before, int after, string to = "")
+        public (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config)
         {
             var status = FindStatus.LocationNotFound;
             
             if (Locations.TryGetValue(location, out var station))
             {
-                var departures = station.Timetable.FindDepartures(at, before, after);
+                var departures = station.Timetable.FindDepartures(at, config);
                 if (departures.Any())
                     return (status: FindStatus.Success, services: departures);
 
@@ -153,7 +149,7 @@ namespace Timetable
             return (status: status, services: new ResolvedServiceStop[0]);
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, int before, int after, string @from = "")
+        public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config)
         {
             throw new NotImplementedException();
         }

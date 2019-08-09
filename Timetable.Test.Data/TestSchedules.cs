@@ -132,14 +132,16 @@ namespace Timetable.Test.Data
 
         public static ICalendar EverydayAugust2019 => CreateAugust2019Calendar();
         public static Time Ten => new Time(new TimeSpan(10, 0,0 ));
-        public static Time TenFifteen => new Time(new TimeSpan(10, 15,0 ));
-        public static Time TenThirty => new Time(new TimeSpan(10, 30,0 ));
+        public static Time TenFifteen => Ten.AddMinutes(15);
+        public static Time TenThirty => Ten.AddMinutes(30);
 
-        public static ScheduleLocation[] DefaultLocations => new[]
+        public static ScheduleLocation[] DefaultLocations => CreateThreeStopSchedule(Ten);
+        
+        public static ScheduleLocation[] CreateThreeStopSchedule(Time start) => new[]
         {
-            (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, Ten),
-            (ScheduleLocation) TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, TenFifteen),
-            TestScheduleLocations.CreateDestination(TestStations.Waterloo, TenThirty)
+            (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, start),
+            (ScheduleLocation) TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, start.AddMinutes(15)),
+            TestScheduleLocations.CreateDestination(TestStations.Waterloo, start.AddMinutes(30))
         };
     }
 }

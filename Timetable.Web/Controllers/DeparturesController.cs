@@ -58,7 +58,8 @@ namespace Timetable.Web.Controllers
             
             try
             {
-                var (findStatus, services) = _timetable.FindDepartures(location, at, before, after, to);
+                var config = CreateGather(before, after, to);
+                var (findStatus, services) = _timetable.FindDepartures(location, at, config);
                 
                 if (findStatus == FindStatus.Success)
                 {
@@ -80,6 +81,11 @@ namespace Timetable.Web.Controllers
             }
             
             return CreateNoServiceResponse(status, request);;
+        }
+
+        private GatherConfiguration CreateGather(ushort before, ushort after, string to)
+        {
+            return new GatherConfiguration(before, after);
         }
 
         private SearchRequest CreateRequest(string location, DateTime at, string to, ushort before, ushort after)

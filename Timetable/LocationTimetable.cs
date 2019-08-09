@@ -11,19 +11,17 @@ namespace Timetable
         /// Scheduled services departing on date near to time
         /// </summary>
         /// <param name="at">Date and Time</param>
-        /// <param name="before">Number of services before to return</param>
-        /// <param name="after">Number of services after to return</param>
+        /// <param name="config">Configuration for gathering the results</param>
         /// <returns>Schedules of running services.  If a service departs at time counts as first of after.</returns>
-        ResolvedServiceStop[] FindDepartures(DateTime at, int before, int after);
+        ResolvedServiceStop[] FindDepartures(DateTime at, GatherConfiguration config);
 
         /// <summary>
         /// Scheduled services arriving on date near to time
         /// </summary>
         /// <param name="at">Date and Time</param>
-        /// <param name="before">Number of services before to return</param>
-        /// <param name="after">Number of services after to return</param>
+        /// <param name="config">Configuration for gathering the results</param>
         /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
-        ResolvedServiceStop[] FindArrivals(DateTime at, int before, int after);
+        ResolvedServiceStop[] FindArrivals(DateTime at, GatherConfiguration config);
     }
 
     public class LocationTimetable : ILocationTimetable
@@ -55,9 +53,9 @@ namespace Timetable
         /// <param name="before">Number of services before to return</param>
         /// <param name="after">Number of services after to return.  First found after or on time is always included in after</param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedServiceStop[] FindDepartures(DateTime at, int before, int after)
+        public ResolvedServiceStop[] FindDepartures(DateTime at, GatherConfiguration config)
         {
-            return _departures.FindServices(at, before, after);
+            return _departures.FindServices(at, config);
         }
         
         /// <summary>
@@ -67,9 +65,9 @@ namespace Timetable
         /// <param name="before">Number of services before to return</param>
         /// <param name="after">Number of services after to return.  First found after or on time is always included in after</param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedServiceStop[] FindArrivals(DateTime at, int before, int after)
+        public ResolvedServiceStop[] FindArrivals(DateTime at, GatherConfiguration config)
         {
-            return _arrivals.FindServices(at, before, after);
+            return _arrivals.FindServices(at, config);
         }
     }
 }

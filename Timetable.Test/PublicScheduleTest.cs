@@ -126,7 +126,7 @@ namespace Timetable.Test
             }
 
             var searchAt = Aug5.Add(time);
-            var found = schedule.FindServices(searchAt, 0, 1);
+            var found = schedule.FindServices(searchAt, GathererConfig.OneService);
 
             var expected =  services[expectedIdx].Schedule;
             Assert.Equal(expected, found[0].Details);
@@ -149,7 +149,7 @@ namespace Timetable.Test
             }
 
             var searchAt = Aug5.AddHours(10).AddMinutes(1);
-            var found = schedule.FindServices(searchAt, 0, 0);
+            var found = schedule.FindServices(searchAt, new GatherConfiguration(0, 0));
             
             Assert.Equal(services[1].Schedule, found[0].Details);
         }
@@ -170,7 +170,7 @@ namespace Timetable.Test
             }
 
             var searchAt = Aug5.AddHours(10).AddMinutes(1);
-            var found = schedule.FindServices(searchAt, 1, 0);
+            var found = schedule.FindServices(searchAt, GathererConfig.OneBefore);
             
             Assert.Equal(services[0].Schedule, found[0].Details);
         }
@@ -191,7 +191,7 @@ namespace Timetable.Test
             }
 
             var searchAt = Aug5.AddHours(10);
-            var found = schedule.FindServices(searchAt, 1, 0);
+            var found = schedule.FindServices(searchAt, GathererConfig.OneBefore);
             
             Assert.Single(found);
             Assert.Equal(services[0].Schedule, found[0].Details);

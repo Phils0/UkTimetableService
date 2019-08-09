@@ -59,24 +59,19 @@ namespace Timetable
 
         public int Count => _services.Count;
 
-        internal ResolvedServiceStop[] FindServices(DateTime at, int before, int after)
+        internal ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config)
         {
-            // Ensure return at least one service
-            if (before == 0 && after == 0)
-                after = 1;
-            
             var on = at.Date;
             var time = new Time(at.TimeOfDay);
 
             var first = FindNearestTime(time);
-
-            // If find service at specific time and only returning before ensure we return the service at the time
-            if (after == 0 && EqualsTime(first.index, time))
+            
+            if (config.HasRequestedBeforeOnly && EqualsTime(first.index, time))
                 first.index = first.index + 1; 
             
             //TODO if need to change day do we go forward or backward
             
-            return GatherServices(first.index, before, after, @on);
+            return GatherServices(first.index, @on, config);
         }
         
         private bool EqualsTime(int idx, Time time)
@@ -96,10 +91,10 @@ namespace Timetable
             return (0, true);
         }
         
-        private ResolvedServiceStop[] GatherServices(int startIdx, int before, int after, DateTime @on)
+        private ResolvedServiceStop[] GatherServices(int startIdx, DateTime @on, GatherConfiguration config)
         {
-            var gatherer = new ScheduleGatherer(this);
-            return gatherer.Gather(startIdx, before, after, @on);
+            var gatherer = new ScheduleGatherer(this, config);
+            return gatherer.Gather(startIdx, @on);
         }
     }
 }

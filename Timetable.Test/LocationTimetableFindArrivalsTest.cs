@@ -16,7 +16,7 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindArrivals(Aug1AtTen, 3, 3);
+            var schedules = clapham.Timetable.FindArrivals(Aug1AtTen, CreateConfig());
             
             Assert.Equal(6, schedules.Length);
 
@@ -34,18 +34,23 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindArrivals(Aug1AtTen, 100, 1);
+            var schedules = clapham.Timetable.FindArrivals(Aug1AtTen, CreateConfig(100, 1));
             
             Assert.Equal(41, schedules.Length);    //TODO Handle wrapping day 
         }
-        
+
+        private GatherConfiguration CreateConfig(int before = 3, int after = 3)
+        {
+            return new GatherConfiguration(before, after);
+        }
+
         [Fact]
         public void ReturnAllFoundArrivalsWhenRequestTooManyAfter()
         {
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindArrivals(Aug1AtTen, 1, 100);
+            var schedules = clapham.Timetable.FindArrivals(Aug1AtTen, CreateConfig(1, 100));
 
             Assert.Equal(57, schedules.Length);     //TODO Handle wrapping day    
         }
@@ -56,7 +61,7 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindArrivals(new DateTime(2019, 8, 2, 0, 30 ,0), 3, 3);
+            var schedules = clapham.Timetable.FindArrivals(new DateTime(2019, 8, 2, 0, 30 ,0), CreateConfig());
             
             Assert.Equal(6, schedules.Length);
 
