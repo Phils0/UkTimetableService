@@ -33,5 +33,15 @@ namespace Timetable.Test.Data
                 return s;
             }
         }
+        
+        public static Station Woking
+        {
+            get
+            {
+                var s = new Station();
+                s.Add(TestLocations.Woking);
+                return s;
+            }
+        }
     }
 }

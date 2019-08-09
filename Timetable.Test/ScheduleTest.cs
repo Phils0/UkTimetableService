@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Castle.DynamicProxy.Generators.Emitters;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -58,25 +59,49 @@ namespace Timetable.Test
             {
                 var stops = TestSchedules.DefaultLocations;
                 var origin = stops[0] as ScheduleOrigin;
-                yield return new object[] {origin.Station, origin.Departure};
+                yield return new object[] {origin.Station, origin.Departure, false};
                 var intermediate = stops[1] as ScheduleStop;
-                yield return new object[] {intermediate.Station, intermediate.Departure};
+                yield return new object[] {intermediate.Station, intermediate.Arrival, true};
+                yield return new object[] {intermediate.Station, intermediate.Departure, false};
                 var destination = stops[2] as ScheduleDestination;
-                yield return new object[] {destination.Station, destination.Arrival};
+                yield return new object[] {destination.Station, destination.Arrival, true};
             }
         }
 
         [Theory]
         [MemberData(nameof(Stops))]
-        public void FindStop(Station station, Time time)
+        public void FindStop(Station station, Time time, bool isArrival)
         {
-            
+            var schedule = TestSchedules.CreateSchedule();
+
+            Assert.True(schedule.TryFindStop(station, time, out var stop));
+            Assert.Equal(station, stop.Station);
+
+            if (isArrival)
+            {
+                IArrival arrival = (IArrival) stop;
+                Assert.Equal(time, arrival.Time);
+            }
+            else
+            {
+                IDeparture departure = (IDeparture) stop;
+                Assert.Equal(time, departure.Time);
+            }
         }
         
         [Fact]
-        public void DoNotFindStop()
+        public void DoNotFindStopWhenTimeDifferent()
         {
-            
+            var schedule = TestSchedules.CreateSchedule();
+
+            Assert.False(schedule.TryFindStop(TestStations.Surbiton, TestSchedules.TenThirty, out var stop));
+        }
+        
+        [Fact]
+        public void DoNotFindStopWheenDoesNotStopAtStation()
+        {
+            var schedule = TestSchedules.CreateSchedule();
+            Assert.False(schedule.TryFindStop(TestStations.Woking, TestSchedules.TenThirty, out var stop));
         }
     }
 }

@@ -76,5 +76,20 @@ namespace Timetable.Test.Data
                 IsEstimate = false
             }
         };
+        
+        public static Location Woking => new Location()
+        {
+            Tiploc = "WOKING",
+            ThreeLetterCode = "WOK",
+            Nlc = "568500",
+            Name = "WOKING",
+            InterchangeStatus = InterchangeStatus.Normal,
+            Coordinates = new Coordinates()
+            {
+                Eastings = 15006,
+                Northings = 61587,
+                IsEstimate = false
+            }
+        };
     }
 }

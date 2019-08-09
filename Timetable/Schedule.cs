@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Timetable
 {
@@ -141,17 +142,8 @@ namespace Timetable
         
         public bool TryFindStop(Station location, Time time, out ScheduleLocation stop)
         {
-            foreach (var l in Locations)
-            {
-                if (l.IsStopAt(location, time))
-                {
-                    stop = l;
-                    return true;
-                }
-            }
-
-            stop = null;
-            return false;
+            stop = Locations.FirstOrDefault(l => l.IsStopAt(location, time));
+            return stop != default;
         }
         
         public override string ToString()
