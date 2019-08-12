@@ -33,6 +33,13 @@ namespace Timetable
         /// <param name="nlc">NLC to set</param>
         void UpdateLocationNlc(string tiploc, string nlc);
 
+        /// <summary>
+        /// Try find station
+        /// </summary>
+        /// <param name="threeLetterCode">Three letter code for Location to find</param>
+        /// <param name="location">Found station</param>
+        /// <returns></returns>
+        bool TryGetLocation(string threeLetterCode, out Station location);
 
         /// <summary>
         /// Try find location
@@ -108,7 +115,7 @@ namespace Timetable
 
         public void UpdateLocationNlc(string tiploc, string nlc)
         {
-            if (TryGetLocation(tiploc, out var location))
+            if (TryGetLocation(tiploc, out Location location))
             {
                 location.Nlc = nlc;
             }
@@ -124,9 +131,16 @@ namespace Timetable
             }
         }
 
+        public bool TryGetLocation(string threeLetterCode, out Station location)
+        {
+            location = Station.NotSet;
+            return !string.IsNullOrEmpty(threeLetterCode) && Locations.TryGetValue(threeLetterCode, out location);
+        }
+
         public bool TryGetLocation(string tiploc, out Location location)
         {
-            if(LocationsByTiploc.TryGetValue(tiploc, out location))
+            location = Location.NotSet;
+            if(!string.IsNullOrEmpty(tiploc) && LocationsByTiploc.TryGetValue(tiploc, out location))
                 return location.IsActive;
             
             _logger.Information("Did not find location {tiploc}", tiploc);
@@ -137,7 +151,7 @@ namespace Timetable
         {
             var status = FindStatus.LocationNotFound;
             
-            if (Locations.TryGetValue(location, out var station))
+            if (TryGetLocation(location, out Station station))
             {
                 var departures = station.Timetable.FindDepartures(at, config);
                 if (departures.Any())

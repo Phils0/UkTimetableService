@@ -9,6 +9,8 @@ namespace Timetable
     /// </summary>
     public class Station : IEquatable<Station>
     {
+        public static Station NotSet = new Station();
+        
         /// <summary>
         /// Location CRS code
         /// </summary>

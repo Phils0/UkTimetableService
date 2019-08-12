@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Serilog.Context;
 using Timetable.Web.Model;
 
 namespace Timetable.Web.Controllers
@@ -15,12 +16,14 @@ namespace Timetable.Web.Controllers
     public class DeparturesController : ControllerBase
     {
         private readonly ILocationData _timetable;
+        private readonly IFilterFactory _filters;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
         
-        public DeparturesController(ILocationData data,  IMapper mapper, ILogger logger)
+        public DeparturesController(ILocationData data,  IFilterFactory filters, IMapper mapper, ILogger logger)
         {
             _timetable = data;
+            _filters = filters;
             _mapper = mapper;
             _logger = logger;
         }
@@ -55,37 +58,45 @@ namespace Timetable.Web.Controllers
         {
             var request = CreateRequest(location, at, to, before, after);
             FindStatus status;
-            
-            try
+
+            using (LogContext.PushProperty("Request", request, true))
             {
-                var config = CreateGather(before, after, to);
-                var (findStatus, services) = _timetable.FindDepartures(location, at, config);
-                
-                if (findStatus == FindStatus.Success)
+                try
                 {
-                    var departures = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundItem[]>(services);
-                    return Ok(new Model.FoundResponse()
-                    {
-                        Request = request,
-                        GeneratedAt = DateTime.Now,
-                        Services = departures
-                    });               
-                }  
+                    var config = CreateGatherConfig(before, after, to);
+                    var (findStatus, services) = _timetable.FindDepartures(location, at, config);
                 
-                status = findStatus;
+                    if (findStatus == FindStatus.Success)
+                    {
+                        var departures = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundItem[]>(services);
+                        return Ok(new Model.FoundResponse()
+                        {
+                            Request = request,
+                            GeneratedAt = DateTime.Now,
+                            Services = departures
+                        });               
+                    }  
+                                                                             
+                    status = findStatus;
+                }
+                catch (Exception e)
+                {
+                    status = FindStatus.Error;
+                    _logger.Error(e, "Error when processing : {@request}", request);
+                }
+                                                                         
+                return CreateNoServiceResponse(status, request);;               
             }
-            catch (Exception e)
-            {
-                status = FindStatus.Error;
-                _logger.Error(e, "Error when processing : {@request}", request);
-            }
-            
-            return CreateNoServiceResponse(status, request);;
         }
 
-        private GatherConfiguration CreateGather(ushort before, ushort after, string to)
+        private GatherConfiguration CreateGatherConfig(ushort before, ushort after, string to)
         {
-            return new GatherConfiguration(before, after);
+            var filter = _filters.NoFilter;
+            if (_timetable.TryGetLocation(to, out Station destination))
+                filter = _filters.DeparturesGoTo(destination);
+            else
+                _logger.Warning("Not adding departure filter.  Did not find to location {to}", to);
+            return new GatherConfiguration(before, after, filter);
         }
 
         private SearchRequest CreateRequest(string location, DateTime at, string to, ushort before, ushort after)

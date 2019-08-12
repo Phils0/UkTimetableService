@@ -149,7 +149,7 @@ namespace Timetable.Test
             }
 
             var searchAt = Aug5.AddHours(10).AddMinutes(1);
-            var found = schedule.FindServices(searchAt, new GatherConfiguration(0, 0));
+            var found = schedule.FindServices(searchAt, GathererConfig.Create(0, 0));
             
             Assert.Equal(services[1].Schedule, found[0].Details);
         }

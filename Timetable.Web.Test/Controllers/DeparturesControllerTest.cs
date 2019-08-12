@@ -27,7 +27,7 @@ namespace Timetable.Web.Test.Controllers
             data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedStop() }));
 
-            var controller = new DeparturesController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -36,6 +36,8 @@ namespace Timetable.Web.Test.Controllers
             AssertRequestSetInResponse(services);
             Assert.NotEmpty(services.Services);
         }
+
+        private static GatherFilterFactory FilterFactory => new GatherFilterFactory();
 
         private void AssertRequestSetInResponse(FoundResponse response)
         {
@@ -58,7 +60,7 @@ namespace Timetable.Web.Test.Controllers
             data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
                 .Returns((status, new ResolvedServiceStop[0]));
 
-            var controller = new DeparturesController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new DeparturesController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;
             
             Assert.Equal(404, response.StatusCode);
@@ -75,7 +77,7 @@ namespace Timetable.Web.Test.Controllers
             data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
                 .Throws(new Exception("Something went wrong"));
 
-            var controller = new DeparturesController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new DeparturesController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;
             
             Assert.Equal(500, response.StatusCode);
@@ -83,6 +85,31 @@ namespace Timetable.Web.Test.Controllers
             var notFound = response.Value as Model.NotFoundResponse;
             Assert.Equal("Error while finding services for SUR@2019-08-12T10:00:00", notFound.Reason);
             AssertRequestSetInResponse(notFound);
+        }
+        
+        [Theory]
+        [InlineData("WAT", true)]
+        [InlineData("XXX", false)]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        public async Task SetsDestinationFilter(string location, bool hasFilter)
+        {
+            var data = Substitute.For<ILocationData>();
+            data.TryGetLocation("WAT", out Arg.Any<Station>()).Returns(true);
+            data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
+                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedStop() }));
+
+            var filterFactory = Substitute.For<IFilterFactory>();
+            filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
+            filterFactory.DeparturesGoTo(Arg.Any<Station>()).Returns(GatherFilterFactory.NoFilter);
+            
+            var controller = new DeparturesController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.Departures("SUR", Aug12AtTen, location) as ObjectResult;;
+
+            if (hasFilter)
+                filterFactory.Received().DeparturesGoTo(Arg.Any<Station>());
+            else
+                filterFactory.DidNotReceive().DeparturesGoTo(Arg.Any<Station>());
         }
     }
 }

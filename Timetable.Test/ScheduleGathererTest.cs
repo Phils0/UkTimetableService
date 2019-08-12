@@ -51,7 +51,7 @@ namespace Timetable.Test
         {
             var schedule = CreateMockSchedule();
 
-            var gatherer = new ScheduleGatherer(schedule, new GatherConfiguration(0, 2));
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(0, 2));
             var services = gatherer.Gather(1, TestDate);
 
             Assert.Equal(2, services.Length);
@@ -110,7 +110,7 @@ namespace Timetable.Test
         {
             var schedule = CreateMockSchedule();
 
-            var gatherer = new ScheduleGatherer(schedule, new GatherConfiguration(2, 0));
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(2, 0));
             var services = gatherer.Gather(1, TestDate);
 
             Assert.Equal(1, services.Length);    //TODO Loop to next day
@@ -121,7 +121,7 @@ namespace Timetable.Test
         {
             var schedule = CreateMockSchedule();
 
-            var gatherer = new ScheduleGatherer(schedule, new GatherConfiguration(0, 2));
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(0, 2));
             var services = gatherer.Gather(3, TestDate);
 
             Assert.Equal(1, services.Length);    //TODO Loop to next day
@@ -147,7 +147,21 @@ namespace Timetable.Test
             var services = gatherer.Gather(1, TestDate);
 
             Assert.Equal(4, services.Length);    //TODO Loop to next day
+        }
+        
+        [Fact]
+        public void OnlyServicesThatSatisfyTheFilterAreReturned()
+        {
+            var schedule = CreateMockSchedule();
+            var filterDelegate = Substitute.For<GatherFilterFactory.GatherFilter>();
+            // First one found satisfies, rest do not
+            filterDelegate(Arg.Any<ResolvedServiceStop>()).Returns(true, false);
+            var config = new GatherConfiguration(0, 2, filterDelegate);
+            var gatherer = new ScheduleGatherer(schedule, config);
+            
+            var services = gatherer.Gather(1, TestDate);
 
+            Assert.Single(services);
         }
     }
 }

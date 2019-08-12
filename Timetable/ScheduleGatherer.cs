@@ -6,9 +6,12 @@ namespace Timetable
 {
     internal class ScheduleGatherer
     {
+
         private readonly ISchedule _schedule;
         private readonly GatherConfiguration _config;
 
+        private GatherFilterFactory.GatherFilter SatisfiesFilter => _config.Filter;
+        
         internal ScheduleGatherer(ISchedule schedule, GatherConfiguration config)
         {
             _schedule = schedule;
@@ -59,8 +62,8 @@ namespace Timetable
         {
             foreach (var service in services)
             {
-                if (service.TryFindScheduledStopOn(date, _schedule.Location, atTime, out var stop))
-                    yield return stop;
+                if (service.TryFindScheduledStopOn(date, _schedule.Location, atTime, out var stop)  && SatisfiesFilter(stop))
+                        yield return stop;
             }
         }
         

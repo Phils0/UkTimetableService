@@ -8,7 +8,7 @@ namespace Timetable.Test
         [Fact]
         public void AlwaysReturnOneResult()
         {
-            var config = new GatherConfiguration(0, 0);
+            var config = new GatherConfiguration(0, 0, GatherFilterFactory.NoFilter);
             
             Assert.Equal(1, config.ServicesAfter);
         }

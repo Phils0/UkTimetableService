@@ -16,7 +16,7 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, CreateConfig());
+            var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, GathererConfig.Create(1, 5));
             
             Assert.Equal(6, schedules.Length);
 
@@ -27,19 +27,14 @@ namespace Timetable.Test
             Assert.Equal("X00660", last.Details.TimetableUid);        
             Assert.Equal(Aug1, last.On);
         }
-        
-        private GatherConfiguration CreateConfig(int before = 1, int after = 5)
-        {
-            return new GatherConfiguration(before, after);
-        }
-        
+
         [Fact]
         public void ReturnAllFoundDeparturesWhenRequestTooManyBefore()
         {
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, CreateConfig(100, 1));
+            var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, GathererConfig.Create(100, 1));
             
             Assert.Equal(41, schedules.Length);    //TODO Handle wrapping day      
         }
@@ -50,7 +45,7 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, CreateConfig(1, 100));
+            var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, GathererConfig.Create(1, 100));
             
             Assert.Equal(57, schedules.Length);    //TODO Handle wrapping day     
         }
@@ -61,7 +56,7 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindDepartures(new DateTime(2019, 8, 1, 23, 30 ,0), CreateConfig());
+            var schedules = clapham.Timetable.FindDepartures(new DateTime(2019, 8, 1, 23, 30 ,0), GathererConfig.Create(1, 5));
             
             Assert.Equal(6, schedules.Length);
 

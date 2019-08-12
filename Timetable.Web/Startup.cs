@@ -44,6 +44,7 @@ namespace Timetable.Web
             services
                 .AddSingleton<ILocationData>(data.Locations)
                 .AddSingleton<ITimetable>(data.Timetable)
+                .AddSingleton<IFilterFactory>(new GatherFilterFactory())
                 .AddSingleton<IMapper>(factory.CreateMapper())    //TODO Swap to scoped
                 .AddSingleton<ILogger>(Log.Logger)
                 .AddSwaggerGen(ConfigureSwagger)

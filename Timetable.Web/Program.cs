@@ -37,7 +37,8 @@ namespace Timetable.Web
             WebHost.CreateDefaultBuilder(args)
                 .UseSerilog((context, config) =>
                 {
-                    config.ReadFrom.Configuration(context.Configuration);                   
+                    config.ReadFrom.Configuration(context.Configuration);
+                    config.Enrich.FromLogContext();
                 })                
                 .UseStartup<Startup>();
     }

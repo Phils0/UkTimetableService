@@ -26,7 +26,11 @@ namespace Timetable.Web.Model
         public string Type { get; set; } = "";
         public override string ToString()
         {
-            return $"{Location}@{At}";
+            return string.IsNullOrEmpty(ComingFromGoingTo) ? 
+                $"{Location}@{At}" :
+                Type == DEPARTURES ?
+                    $"{Location}@{At} to {ComingFromGoingTo}" :
+                    $"{Location}@{At} from {ComingFromGoingTo}" ;
         }
     }
 }

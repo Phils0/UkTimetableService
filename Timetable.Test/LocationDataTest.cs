@@ -61,14 +61,33 @@ namespace Timetable.Test
         [InlineData("SURBITN", true)]
         [InlineData("NOT_EXIST", false)]
         [InlineData("WATRLOW", true)]
+        [InlineData("", false)]
+        [InlineData(null, false)]
         public void FindLocation(string tiploc, bool found)
         {
             var data = TestData.Locations;
-            var find = data.TryGetLocation(tiploc, out var location);
+            var find = data.TryGetLocation(tiploc, out Location location);
             
             Assert.Equal(found, find);
             if(found)
                 Assert.Equal(tiploc, location.Tiploc);
+        }
+        
+        [Theory]
+        [InlineData("SUR", true)]
+        [InlineData("SURBITN", false)]
+        [InlineData("NOT_EXIST", false)]
+        [InlineData("WAT", true)]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        public void FindStation(string threeLetterCode, bool found)
+        {
+            var data = TestData.Locations;
+            var find = data.TryGetLocation(threeLetterCode, out Station location);
+            
+            Assert.Equal(found, find);
+            if(found)
+                Assert.Equal(threeLetterCode, location.ThreeLetterCode);
         }
     }
 }

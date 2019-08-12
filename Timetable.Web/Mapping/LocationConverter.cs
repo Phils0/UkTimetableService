@@ -13,7 +13,7 @@ namespace Timetable.Web.Mapping
             {
                 var lookup = context.Items["Locations"] as ILocationData;
                 
-                if(lookup.TryGetLocation(source, out var location))
+                if(lookup.TryGetLocation(source, out Location location))
                     return location;
 
                 return null;    //TODO Fix.  Add to lookup if 

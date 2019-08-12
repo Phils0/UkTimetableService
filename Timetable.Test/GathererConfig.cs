@@ -4,11 +4,15 @@ namespace Timetable.Test
 {
     static internal class GathererConfig
     {
-        public static GatherConfiguration OneService => new GatherConfiguration(0, 1);
+        internal static GatherConfiguration OneService => Create(0, 1);
         
-        public static GatherConfiguration OneBefore => new GatherConfiguration(1, 0);
+        internal static GatherConfiguration OneBefore => Create(1, 0);
         
-        public static GatherConfiguration OneBeforeTwoAfter => new GatherConfiguration(1, 2);
+        internal static GatherConfiguration OneBeforeTwoAfter => Create(1, 2);
 
+        internal static GatherConfiguration Create(int before, int after)
+        {
+            return new GatherConfiguration(before, after, GatherFilterFactory.NoFilter);
+        }
     }
 }
