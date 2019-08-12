@@ -18,11 +18,11 @@ namespace Timetable.Web.Model
         /// <summary>
         /// Details for Coming From location - Arrivals only
         /// </summary>
-        public ScheduledStop ComingFrom { get; set; }
+        public ScheduledStop From { get; set; }
 
         /// <summary>
         /// Details for Going To location - Departures only
         /// </summary>
-        public ScheduledStop GoingTo { get; set; }
+        public ScheduledStop To { get; set; }
     }
 }

@@ -5,8 +5,10 @@ namespace Timetable
 {
     public class ResolvedServiceStop : ResolvedService
     {
-        public ScheduleLocation Stop { get; private set; }
+        public ScheduleLocation Stop { get; }
 
+        public ScheduleLocation FoundToStop { get; private set; } = null;
+        
         public ResolvedServiceStop(ResolvedService service, ScheduleLocation stop)
             : this(service.Details, stop, service.On, service.IsCancelled)
         {
@@ -29,10 +31,13 @@ namespace Timetable
             {
                 // Check if got to Stop, if so can shortcut as it doesn't go there although this is slightly dodgy
                 if (Stop.Station.Equals(stop.Station))
-                    return false;                
-                
-                if(destination.Equals(stop.Station))
+                    return false;
+
+                if (destination.Equals(stop.Station))
+                {
+                    FoundToStop = stop;
                     return true;
+                }
             }
 
             return false;

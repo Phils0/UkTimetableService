@@ -99,7 +99,8 @@ namespace Timetable.Web.Mapping
             return new FoundItem()
             {
                 Service = CreateServiceSummary(source, context),
-                At = context.Mapper.Map<Model.ScheduledStop>(source.Stop)
+                At = context.Mapper.Map<Model.ScheduledStop>(source.Stop),
+                To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop)
             };
         }
     }

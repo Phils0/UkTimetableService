@@ -31,13 +31,22 @@ namespace Timetable.Test
         
         [Theory]
         [MemberData(nameof(Stations))]
-        public void GoesTo(Station station, bool expected)
+        public void GoesTo(Station station, bool isTo)
         {
             var service =  TestSchedules.CreateService();
             var clapham = service.Details.Locations[1];
             var stop = new ResolvedServiceStop(service, clapham);
-            
-            Assert.Equal(expected, stop.GoesTo(station));
+
+            if (isTo)
+            {
+                Assert.True(stop.GoesTo(station));
+                Assert.NotNull(stop.FoundToStop);
+            }
+            else
+            {
+                Assert.False(stop.GoesTo(station));
+                Assert.Null(stop.FoundToStop);
+            }
         }
     }
 }

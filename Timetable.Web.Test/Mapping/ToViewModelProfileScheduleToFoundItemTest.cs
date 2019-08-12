@@ -31,13 +31,15 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal(TestDate, service.Date);
         }
 
-        private static Model.FoundItem MapResolvedStop(Timetable.Schedule schedule = null, bool isCancelled = false)
+        private static Model.FoundItem MapResolvedStop(Timetable.Schedule schedule = null, Timetable.Station to = null)
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
             
-            var resolved = new ResolvedService(schedule, TestDate, isCancelled);
+            var resolved = new ResolvedService(schedule, TestDate, false);
             resolved.TryFindStop(TestStations.Surbiton, TestSchedules.Ten, out var stop);
+            if(to != null)
+                stop.GoesTo(to);
             
             return mapper.Map<Timetable.ResolvedServiceStop, Model.FoundItem>(stop);
         }
@@ -49,6 +51,15 @@ namespace Timetable.Web.Test.Mapping
             var stop = output.At;
             Assert.Equal("SUR", stop.Location.ThreeLetterCode);
             Assert.Equal(TestDate, stop.Departure.Value.Date);
+        }
+        
+        [Fact]
+        public void MapToStop()
+        {
+            var output = MapResolvedStop(to: TestStations.Waterloo);            
+            var stop = output.To;
+            Assert.Equal("WAT", stop.Location.ThreeLetterCode);
+            Assert.Equal(TestDate, stop.Arrival.Value.Date);
         }
     }
 }
