@@ -100,7 +100,8 @@ namespace Timetable.Web.Mapping
             {
                 Service = CreateServiceSummary(source, context),
                 At = context.Mapper.Map<Model.ScheduledStop>(source.Stop),
-                To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop)
+                To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop),
+                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop)
             };
         }
     }

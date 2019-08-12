@@ -149,11 +149,17 @@ namespace Timetable
 
         public (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config)
         {
+            return Find(location, (station) => station.Timetable.FindDepartures(at, config));
+        }
+
+        private (FindStatus status, ResolvedServiceStop[] services) Find(string location,  Func<Station, ResolvedServiceStop[]> findFunc)
+        {
             var status = FindStatus.LocationNotFound;
-            
-            if (TryGetLocation(location, out Station station))
+
+            if (!string.IsNullOrEmpty(location) && TryGetLocation(location, out Station station))
             {
-                var departures = station.Timetable.FindDepartures(at, config);
+                var departures = findFunc(station);
+                
                 if (departures.Any())
                     return (status: FindStatus.Success, services: departures);
 
@@ -165,7 +171,7 @@ namespace Timetable
 
         public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config)
         {
-            throw new NotImplementedException();
+            return Find(location, (station) => station.Timetable.FindArrivals(at, config));
         }
     }
 }

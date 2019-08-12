@@ -9,48 +9,56 @@ namespace Timetable.Web.Controllers
 {
     [Route("api/timetable")]
     [ApiController]
-    public class ArrivalsController : ControllerBase
+    public class ArrivalsController : ArrivalDeparturesControllerBase
     {
-        private readonly ILocationData _timetable;
-        private readonly IMapper _mapper;
-        private readonly ILogger _logger;
-        
-        public ArrivalsController(ILocationData data,  IMapper mapper, ILogger logger)
+        public ArrivalsController(ILocationData data, IFilterFactory filters, IMapper mapper, ILogger logger) :
+            base(data, filters, mapper, logger)
         {
-            _timetable = data;
-            _mapper = mapper;
-            _logger = logger;
         }
-        
+
         /// <summary>
         /// Returns arrivals at a location, optionally from another location
         /// </summary>
-        /// <param name="location"></param>
-        /// <param name="at"></param>
+        /// <param name="location">Three letter code</param>
+        /// <param name="from">Optional to location filter </param>
+        /// <param name="before">Number of services to return that depart before the time</param>
+        /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
+        /// <returns></returns>
+        [Route("arrivals/{location}")]
+        [HttpGet]
+        public async Task<IActionResult> Arrivals(string location, [FromQuery] string from = "",
+            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3)
+        {
+            return await Arrivals(location, DateTime.Now, from, before, after);
+        }
+
+        /// <summary>
+        /// Returns arrivals at a location, optionally from another location
+        /// </summary>
+        /// <param name="location">Three letter code</param>
+        /// <param name="at">Datetime</param>
+        /// <param name="from">Optional to location filter </param>
+        /// <param name="before">Number of services to return that depart before the time</param>
+        /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
         /// <returns></returns>
         [Route("arrivals/{location}/{at}")]
         [HttpGet]
-        public async Task<IActionResult> Arrivals(string location, DateTime? at, [FromQuery] string from = "", [FromQuery] ushort before = 3, [FromQuery] ushort after = 3)
+        public async Task<IActionResult> Arrivals(string location, DateTime at, [FromQuery] string from = "",
+            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3)
         {
-            var request = new SearchRequest()
-            {
-                Location = location,
-                At = new Window()
-                {
-                    At = at ?? DateTime.Now,
-                    Before = before,
-                    After = after
-                },
-                ComingFromGoingTo = from
-            };
-            
-            var response = new Model.FoundResponse()
-            {
-                Request = request,
-                GeneratedAt = DateTime.Now
-            };
-            
-            return Ok(response);
+            var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS);
+            return Process(request);
+        }
+
+        protected override (FindStatus status, ResolvedServiceStop[] services) FindServices(string location,
+            DateTime at, GatherConfiguration config)
+        {
+            return _timetable.FindArrivals(location, at, config);
+        }
+
+        protected override GatherFilterFactory.GatherFilter CreateFilter(Station station)
+        {
+            return _filters.ArrivalsComeFrom(station);
         }
     }
 }

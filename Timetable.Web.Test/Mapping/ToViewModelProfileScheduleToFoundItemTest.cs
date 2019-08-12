@@ -31,16 +31,22 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal(TestDate, service.Date);
         }
 
-        private static Model.FoundItem MapResolvedStop(Timetable.Schedule schedule = null, Timetable.Station to = null)
+        private static Model.FoundItem MapResolvedStop(Timetable.Schedule schedule = null, 
+            Timetable.Station at = null, Time? time = null,
+            Timetable.Station from = null, Timetable.Station to = null)
         {
-            var mapper = ToViewProfileConfiguration.CreateMapper();
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
+            at = at ?? TestStations.Surbiton;
+            time = time ?? TestSchedules.Ten;
             
             var resolved = new ResolvedService(schedule, TestDate, false);
-            resolved.TryFindStop(TestStations.Surbiton, TestSchedules.Ten, out var stop);
+            resolved.TryFindStop(at, time.Value, out var stop);
             if(to != null)
                 stop.GoesTo(to);
+            if(from != null)
+                stop.ComesFrom(from);
             
+            var mapper = ToViewProfileConfiguration.CreateMapper();
             return mapper.Map<Timetable.ResolvedServiceStop, Model.FoundItem>(stop);
         }
 
@@ -60,6 +66,15 @@ namespace Timetable.Web.Test.Mapping
             var stop = output.To;
             Assert.Equal("WAT", stop.Location.ThreeLetterCode);
             Assert.Equal(TestDate, stop.Arrival.Value.Date);
+        }
+        
+        [Fact]
+        public void MapFromStop()
+        {
+            var output = MapResolvedStop(at: TestStations.ClaphamJunction, time: TestSchedules.TenFifteen,  from: TestStations.Surbiton);            
+            var stop = output.From;
+            Assert.Equal("SUR", stop.Location.ThreeLetterCode);
+            Assert.Equal(TestDate, stop.Departure.Value.Date);
         }
     }
 }

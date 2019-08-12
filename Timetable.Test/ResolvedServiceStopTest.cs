@@ -18,7 +18,7 @@ namespace Timetable.Test
         }
 
         
-        public static IEnumerable<object[]> Stations
+        public static IEnumerable<object[]> ToStations
         {
             get
             {
@@ -30,7 +30,7 @@ namespace Timetable.Test
         }
         
         [Theory]
-        [MemberData(nameof(Stations))]
+        [MemberData(nameof(ToStations))]
         public void GoesTo(Station station, bool isTo)
         {
             var service =  TestSchedules.CreateService();
@@ -46,6 +46,37 @@ namespace Timetable.Test
             {
                 Assert.False(stop.GoesTo(station));
                 Assert.Null(stop.FoundToStop);
+            }
+        }
+        
+        public static IEnumerable<object[]> FromStations
+        {
+            get
+            {
+                yield return new object[] {TestStations.Surbiton, true};   
+                yield return new object[] {TestStations.ClaphamJunction, false};    // Destination is our stop.  Effectively assumes we do not have the same location twice in the stops list 
+                yield return new object[] {TestStations.Waterloo, false};
+                yield return new object[] {TestStations.Woking, false};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(FromStations))]
+        public void ComesFrom(Station station, bool isFrom)
+        {
+            var service =  TestSchedules.CreateService();
+            var clapham = service.Details.Locations[1];
+            var stop = new ResolvedServiceStop(service, clapham);
+
+            if (isFrom)
+            {
+                Assert.True(stop.ComesFrom(station));
+                Assert.NotNull(stop.FoundFromStop);
+            }
+            else
+            {
+                Assert.False(stop.ComesFrom(station));
+                Assert.Null(stop.FoundFromStop);
             }
         }
     }

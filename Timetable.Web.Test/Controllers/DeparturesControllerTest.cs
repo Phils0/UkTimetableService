@@ -92,7 +92,7 @@ namespace Timetable.Web.Test.Controllers
         [InlineData("XXX", false)]
         [InlineData("", false)]
         [InlineData(null, false)]
-        public async Task SetsDestinationFilter(string location, bool hasFilter)
+        public async Task SetsToFilter(string location, bool hasFilter)
         {
             var data = Substitute.For<ILocationData>();
             data.TryGetLocation("WAT", out Arg.Any<Station>()).Returns(true);

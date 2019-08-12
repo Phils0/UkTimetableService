@@ -19,7 +19,7 @@ namespace Timetable.Test.Data
 
         private static readonly Time First = new Time(new TimeSpan(0, 7, 0));
         
-        public static ILocationData CreateTimetabledLocations()
+        public static ILocationData CreateTimetabledLocations(int duration = 1440)
         {
             var data = Locations;
             var surbiton = data.LocationsByTiploc["SURBITN"];
@@ -27,7 +27,7 @@ namespace Timetable.Test.Data
             var clapham = data.LocationsByTiploc["CLPHMJN"];
 
 
-            for (int i = 0; i < 1440; i += 15)
+            for (int i = 0; i < duration; i += 15)
             {
                 var start = First.AddMinutes(i);
                 var locations = new[]

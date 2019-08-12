@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Timetable.Test.Data;
 using Xunit;
@@ -88,6 +89,63 @@ namespace Timetable.Test
             Assert.Equal(found, find);
             if(found)
                 Assert.Equal(threeLetterCode, location.ThreeLetterCode);
+        }
+
+
+        private static readonly DateTime Ten = new DateTime(2019, 8, 12, 10, 0, 0);
+        
+        [Theory]
+        [InlineData("SUR", FindStatus.Success)]
+        [InlineData("NOT_EXIST", FindStatus.LocationNotFound)]
+        [InlineData("", FindStatus.LocationNotFound)]
+        [InlineData(null, FindStatus.LocationNotFound)]
+        public void FindDeparture(string threeLetterCode, FindStatus found)
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.FindDepartures(threeLetterCode, Ten, GathererConfig.OneService);
+            
+            Assert.Equal(found, find.status);
+            if(found == FindStatus.Success)
+                Assert.NotEmpty(find.services);
+            else
+                Assert.Empty(find.services);
+        }
+
+        [Fact]
+        public void DoNotFindDeparturesWhenNone()
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.FindDepartures("WAT", Ten, GathererConfig.OneService);
+            
+            Assert.Equal(FindStatus.NoServicesForLocation, find.status);
+            Assert.Empty(find.services);
+        }
+        
+        [Theory]
+        [InlineData("WAT", FindStatus.Success)]
+        [InlineData("NOT_EXIST", FindStatus.LocationNotFound)]
+        [InlineData("", FindStatus.LocationNotFound)]
+        [InlineData(null, FindStatus.LocationNotFound)]
+        public void FindArrivals(string threeLetterCode, FindStatus found)
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.FindArrivals(threeLetterCode, Ten, GathererConfig.OneService);
+            
+            Assert.Equal(found, find.status);
+            if(found == FindStatus.Success)
+                Assert.NotEmpty(find.services);
+            else
+                Assert.Empty(find.services);
+        }
+
+        [Fact]
+        public void DoNotFindArrivalsWhenNone()
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.FindArrivals("SUR", Ten, GathererConfig.OneService);
+            
+            Assert.Equal(FindStatus.NoServicesForLocation, find.status);
+            Assert.Empty(find.services);
         }
     }
 }

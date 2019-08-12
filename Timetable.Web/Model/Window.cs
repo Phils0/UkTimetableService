@@ -7,7 +7,7 @@ namespace Timetable.Web.Model
         /// <summary>
         /// Request time for board
         /// </summary>
-        public DateTime? At { get; set; }
+        public DateTime At { get; set; }
         /// <summary>
         /// Number of services arriving\departing before
         /// </summary>
@@ -19,7 +19,7 @@ namespace Timetable.Web.Model
 
         public override string ToString()
         {
-            return At?.ToString("s") ?? "Now";
+            return At.ToString("s");
         }      
     }
 }

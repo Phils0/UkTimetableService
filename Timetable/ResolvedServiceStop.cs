@@ -6,8 +6,8 @@ namespace Timetable
     public class ResolvedServiceStop : ResolvedService
     {
         public ScheduleLocation Stop { get; }
-
         public ScheduleLocation FoundToStop { get; private set; } = null;
+        public ScheduleLocation FoundFromStop { get; private set; } = null;
         
         public ResolvedServiceStop(ResolvedService service, ScheduleLocation stop)
             : this(service.Details, stop, service.On, service.IsCancelled)
@@ -45,7 +45,20 @@ namespace Timetable
         
         public bool ComesFrom(Station origin)
         {
-            throw new NotImplementedException();
+            foreach (var stop in Details.Locations)
+            {
+                // Check if got to Stop, if so can shortcut as it doesn't go there although this is slightly dodgy
+                if (Stop.Station.Equals(stop.Station))
+                    return false;
+
+                if (origin.Equals(stop.Station))
+                {
+                    FoundFromStop = stop;
+                    return true;
+                }
+            }
+
+            return false;        
         }
     }
 }
