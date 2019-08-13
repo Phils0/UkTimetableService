@@ -63,7 +63,7 @@ namespace Timetable.Test
                 var intermediate = stops[1] as ScheduleStop;
                 yield return new object[] {intermediate.Station, intermediate.Arrival, true};
                 yield return new object[] {intermediate.Station, intermediate.Departure, false};
-                var destination = stops[2] as ScheduleDestination;
+                var destination = stops[3] as ScheduleDestination;
                 yield return new object[] {destination.Station, destination.Arrival, true};
             }
         }

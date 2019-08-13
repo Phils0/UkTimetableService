@@ -114,29 +114,29 @@ namespace Timetable.Test
         public void ScheduleOriginStopTypeIsOrigin()
         {
             var scheduleLocation = TestScheduleLocations.CreateOrigin(TestStations.Surbiton, Test);
-            Assert.Equal(StopType.PickUpOnly, scheduleLocation.AdvertisedStop);
+            Assert.Equal(PublicStop.PickUpOnly, scheduleLocation.AdvertisedStop);
         }
         
         [Fact]
         public void ScheduleDestinationStopTypeIsDestination()
         {
             var scheduleLocation = TestScheduleLocations.CreateDestination(TestStations.Surbiton, Test);
-            Assert.Equal(StopType.SetDownOnly, scheduleLocation.AdvertisedStop);
+            Assert.Equal(PublicStop.SetDownOnly, scheduleLocation.AdvertisedStop);
         }
         
         [Fact]
         public void SchedulePassIsNotAStop()
         {
             var scheduleLocation = TestScheduleLocations.CreatePass(TestStations.Surbiton, Test);            
-            Assert.Equal(StopType.NotAPublicStop, scheduleLocation.AdvertisedStop);
+            Assert.Equal(PublicStop.No, scheduleLocation.AdvertisedStop);
         }
         
         [Theory]
-        [InlineData("T", StopType.Normal)]
-        [InlineData("D", StopType.SetDownOnly)]
-        [InlineData("U", StopType.PickUpOnly)]
-        [InlineData("R", StopType.Request)]
-        public void SchedulePassSetsStopTypeBasedUponAttributes(string activity, StopType expected)
+        [InlineData("T", PublicStop.Yes)]
+        [InlineData("D", PublicStop.SetDownOnly)]
+        [InlineData("U", PublicStop.PickUpOnly)]
+        [InlineData("R", PublicStop.Request)]
+        public void SchedulePassSetsStopTypeBasedUponAttributes(string activity, PublicStop expected)
         {
             var scheduleLocation = TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, activity);            
             Assert.Equal(expected, scheduleLocation.AdvertisedStop);
@@ -156,7 +156,7 @@ namespace Timetable.Test
                 })
             };
             scheduleLocation.UpdateAdvertisedStop();
-            Assert.Equal(StopType.Normal, scheduleLocation.AdvertisedStop);
+            Assert.Equal(PublicStop.Yes, scheduleLocation.AdvertisedStop);
         }     
     }
 }

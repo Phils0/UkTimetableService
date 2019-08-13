@@ -67,7 +67,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var output = Map();
 
-            Assert.Equal(StopType.PickUpOnly, output.AdvertisedStop);
+            Assert.Equal(PublicStop.PickUpOnly, output.AdvertisedStop);
         } 
     }
 }

@@ -43,5 +43,15 @@ namespace Timetable.Test.Data
                 return s;
             }
         }
+        
+        public static Station Vauxhall
+        {
+            get
+            {
+                var s = new Station();
+                s.Add(TestLocations.Vauxhall);
+                return s;
+            }
+        }
     }
 }

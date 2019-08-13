@@ -44,7 +44,7 @@ namespace Timetable
 
         public override string ToString()
         {
-            var time = AdvertisedStop == StopType.PickUpOnly ? Departure : Arrival;
+            var time = AdvertisedStop == PublicStop.PickUpOnly ? Departure : Arrival;
             return $"{time} {base.ToString()}";
         }
     }

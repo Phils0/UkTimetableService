@@ -16,7 +16,6 @@ namespace Timetable.Test
             var stop = new ResolvedServiceStop(service, service.Details.Locations[0]);
             Assert.Equal("X12345 12/08/2019 10:00 SUR-SURBITN", stop.ToString());
         }
-
         
         public static IEnumerable<object[]> ToStations
         {
@@ -24,6 +23,7 @@ namespace Timetable.Test
             {
                 yield return new object[] {TestStations.Surbiton, false};   
                 yield return new object[] {TestStations.ClaphamJunction, false};    // Destination is our stop.  Effectively assumes we do not have the same location twice in the stops list 
+                yield return new object[] {TestStations.Vauxhall, false};
                 yield return new object[] {TestStations.Waterloo, true};
                 yield return new object[] {TestStations.Woking, false};
             }
@@ -48,6 +48,22 @@ namespace Timetable.Test
                 Assert.Null(stop.FoundToStop);
             }
         }
+
+        [Fact]
+        public void GoesToAtPickUpOnlyIsFalse()
+        {
+            var service =  TestSchedules.CreateService();
+            var surbiton = service.Details.Locations[0];
+            var clapham = service.Details.Locations[1] as ScheduleStop;
+            clapham.Arrival = Time.NotValid;
+            clapham.Activities = new HashSet<string>(new [] {Activity.PickUpOnlyStop});
+            clapham.UpdateAdvertisedStop();
+            
+            var stop = new ResolvedServiceStop(service, surbiton);
+            
+            Assert.False(stop.GoesTo(clapham.Station));
+            Assert.Null(stop.FoundToStop);
+        }
         
         public static IEnumerable<object[]> FromStations
         {
@@ -55,6 +71,7 @@ namespace Timetable.Test
             {
                 yield return new object[] {TestStations.Surbiton, true};   
                 yield return new object[] {TestStations.ClaphamJunction, false};    // Destination is our stop.  Effectively assumes we do not have the same location twice in the stops list 
+                yield return new object[] {TestStations.Vauxhall, false};
                 yield return new object[] {TestStations.Waterloo, false};
                 yield return new object[] {TestStations.Woking, false};
             }
@@ -78,6 +95,22 @@ namespace Timetable.Test
                 Assert.False(stop.ComesFrom(station));
                 Assert.Null(stop.FoundFromStop);
             }
+        }
+        
+        [Fact]
+        public void ComesFromAtSetDownOnlyIsFalse()
+        {
+            var service =  TestSchedules.CreateService();
+            var waterloo = service.Details.Locations[3];
+            var clapham = service.Details.Locations[1] as ScheduleStop;
+            clapham.Departure = Time.NotValid;
+            clapham.Activities = new HashSet<string>(new [] {Activity.SetDownOnlyStop});
+            clapham.UpdateAdvertisedStop();
+            
+            var stop = new ResolvedServiceStop(service, waterloo);
+            
+            Assert.False(stop.GoesTo(clapham.Station));
+            Assert.Null(stop.FoundFromStop);
         }
     }
 }

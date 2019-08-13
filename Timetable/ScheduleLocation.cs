@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace Timetable
 {
-    public enum StopType
+    public enum PublicStop
     {
         NotSet,
-        Normal,        // SetDown and PickUp
+        Yes,        // SetDown and PickUp
         PickUpOnly,
         SetDownOnly,
         Request,
-        NotAPublicStop
+        No
     }
     
     public abstract class ScheduleLocation
@@ -30,29 +30,29 @@ namespace Timetable
             
             if (Activities.Contains(Activity.PassengerStop))
             {
-                AdvertisedStop = StopType.Normal;
+                AdvertisedStop = PublicStop.Yes;
             }
             else if (Activities.Contains(Activity.TrainBegins) ||
                      Activities.Contains(Activity.PickUpOnlyStop))
             {
-                AdvertisedStop = StopType.PickUpOnly;                           
+                AdvertisedStop = PublicStop.PickUpOnly;                           
             }
             else if (Activities.Contains(Activity.TrainFinishes) ||
                      Activities.Contains(Activity.SetDownOnlyStop))
             {
-                AdvertisedStop = StopType.SetDownOnly;                           
+                AdvertisedStop = PublicStop.SetDownOnly;                           
             }
             else if (Activities.Contains(Activity.RequestStop))
             {
-                AdvertisedStop = StopType.Request;                           
+                AdvertisedStop = PublicStop.Request;                           
             }
             else
             {
-                AdvertisedStop = StopType.NotAPublicStop;
+                AdvertisedStop = PublicStop.No;
             }
         }
 
-        public StopType AdvertisedStop { get; private set; } = StopType.NotSet;
+        public PublicStop AdvertisedStop { get; private set; } = PublicStop.NotSet;
         
         public Schedule Schedule { get; private set; }
 

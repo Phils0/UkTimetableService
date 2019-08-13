@@ -91,5 +91,20 @@ namespace Timetable.Test.Data
                 IsEstimate = false
             }
         };
+        
+        public static Location Vauxhall => new Location()
+        {
+            Tiploc = "VAUXHLM",
+            ThreeLetterCode = "VXH",
+            Nlc = "559700",
+            Name = "VAUXHALL",
+            InterchangeStatus = InterchangeStatus.Normal,
+            Coordinates = new Coordinates()
+            {
+                Eastings = 15304,
+                Northings = 61780,
+                IsEstimate = false
+            }
+        };
     }
 }

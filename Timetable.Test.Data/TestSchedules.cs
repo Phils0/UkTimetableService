@@ -140,7 +140,8 @@ namespace Timetable.Test.Data
         public static ScheduleLocation[] CreateThreeStopSchedule(Time start) => new[]
         {
             (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, start),
-            (ScheduleLocation) TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, start.AddMinutes(15)),
+            TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, start.AddMinutes(15)),
+            TestScheduleLocations.CreatePass(TestStations.Vauxhall, start.AddMinutes(20)),
             TestScheduleLocations.CreateDestination(TestStations.Waterloo, start.AddMinutes(30))
         };
     }
