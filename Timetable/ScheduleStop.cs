@@ -38,8 +38,8 @@ namespace Timetable
         {
             var arrival = (IArrival) this;
             var departure = (IDeparture) this;
-            return arrival.IsPublic && arrival.Time.Equals(time) || 
-                   departure.IsPublic && departure.Time.Equals(time);
+            return (arrival.IsPublic && arrival.Time.Equals(time)) || 
+                   (departure.IsPublic && departure.Time.Equals(time));
         }
 
         public override string ToString()

@@ -10,9 +10,9 @@ namespace Timetable.Test
         
         internal static GatherConfiguration OneBeforeTwoAfter => Create(1, 2);
 
-        internal static GatherConfiguration Create(int before, int after)
+        internal static GatherConfiguration Create(int before, int after, TimesToUse arrivalsOrDepartures = TimesToUse.Departures)
         {
-            return new GatherConfiguration(before, after, GatherFilterFactory.NoFilter);
+            return new GatherConfiguration(before, after, GatherFilterFactory.NoFilter, arrivalsOrDepartures);
         }
     }
 }

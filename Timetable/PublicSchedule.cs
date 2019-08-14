@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Timetable
-{
-    public interface ILocationSchedule
+{ 
+    public interface IPublicSchedule
     {
-        Station Location { get; }
-        (Time time, Service[] services) ValuesAt(int index);
-        int Count { get; }
+        void AddService(IServiceTime stop);
+        ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config);
     }
 
     /// <summary>
     /// Represents the Public Arrivals or Departures for a location
     /// </summary>
     /// <remarks>Services are ordered by time</remarks>
-    internal class PublicSchedule : ILocationSchedule
+    internal class PublicSchedule : IPublicSchedule, IGathererScheduleData
     {
         public Station Location { get; }
 
@@ -29,7 +28,7 @@ namespace Timetable
             _services = new SortedList<Time, Service[]>(comparer);
         }
 
-        internal void AddService(IServiceTime stop)
+        public void AddService(IServiceTime stop)
         {
             var time = stop.Time;
             if (!_services.ContainsKey(time))
@@ -46,12 +45,7 @@ namespace Timetable
                 }
             }
         }
-
-        internal Service[] GetServices(Time time)
-        {
-            return _services.TryGetValue(time, out var services) ? services : new Service[0];
-        }
-
+        
         public (Time time, Service[] services) ValuesAt(int index)
         {
             return (_services.Keys[index], _services.Values[index]);
@@ -59,7 +53,7 @@ namespace Timetable
 
         public int Count => _services.Count;
 
-        internal ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config)
+        public ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config)
         {
             var on = at.Date;
             var time = new Time(at.TimeOfDay);

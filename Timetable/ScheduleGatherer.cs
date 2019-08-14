@@ -4,15 +4,22 @@ using System.Linq;
 
 namespace Timetable
 {
+    public interface IGathererScheduleData
+    {
+        Station Location { get; }
+        (Time time, Service[] services) ValuesAt(int index);
+        int Count { get; }
+    }
+
     internal class ScheduleGatherer
     {
 
-        private readonly ILocationSchedule _schedule;
+        private readonly IGathererScheduleData _schedule;
         private readonly GatherConfiguration _config;
 
         private GatherFilterFactory.GatherFilter SatisfiesFilter => _config.Filter;
         
-        internal ScheduleGatherer(ILocationSchedule schedule, GatherConfiguration config)
+        internal ScheduleGatherer(IGathererScheduleData schedule, GatherConfiguration config)
         {
             _schedule = schedule;
             _config = config;

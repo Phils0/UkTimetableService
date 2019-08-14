@@ -26,14 +26,18 @@ namespace Timetable
 
     public class LocationTimetable : ILocationTimetable
     {
-        private readonly PublicSchedule _arrivals;
-        private readonly PublicSchedule _departures;
+        private readonly IPublicSchedule _arrivals;
+        private readonly IPublicSchedule _departures;
         
-        public LocationTimetable(Station at)
+        public LocationTimetable(Station at) :
+            this( new PublicSchedule(at, Time.EarlierLaterComparer), new PublicSchedule(at, Time.EarlierLaterComparer))
         {
-            _arrivals = new PublicSchedule(at, Time.EarlierLaterComparer);
-            _departures = new PublicSchedule(at, Time.EarlierLaterComparer);
-            
+        }
+        
+        public LocationTimetable(IPublicSchedule arrivals, IPublicSchedule departures)
+        {
+            _arrivals = arrivals;
+            _departures = departures;
         }
 
         internal void AddService(ScheduleLocation stop)
@@ -54,6 +58,7 @@ namespace Timetable
         /// <returns>Schedules of running services.</returns>
         public ResolvedServiceStop[] FindDepartures(DateTime at, GatherConfiguration config)
         {
+            config.TimesToUse = TimesToUse.Departures;
             return _departures.FindServices(at, config);
         }
         
@@ -66,6 +71,7 @@ namespace Timetable
         /// <returns>Schedules of running services.</returns>
         public ResolvedServiceStop[] FindArrivals(DateTime at, GatherConfiguration config)
         {
+            config.TimesToUse = TimesToUse.Arrivals;
             return _arrivals.FindServices(at, config);
         }
     }

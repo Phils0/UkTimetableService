@@ -3,6 +3,13 @@ using System.Data.SqlTypes;
 
 namespace Timetable
 {
+    public enum TimesToUse
+    {
+        NotSet = -1,
+        Arrivals,
+        Departures
+    }
+    
     public class GatherConfiguration
     {
 
@@ -10,7 +17,9 @@ namespace Timetable
         public int ServicesBefore { get; }
         public int ServicesAfter { get; }
         
-        public GatherConfiguration(int before, int after, GatherFilterFactory.GatherFilter filter)
+        public TimesToUse TimesToUse { get; set; }
+        
+        public GatherConfiguration(int before, int after, GatherFilterFactory.GatherFilter filter, TimesToUse arrivalsOrDepartures = TimesToUse.NotSet)
         {
             Filter = filter;
             
@@ -20,6 +29,7 @@ namespace Timetable
             
             ServicesBefore = before;
             ServicesAfter = after;
+            TimesToUse = arrivalsOrDepartures;
         }
 
         public bool HasRequestedBeforeOnly => ServicesAfter == 0;

@@ -23,7 +23,7 @@ namespace Timetable.Test
             Assert.Equal(TestSchedules.TenFifteen, stop.Departure);
         }
 
-        private ILocationSchedule CreateMockSchedule((int idx, (Time, Service[]) services)[] responses = null)
+        private IGathererScheduleData CreateMockSchedule((int idx, (Time, Service[]) services)[] responses = null)
         {
             responses = responses ?? (new []
             {
@@ -33,7 +33,7 @@ namespace Timetable.Test
                 (idx: 3, services: CreateTimeEntry(TestSchedules.TenThirty))
             });
             
-            var schedule = Substitute.For<ILocationSchedule>();
+            var schedule = Substitute.For<IGathererScheduleData>();
             schedule.Location.Returns(TestStations.Surbiton);
             schedule.Count.Returns(responses.Length);
             foreach (var tuple in responses)

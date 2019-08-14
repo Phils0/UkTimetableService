@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ReflectionMagic;
 using Timetable.Test.Data;
@@ -8,6 +9,7 @@ namespace Timetable.Test
 {
     public class LocationTimetableTest
     {
+        
         [Fact]
         public void LocationHasEntryForOrigin()
         {
@@ -18,16 +20,16 @@ namespace Timetable.Test
             AssertNoArrivalTime(originTimetable, TestSchedules.Ten);
 
             var departures = GetDepartureTimes(originTimetable);
-            var service = departures.GetServices(TestSchedules.Ten)[0];
+            var service = departures.GetService(TestSchedules.Ten);
             Assert.Equal(testSchedule.Service, service);
         }
-        
+
         private PublicSchedule GetDepartureTimes(LocationTimetable timetable)
         {
             var departures = (PublicSchedule) timetable.AsDynamic()._departures.RealObject;
             return departures;
         }
-
+        
         private PublicSchedule GetArrivalTimes(LocationTimetable timetable)
         {
             var arrivals = (PublicSchedule) timetable.AsDynamic()._arrivals.RealObject;
@@ -48,7 +50,7 @@ namespace Timetable.Test
             var destinationTimetable = testSchedule.Locations.Last().Station.Timetable;
 
             var arrivals = GetArrivalTimes(destinationTimetable);
-            var service = arrivals.GetServices(TestSchedules.TenThirty)[0];
+            var service = arrivals.GetService(TestSchedules.TenThirty);
             Assert.Equal(testSchedule.Service, service);
 
             AssertNoDepartureTime(destinationTimetable, TestSchedules.TenThirty);
@@ -73,11 +75,11 @@ namespace Timetable.Test
             var stop = locations[1].Station.Timetable;
 
             var arrivals = GetArrivalTimes(stop);
-            var service = arrivals.GetServices(TenFifteen)[0];
+            var service = arrivals.GetService(TenFifteen);
             Assert.Equal(testSchedule.Service, service);
 
             var departures = GetDepartureTimes(stop);
-            service = departures.GetServices(TenSixteen)[0];
+            service = departures.GetService(TenSixteen);
             Assert.Equal(testSchedule.Service, service);
         }
         
@@ -98,7 +100,7 @@ namespace Timetable.Test
             AssertNoArrivalTime(stop, TenFifteen);
 
             var departures = GetDepartureTimes(stop);
-            var service = departures.GetServices(TenFifteen)[0];
+            var service = departures.GetService(TenFifteen);
             Assert.Equal(testSchedule.Service, service);
         }
         
@@ -117,7 +119,7 @@ namespace Timetable.Test
             var stop = locations[1].Station.Timetable;
 
             var arrivals = GetArrivalTimes(stop);
-            var service = arrivals.GetServices(TenFifteen)[0];
+            var service = arrivals.GetService(TenFifteen);
             Assert.Equal(testSchedule.Service, service);
             
             AssertNoDepartureTime(stop, TenFifteen);
