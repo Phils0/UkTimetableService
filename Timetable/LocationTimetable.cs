@@ -28,8 +28,7 @@ namespace Timetable
     {
         private readonly PublicSchedule _arrivals;
         private readonly PublicSchedule _departures;
-
-
+        
         public LocationTimetable(Station at)
         {
             _arrivals = new PublicSchedule(at, Time.EarlierLaterComparer);

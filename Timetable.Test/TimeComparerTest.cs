@@ -43,5 +43,36 @@ namespace Timetable.Test
             Assert.Equal(expected, comparer.Compare(x, y));
             Assert.Equal(expected * -1, comparer.Compare(y, x));
         }
+        
+        public static TheoryData<Time, bool> SameTimeTests =>
+            new TheoryData<Time, bool>()
+            {
+                {new Time(TenThirty), true},
+                {new Time(TenThirty.Add(OneMinute)), false},
+                {new Time(TenThirty.Subtract(OneMinute)), false},
+                {new Time(TenThirty.Add(OneDay)), true}
+            };
+        
+        [Theory]
+        [MemberData(nameof(SameTimeTests))]
+        public void IsSameTime(Time y, bool expected)
+        {
+            var x = new Time(TenThirty);
+            var comparer = Time.IsSameTimeComparer;
+            
+            Assert.Equal(expected, comparer.Equals(x, y));
+            Assert.Equal(expected, comparer.Equals(y, x));
+        }
+        
+        [Theory]
+        [MemberData(nameof(SameTimeTests))]
+        public void IsSameTimeGetHashCodeIsSameWhenEqual(Time y, bool expected)
+        {
+            var x = new Time(TenThirty);
+            var comparer = Time.IsSameTimeComparer;
+            var xHash = comparer.GetHashCode(x);
+            
+            Assert.Equal(expected, comparer.GetHashCode(y) == xHash);
+        }
     }
 }

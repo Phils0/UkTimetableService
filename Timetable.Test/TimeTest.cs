@@ -108,5 +108,21 @@ namespace Timetable.Test
         {
             Assert.Equal(expected, time.IsValid);
         }
+        
+        public static TheoryData<Time, bool> AroundMidnight =>
+            new TheoryData<Time, bool>()
+            {
+                {new Time(new TimeSpan(0, 1, 0)), false },
+                {new Time(new TimeSpan(23, 59, 0)), false },
+                {new Time(OneDay), false },
+                {new Time(OneDay.Add(OneMinute)), true }
+            };
+
+        [Theory]
+        [MemberData(nameof(AroundMidnight))]
+        public void IsNextDay(Time time, bool expected)
+        {
+            Assert.Equal(expected, time.IsNextDay);
+        }
     }
 }

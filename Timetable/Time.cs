@@ -34,21 +34,50 @@ namespace Timetable
                 return _comparer.Compare(y, x);
             }
         }
+
+        private sealed class SameTimeEqualityComparer : IEqualityComparer<Time>
+        {
+            public bool Equals(Time x, Time y)
+            {
+                var xValue = x.Value;
+                var yValue = y.Value;
+
+                return xValue.Hours == yValue.Hours &&
+                       x.Value.Minutes == yValue.Minutes &&
+                       xValue.Seconds == yValue.Seconds;
+            }
+            public int GetHashCode(Time obj)
+            {
+                unchecked
+                {
+                    var v = obj.Value;
+                    var hashCode = v.Hours;
+                    hashCode = (hashCode * 397) ^ v.Minutes;
+                    hashCode = (hashCode * 397) ^ v.Seconds;
+                    return hashCode;
+                }
+            }
+        }
         
         /// <summary>
         /// Earlier to Later comparer
         /// </summary>
         /// <remarks>Ignores going over into the next day, therefore 00:10+1day is less than 23:50 </remarks>
-        public static IComparer<Time> EarlierLaterComparer => new EarlierToLaterComparer();
+        public static readonly IComparer<Time> EarlierLaterComparer = new EarlierToLaterComparer();
 
         /// <summary>
         /// Later to Earlier comparer
         /// </summary>
         /// <remarks>Ignores going over into the next day, therefore 00:10+1day is less than 23:50 </remarks>
-        public static IComparer<Time> LaterEarlierComparer => new LaterToEarlierComparer();
+        public static readonly IComparer<Time> LaterEarlierComparer = new LaterToEarlierComparer();
+
+        /// <summary>
+        /// Is same time equality
+        /// </summary>
+        /// <remarks>Ignores going over into the next day, therefore 00:10+1day equals 00:10 </remarks>
+        public static readonly IEqualityComparer<Time> IsSameTimeComparer = new SameTimeEqualityComparer();
         
-        
-        private static readonly TimeSpan OneDay = new TimeSpan(24, 0, 0);
+        public static readonly TimeSpan OneDay = new TimeSpan(24, 0, 0);
        
         public static readonly Time NotValid = new Time(TimeSpan.Zero); 
 
@@ -79,7 +108,7 @@ namespace Timetable
         public Time Subtract(TimeSpan ts) => new Time(this.Value.Subtract(ts));
         [Pure]
         public Time AddMinutes(int minutes) => Add(new TimeSpan(0, minutes, 0));
-
+        
         public bool Equals(Time other)
         {
             return Value.Equals(other.Value);
