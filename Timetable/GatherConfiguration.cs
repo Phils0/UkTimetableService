@@ -19,7 +19,12 @@ namespace Timetable
         
         public TimesToUse TimesToUse { get; set; }
         
-        public GatherConfiguration(int before, int after, GatherFilterFactory.GatherFilter filter, TimesToUse arrivalsOrDepartures = TimesToUse.NotSet)
+        public GatherConfiguration(int before, int after, GatherFilterFactory.GatherFilter filter) :
+            this(before, after, filter, TimesToUse.NotSet)
+        {
+        }
+        
+        internal GatherConfiguration(int before, int after, GatherFilterFactory.GatherFilter filter, TimesToUse arrivalsOrDepartures)
         {
             Filter = filter;
             

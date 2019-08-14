@@ -8,7 +8,7 @@ namespace Timetable.Test.Data
         private static readonly Toc VirginTrains = new Toc() {Code = "VT", Name = "Virgin Trains"};
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
         
-        public static ResolvedServiceStop CreateResolvedStop(
+        public static ResolvedServiceStop CreateResolvedDepartureStop(
             string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, ScheduleLocation[] locations = null,
@@ -27,7 +27,7 @@ namespace Timetable.Test.Data
             var origin = schedule.Locations.First() as ScheduleOrigin; 
             atLocation = atLocation ?? origin.Station;
             when = when.Equals(default(Time)) ? origin.Departure : when;
-            var find = new StopSpecification(atLocation, when, on);
+            var find = new StopSpecification(atLocation, when, on, TimesToUse.Departures);
             resolved.TryFindStop(find, out var stop);
             return stop;
         }
@@ -134,6 +134,7 @@ namespace Timetable.Test.Data
         public static ICalendar EverydayAugust2019 => CreateAugust2019Calendar();
         public static Time Ten => new Time(new TimeSpan(10, 0,0 ));
         public static Time TenFifteen => Ten.AddMinutes(15);
+        public static Time TenSixteen => Ten.AddMinutes(16);
         public static Time TenThirty => Ten.AddMinutes(30);
 
         public static ScheduleLocation[] DefaultLocations => CreateThreeStopSchedule(Ten);

@@ -38,7 +38,7 @@ namespace Timetable.Web.Test.Mapping
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
             at = at ?? TestStations.Surbiton;
             time = time ?? TestSchedules.Ten;
-            var find = new StopSpecification(at, time.Value, TestDate);
+            var find = new StopSpecification(at, time.Value, TestDate, TimesToUse.Departures);
             
             var resolved = new ResolvedService(schedule, TestDate, false);
             resolved.TryFindStop(find, out var stop);
@@ -72,7 +72,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void MapFromStop()
         {
-            var output = MapResolvedStop(at: TestStations.ClaphamJunction, time: TestSchedules.TenFifteen,  from: TestStations.Surbiton);            
+            var output = MapResolvedStop(at: TestStations.ClaphamJunction, time: TestSchedules.TenSixteen,  from: TestStations.Surbiton);            
             var stop = output.From;
             Assert.Equal("SUR", stop.Location.ThreeLetterCode);
             Assert.Equal(TestDate, stop.Departure.Value.Date);

@@ -39,7 +39,7 @@ namespace Timetable.Web.Test.Controllers
 
         private ResolvedServiceStop CreateClaphamResolvedStop()
         {
-            return TestSchedules.CreateResolvedStop(atLocation: TestStations.ClaphamJunction, when: TestSchedules.TenFifteen);
+            return TestSchedules.CreateResolvedDepartureStop(atLocation: TestStations.ClaphamJunction, when: TestSchedules.TenSixteen);
         }
 
         private static GatherFilterFactory FilterFactory => new GatherFilterFactory();

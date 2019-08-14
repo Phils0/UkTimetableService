@@ -59,26 +59,26 @@ namespace Timetable.Test
             {
                 var stops = TestSchedules.DefaultLocations;
                 var origin = stops[0] as ScheduleOrigin;
-                yield return new object[] {origin.Station, origin.Departure, false};
+                yield return new object[] {origin.Station, origin.Departure, TimesToUse.Departures};
                 var intermediate = stops[1] as ScheduleStop;
-                yield return new object[] {intermediate.Station, intermediate.Arrival, true};
-                yield return new object[] {intermediate.Station, intermediate.Departure, false};
+                yield return new object[] {intermediate.Station, intermediate.Arrival, TimesToUse.Arrivals};
+                yield return new object[] {intermediate.Station, intermediate.Departure, TimesToUse.Departures};
                 var destination = stops[3] as ScheduleDestination;
-                yield return new object[] {destination.Station, destination.Arrival, true};
+                yield return new object[] {destination.Station, destination.Arrival, TimesToUse.Arrivals};
             }
         }
 
         [Theory]
         [MemberData(nameof(Stops))]
-        public void FindStop(Station station, Time time, bool isArrival)
+        public void FindStop(Station station, Time time, TimesToUse arrivalOrDeparture)
         {
             var schedule = TestSchedules.CreateSchedule();
-            var find = new StopSpecification(station, time, MondayAugust12);
+            var find = CreateFindSpec(station, time, arrivalOrDeparture);
              
             Assert.True(schedule.TryFindStop(find, out var stop));
             Assert.Equal(station, stop.Station);
 
-            if (isArrival)
+            if (find.UseArrival)
             {
                 IArrival arrival = (IArrival) stop;
                 Assert.Equal(time, arrival.Time);
@@ -89,12 +89,17 @@ namespace Timetable.Test
                 Assert.Equal(time, departure.Time);
             }
         }
-        
+
+        private StopSpecification CreateFindSpec(Station station, Time time, TimesToUse arrivalOrDeparture = TimesToUse.Departures)
+        {
+            return new StopSpecification(station, time, MondayAugust12, arrivalOrDeparture);
+        }
+
         [Fact]
         public void DoNotFindStopWhenTimeDifferent()
         {
             var schedule = TestSchedules.CreateSchedule();
-            var find = new StopSpecification(TestStations.Surbiton, TestSchedules.TenThirty, MondayAugust12);
+            var find = CreateFindSpec(TestStations.Surbiton, TestSchedules.TenThirty);
 
             Assert.False(schedule.TryFindStop(find, out var stop));
         }
@@ -103,7 +108,7 @@ namespace Timetable.Test
         public void DoNotFindStopWheenDoesNotStopAtStation()
         {
             var schedule = TestSchedules.CreateSchedule();
-            var find = new StopSpecification(TestStations.Woking, TestSchedules.TenThirty, MondayAugust12);
+            var find = CreateFindSpec(TestStations.Woking, TestSchedules.TenThirty);
             
             Assert.False(schedule.TryFindStop(find, out var stop));
         }

@@ -31,17 +31,27 @@ namespace Timetable
 
         public override bool IsStopAt(StopSpecification spec)
         {
-            return Station.Equals(spec.Location) && IsAt(spec.Time);
+            
+            return Station.Equals(spec.Location) && IsAt(spec);
         }
 
-        private bool IsAt(Time time)
+        private bool IsAt(StopSpecification spec)
+        {
+            return spec.UseDeparture ? IsDeparture(spec.Time) : IsArrival(spec.Time);
+        }
+
+        private bool IsArrival(Time time)
         {
             var arrival = (IArrival) this;
-            var departure = (IDeparture) this;
-            return (arrival.IsPublic && arrival.Time.Equals(time)) || 
-                   (departure.IsPublic && departure.Time.Equals(time));
+            return arrival.IsPublic && arrival.Time.Equals(time);
         }
 
+        private bool IsDeparture(Time time)
+        {
+            var departure = (IDeparture) this;
+            return departure.IsPublic && departure.Time.Equals(time);
+        }
+        
         public override string ToString()
         {
             var time = AdvertisedStop == PublicStop.PickUpOnly ? Departure : Arrival;

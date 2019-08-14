@@ -22,7 +22,7 @@ namespace Timetable
 
         public override bool IsStopAt(StopSpecification spec)
         {
-            return Station.Equals(spec.Location) && Departure.Equals(spec.Time);
+            return spec.UseDeparture && Station.Equals(spec.Location) && Departure.Equals(spec.Time);
         }
 
         public override string ToString()

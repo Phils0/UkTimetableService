@@ -14,7 +14,7 @@ namespace Timetable.Test
         public void GatherSingleServiceAfter()
         {
             var schedule = CreateMockSchedule();
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneService);
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneDepartureService);
             var services = gatherer.Gather(2, TestDate);
 
             Assert.Single(services);
@@ -49,7 +49,7 @@ namespace Timetable.Test
         {
             var schedule = CreateMockSchedule();
 
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(0, 2));
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(0, 2, TimesToUse.Departures));
             var services = gatherer.Gather(1, TestDate);
 
             Assert.Equal(2, services.Length);
@@ -67,7 +67,7 @@ namespace Timetable.Test
         public void GatherSingleServiceBefore()
         {
             var schedule = CreateMockSchedule();
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneBefore);
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneDepartureBefore);
             var services = gatherer.Gather(2, TestDate);
 
             Assert.Single(services);
@@ -81,7 +81,7 @@ namespace Timetable.Test
         {
             var schedule = CreateMockSchedule();
 
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneBeforeTwoAfter);
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneBeforeTwoAfterDeparture);
             var services = gatherer.Gather(1, TestDate);
 
             Assert.Equal(3, services.Length);
@@ -92,7 +92,7 @@ namespace Timetable.Test
         {
             var schedule = CreateMockSchedule();
 
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneBeforeTwoAfter);
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneBeforeTwoAfterDeparture);
             var services = gatherer.Gather(1, TestDate);
 
             var first = services[0].Stop as ScheduleOrigin;
@@ -108,7 +108,7 @@ namespace Timetable.Test
         {
             var schedule = CreateMockSchedule();
 
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(2, 0));
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(2, 0, TimesToUse.Departures));
             var services = gatherer.Gather(1, TestDate);
 
             Assert.Equal(1, services.Length);    //TODO Loop to next day
@@ -119,7 +119,7 @@ namespace Timetable.Test
         {
             var schedule = CreateMockSchedule();
 
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(0, 2));
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(0, 2, TimesToUse.Departures));
             var services = gatherer.Gather(3, TestDate);
 
             Assert.Equal(1, services.Length);    //TODO Loop to next day
@@ -141,7 +141,7 @@ namespace Timetable.Test
             };
             
             var schedule = CreateMockSchedule(responses);
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneBeforeTwoAfter);
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneBeforeTwoAfterDeparture);
             var services = gatherer.Gather(1, TestDate);
 
             Assert.Equal(4, services.Length);    //TODO Loop to next day

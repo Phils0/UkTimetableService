@@ -25,7 +25,7 @@ namespace Timetable.Web.Test.Controllers
         {
             var data = Substitute.For<ILocationData>();
             data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
-               .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedStop() }));
+               .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
 
             var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;;
@@ -97,7 +97,7 @@ namespace Timetable.Web.Test.Controllers
             var data = Substitute.For<ILocationData>();
             data.TryGetLocation("WAT", out Arg.Any<Station>()).Returns(true);
             data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
-                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedStop() }));
+                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
 
             var filterFactory = Substitute.For<IFilterFactory>();
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);

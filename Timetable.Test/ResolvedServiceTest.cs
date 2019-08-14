@@ -25,17 +25,22 @@ namespace Timetable.Test
         {
             var service =  new ResolvedService(TestSchedules.CreateSchedule(), DateTime.Today, isCancelled);
 
-            var find = new StopSpecification(TestStations.Surbiton, TestSchedules.Ten, TestDate);
+            var find = CreateFindSpec(TestSchedules.Ten);
             Assert.True(service.TryFindStop(find, out var stop));
             Assert.NotNull(stop);
         }
-        
+
+        private StopSpecification CreateFindSpec(Time time)
+        {
+            return new StopSpecification(TestStations.Surbiton, time, TestDate, TimesToUse.Departures);
+        }
+
         [Fact]
         public void DoNotFindStop()
         {
             var service =  new ResolvedService(TestSchedules.CreateSchedule(), DateTime.Today, false);
 
-            var find = new StopSpecification(TestStations.Surbiton, TestSchedules.TenThirty, TestDate);
+            var find = CreateFindSpec(TestSchedules.TenThirty);
             Assert.False(service.TryFindStop(find, out var stop));
             Assert.Null(stop);
         }
