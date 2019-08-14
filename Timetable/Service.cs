@@ -103,10 +103,10 @@ namespace Timetable
             return schedule != null;
         }
         
-        public bool TryFindScheduledStopOn(DateTime date, Station location, Time time, out ResolvedServiceStop stop)
+        public bool TryFindScheduledStopOn(StopSpecification find, out ResolvedServiceStop stop)
         {
-            if (TryFindScheduleOn(date, out var schedule))
-                return schedule.TryFindStop(location, time, out stop);
+            if (TryFindScheduleOn(find.OnDate, out var schedule))
+                return schedule.TryFindStop(find, out stop);
 
             stop = null;
             return false;

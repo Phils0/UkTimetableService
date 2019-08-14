@@ -12,7 +12,7 @@ namespace Timetable
             PassesAt = PassesAt.MakeAfterByAddingADay(start);
         }
 
-        public override bool IsStopAt(Station location, Time time)
+        public override bool IsStopAt(StopSpecification spec)
         {
             return false;
         }

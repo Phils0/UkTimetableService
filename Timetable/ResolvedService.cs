@@ -27,9 +27,9 @@ namespace Timetable
             return Details.OperatedBy(toc);
         }
 
-        public bool TryFindStop(Station location, Time time, out ResolvedServiceStop stop)
+        public bool TryFindStop(StopSpecification find, out ResolvedServiceStop stop)
         {
-            if (Details.TryFindStop(location, time, out var found))
+            if (Details.TryFindStop(find, out var found))
             {
                 stop = new ResolvedServiceStop(this, found);
                 return true;

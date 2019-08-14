@@ -29,9 +29,9 @@ namespace Timetable
             WorkingDeparture = WorkingDeparture.MakeAfterByAddingADay(start);
         }
 
-        public override bool IsStopAt(Station location, Time time)
+        public override bool IsStopAt(StopSpecification spec)
         {
-            return Station.Equals(location) && IsAt(time);
+            return Station.Equals(spec.Location) && IsAt(spec.Time);
         }
 
         private bool IsAt(Time time)

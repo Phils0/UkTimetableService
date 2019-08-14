@@ -71,7 +71,7 @@ namespace Timetable
 
         public abstract void AddDay(Time start);
 
-        public abstract bool IsStopAt(Station location, Time time);
+        public abstract bool IsStopAt(StopSpecification spec);
 
         public override string ToString()
         {

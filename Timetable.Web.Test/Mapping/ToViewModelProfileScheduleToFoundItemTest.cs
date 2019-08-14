@@ -38,9 +38,10 @@ namespace Timetable.Web.Test.Mapping
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
             at = at ?? TestStations.Surbiton;
             time = time ?? TestSchedules.Ten;
+            var find = new StopSpecification(at, time.Value, TestDate);
             
             var resolved = new ResolvedService(schedule, TestDate, false);
-            resolved.TryFindStop(at, time.Value, out var stop);
+            resolved.TryFindStop(find, out var stop);
             if(to != null)
                 stop.GoesTo(to);
             if(from != null)

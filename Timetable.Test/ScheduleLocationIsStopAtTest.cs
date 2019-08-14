@@ -6,6 +6,7 @@ namespace Timetable.Test
 {
     public class ScheduleLocationIsStopAtTest
     {
+        private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
         private static Time TenZeroOne => new Time(new TimeSpan(10, 1,0 ));
 
         [Fact]
@@ -13,24 +14,27 @@ namespace Timetable.Test
         {
             var surbiton = TestStations.Surbiton;
             var stop = TestScheduleLocations.CreateStop(surbiton, TestSchedules.Ten);
-            Assert.True(stop.IsStopAt(surbiton, TestSchedules.Ten));
+            var spec = new StopSpecification(surbiton, TestSchedules.Ten, MondayAugust12);
+            Assert.True(stop.IsStopAt(spec));
         }
-        
+
         [Fact]
         public void IsStopAtIfLocationMatchesAndPublicDepartureTimeMatches()
         {
             var surbiton = TestStations.Surbiton;
             var stop = TestScheduleLocations.CreateStop(surbiton, TestSchedules.Ten);
-            Assert.True(stop.IsStopAt(surbiton, TenZeroOne));
+            var spec = new StopSpecification(surbiton, TenZeroOne, MondayAugust12);
+            Assert.True(stop.IsStopAt(spec));
         }
-        
+
         [Fact]
         public void IsStopAtIsFalseIfLocationMatchesAndArrivalTimeMatchesButIsPickupOnly()
         {
             var surbiton = TestStations.Surbiton;
             var stop = TestScheduleLocations.CreatePickupOnlyStop(surbiton, TestSchedules.TenThirty);
             stop.WorkingArrival = TestSchedules.Ten;
-            Assert.False(stop.IsStopAt(surbiton, TestSchedules.Ten));
+            var spec = new StopSpecification(surbiton, TestSchedules.Ten, MondayAugust12);
+            Assert.False(stop.IsStopAt(spec));
         }
         
         [Fact]
@@ -39,7 +43,8 @@ namespace Timetable.Test
             var surbiton = TestStations.Surbiton;
             var stop = TestScheduleLocations.CreateSetdownOnlyStop(surbiton, TestSchedules.TenThirty);
             stop.WorkingDeparture = TenZeroOne;
-            Assert.False(stop.IsStopAt(surbiton, TenZeroOne));
+            var spec = new StopSpecification(surbiton, TenZeroOne, MondayAugust12);
+            Assert.False(stop.IsStopAt(spec));
         }
         
         [Fact]
@@ -47,7 +52,8 @@ namespace Timetable.Test
         {
             var surbiton = TestStations.Surbiton;
             var stop = TestScheduleLocations.CreateDestination(surbiton, TestSchedules.Ten);
-            Assert.True(stop.IsStopAt(surbiton, TestSchedules.Ten));
+            var spec = new StopSpecification(surbiton, TestSchedules.Ten, MondayAugust12);
+            Assert.True(stop.IsStopAt(spec));
         }
         
         [Fact]
@@ -55,7 +61,8 @@ namespace Timetable.Test
         {
             var surbiton = TestStations.Surbiton;
             var stop = TestScheduleLocations.CreateOrigin(surbiton, TestSchedules.Ten);
-            Assert.True(stop.IsStopAt(surbiton, TestSchedules.Ten));
+            var spec = new StopSpecification(surbiton, TestSchedules.Ten, MondayAugust12);
+            Assert.True(stop.IsStopAt(spec));
         }
     }
 }

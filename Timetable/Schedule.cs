@@ -140,9 +140,9 @@ namespace Timetable
             return Operator.Equals(toc);
         }
         
-        public bool TryFindStop(Station location, Time time, out ScheduleLocation stop)
+        public bool TryFindStop(StopSpecification find, out ScheduleLocation stop)
         {
-            stop = Locations.FirstOrDefault(l => l.IsStopAt(location, time));
+            stop = Locations.FirstOrDefault(l => l.IsStopAt(find));
             return stop != default;
         }
         

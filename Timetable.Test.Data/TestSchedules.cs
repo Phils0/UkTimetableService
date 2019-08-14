@@ -27,7 +27,8 @@ namespace Timetable.Test.Data
             var origin = schedule.Locations.First() as ScheduleOrigin; 
             atLocation = atLocation ?? origin.Station;
             when = when.Equals(default(Time)) ? origin.Departure : when;
-            resolved.TryFindStop(atLocation, when, out var stop);
+            var find = new StopSpecification(atLocation, when, on);
+            resolved.TryFindStop(find, out var stop);
             return stop;
         }
         

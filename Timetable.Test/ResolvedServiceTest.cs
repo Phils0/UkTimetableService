@@ -25,7 +25,8 @@ namespace Timetable.Test
         {
             var service =  new ResolvedService(TestSchedules.CreateSchedule(), DateTime.Today, isCancelled);
 
-            Assert.True(service.TryFindStop(TestStations.Surbiton, TestSchedules.Ten, out var stop));
+            var find = new StopSpecification(TestStations.Surbiton, TestSchedules.Ten, TestDate);
+            Assert.True(service.TryFindStop(find, out var stop));
             Assert.NotNull(stop);
         }
         
@@ -34,7 +35,8 @@ namespace Timetable.Test
         {
             var service =  new ResolvedService(TestSchedules.CreateSchedule(), DateTime.Today, false);
 
-            Assert.False(service.TryFindStop(TestStations.Surbiton, TestSchedules.TenThirty, out var stop));
+            var find = new StopSpecification(TestStations.Surbiton, TestSchedules.TenThirty, TestDate);
+            Assert.False(service.TryFindStop(find, out var stop));
             Assert.Null(stop);
         }
     }

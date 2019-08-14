@@ -73,8 +73,9 @@ namespace Timetable.Test
         public void FindStop(Station station, Time time, bool isArrival)
         {
             var schedule = TestSchedules.CreateSchedule();
-
-            Assert.True(schedule.TryFindStop(station, time, out var stop));
+            var find = new StopSpecification(station, time, MondayAugust12);
+             
+            Assert.True(schedule.TryFindStop(find, out var stop));
             Assert.Equal(station, stop.Station);
 
             if (isArrival)
@@ -93,15 +94,18 @@ namespace Timetable.Test
         public void DoNotFindStopWhenTimeDifferent()
         {
             var schedule = TestSchedules.CreateSchedule();
+            var find = new StopSpecification(TestStations.Surbiton, TestSchedules.TenThirty, MondayAugust12);
 
-            Assert.False(schedule.TryFindStop(TestStations.Surbiton, TestSchedules.TenThirty, out var stop));
+            Assert.False(schedule.TryFindStop(find, out var stop));
         }
         
         [Fact]
         public void DoNotFindStopWheenDoesNotStopAtStation()
         {
             var schedule = TestSchedules.CreateSchedule();
-            Assert.False(schedule.TryFindStop(TestStations.Woking, TestSchedules.TenThirty, out var stop));
+            var find = new StopSpecification(TestStations.Woking, TestSchedules.TenThirty, MondayAugust12);
+            
+            Assert.False(schedule.TryFindStop(find, out var stop));
         }
     }
 }

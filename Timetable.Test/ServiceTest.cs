@@ -158,8 +158,9 @@ namespace Timetable.Test
         {
             var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
             var service = schedule.Service;
+            var find = new StopSpecification(TestStations.ClaphamJunction, TestSchedules.TenFifteen, MondayAugust12.AddDays(2));
             
-            Assert.True(service.TryFindScheduledStopOn(MondayAugust12.AddDays(2), TestStations.ClaphamJunction, TestSchedules.TenFifteen, out var found));
+            Assert.True(service.TryFindScheduledStopOn(find, out var found));
             Assert.Equal(schedule, found.Details);
         }
         
@@ -168,8 +169,9 @@ namespace Timetable.Test
         {
             var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
             var service = schedule.Service;
-            
-            Assert.False(service.TryFindScheduledStopOn(MondayAugust12, TestStations.ClaphamJunction, TestSchedules.TenFifteen, out var found));
+            var find = new StopSpecification(TestStations.ClaphamJunction, TestSchedules.TenFifteen, MondayAugust12);
+          
+            Assert.False(service.TryFindScheduledStopOn(find, out var found));
             Assert.Null(found);
         }
         
@@ -178,8 +180,9 @@ namespace Timetable.Test
         {
             var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
             var service = schedule.Service;
+            var find = new StopSpecification(TestStations.ClaphamJunction, TestSchedules.Ten, MondayAugust12.AddDays(2));
             
-            Assert.False(service.TryFindScheduledStopOn(MondayAugust12.AddDays(2), TestStations.ClaphamJunction, TestSchedules.Ten, out var found));
+            Assert.False(service.TryFindScheduledStopOn(find, out var found));
             Assert.Null(found);
         }
     }

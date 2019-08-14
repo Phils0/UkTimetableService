@@ -19,9 +19,9 @@ namespace Timetable
             WorkingArrival = WorkingArrival.MakeAfterByAddingADay(start);
         }
 
-        public override bool IsStopAt(Station location, Time time)
+        public override bool IsStopAt(StopSpecification spec)
         {
-            return Station.Equals(location) && Arrival.Equals(time);
+            return Station.Equals(spec.Location) && Arrival.Equals(spec.Time);
         }
 
         public override string ToString()
