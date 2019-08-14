@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Timetable
 {
-    public interface ISchedule
+    public interface ILocationSchedule
     {
         Station Location { get; }
         (Time time, Service[] services) ValuesAt(int index);
@@ -15,7 +15,7 @@ namespace Timetable
     /// Represents the Public Arrivals or Departures for a location
     /// </summary>
     /// <remarks>Services are ordered by time</remarks>
-    internal class PublicSchedule : ISchedule
+    internal class PublicSchedule : ILocationSchedule
     {
         public Station Location { get; }
 

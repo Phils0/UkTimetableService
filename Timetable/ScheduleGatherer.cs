@@ -7,12 +7,12 @@ namespace Timetable
     internal class ScheduleGatherer
     {
 
-        private readonly ISchedule _schedule;
+        private readonly ILocationSchedule _schedule;
         private readonly GatherConfiguration _config;
 
         private GatherFilterFactory.GatherFilter SatisfiesFilter => _config.Filter;
         
-        internal ScheduleGatherer(ISchedule schedule, GatherConfiguration config)
+        internal ScheduleGatherer(ILocationSchedule schedule, GatherConfiguration config)
         {
             _schedule = schedule;
             _config = config;

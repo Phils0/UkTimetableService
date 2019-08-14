@@ -23,7 +23,7 @@ namespace Timetable.Test
             Assert.Equal(TestSchedules.TenFifteen, stop.Departure);
         }
 
-        private ISchedule CreateMockSchedule((int idx, (Time, Service[]) services)[] responses = null)
+        private ILocationSchedule CreateMockSchedule((int idx, (Time, Service[]) services)[] responses = null)
         {
             responses = responses ?? (new []
             {
@@ -32,12 +32,10 @@ namespace Timetable.Test
                 (idx: 2, services: CreateTimeEntry(TestSchedules.TenFifteen)),
                 (idx: 3, services: CreateTimeEntry(TestSchedules.TenThirty))
             });
-
-            var maxIdx = responses.Max(r => r.idx);
             
-            var schedule = Substitute.For<ISchedule>();
+            var schedule = Substitute.For<ILocationSchedule>();
             schedule.Location.Returns(TestStations.Surbiton);
-            schedule.Count.Returns(maxIdx + 1);
+            schedule.Count.Returns(responses.Length);
             foreach (var tuple in responses)
             {
                 schedule.ValuesAt(tuple.idx).Returns(tuple.services);
@@ -156,7 +154,7 @@ namespace Timetable.Test
             var filterDelegate = Substitute.For<GatherFilterFactory.GatherFilter>();
             // First one found satisfies, rest do not
             filterDelegate(Arg.Any<ResolvedServiceStop>()).Returns(true, false);
-            var config = new GatherConfiguration(0, 2, filterDelegate);
+            var config = new GatherConfiguration(0, 2, filterDelegate, TimesToUse.Departures);
             var gatherer = new ScheduleGatherer(schedule, config);
             
             var services = gatherer.Gather(1, TestDate);
