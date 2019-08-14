@@ -43,13 +43,13 @@ namespace Timetable
         private bool IsArrival(Time time)
         {
             var arrival = (IArrival) this;
-            return arrival.IsPublic && arrival.Time.Equals(time);
+            return arrival.IsPublic && arrival.Time.IsSameTime(time);
         }
 
         private bool IsDeparture(Time time)
         {
             var departure = (IDeparture) this;
-            return departure.IsPublic && departure.Time.Equals(time);
+            return departure.IsPublic && departure.Time.IsSameTime(time);
         }
         
         public override string ToString()

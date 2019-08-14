@@ -33,27 +33,6 @@ namespace Timetable.Test
             
             Assert.Equal("01:10 (+1)", t.ToString());
         }
-
-        // Add and Subtract helper methods, not fully tested e.g. when goes negative
-        [Fact]
-        public void AddTimespan()
-        {
-            var t = new Time(TenThirty);
-            var tAdd = t.Add(OneMinute);
-            
-            Assert.Equal(new Time(new TimeSpan(10, 31,0)), tAdd);
-            Assert.Equal(new Time(TenThirty), t);
-        }
-        
-        [Fact]
-        public void SubtractTimespan()
-        {
-            var t = new Time(TenThirty);
-            var tSubtract = t.Subtract(OneMinute);
-            
-            Assert.Equal(new Time(new TimeSpan(10, 29,0)), tSubtract);
-            Assert.Equal(new Time(TenThirty), t);
-        }
         
         public static TheoryData<Time, Time> TimeAddDay =>
             new TheoryData<Time, Time>()
@@ -70,7 +49,7 @@ namespace Timetable.Test
         
         [Theory]
         [MemberData(nameof(TimeAddDay))]
-        public void AddDay(Time time, Time expected)
+        public void AddDayIfStopNextDay(Time time, Time expected)
         {
             var tAdd = time.MakeAfterByAddingADay(Start);
            
@@ -123,6 +102,16 @@ namespace Timetable.Test
         public void IsNextDay(Time time, bool expected)
         {
             Assert.Equal(expected, time.IsNextDay);
+        }
+        
+        [Theory]
+        [ClassData(typeof(SameTimeTestData))]
+        public void IsSameTime(Time other, bool expected)
+        {
+            var time = new Time(TenThirty);
+            var comparer = Time.IsSameTimeComparer;
+            
+            Assert.Equal(expected, time.IsSameTime(other));
         }
     }
 }

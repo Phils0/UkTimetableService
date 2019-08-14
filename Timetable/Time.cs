@@ -102,12 +102,7 @@ namespace Timetable
              
         public Time MakeAfterByAddingADay(Time start) => IsBefore(start) && IsValid ? Add(OneDay) : this;
 
-        [Pure]
-        public Time Add(TimeSpan ts) => new Time(this.Value.Add(ts));
-        [Pure]
-        public Time Subtract(TimeSpan ts) => new Time(this.Value.Subtract(ts));
-        [Pure]
-        public Time AddMinutes(int minutes) => Add(new TimeSpan(0, minutes, 0));
+        private Time Add(TimeSpan ts) => new Time(this.Value.Add(ts));
         
         public bool Equals(Time other)
         {
@@ -120,6 +115,11 @@ namespace Timetable
             return obj is Time other && Equals(other);
         }
 
+        public bool IsSameTime(Time other)
+        {
+            return  IsSameTimeComparer.Equals(this, other);
+        }
+        
         public override int GetHashCode()
         {
             return Value.GetHashCode();

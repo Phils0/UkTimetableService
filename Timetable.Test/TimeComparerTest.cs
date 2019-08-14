@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Timetable.Test
@@ -9,6 +11,7 @@ namespace Timetable.Test
         private static readonly TimeSpan TenThirty = new TimeSpan(10, 30, 0);
         private static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
         private static readonly TimeSpan OneDay = new TimeSpan(24, 0, 0);
+
 
         public static TheoryData<Time, int> TimeComparisonTests =>
             new TheoryData<Time, int>()
@@ -44,17 +47,10 @@ namespace Timetable.Test
             Assert.Equal(expected * -1, comparer.Compare(y, x));
         }
         
-        public static TheoryData<Time, bool> SameTimeTests =>
-            new TheoryData<Time, bool>()
-            {
-                {new Time(TenThirty), true},
-                {new Time(TenThirty.Add(OneMinute)), false},
-                {new Time(TenThirty.Subtract(OneMinute)), false},
-                {new Time(TenThirty.Add(OneDay)), true}
-            };
+
         
         [Theory]
-        [MemberData(nameof(SameTimeTests))]
+        [ClassData(typeof(SameTimeTestData))]
         public void IsSameTime(Time y, bool expected)
         {
             var x = new Time(TenThirty);
@@ -65,14 +61,32 @@ namespace Timetable.Test
         }
         
         [Theory]
-        [MemberData(nameof(SameTimeTests))]
+        [ClassData(typeof(SameTimeTestData))]
         public void IsSameTimeGetHashCodeIsSameWhenEqual(Time y, bool expected)
         {
-            var x = new Time(TenThirty);
+            var x = new Time(SameTimeTestData.TenThirty);
             var comparer = Time.IsSameTimeComparer;
             var xHash = comparer.GetHashCode(x);
             
             Assert.Equal(expected, comparer.GetHashCode(y) == xHash);
         }
     }
+    
+    public class SameTimeTestData : IEnumerable<object[]>
+    {
+        public static readonly TimeSpan TenThirty = new TimeSpan(10, 30, 0);
+        private static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
+        private static readonly TimeSpan OneDay = new TimeSpan(24, 0, 0);
+        
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            yield return new object[] {new Time(TenThirty), true};
+            yield return new object[] {new Time(TenThirty.Add(OneMinute)), false};
+            yield return new object[] {new Time(TenThirty.Subtract(OneMinute)), false};
+            yield return new object[] {new Time(TenThirty.Add(OneDay)), true};
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
 }

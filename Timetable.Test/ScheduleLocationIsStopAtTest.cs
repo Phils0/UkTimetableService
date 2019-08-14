@@ -21,6 +21,10 @@ namespace Timetable.Test
                 yield return new object[] {TestSchedules.Ten, TestSchedules.Ten, TimesToUse.Departures, false};
                 yield return new object[] {TestSchedules.Ten, TenZeroOne, TimesToUse.Departures, true};
                 yield return new object[] {TestSchedules.Ten, TestSchedules.TenThirty, TimesToUse.Arrivals, false};
+                yield return new object[] {TestSchedules.Ten, TestSchedules.Ten.AddDay(), TimesToUse.Arrivals, true};
+                yield return new object[] {TestSchedules.Ten.AddDay(), TestSchedules.Ten, TimesToUse.Arrivals, true};
+                yield return new object[] {TestSchedules.Ten, TenZeroOne.AddDay(), TimesToUse.Departures, true};
+                yield return new object[] {TestSchedules.Ten.AddDay(), TenZeroOne, TimesToUse.Departures, true};
             }
         }
         
@@ -46,6 +50,8 @@ namespace Timetable.Test
                 yield return new object[] {TenZeroOne, TestSchedules.Ten, TimesToUse.Departures, false};
                 yield return new object[] {TenZeroOne, TenZeroOne, TimesToUse.Departures, true};
                 yield return new object[] {TenZeroOne, TestSchedules.TenThirty, TimesToUse.Arrivals, false};
+                yield return new object[] {TenZeroOne, TenZeroOne.AddDay(), TimesToUse.Departures, true};
+                yield return new object[] {TenZeroOne, TenZeroOne, TimesToUse.Departures, true};
             }
         }
         
@@ -69,6 +75,8 @@ namespace Timetable.Test
                 yield return new object[] {TestSchedules.Ten, TestSchedules.Ten, TimesToUse.Departures, false};
                 yield return new object[] {TestSchedules.Ten, TenZeroOne, TimesToUse.Departures, false};
                 yield return new object[] {TestSchedules.Ten, TestSchedules.TenThirty, TimesToUse.Arrivals, false};
+                yield return new object[] {TestSchedules.Ten, TestSchedules.Ten.AddDay(), TimesToUse.Arrivals, true};
+                yield return new object[] {TestSchedules.Ten.AddDay(), TestSchedules.Ten, TimesToUse.Arrivals, true};
             }
         }
         
