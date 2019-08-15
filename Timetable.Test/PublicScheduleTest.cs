@@ -15,7 +15,7 @@ namespace Timetable.Test
             var workingStop = CreateScheduleStop(TestSchedules.TenThirty);
             workingStop.Arrival = Time.NotValid;
 
-            var schedule = new PublicSchedule(TestStations.Surbiton,  Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals,  Time.EarlierLaterComparer);
             schedule.AddService(CreateServiceTime(publicStop));
             schedule.AddService(CreateServiceTime(workingStop));
 
@@ -23,10 +23,11 @@ namespace Timetable.Test
             Assert.Empty(schedule.GetServices(TestSchedules.TenThirty));
         }
 
-        private ScheduleStop CreateScheduleStop(Time time, string timetableId = "X12345")
+        private ScheduleStop CreateScheduleStop(Time time, string timetableId = "X12345", ICalendar calendar = null)
         {
+            calendar = calendar ?? TestSchedules.EverydayAugust2019;
             var stop = TestScheduleLocations.CreateStop(TestStations.Surbiton, time);
-            TestSchedules.CreateScheduleWithService(timetableId: timetableId, stops: new ScheduleLocation[] {stop});
+            TestSchedules.CreateScheduleWithService(timetableId: timetableId, calendar: calendar, stops: new ScheduleLocation[] {stop});
             return stop;
         }
 
@@ -36,27 +37,12 @@ namespace Timetable.Test
         }
         
         [Fact]
-        public void ReturnsServiceAtTime()
-        {
-            var stop1 = CreateScheduleStop(TestSchedules.Ten);
-            var stop2 = CreateScheduleStop(TestSchedules.TenThirty);
-
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
-            schedule.AddService(CreateServiceTime(stop1));
-            schedule.AddService(CreateServiceTime(stop2));
-
-            var services = schedule.GetServices(TestSchedules.Ten);
-            Assert.Single(services);
-            Assert.Contains(stop1.Service, services);
-        }
-
-        [Fact]
         public void SupportsMultipleServicesAtTheSameTime()
         {
             var stop1 = CreateScheduleStop(TestSchedules.Ten);
             var stop2 = CreateScheduleStop(TestSchedules.Ten);
 
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
             schedule.AddService(CreateServiceTime(stop1));
             schedule.AddService(CreateServiceTime(stop2));
 
@@ -70,7 +56,7 @@ namespace Timetable.Test
             var stop1 = CreateScheduleStop(TestSchedules.Ten);
             var stop2 = CreateScheduleStop(TestSchedules.TenThirty);
 
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
             schedule.AddService(CreateServiceTime(stop1));
             schedule.AddService(CreateServiceTime(stop2));
 
@@ -86,7 +72,7 @@ namespace Timetable.Test
             var stop2 = CreateScheduleStop(TestSchedules.TenThirty);
             var stop3 = CreateScheduleStop(TestSchedules.Ten);
 
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
             schedule.AddService(CreateServiceTime(stop1));
             schedule.AddService(CreateServiceTime(stop2));
             schedule.AddService(CreateServiceTime(stop3));
@@ -112,24 +98,31 @@ namespace Timetable.Test
         [MemberData(nameof(Times))]
         public void FindService(TimeSpan time, int expectedIdx)
         {
-            var services = new[]
-            {
-                CreateScheduleStop(TestSchedules.Ten),
-                CreateScheduleStop(TestSchedules.TenThirty),
-                CreateScheduleStop(new Time(new TimeSpan(11, 0, 0)))
-            };
-            
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
-            foreach (var service in services)
-            {
-                schedule.AddService(CreateServiceTime(service));
-            }
+            var (schedule, services) = CreateSchedule();
 
             var searchAt = Aug5.Add(time);
             var found = schedule.FindServices(searchAt, GathererConfig.OneService);
 
             var expected =  services[expectedIdx].Schedule;
             Assert.Equal(expected, found[0].Details);
+        }
+
+        private (PublicSchedule schedule, ScheduleStop[] stops) CreateSchedule(ICalendar calendar = null)
+        {
+            var services = new[]
+            {
+                CreateScheduleStop(TestSchedules.Ten, calendar: calendar),
+                CreateScheduleStop(TestSchedules.TenThirty, calendar: calendar),
+                CreateScheduleStop(new Time(new TimeSpan(11, 0, 0)), calendar: calendar)
+            };
+
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
+            foreach (var service in services)
+            {
+                schedule.AddService(CreateServiceTime(service));
+            }
+
+            return (schedule, services);
         }
 
         // TODO This is an initial version, fix to return nearest time
@@ -142,7 +135,7 @@ namespace Timetable.Test
                 CreateScheduleStop(TestSchedules.TenThirty),
             };
 
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));
@@ -163,7 +156,7 @@ namespace Timetable.Test
                 CreateScheduleStop(TestSchedules.TenThirty),
             };
 
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));
@@ -184,7 +177,7 @@ namespace Timetable.Test
                 CreateScheduleStop(TestSchedules.TenThirty),
             };
 
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));
@@ -210,7 +203,7 @@ namespace Timetable.Test
                 CreateScheduleStop(twelvethirty)
             };
 
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));
@@ -235,7 +228,7 @@ namespace Timetable.Test
                 CreateScheduleStop(twelvethirty)
             };
 
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));
@@ -259,7 +252,7 @@ namespace Timetable.Test
                 CreateScheduleStop(twelvethirty, "Today")
             };
 
-            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
                 schedule.AddService(CreateServiceTime(service));
@@ -272,6 +265,24 @@ namespace Timetable.Test
             Assert.Collection(found, 
                 s => { Assert.Equal(Aug4, s.On);},
                 s => { Assert.Equal(Aug5, s.On); });
+        }
+        
+        [Fact]
+        public void GatherAll()
+        {
+            var (schedule, expected) = CreateSchedule();
+            
+            var found = schedule.AllServices(Aug5, GatherFilterFactory.NoFilter);
+            Assert.Equal(expected.Length, found.Length);
+        }
+        
+        [Fact]
+        public void GatherAllReturnsEmptyWhenNoSchedules()
+        {
+            var (schedule, expected) = CreateSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.None));
+            
+            var services = schedule.AllServices(Aug5, GatherFilterFactory.NoFilter);
+            Assert.Empty(services);
         }
     }
 }

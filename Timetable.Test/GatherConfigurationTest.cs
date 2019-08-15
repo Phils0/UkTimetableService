@@ -11,12 +11,5 @@ namespace Timetable.Test
             var config = new GatherConfiguration(0, 0, GatherFilterFactory.NoFilter);
             Assert.Equal(1, config.ServicesAfter);
         }
-        
-        [Fact]
-        public void ByDefaultTimesToUseNotSet()
-        {
-            var config = new GatherConfiguration(0, 0, GatherFilterFactory.NoFilter);
-            Assert.Equal(TimesToUse.NotSet, config.TimesToUse);
-        }
     }
 }

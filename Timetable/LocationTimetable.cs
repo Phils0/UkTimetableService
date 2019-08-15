@@ -30,7 +30,9 @@ namespace Timetable
         private readonly IPublicSchedule _departures;
         
         public LocationTimetable(Station at) :
-            this( new PublicSchedule(at, Time.EarlierLaterComparer), new PublicSchedule(at, Time.EarlierLaterComparer))
+            this( 
+                new PublicSchedule(at, TimesToUse.Arrivals, Time.EarlierLaterComparer), 
+                new PublicSchedule(at, TimesToUse.Departures, Time.EarlierLaterComparer))
         {
         }
         
@@ -58,7 +60,6 @@ namespace Timetable
         /// <returns>Schedules of running services.</returns>
         public ResolvedServiceStop[] FindDepartures(DateTime at, GatherConfiguration config)
         {
-            config.TimesToUse = TimesToUse.Departures;
             return _departures.FindServices(at, config);
         }
         
@@ -71,7 +72,6 @@ namespace Timetable
         /// <returns>Schedules of running services.</returns>
         public ResolvedServiceStop[] FindArrivals(DateTime at, GatherConfiguration config)
         {
-            config.TimesToUse = TimesToUse.Arrivals;
             return _arrivals.FindServices(at, config);
         }
     }

@@ -15,25 +15,15 @@ namespace Timetable
     {
         private readonly IGathererScheduleData _schedule;
         private readonly GatherConfiguration _config;
+        private readonly TimesToUse _arrivalsOrDestinations;
 
         private GatherFilterFactory.GatherFilter SatisfiesFilter => _config.Filter;
         
-        internal ScheduleGatherer(IGathererScheduleData schedule, GatherConfiguration config)
+        internal ScheduleGatherer(IGathererScheduleData schedule, GatherConfiguration config, TimesToUse arrivalsOrDestinations)
         {
             _schedule = schedule;
             _config = config;
-        }
-
-        private const int Lots = 10000;    // This should be more than we will see in any station for a day
-
-        /// <summary>
-        /// Gathers all services on date
-        /// </summary>
-        /// <param name="onDate">Date</param>
-        /// <returns>Array of all services running on day</returns>
-        internal ResolvedServiceStop[] GatherAll(DateTime onDate)
-        {
-            return SelectServicesAfter(0, Lots, onDate).ToArray();
+            _arrivalsOrDestinations = arrivalsOrDestinations;
         }
         
         /// <summary>
@@ -84,7 +74,7 @@ namespace Timetable
         {
             foreach (var service in services)
             {
-                var find = new StopSpecification(_schedule.Location, atTime, onDate, _config.TimesToUse);
+                var find = new StopSpecification(_schedule.Location, atTime, onDate, _arrivalsOrDestinations);
                 if (service.TryFindScheduledStop(find, out var stop)  && SatisfiesFilter(stop))
                         yield return stop;
             }

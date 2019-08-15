@@ -6,12 +6,6 @@ namespace Timetable.Test
 {
     public class StopSpecificationTest
     {
-        [Fact]
-        public void TimesToUseMustBeSetToValidValue()
-        {
-            Assert.Throws<ArgumentException>(() => Create(TimesToUse.NotSet));
-        }
-
         [Theory]
         [InlineData(TimesToUse.Arrivals, true)]
         [InlineData(TimesToUse.Departures, false)]
@@ -47,7 +41,7 @@ namespace Timetable.Test
             Assert.Equal(expectedDate, spec.OnDate);
             Assert.Equal(origSpec.Location, spec.Location);
             Assert.Equal(origSpec.Time, spec.Time);
-            Assert.Equal(origSpec.ArrivalOrDeparture, spec.ArrivalOrDeparture);
+            Assert.Equal(origSpec.UseDeparture, spec.UseDeparture);
         }
     }
 }

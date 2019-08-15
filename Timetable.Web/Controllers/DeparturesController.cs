@@ -26,7 +26,7 @@ namespace Timetable.Web.Controllers
         /// <param name="to">Optional to location filter </param>
         /// <param name="before">Number of services to return that depart before the time</param>
         /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
-        /// <returns></returns>
+        /// <returns>A list of departing services</returns>
         [Route("departures/{location}")]
         [HttpGet]
         public async Task<IActionResult> Departures(string location, [FromQuery] string to = "", [FromQuery] ushort before = 1, [FromQuery] ushort after = 5)
@@ -42,12 +42,27 @@ namespace Timetable.Web.Controllers
         /// <param name="to">Optional to location filter </param>
         /// <param name="before">Number of services to return that depart before the time</param>
         /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
-        /// <returns></returns>
+        /// <returns>A list of departing services</returns>
         [Route("departures/{location}/{at}")]
         [HttpGet]
         public async Task<IActionResult> Departures(string location, DateTime at, [FromQuery] string to = "", [FromQuery] ushort before = 1, [FromQuery] ushort after = 5)
         {
             var request = CreateRequest(location, at, to, before, after, SearchRequest.DEPARTURES);
+            return Process(request);
+        }
+        
+        /// <summary>
+        /// Returns departures at a location for the whole day
+        /// </summary>
+        /// <param name="location">Three letter code</param>
+        /// <param name="onDate">Datetime</param>
+        /// <param name="to">Optional to location filter </param>
+        /// <returns>A list of departing services</returns>
+        [Route("departures/{location}/day/{onDate}")]
+        [HttpGet]
+        public async Task<IActionResult> FullDayDepartures(string location, DateTime onDate, [FromQuery] string to = "")
+        {
+            var request = new SearchRequest();
             return Process(request);
         }
         
