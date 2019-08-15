@@ -23,10 +23,10 @@ namespace Timetable.Test
             Assert.Empty(schedule.GetServices(TestSchedules.TenThirty));
         }
 
-        private ScheduleStop CreateScheduleStop(Time time)
+        private ScheduleStop CreateScheduleStop(Time time, string timetableId = "X12345")
         {
             var stop = TestScheduleLocations.CreateStop(TestStations.Surbiton, time);
-            TestSchedules.CreateScheduleWithService(locations: new ScheduleLocation[] {stop});
+            TestSchedules.CreateScheduleWithService(timetableId: timetableId, stops: new ScheduleLocation[] {stop});
             return stop;
         }
 
@@ -105,8 +105,9 @@ namespace Timetable.Test
             }
         }
 
-        private static DateTime Aug5 = new DateTime(2019, 8, 5);
-        
+        private static DateTime Aug4 = new DateTime(2019, 8, 4);
+        private static DateTime Aug5 = Aug4.AddDays(1);
+       
         [Theory]
         [MemberData(nameof(Times))]
         public void FindService(TimeSpan time, int expectedIdx)
@@ -117,8 +118,7 @@ namespace Timetable.Test
                 CreateScheduleStop(TestSchedules.TenThirty),
                 CreateScheduleStop(new Time(new TimeSpan(11, 0, 0)))
             };
-
-
+            
             var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
             foreach (var service in services)
             {
@@ -195,6 +195,83 @@ namespace Timetable.Test
             
             Assert.Single(found);
             Assert.Equal(services[0].Schedule, found[0].Details);
+        }
+        
+        [Fact]
+        public void ReturnNearestWhenHaveVersionGoesOverMidnight()
+        {
+            var one = new Time(new TimeSpan(1, 0 , 0));
+            var twelvethirty = new Time(new TimeSpan(0, 30, 0));
+            twelvethirty = twelvethirty.Add(Time.OneDay);
+            
+            var services = new[]
+            {
+                CreateScheduleStop(one),
+                CreateScheduleStop(twelvethirty)
+            };
+
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            foreach (var service in services)
+            {
+                schedule.AddService(CreateServiceTime(service));
+            }
+
+            var searchAt = Aug5.AddMinutes(1);
+            var found = schedule.FindServices(searchAt, GathererConfig.OneService);
+            
+            Assert.Equal(services[1].Schedule, found[0].Details);
+        }
+        
+        [Fact]
+        public void ServiceDateIsDayBeforeWhenTimeIsPlusOneDay()
+        {
+            var one = new Time(new TimeSpan(1, 0 , 0));
+            var twelvethirty = new Time(new TimeSpan(0, 30, 0));
+            twelvethirty = twelvethirty.Add(Time.OneDay);
+            
+            var services = new[]
+            {
+                CreateScheduleStop(one),
+                CreateScheduleStop(twelvethirty)
+            };
+
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            foreach (var service in services)
+            {
+                schedule.AddService(CreateServiceTime(service));
+            }
+
+            var searchAt = Aug5.AddMinutes(1);
+            var found = schedule.FindServices(searchAt, GathererConfig.OneService);
+            
+            Assert.Equal(Aug4, found[0].On);
+        }
+        
+        [Fact]
+        public void WhenHaveTwoAtSameTimeJustOnePlusOneDay()
+        {
+            var twelvethirty = new Time(new TimeSpan(0, 30, 0));
+            var twelvethirtyPlusOne = twelvethirty.Add(Time.OneDay);
+            
+            var services = new[]
+            {
+                CreateScheduleStop(twelvethirtyPlusOne, "NextDay"),
+                CreateScheduleStop(twelvethirty, "Today")
+            };
+
+            var schedule = new PublicSchedule(TestStations.Surbiton, Time.EarlierLaterComparer);
+            foreach (var service in services)
+            {
+                schedule.AddService(CreateServiceTime(service));
+            }
+
+            var searchAt = Aug5.AddMinutes(1);
+            var found = schedule.FindServices(searchAt, GathererConfig.OneService);
+            
+            Assert.Equal(2, found.Length);
+            Assert.Collection(found, 
+                s => { Assert.Equal(Aug4, s.On);},
+                s => { Assert.Equal(Aug5, s.On); });
         }
     }
 }

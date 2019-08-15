@@ -13,7 +13,7 @@ namespace Timetable
             SingleSchedule,
             MultipleSchedules
         }
-        
+
         private sealed class StpDescendingComparer : IComparer<(StpIndicator indicator, ICalendar calendar)>
         {
             public int Compare((StpIndicator indicator, ICalendar calendar) x,
@@ -23,11 +23,11 @@ namespace Timetable
                 return compare != 0 ? compare : x.calendar.CompareTo(y.calendar);
             }
         }
-        
+
         public string TimetableUid { get; }
 
         private Schedule _schedule;
-        
+
         private SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> _multipleSchedules;
 
         private Multiplicity _stateType = Multiplicity.None;
@@ -35,7 +35,6 @@ namespace Timetable
         public Service(string timetableUid)
         {
             TimetableUid = timetableUid;
-            
         }
 
         internal void Add(Schedule schedule)
@@ -48,12 +47,12 @@ namespace Timetable
             {
                 SetSingleSchedule();
                 return;
-            }                    
+            }
             else if (_stateType == Multiplicity.SingleSchedule)
             {
-                MoveToMultipleSchedules();                
+                MoveToMultipleSchedules();
             }
-            
+
             _multipleSchedules.Add((schedule.StpIndicator, schedule.Calendar), schedule);
 
             void SetSingleSchedule()
@@ -61,7 +60,7 @@ namespace Timetable
                 _schedule = schedule;
                 _stateType = Multiplicity.SingleSchedule;
             }
-            
+
             void MoveToMultipleSchedules()
             {
                 _multipleSchedules =
@@ -74,11 +73,10 @@ namespace Timetable
 
         public ResolvedService GetScheduleOn(DateTime date)
         {
-            
             if (_schedule != null)
             {
                 if (_schedule.RunsOn(date))
-                    return new ResolvedService(_schedule, date,_schedule.IsCancelled());
+                    return new ResolvedService(_schedule, date, _schedule.IsCancelled());
 
                 return null;
             }
@@ -94,6 +92,7 @@ namespace Timetable
                         return new ResolvedService(schedule, date, isCancelled);
                 }
             }
+
             return null;
         }
 
@@ -102,8 +101,21 @@ namespace Timetable
             schedule = GetScheduleOn(date);
             return schedule != null;
         }
-        
-        public bool TryFindScheduledStopOn(StopSpecification find, out ResolvedServiceStop stop)
+
+        public bool TryFindScheduledStop(StopSpecification find, out ResolvedServiceStop stop)
+        {
+            var found = TryFindStopOn(find, out stop);
+
+            if (found && stop.IsNextDay(find.UseDeparture))
+            {
+                find = find.MoveToPreviousDay();
+                return TryFindStopOn(find, out stop);
+            }
+
+            return found;
+        }
+
+        private bool TryFindStopOn(StopSpecification find, out ResolvedServiceStop stop)
         {
             if (TryFindScheduleOn(find.OnDate, out var schedule))
                 return schedule.TryFindStop(find, out stop);
@@ -111,7 +123,7 @@ namespace Timetable
             stop = null;
             return false;
         }
-        
+
         public override string ToString()
         {
             return TimetableUid;

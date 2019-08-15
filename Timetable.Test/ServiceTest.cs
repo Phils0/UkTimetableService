@@ -160,7 +160,7 @@ namespace Timetable.Test
             var service = schedule.Service;
             var find = CreateFindSpec(TestSchedules.TenSixteen, MondayAugust12.AddDays(2));
             
-            Assert.True(service.TryFindScheduledStopOn(find, out var found));
+            Assert.True(service.TryFindScheduledStop(find, out var found));
             Assert.Equal(schedule, found.Details);
         }
 
@@ -176,7 +176,7 @@ namespace Timetable.Test
             var service = schedule.Service;
             var find = CreateFindSpec(TestSchedules.TenFifteen, MondayAugust12);
           
-            Assert.False(service.TryFindScheduledStopOn(find, out var found));
+            Assert.False(service.TryFindScheduledStop(find, out var found));
             Assert.Null(found);
         }
         
@@ -187,8 +187,24 @@ namespace Timetable.Test
             var service = schedule.Service;
             var find = CreateFindSpec(TestSchedules.Ten, MondayAugust12.AddDays(2));
             
-            Assert.False(service.TryFindScheduledStopOn(find, out var found));
+            Assert.False(service.TryFindScheduledStop(find, out var found));
             Assert.Null(found);
+        }
+        
+        private static readonly Time TwentyThreeFiftyFive = new Time(new TimeSpan(23, 55, 0));
+        private static readonly Time MidnightEleven = new Time(new TimeSpan(0, 11, 0));
+       
+        [Fact]
+        public void TryFindScheduleStopOnFindsStopOnNextDay()
+        {
+            var stops = TestSchedules.CreateThreeStopSchedule(TwentyThreeFiftyFive);
+            var schedule = TestSchedules.CreateScheduleWithService(stops: stops);
+            var service = schedule.Service;
+            var find = CreateFindSpec(MidnightEleven, MondayAugust12);
+            
+            Assert.True(service.TryFindScheduledStop(find, out var found));
+            Assert.Equal(schedule, found.Details);
+            Assert.Equal(MondayAugust12.AddDays(-1), found.On);
         }
     }
 }

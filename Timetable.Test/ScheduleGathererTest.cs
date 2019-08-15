@@ -59,7 +59,7 @@ namespace Timetable.Test
         {
             return (time, new[]
             {
-                TestSchedules.CreateScheduleWithService(locations: TestSchedules.CreateThreeStopSchedule(time)).Service
+                TestSchedules.CreateScheduleWithService(stops: TestSchedules.CreateThreeStopSchedule(time)).Service
             });
         }
         
@@ -134,8 +134,8 @@ namespace Timetable.Test
                 (idx: 1, services: CreateTimeEntry(TestSchedules.Ten)), 
                 (idx: 2, services: (TestSchedules.TenFifteen, new[]
                 {
-                    TestSchedules.CreateScheduleWithService(locations: TestSchedules.CreateThreeStopSchedule(TestSchedules.TenFifteen)).Service,
-                    TestSchedules.CreateScheduleWithService(timetableId: "Y999999", locations: TestSchedules.CreateThreeStopSchedule(TestSchedules.TenFifteen)).Service
+                    TestSchedules.CreateScheduleWithService(stops: TestSchedules.CreateThreeStopSchedule(TestSchedules.TenFifteen)).Service,
+                    TestSchedules.CreateScheduleWithService(timetableId: "Y999999", stops: TestSchedules.CreateThreeStopSchedule(TestSchedules.TenFifteen)).Service
                 })),
                 (idx: 3, services: CreateTimeEntry(TestSchedules.TenThirty))
             };

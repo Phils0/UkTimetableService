@@ -30,7 +30,7 @@ namespace Timetable.Test.Data
             for (int i = 0; i < duration; i += 15)
             {
                 var start = First.AddMinutes(i);
-                var locations = new[]
+                var stops = new[]
                 {
                     (ScheduleLocation) TestScheduleLocations.CreateOrigin(surbiton, start),
                     TestScheduleLocations.CreateStop(clapham, start.AddMinutes(5)),
@@ -38,7 +38,7 @@ namespace Timetable.Test.Data
                 };
 
                 var uid = $"X{i:D5}";
-                var testSchedule = TestSchedules.CreateScheduleWithService(timetableId: uid,  locations: locations);
+                var testSchedule = TestSchedules.CreateScheduleWithService(timetableId: uid,  stops: stops);
             }
 
             return data;

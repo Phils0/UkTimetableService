@@ -22,5 +22,15 @@ namespace Timetable
         public bool UseDeparture => TimesToUse.Departures == ArrivalOrDeparture;
         
         public bool UseArrival => TimesToUse.Arrivals == ArrivalOrDeparture;
+
+        public StopSpecification ChangeDate(DateTime newDate)
+        {
+            return new StopSpecification(Location, Time, newDate, ArrivalOrDeparture);
+        }
+        
+        public StopSpecification MoveToPreviousDay()
+        {
+            return ChangeDate(OnDate.AddDays(-1));
+        }
     }
 }

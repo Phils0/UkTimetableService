@@ -9,6 +9,8 @@ namespace Timetable
         
         Time IArrival.Time => ((IArrival) this).IsPublic ? Arrival : WorkingArrival;
 
+        bool IArrival.IsNextDay => ((IArrival) this).Time.IsNextDay;
+
         public Time Arrival { get; set; }
 
         public Time WorkingArrival { get; set; }
@@ -16,6 +18,8 @@ namespace Timetable
         bool IDeparture.IsPublic => Departure.IsValid;
         
         Time IDeparture.Time => ((IDeparture) this).IsPublic ? Departure : WorkingDeparture;
+
+        bool IDeparture.IsNextDay => ((IDeparture) this).Time.IsNextDay;
 
         public Time Departure { get; set; }
 

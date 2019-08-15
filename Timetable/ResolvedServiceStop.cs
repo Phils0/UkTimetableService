@@ -25,6 +25,18 @@ namespace Timetable
             return $"{base.ToString()} {Stop}";
         }
 
+        public bool IsNextDay(bool useDeparture)
+        {
+            if (useDeparture)
+            {
+                var departure = Stop as IDeparture;
+                return departure?.IsNextDay ?? false;
+            }
+            
+            var arrival = Stop as IArrival;
+            return arrival?.IsNextDay ?? false;
+        }
+        
         public bool GoesTo(Station destination)
         {
             foreach (var arrival in Details.Locations.OfType<IArrival>().Where(a => a.IsPublic).Reverse())

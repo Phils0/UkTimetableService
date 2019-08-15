@@ -11,7 +11,8 @@ namespace Timetable.Test.Data
         public static ResolvedServiceStop CreateResolvedDepartureStop(
             string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
-            ICalendar calendar = null, ScheduleLocation[] locations = null,
+            ICalendar calendar = null, 
+            ScheduleLocation[] stops = null,
             int id = 1,
             Service service = null,
             string retailServiceId = null,
@@ -21,7 +22,7 @@ namespace Timetable.Test.Data
             Time when = default(Time))
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
-            var schedule = CreateSchedule(timetableId, indicator, calendar, locations, id, service, retailServiceId);
+            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, id, service, retailServiceId);
             var resolved = new ResolvedService(schedule, on, isCancelled);
 
             var origin = schedule.Locations.First() as ScheduleOrigin; 
@@ -35,7 +36,8 @@ namespace Timetable.Test.Data
         public static ResolvedService CreateService(
             string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
-            ICalendar calendar = null, ScheduleLocation[] locations = null,
+            ICalendar calendar = null, 
+            ScheduleLocation[] stops = null,
             int id = 1,
             Service service = null,
             string retailServiceId = null,
@@ -43,13 +45,14 @@ namespace Timetable.Test.Data
             bool isCancelled = false)
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
-            var schedule = CreateSchedule(timetableId, indicator, calendar, locations, id, service, retailServiceId);
+            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, id, service, retailServiceId);
             return new ResolvedService(schedule, on, isCancelled);
         }
         
         public static Schedule CreateSchedule(string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
-            ICalendar calendar = null, ScheduleLocation[] locations = null,
+            ICalendar calendar = null, 
+            ScheduleLocation[] stops = null,
             int id = 1,
             Service service = null,
             string retailServiceId = null)
@@ -72,8 +75,8 @@ namespace Timetable.Test.Data
             if (service != null)
                 schedule.AddToService(service);
             
-            locations = locations ?? DefaultLocations;
-            foreach (var location in locations)
+            stops = stops ?? DefaultLocations;
+            foreach (var location in stops)
             {
                 location.SetParent(schedule);
             }
@@ -83,24 +86,25 @@ namespace Timetable.Test.Data
 
         public static Schedule CreateScheduleWithService(string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
-            ICalendar calendar = null, ScheduleLocation[] locations = null,
+            ICalendar calendar = null, 
+            ScheduleLocation[] stops = null,
             int id = 1,
             Service service = null)
         {
             service = service ?? new Service(timetableId);
 
-            return CreateSchedule(timetableId, indicator, calendar, locations, id, service);
+            return CreateSchedule(timetableId, indicator, calendar, stops, id, service);
         }
 
         public static Schedule CreateScheduleInTimetable(TimetableData timetable, 
             string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
-            ScheduleLocation[] locations = null,
+            ScheduleLocation[] stops = null,
             int id = 1,
             string retailServiceId = null)
         {
-            var schedule = CreateSchedule(timetableId, indicator, calendar, locations, id, retailServiceId: retailServiceId);
+            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, id, retailServiceId: retailServiceId);
 
             timetable.AddSchedule(schedule);
 

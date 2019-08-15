@@ -10,7 +10,7 @@ namespace Timetable.Test
         private  ScheduleStop CreateScheduleStop()
         {
             var stop = TestScheduleLocations.CreateStop(TestStations.Surbiton, TestSchedules.Ten);
-            TestSchedules.CreateScheduleWithService(locations: new ScheduleLocation[] {stop});
+            TestSchedules.CreateScheduleWithService(stops: new ScheduleLocation[] {stop});
             return stop;
         }
         

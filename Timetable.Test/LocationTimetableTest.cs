@@ -70,7 +70,7 @@ namespace Timetable.Test
         {
             var locations = TestSchedules.DefaultLocations;
             
-            var testSchedule = TestSchedules.CreateScheduleWithService(locations: locations);
+            var testSchedule = TestSchedules.CreateScheduleWithService(stops: locations);
 
             var stop = locations[1].Station.Timetable;
 
@@ -93,7 +93,7 @@ namespace Timetable.Test
                 TestScheduleLocations.CreateDestination(TestStations.Waterloo, TestSchedules.TenThirty)
             };
             
-            var testSchedule = TestSchedules.CreateScheduleWithService(locations: locations);
+            var testSchedule = TestSchedules.CreateScheduleWithService(stops: locations);
 
             var stop = locations[1].Station.Timetable;
             
@@ -114,7 +114,7 @@ namespace Timetable.Test
                 TestScheduleLocations.CreateDestination(TestStations.Waterloo, TestSchedules.TenThirty)
             };
             
-            var testSchedule = TestSchedules.CreateScheduleWithService(locations: locations);
+            var testSchedule = TestSchedules.CreateScheduleWithService(stops: locations);
 
             var stop = locations[1].Station.Timetable;
 
@@ -135,7 +135,7 @@ namespace Timetable.Test
                 TestScheduleLocations.CreateDestination(TestStations.Waterloo, TestSchedules.TenThirty)
             };
             
-            var testSchedule = TestSchedules.CreateScheduleWithService(locations: locations);
+            var testSchedule = TestSchedules.CreateScheduleWithService(stops: locations);
 
             var passing = locations[1].Station.Timetable;
 
@@ -167,14 +167,14 @@ namespace Timetable.Test
                 (ScheduleLocation) TestScheduleLocations.CreateOrigin(surbiton, TestSchedules.Ten),
                 TestScheduleLocations.CreateDestination(waterloo, TestSchedules.TenThirty)
             };            
-            var service1 = TestSchedules.CreateScheduleWithService(timetableId: "A00001", locations: locations1);
+            var service1 = TestSchedules.CreateScheduleWithService(timetableId: "A00001", stops: locations1);
             
             var locations2 = new[]
             {
                 (ScheduleLocation) TestScheduleLocations.CreateOrigin(surbiton, TestSchedules.Ten),
                 TestScheduleLocations.CreateDestination(waterloo, TestSchedules.TenThirty)
             };             
-            var service2 = TestSchedules.CreateScheduleWithService(timetableId: "A00002", locations: locations2);
+            var service2 = TestSchedules.CreateScheduleWithService(timetableId: "A00002", stops: locations2);
             
             var destination = service1.Locations.Last().Station.Timetable;
 

@@ -70,7 +70,7 @@ namespace Timetable
             foreach (var service in services)
             {
                 var find = new StopSpecification(_schedule.Location, atTime, date, _config.TimesToUse);
-                if (service.TryFindScheduledStopOn(find, out var stop)  && SatisfiesFilter(stop))
+                if (service.TryFindScheduledStop(find, out var stop)  && SatisfiesFilter(stop))
                         yield return stop;
             }
         }
