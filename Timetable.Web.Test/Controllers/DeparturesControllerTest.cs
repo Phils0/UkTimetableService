@@ -21,15 +21,17 @@ namespace Timetable.Web.Test.Controllers
         private static readonly DateTime Aug12 = new DateTime(2019, 8, 12);
         private static readonly DateTime Aug12AtTen = Aug12.AddHours(10);
         
-        [Fact]
-        public async Task DeparturesReturnsServices()
+        [Theory]
+        [InlineData("SUR")]
+        [InlineData("sur")]
+        public async Task DeparturesReturnsServices(string surbiton)
         {
             var data = Substitute.For<ILocationData>();
-            data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
+            data.FindDepartures("SUR", Aug12AtTen, Arg.Any<GatherConfiguration>())
                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
 
             var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.Departures("SUR", Aug12AtTen) as ObjectResult;;
+            var response = await controller.Departures(surbiton, Aug12AtTen) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
 
@@ -113,15 +115,17 @@ namespace Timetable.Web.Test.Controllers
                 filterFactory.DidNotReceive().DeparturesGoTo(Arg.Any<Station>());
         }
         
-        [Fact]
-        public async Task AllDeparturesReturnsServices()
+        [Theory]
+        [InlineData("SUR")]
+        [InlineData("sur")]
+        public async Task AllDeparturesReturnsServices(string surbiton)
         {
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>())
+            data.AllDepartures("SUR", Aug12, Arg.Any<GatherConfiguration.GatherFilter>())
                 .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
 
             var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.FullDayDepartures("SUR", Aug12) as ObjectResult;;
+            var response = await controller.FullDayDepartures(surbiton, Aug12) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
 

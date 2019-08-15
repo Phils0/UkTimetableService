@@ -20,15 +20,17 @@ namespace Timetable.Web.Test.Controllers
 
         private static readonly DateTime Aug12AtTenFifteen = new DateTime(2019, 8, 12, 10, 15, 0);
         
-        [Fact]
-        public async Task ArrivalsReturnsServices()
+        [Theory]
+        [InlineData("CLJ")]
+        [InlineData("clj")]
+        public async Task ArrivalsReturnsServices(string clapham)
         {
             var data = Substitute.For<ILocationData>();
-            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
+            data.FindArrivals("CLJ", Aug12AtTenFifteen, Arg.Any<GatherConfiguration>())
                .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
 
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;;
+            var response = await controller.Arrivals(clapham, Aug12AtTenFifteen) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
 
@@ -117,15 +119,17 @@ namespace Timetable.Web.Test.Controllers
                 filterFactory.DidNotReceive().ArrivalsComeFrom(Arg.Any<Station>());
         }
         
-        [Fact]
-        public async Task FullDayArrivalsReturnsServices()
+        [Theory]
+        [InlineData("CLJ")]
+        [InlineData("clj")]
+        public async Task FullDayArrivalsReturnsServices(string clapham)
         {
             var data = Substitute.For<ILocationData>();
-            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>())
+            data.AllArrivals("CLJ", Aug12AtTenFifteen, Arg.Any<GatherConfiguration.GatherFilter>())
                 .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
 
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.FullDayArrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;;
+            var response = await controller.FullDayArrivals(clapham, Aug12AtTenFifteen) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
 

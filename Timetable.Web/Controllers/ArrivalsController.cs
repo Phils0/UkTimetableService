@@ -49,8 +49,8 @@ namespace Timetable.Web.Controllers
             var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS);
             return await Process(request, async () =>
             {
-                var config = CreateGatherConfig( before, after, from);
-                var result =  _timetable.FindArrivals(location, at, config);
+                var config = CreateGatherConfig( before, after, request.ComingFromGoingTo);
+                var result =  _timetable.FindArrivals(request.Location, at, config);
                 return await Task.FromResult(result);
             });
         }
@@ -69,8 +69,8 @@ namespace Timetable.Web.Controllers
             var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS);
             return await Process(request, async () =>
             {
-                var filter = CreateFilter(@from);
-                var result = _timetable.AllArrivals(location, onDate, filter);
+                var filter = CreateFilter(request.ComingFromGoingTo);
+                var result = _timetable.AllArrivals(request.Location, onDate, filter);
                 return await Task.FromResult(result);
             });
         }
