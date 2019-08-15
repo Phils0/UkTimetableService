@@ -12,19 +12,12 @@ namespace Timetable
     
     public class GatherConfiguration
     {
-
         public GatherFilterFactory.GatherFilter Filter; 
         public int ServicesBefore { get; }
         public int ServicesAfter { get; }
+        public TimesToUse TimesToUse { get; internal set; } = TimesToUse.NotSet;
         
-        public TimesToUse TimesToUse { get; set; }
-        
-        public GatherConfiguration(int before, int after, GatherFilterFactory.GatherFilter filter) :
-            this(before, after, filter, TimesToUse.NotSet)
-        {
-        }
-        
-        internal GatherConfiguration(int before, int after, GatherFilterFactory.GatherFilter filter, TimesToUse arrivalsOrDepartures)
+        public GatherConfiguration(ushort before, ushort after, GatherFilterFactory.GatherFilter filter)
         {
             Filter = filter;
             
@@ -34,9 +27,8 @@ namespace Timetable
             
             ServicesBefore = before;
             ServicesAfter = after;
-            TimesToUse = arrivalsOrDepartures;
         }
-
+        
         public bool HasRequestedBeforeOnly => ServicesAfter == 0;
     }
 }

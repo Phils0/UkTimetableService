@@ -13,7 +13,6 @@ namespace Timetable
 
     internal class ScheduleGatherer
     {
-
         private readonly IGathererScheduleData _schedule;
         private readonly GatherConfiguration _config;
 
@@ -25,27 +24,43 @@ namespace Timetable
             _config = config;
         }
 
+        private const int Lots = 10000;    // This should be more than we will see in any station for a day
+
         /// <summary>
-        /// Gathers a set of 
+        /// Gathers all services on date
         /// </summary>
-        /// <param name="startIdx"></param>
-        /// <param name="before"></param>
-        /// <param name="after"></param>
-        /// <param name="on"></param>
-        /// <returns></returns>
-        internal ResolvedServiceStop[] Gather(int startIdx, DateTime @on)
+        /// <param name="onDate">Date</param>
+        /// <returns>Array of all services running on day</returns>
+        internal ResolvedServiceStop[] GatherAll(DateTime onDate)
         {
-            var beforeServices = SelectServicesBefore(startIdx - 1,  @on).Reverse();
-            var afterServices = SelectServicesAfter(startIdx,  on);
+            return SelectServicesAfter(0, Lots, onDate).ToArray();
+        }
+        
+        /// <summary>
+        /// Gathers a set of services
+        /// </summary>
+        /// <param name="startIdx">Start position in the data set</param>
+        /// <param name="before">Number of services before</param>
+        /// <param name="after">Number of services after, includes start position</param>
+        /// <param name="onDate">Date </param>
+        /// <returns>Array of services running on day</returns>
+        internal ResolvedServiceStop[] Gather(int startIdx, DateTime onDate)
+        {
+            var beforeServices = SelectServicesBefore(startIdx - 1,  _config.ServicesBefore, onDate).Reverse();
+            var afterServices = SelectServicesAfter(startIdx, _config.ServicesAfter,  onDate);
             return beforeServices.Concat(afterServices).ToArray();
         }
 
-        private IEnumerable<ResolvedServiceStop>  SelectServicesBefore(int startIdx, DateTime date)
+        private IEnumerable<ResolvedServiceStop>  SelectServicesBefore(int startIdx, int quantity, DateTime onDate)
         {
-            var quantity = _config.ServicesBefore;
-            return quantity == 0 || startIdx < 0? 
+            return DoNotIterate() ? 
                 Enumerable.Empty<ResolvedServiceStop>() :
                 IterateBackwardsThroughServices();
+
+            bool DoNotIterate()
+            {
+                return quantity == 0 || startIdx < 0;
+            }
 
             IEnumerable<ResolvedServiceStop> IterateBackwardsThroughServices()
             {
@@ -54,7 +69,7 @@ namespace Timetable
                 while (found < quantity && idx >= 0)
                 {
                     var pair = _schedule.ValuesAt(idx);
-                    foreach (var stop in CheckServicesForIndex(pair.services, pair.time, date))
+                    foreach (var stop in CheckServicesForIndex(pair.services, pair.time, onDate))
                     {
                         found++;
                         yield return stop;
@@ -65,23 +80,27 @@ namespace Timetable
             }
         }
         
-        private IEnumerable<ResolvedServiceStop> CheckServicesForIndex(Service[] services, Time atTime, DateTime date)
+        private IEnumerable<ResolvedServiceStop> CheckServicesForIndex(Service[] services, Time atTime, DateTime onDate)
         {
             foreach (var service in services)
             {
-                var find = new StopSpecification(_schedule.Location, atTime, date, _config.TimesToUse);
+                var find = new StopSpecification(_schedule.Location, atTime, onDate, _config.TimesToUse);
                 if (service.TryFindScheduledStop(find, out var stop)  && SatisfiesFilter(stop))
                         yield return stop;
             }
         }
-        
-        private IEnumerable<ResolvedServiceStop> SelectServicesAfter(int startIdx, DateTime date)
+
+        private IEnumerable<ResolvedServiceStop> SelectServicesAfter(int startIdx, int quantity, DateTime date)
         {
-            var quantity = _config.ServicesAfter;
             int stopIterating = _schedule.Count;
-            return quantity == 0 || startIdx >= stopIterating ? 
+            return DoNotIterate() ? 
                 Enumerable.Empty<ResolvedServiceStop>() :
                 IterateForwardsThroughServices();
+
+            bool DoNotIterate()
+            {
+                return quantity == 0 || startIdx >= stopIterating;
+            }
 
             IEnumerable<ResolvedServiceStop> IterateForwardsThroughServices()
             {

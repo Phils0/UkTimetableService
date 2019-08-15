@@ -23,14 +23,14 @@ namespace Timetable.Test
             Assert.Equal(TestSchedules.TenFifteen, stop.Departure);
         }
 
-        private IGathererScheduleData CreateMockSchedule((int idx, (Time, Service[]) services)[] responses = null)
+        private IGathererScheduleData CreateMockSchedule((int idx, (Time, Service[]) services)[] responses = null, ICalendar calendar = null)
         {
             responses = responses ?? (new []
             {
-                (idx: 0, services: CreateTimeEntry(TestSchedules.Ten.AddMinutes(-60))), 
-                (idx: 1, services: CreateTimeEntry(TestSchedules.Ten)), 
-                (idx: 2, services: CreateTimeEntry(TestSchedules.TenFifteen)),
-                (idx: 3, services: CreateTimeEntry(TestSchedules.TenThirty))
+                (idx: 0, services: CreateTimeEntry(TestSchedules.Ten.AddMinutes(-60), calendar)), 
+                (idx: 1, services: CreateTimeEntry(TestSchedules.Ten, calendar)), 
+                (idx: 2, services: CreateTimeEntry(TestSchedules.TenFifteen, calendar)),
+                (idx: 3, services: CreateTimeEntry(TestSchedules.TenThirty, calendar))
             });
             
             var schedule = Substitute.For<IGathererScheduleData>();
@@ -44,6 +44,17 @@ namespace Timetable.Test
             return schedule;
         }
 
+        private (Time, Service[]) CreateTimeEntry(Time time, ICalendar calendar = null)
+        {
+            calendar = calendar ?? TestSchedules.EverydayAugust2019;
+            return (time, new[]
+            {
+                TestSchedules.CreateScheduleWithService(
+                    calendar: calendar,
+                    stops: TestSchedules.CreateThreeStopSchedule(time)).Service
+            });
+        }
+
         [Fact]
         public void GatherMultipleServiceAfter()
         {
@@ -54,13 +65,16 @@ namespace Timetable.Test
 
             Assert.Equal(2, services.Length);
         }
-
-        private (Time, Service[]) CreateTimeEntry(Time time)
+        
+        [Fact]
+        public void GatherReturnsEmptyWhenNoneValid()
         {
-            return (time, new[]
-            {
-                TestSchedules.CreateScheduleWithService(stops: TestSchedules.CreateThreeStopSchedule(time)).Service
-            });
+            var schedule = CreateMockSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.None));
+
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(0, 2, TimesToUse.Departures));
+            var services = gatherer.Gather(1, TestDate);
+
+            Assert.Empty(services);
         }
         
         [Fact]
@@ -154,12 +168,35 @@ namespace Timetable.Test
             var filterDelegate = Substitute.For<GatherFilterFactory.GatherFilter>();
             // First one found satisfies, rest do not
             filterDelegate(Arg.Any<ResolvedServiceStop>()).Returns(true, false);
-            var config = new GatherConfiguration(0, 2, filterDelegate, TimesToUse.Departures);
+            var config = new GatherConfiguration(0, 2, filterDelegate);
+            config.TimesToUse = TimesToUse.Departures;
             var gatherer = new ScheduleGatherer(schedule, config);
             
             var services = gatherer.Gather(1, TestDate);
 
             Assert.Single(services);
+        }
+        
+        [Fact]
+        public void GatherAll()
+        {
+            var schedule = CreateMockSchedule();
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneDepartureService);
+            
+            var services = gatherer.GatherAll(TestDate);
+            
+            Assert.Equal(4, services.Length);
+        }
+        
+        [Fact]
+        public void GatherAllReturnsEmptyWhenNoSchedules()
+        {
+            var schedule = CreateMockSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.None));
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneDepartureService);
+            
+            var services = gatherer.GatherAll(TestDate);
+            
+            Assert.Empty(services);
         }
     }
 }
