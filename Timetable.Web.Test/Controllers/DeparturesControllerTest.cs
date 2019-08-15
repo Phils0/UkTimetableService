@@ -18,7 +18,8 @@ namespace Timetable.Web.Test.Controllers
         private static readonly MapperConfiguration _config = new MapperConfiguration(
             cfg => cfg.AddProfile<ToViewModelProfile>());
 
-        private static readonly DateTime Aug12AtTen = new DateTime(2019, 8, 12, 10, 0, 0);
+        private static readonly DateTime Aug12 = new DateTime(2019, 8, 12);
+        private static readonly DateTime Aug12AtTen = Aug12.AddHours(10);
         
         [Fact]
         public async Task DeparturesReturnsServices()
@@ -110,6 +111,59 @@ namespace Timetable.Web.Test.Controllers
                 filterFactory.Received().DeparturesGoTo(Arg.Any<Station>());
             else
                 filterFactory.DidNotReceive().DeparturesGoTo(Arg.Any<Station>());
+        }
+        
+        [Fact]
+        public async Task AllDeparturesReturnsServices()
+        {
+            var data = Substitute.For<ILocationData>();
+            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherFilterFactory.GatherFilter>())
+                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
+
+            var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.FullDayDepartures("SUR", Aug12) as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+
+            var services = response.Value as Model.FoundResponse;
+            AssertRequestSetInResponse(services);
+            Assert.NotEmpty(services.Services);
+        }
+        
+        [InlineData(FindStatus.LocationNotFound,  "Did not find location SUR")]
+        [InlineData(FindStatus.NoServicesForLocation, "Did not find services for SUR@2019-08-12T00:00:00")]
+        [Theory]
+        public async Task DeparturesForDayReturnsNotFoundWithReason(FindStatus status, string expectedReason)
+        {
+            var data = Substitute.For<ILocationData>();
+            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherFilterFactory.GatherFilter>())
+                .Returns((status, new ResolvedServiceStop[0]));
+
+            var controller = new DeparturesController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.FullDayDepartures("SUR", Aug12) as ObjectResult;
+            
+            Assert.Equal(404, response.StatusCode);
+
+            var notFound = response.Value as Model.NotFoundResponse;
+            Assert.Equal(expectedReason, notFound.Reason);
+            AssertRequestSetInResponse(notFound);
+        }
+        
+        [Fact]
+        public async Task DeparturesForDayReturnsError()
+        {
+            var data = Substitute.For<ILocationData>();
+            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherFilterFactory.GatherFilter>())
+                .Throws(new Exception("Something went wrong"));
+
+            var controller = new DeparturesController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.FullDayDepartures("SUR", Aug12AtTen) as ObjectResult;
+            
+            Assert.Equal(500, response.StatusCode);
+
+            var notFound = response.Value as Model.NotFoundResponse;
+            Assert.Equal("Error while finding services for SUR@2019-08-12T10:00:00", notFound.Reason);
+            AssertRequestSetInResponse(notFound);
         }
     }
 }

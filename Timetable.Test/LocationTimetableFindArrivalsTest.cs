@@ -63,5 +63,16 @@ namespace Timetable.Test
             var last = schedules.Last().Details.Locations[1];
             //TODO check next day       
         }
+        
+        [Fact]
+        public void AllArrivalsReturnsEverything()
+        {
+            var locations = TestData.CreateTimetabledLocations();
+            var clapham = locations.Locations["CLJ"];
+            
+            var schedules = clapham.Timetable.AllArrivals(Aug1AtTen, GatherFilterFactory.NoFilter);
+
+            Assert.Equal(96, schedules.Length);
+        }
     }
 }

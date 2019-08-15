@@ -48,7 +48,11 @@ namespace Timetable.Web.Controllers
         public async Task<IActionResult> Departures(string location, DateTime at, [FromQuery] string to = "", [FromQuery] ushort before = 1, [FromQuery] ushort after = 5)
         {
             var request = CreateRequest(location, at, to, before, after, SearchRequest.DEPARTURES);
-            return Process(request);
+            return Process(request, () =>
+            {
+                var config = CreateGatherConfig( before, after, to);
+                return _timetable.FindDepartures(location, at, config);
+            });
         }
         
         /// <summary>
@@ -62,13 +66,12 @@ namespace Timetable.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> FullDayDepartures(string location, DateTime onDate, [FromQuery] string to = "")
         {
-            var request = new SearchRequest();
-            return Process(request);
-        }
-        
-        protected override (FindStatus status, ResolvedServiceStop[] services) FindServices(string location, DateTime at, GatherConfiguration config)
-        {
-            return _timetable.FindDepartures(location, at, config);
+            var request = CreateFullDayRequest(location, onDate, to, SearchRequest.DEPARTURES);
+            return Process(request, () =>
+            {
+                var filter = CreateFilter(to);
+                return _timetable.AllDepartures(location, onDate, filter);
+            });
         }
         
         protected override GatherFilterFactory.GatherFilter CreateFilter(Station station)

@@ -122,6 +122,33 @@ namespace Timetable.Test
         }
         
         [Theory]
+        [InlineData("SUR", FindStatus.Success)]
+        [InlineData("NOT_EXIST", FindStatus.LocationNotFound)]
+        [InlineData("", FindStatus.LocationNotFound)]
+        [InlineData(null, FindStatus.LocationNotFound)]
+        public void AllDeparture(string threeLetterCode, FindStatus found)
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.AllDepartures(threeLetterCode, Ten, GatherFilterFactory.NoFilter);
+            
+            Assert.Equal(found, find.status);
+            if(found == FindStatus.Success)
+                Assert.NotEmpty(find.services);
+            else
+                Assert.Empty(find.services);
+        }
+        
+        [Fact]
+        public void EmptyDeparturesWhenNone()
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.AllDepartures("WAT", Ten, GatherFilterFactory.NoFilter);
+            
+            Assert.Equal(FindStatus.NoServicesForLocation, find.status);
+            Assert.Empty(find.services);
+        }
+        
+        [Theory]
         [InlineData("WAT", FindStatus.Success)]
         [InlineData("NOT_EXIST", FindStatus.LocationNotFound)]
         [InlineData("", FindStatus.LocationNotFound)]
@@ -137,12 +164,39 @@ namespace Timetable.Test
             else
                 Assert.Empty(find.services);
         }
-
+        
         [Fact]
         public void DoNotFindArrivalsWhenNone()
         {
             var data = TestData.CreateTimetabledLocations();
             var find = data.FindArrivals("SUR", Ten, GathererConfig.OneService);
+            
+            Assert.Equal(FindStatus.NoServicesForLocation, find.status);
+            Assert.Empty(find.services);
+        }
+        
+        [Theory]
+        [InlineData("WAT", FindStatus.Success)]
+        [InlineData("NOT_EXIST", FindStatus.LocationNotFound)]
+        [InlineData("", FindStatus.LocationNotFound)]
+        [InlineData(null, FindStatus.LocationNotFound)]
+        public void AllArrivals(string threeLetterCode, FindStatus found)
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.AllArrivals(threeLetterCode, Ten, GatherFilterFactory.NoFilter);
+            
+            Assert.Equal(found, find.status);
+            if(found == FindStatus.Success)
+                Assert.NotEmpty(find.services);
+            else
+                Assert.Empty(find.services);
+        }
+        
+        [Fact]
+        public void EmptyArrivalsWhenNone()
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.AllArrivals("SUR", Ten, GatherFilterFactory.NoFilter);
             
             Assert.Equal(FindStatus.NoServicesForLocation, find.status);
             Assert.Empty(find.services);

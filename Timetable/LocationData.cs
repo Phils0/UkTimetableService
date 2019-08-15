@@ -59,6 +59,14 @@ namespace Timetable
         (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config);
 
         /// <summary>
+        /// Scheduled services departing on date
+        /// </summary>
+        /// <param name="onDate">Date and Time</param>
+        /// <param name="filter">Any filter</param>
+        /// <returns>Schedules of running services.</returns>
+        (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherFilterFactory.GatherFilter filter);
+        
+        /// <summary>
         /// Scheduled services arriving at location on date near to time
         /// </summary>
         /// <param name="location">Three Letter Code</param>
@@ -66,6 +74,14 @@ namespace Timetable
         /// <param name="config">Configuration for gathering the results</param>
         /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
         (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config);
+        
+        /// <summary>
+        /// Scheduled services arriving on date
+        /// </summary>
+        /// <param name="onDate">Date and Time</param>
+        /// <param name="filter">Any filter</param>
+        /// <returns>Schedules of running services.</returns>
+        (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherFilterFactory.GatherFilter filter);
     }
 
     /// <summary>
@@ -152,6 +168,11 @@ namespace Timetable
             return Find(location, (station) => station.Timetable.FindDepartures(at, config));
         }
 
+        public (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherFilterFactory.GatherFilter filter)
+        {
+            return Find(location, (station) => station.Timetable.AllDepartures(onDate, filter));
+        }
+
         private (FindStatus status, ResolvedServiceStop[] services) Find(string location,  Func<Station, ResolvedServiceStop[]> findFunc)
         {
             var status = FindStatus.LocationNotFound;
@@ -172,6 +193,11 @@ namespace Timetable
         public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config)
         {
             return Find(location, (station) => station.Timetable.FindArrivals(at, config));
+        }
+
+        public (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherFilterFactory.GatherFilter filter)
+        {
+            return Find(location, (station) => station.Timetable.AllArrivals(onDate, filter));
         }
     }
 }

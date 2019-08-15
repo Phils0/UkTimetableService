@@ -47,15 +47,13 @@ namespace Timetable.Web.Controllers
             [FromQuery] ushort before = 3, [FromQuery] ushort after = 3)
         {
             var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS);
-            return Process(request);
+            return Process(request, () =>
+            {
+                var config = CreateGatherConfig( before, after, from);
+                return _timetable.FindArrivals(location, at, config);
+            });
         }
-
-        protected override (FindStatus status, ResolvedServiceStop[] services) FindServices(string location,
-            DateTime at, GatherConfiguration config)
-        {
-            return _timetable.FindArrivals(location, at, config);
-        }
-
+        
         protected override GatherFilterFactory.GatherFilter CreateFilter(Station station)
         {
             return _filters.ArrivalsComeFrom(station);

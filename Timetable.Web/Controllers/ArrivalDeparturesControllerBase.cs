@@ -23,8 +23,6 @@ namespace Timetable.Web.Controllers
         }
 
         protected abstract GatherFilterFactory.GatherFilter CreateFilter(Station station);
-
-        protected abstract (FindStatus status, ResolvedServiceStop[] services) FindServices(string location, DateTime at, GatherConfiguration config);
         
         protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType)
         {
@@ -42,15 +40,29 @@ namespace Timetable.Web.Controllers
             };
         }
 
-        protected IActionResult Process(SearchRequest request)
+        protected SearchRequest CreateFullDayRequest(string location, DateTime at, string toFrom, string requestType)
+        {
+            return new SearchRequest()
+            {
+                Location = location,
+                At = new Window()
+                {
+                    At = at,
+                    FullDay = true
+                },
+                ComingFromGoingTo = toFrom,
+                Type = requestType
+            };
+        }
+        
+        protected IActionResult Process(SearchRequest request, Func<(FindStatus status, ResolvedServiceStop[] services)> find)
         {
             using (LogContext.PushProperty("Request", request, true))
             {
                 FindStatus status;
                 try
                 {
-                    var config = CreateGatherConfig(request.At.Before, request.At.After, request.ComingFromGoingTo);
-                    var (findStatus, services) = FindServices(request.Location, request.At.At, config);
+                    var (findStatus, services) = find();
 
                     if (findStatus == FindStatus.Success)
                     {
@@ -75,18 +87,24 @@ namespace Timetable.Web.Controllers
             }
         }
         
-        private GatherConfiguration CreateGatherConfig(ushort before, ushort after, string toFrom)
+        protected GatherConfiguration CreateGatherConfig(ushort before, ushort after, string toFrom)
+        {
+            var filter = CreateFilter(toFrom);
+            return new GatherConfiguration(before, after, filter);
+        }
+        
+        protected GatherFilterFactory.GatherFilter CreateFilter(string toFrom)
         {
             var filter = _filters.NoFilter;
             if(string.IsNullOrEmpty(toFrom))
-                return new GatherConfiguration(before, after, filter);
+                return _filters.NoFilter;
             
             if (_timetable.TryGetLocation(toFrom, out Station station))
                 filter = CreateFilter(station);
             else
                 _logger.Warning("Not adding filter.  Did not find location {toFrom}", toFrom);
             
-            return new GatherConfiguration(before, after, filter);
+            return filter;
         }
         
         private ObjectResult CreateNoServiceResponse(FindStatus status, SearchRequest request)

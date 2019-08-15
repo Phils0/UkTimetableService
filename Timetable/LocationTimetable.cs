@@ -16,12 +16,28 @@ namespace Timetable
         ResolvedServiceStop[] FindDepartures(DateTime at, GatherConfiguration config);
 
         /// <summary>
+        /// Scheduled services departing on date
+        /// </summary>
+        /// <param name="onDate">Date and Time</param>
+        /// <param name="filter">Any filter</param>
+        /// <returns>Schedules of running services.</returns>
+        ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherFilterFactory.GatherFilter filter);
+        
+        /// <summary>
         /// Scheduled services arriving on date near to time
         /// </summary>
         /// <param name="at">Date and Time</param>
         /// <param name="config">Configuration for gathering the results</param>
         /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
         ResolvedServiceStop[] FindArrivals(DateTime at, GatherConfiguration config);
+        
+        /// <summary>
+        /// Scheduled services arriving on date
+        /// </summary>
+        /// <param name="onDate">Date and Time</param>
+        /// <param name="filter">Any filter</param>
+        /// <returns>Schedules of running services.</returns>
+        ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherFilterFactory.GatherFilter filter);
     }
 
     public class LocationTimetable : ILocationTimetable
@@ -62,7 +78,18 @@ namespace Timetable
         {
             return _departures.FindServices(at, config);
         }
-        
+
+        /// <summary>
+        /// Scheduled services departing on date
+        /// </summary>
+        /// <param name="onDate">Date and Time</param>
+        /// <param name="filter">Any filter</param>
+        /// <returns>Schedules of running services.</returns>
+        public ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherFilterFactory.GatherFilter filter)
+        {
+            return _departures.AllServices(onDate, filter);
+        }
+
         /// <summary>
         /// Scheduled services arriving on date near to time
         /// </summary>
@@ -73,6 +100,17 @@ namespace Timetable
         public ResolvedServiceStop[] FindArrivals(DateTime at, GatherConfiguration config)
         {
             return _arrivals.FindServices(at, config);
+        }
+
+        /// <summary>
+        /// Scheduled services arriving on date
+        /// </summary>
+        /// <param name="onDate">Date and Time</param>
+        /// <param name="filter">Any filter</param>
+        /// <returns>Schedules of running services.</returns>
+        public ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherFilterFactory.GatherFilter filter)
+        {
+            return _arrivals.AllServices(onDate, filter);
         }
     }
 }
