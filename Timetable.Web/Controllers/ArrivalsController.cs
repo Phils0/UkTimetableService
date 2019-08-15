@@ -54,6 +54,25 @@ namespace Timetable.Web.Controllers
             });
         }
         
+        /// <summary>
+        /// Returns arrivals at a location for the whole day
+        /// </summary>
+        /// <param name="location">Three letter code</param>
+        /// <param name="onDate">Datetime</param>
+        /// <param name="from">Optional from location filter </param>
+        /// <returns>A list of arriving services</returns>
+        [Route("arrivals/{location}/day/{onDate}")]
+        [HttpGet]
+        public async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, [FromQuery] string from = "")
+        {
+            var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS);
+            return Process(request, () =>
+            {
+                var filter = CreateFilter(@from);
+                return _timetable.AllArrivals(location, onDate, filter);
+            });
+        }
+        
         protected override GatherFilterFactory.GatherFilter CreateFilter(Station station)
         {
             return _filters.ArrivalsComeFrom(station);

@@ -116,5 +116,58 @@ namespace Timetable.Web.Test.Controllers
             else
                 filterFactory.DidNotReceive().ArrivalsComeFrom(Arg.Any<Station>());
         }
+        
+        [Fact]
+        public async Task FullDayArrivalsReturnsServices()
+        {
+            var data = Substitute.For<ILocationData>();
+            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherFilterFactory.GatherFilter>())
+                .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
+
+            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.FullDayArrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+
+            var services = response.Value as Model.FoundResponse;
+            AssertRequestSetInResponse(services);
+            Assert.NotEmpty(services.Services);
+        }
+
+        [InlineData(FindStatus.LocationNotFound,  "Did not find location CLJ")]
+        [InlineData(FindStatus.NoServicesForLocation, "Did not find services for CLJ@2019-08-12T10:15:00")]
+        [Theory]
+        public async Task ArrivalsForDayReturnsNotFoundWithReason(FindStatus status, string expectedReason)
+        {
+            var data = Substitute.For<ILocationData>();
+            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherFilterFactory.GatherFilter>())
+                .Returns((status, new ResolvedServiceStop[0]));
+
+            var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.FullDayArrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;
+            
+            Assert.Equal(404, response.StatusCode);
+
+            var notFound = response.Value as Model.NotFoundResponse;
+            Assert.Equal(expectedReason, notFound.Reason);
+            AssertRequestSetInResponse(notFound);
+        }
+        
+        [Fact]
+        public async Task ArrivalsForDayReturnsError()
+        {
+            var data = Substitute.For<ILocationData>();
+            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherFilterFactory.GatherFilter>())
+                .Throws(new Exception("Something went wrong"));
+
+            var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.FullDayArrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;
+            
+            Assert.Equal(500, response.StatusCode);
+
+            var notFound = response.Value as Model.NotFoundResponse;
+            Assert.Equal("Error while finding services for CLJ@2019-08-12T10:15:00", notFound.Reason);
+            AssertRequestSetInResponse(notFound);
+        }
     }
 }
