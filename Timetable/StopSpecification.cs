@@ -23,7 +23,7 @@ namespace Timetable
         
         public bool UseArrival => TimesToUse.Arrivals == ArrivalOrDeparture;
 
-        public StopSpecification ChangeDate(DateTime newDate)
+        private StopSpecification ChangeDate(DateTime newDate)
         {
             return new StopSpecification(Location, Time, newDate, ArrivalOrDeparture);
         }
