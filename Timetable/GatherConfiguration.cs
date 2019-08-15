@@ -5,11 +5,13 @@ namespace Timetable
 {
     public class GatherConfiguration
     {
-        public GatherFilterFactory.GatherFilter Filter; 
+        public delegate bool GatherFilter(ResolvedServiceStop service);
+        
+        public GatherFilter Filter; 
         public int ServicesBefore { get; }
         public int ServicesAfter { get; }
         
-        public GatherConfiguration(ushort before, ushort after, GatherFilterFactory.GatherFilter filter)
+        public GatherConfiguration(ushort before, ushort after, GatherFilter filter)
         {
             Filter = filter;
             

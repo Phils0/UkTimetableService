@@ -21,7 +21,7 @@ namespace Timetable
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
         /// <returns>Schedules of running services.</returns>
-        ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherFilterFactory.GatherFilter filter);
+        ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherConfiguration.GatherFilter filter);
         
         /// <summary>
         /// Scheduled services arriving on date near to time
@@ -37,7 +37,7 @@ namespace Timetable
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
         /// <returns>Schedules of running services.</returns>
-        ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherFilterFactory.GatherFilter filter);
+        ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherConfiguration.GatherFilter filter);
     }
 
     public class LocationTimetable : ILocationTimetable
@@ -85,7 +85,7 @@ namespace Timetable
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherFilterFactory.GatherFilter filter)
+        public ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherConfiguration.GatherFilter filter)
         {
             return _departures.AllServices(onDate, filter);
         }
@@ -108,7 +108,7 @@ namespace Timetable
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherFilterFactory.GatherFilter filter)
+        public ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherConfiguration.GatherFilter filter)
         {
             return _arrivals.AllServices(onDate, filter);
         }

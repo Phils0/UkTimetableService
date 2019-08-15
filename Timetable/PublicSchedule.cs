@@ -8,7 +8,7 @@ namespace Timetable
     {
         void AddService(IServiceTime stop);
         ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config);
-        ResolvedServiceStop[] AllServices(DateTime onDate, GatherFilterFactory.GatherFilter filter);
+        ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter);
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ namespace Timetable
         /// <param name="filter"></param>
         /// <returns>All services for day</returns>
         /// <remarks>Reuses standard Gather functionality, setting starting index to 0 and config to get all (actually lots) </remarks>
-        public ResolvedServiceStop[] AllServices(DateTime onDate, GatherFilterFactory.GatherFilter filter)
+        public ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter)
         {
             var config = new GatherConfiguration(0, Lots, filter);
             var gatherer = new ScheduleGatherer(this, config, _arrivalsOrDepartures);

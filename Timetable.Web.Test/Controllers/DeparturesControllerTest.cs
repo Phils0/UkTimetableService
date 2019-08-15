@@ -117,7 +117,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task AllDeparturesReturnsServices()
         {
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherFilterFactory.GatherFilter>())
+            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>())
                 .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
 
             var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
@@ -136,7 +136,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task DeparturesForDayReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherFilterFactory.GatherFilter>())
+            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>())
                 .Returns((status, new ResolvedServiceStop[0]));
 
             var controller = new DeparturesController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -153,7 +153,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task DeparturesForDayReturnsError()
         {
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherFilterFactory.GatherFilter>())
+            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>())
                 .Throws(new Exception("Something went wrong"));
 
             var controller = new DeparturesController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());

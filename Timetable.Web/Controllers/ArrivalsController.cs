@@ -47,10 +47,11 @@ namespace Timetable.Web.Controllers
             [FromQuery] ushort before = 3, [FromQuery] ushort after = 3)
         {
             var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS);
-            return Process(request, () =>
+            return await Process(request, async () =>
             {
                 var config = CreateGatherConfig( before, after, from);
-                return _timetable.FindArrivals(location, at, config);
+                var result =  _timetable.FindArrivals(location, at, config);
+                return await Task.FromResult(result);
             });
         }
         
@@ -66,14 +67,15 @@ namespace Timetable.Web.Controllers
         public async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, [FromQuery] string from = "")
         {
             var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS);
-            return Process(request, () =>
+            return await Process(request, async () =>
             {
                 var filter = CreateFilter(@from);
-                return _timetable.AllArrivals(location, onDate, filter);
+                var result = _timetable.AllArrivals(location, onDate, filter);
+                return await Task.FromResult(result);
             });
         }
         
-        protected override GatherFilterFactory.GatherFilter CreateFilter(Station station)
+        protected override GatherConfiguration.GatherFilter CreateFilter(Station station)
         {
             return _filters.ArrivalsComeFrom(station);
         }

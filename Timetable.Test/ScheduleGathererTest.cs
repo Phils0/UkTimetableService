@@ -165,7 +165,7 @@ namespace Timetable.Test
         public void OnlyServicesThatSatisfyTheFilterAreReturned()
         {
             var schedule = CreateMockSchedule();
-            var filterDelegate = Substitute.For<GatherFilterFactory.GatherFilter>();
+            var filterDelegate = Substitute.For<GatherConfiguration.GatherFilter>();
             // First one found satisfies, rest do not
             filterDelegate(Arg.Any<ResolvedServiceStop>()).Returns(true, false);
             var config = new GatherConfiguration(0, 2, filterDelegate);

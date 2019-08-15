@@ -4,25 +4,23 @@ namespace Timetable
 {
     public interface IFilterFactory
     {
-        GatherFilterFactory.GatherFilter NoFilter { get; }
-        GatherFilterFactory.GatherFilter DeparturesGoTo(Station destination);
-        GatherFilterFactory.GatherFilter ArrivalsComeFrom(Station origin);
+        GatherConfiguration.GatherFilter NoFilter { get; }
+        GatherConfiguration.GatherFilter DeparturesGoTo(Station destination);
+        GatherConfiguration.GatherFilter ArrivalsComeFrom(Station origin);
     }
 
     public class GatherFilterFactory : IFilterFactory
     {
-        public delegate bool GatherFilter(ResolvedServiceStop service);
-        
-        public static readonly GatherFilter NoFilter = (s => true);
+        public static readonly GatherConfiguration.GatherFilter NoFilter = (s => true);
 
-        GatherFilter IFilterFactory.NoFilter => NoFilter;
+        GatherConfiguration.GatherFilter IFilterFactory.NoFilter => NoFilter;
         
-        public GatherFilter DeparturesGoTo(Station destination)
+        public GatherConfiguration.GatherFilter DeparturesGoTo(Station destination)
         {
             return (s => s.GoesTo(destination));
         }
         
-        public GatherFilter ArrivalsComeFrom(Station origin)
+        public GatherConfiguration.GatherFilter ArrivalsComeFrom(Station origin)
         {
             return (s => s.ComesFrom(origin));
         }

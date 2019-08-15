@@ -10,14 +10,14 @@ namespace Timetable
         (Time time, Service[] services) ValuesAt(int index);
         int Count { get; }
     }
-
+    
     internal class ScheduleGatherer
     {
         private readonly IGathererScheduleData _schedule;
         private readonly GatherConfiguration _config;
         private readonly TimesToUse _arrivalsOrDestinations;
 
-        private GatherFilterFactory.GatherFilter SatisfiesFilter => _config.Filter;
+        private GatherConfiguration.GatherFilter SatisfiesFilter => _config.Filter;
         
         internal ScheduleGatherer(IGathererScheduleData schedule, GatherConfiguration config, TimesToUse arrivalsOrDestinations)
         {

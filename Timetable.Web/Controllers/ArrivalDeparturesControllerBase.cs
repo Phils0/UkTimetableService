@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -22,7 +23,7 @@ namespace Timetable.Web.Controllers
             _logger = logger;
         }
 
-        protected abstract GatherFilterFactory.GatherFilter CreateFilter(Station station);
+        protected abstract GatherConfiguration.GatherFilter CreateFilter(Station station);
         
         protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType)
         {
@@ -55,14 +56,14 @@ namespace Timetable.Web.Controllers
             };
         }
         
-        protected IActionResult Process(SearchRequest request, Func<(FindStatus status, ResolvedServiceStop[] services)> find)
+        protected async Task<IActionResult> Process(SearchRequest request, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find)
         {
             using (LogContext.PushProperty("Request", request, true))
             {
                 FindStatus status;
                 try
                 {
-                    var (findStatus, services) = find();
+                    var (findStatus, services) = await find();
 
                     if (findStatus == FindStatus.Success)
                     {
@@ -93,7 +94,7 @@ namespace Timetable.Web.Controllers
             return new GatherConfiguration(before, after, filter);
         }
         
-        protected GatherFilterFactory.GatherFilter CreateFilter(string toFrom)
+        protected GatherConfiguration.GatherFilter CreateFilter(string toFrom)
         {
             var filter = _filters.NoFilter;
             if(string.IsNullOrEmpty(toFrom))
