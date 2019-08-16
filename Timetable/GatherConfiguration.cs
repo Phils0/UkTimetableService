@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Data.SqlTypes;
 
 namespace Timetable
 {
     public class GatherConfiguration
     {
-        public delegate bool GatherFilter(ResolvedServiceStop service);
+        public delegate IEnumerable<ResolvedServiceStop> GatherFilter(IEnumerable<ResolvedServiceStop> source);
         
         public GatherFilter Filter; 
         public int ServicesBefore { get; }

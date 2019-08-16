@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NSubstitute;
 using Timetable.Test.Data;
@@ -165,10 +166,20 @@ namespace Timetable.Test
         public void OnlyServicesThatSatisfyTheFilterAreReturned()
         {
             var schedule = CreateMockSchedule();
-            var filterDelegate = Substitute.For<GatherConfiguration.GatherFilter>();
-            // First one found satisfies, rest do not
-            filterDelegate(Arg.Any<ResolvedServiceStop>()).Returns(true, false);
-            var config = new GatherConfiguration(0, 2, filterDelegate);
+            // Simulate first one found satisfies, rest do not
+            bool returnedOnce = false;
+            IEnumerable<ResolvedServiceStop> Filter(IEnumerable<ResolvedServiceStop> s)
+            {
+                if (!returnedOnce)
+                {
+                    returnedOnce = true;
+                    return s;
+                }
+
+                return Enumerable.Empty<ResolvedServiceStop>();
+            }
+
+            var config = new GatherConfiguration(0, 3, Filter);
             var gatherer = new ScheduleGatherer(schedule, config, TimesToUse.Departures);
             
             var services = gatherer.Gather(1, TestDate);

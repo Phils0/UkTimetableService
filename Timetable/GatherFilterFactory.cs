@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Timetable
 {
@@ -11,18 +12,18 @@ namespace Timetable
 
     public class GatherFilterFactory : IFilterFactory
     {
-        public static readonly GatherConfiguration.GatherFilter NoFilter = (s => true);
+        public static readonly GatherConfiguration.GatherFilter NoFilter = (s => s);
 
         GatherConfiguration.GatherFilter IFilterFactory.NoFilter => NoFilter;
         
         public GatherConfiguration.GatherFilter DeparturesGoTo(Station destination)
         {
-            return (s => s.GoesTo(destination));
+            return (s => s.Where(service => service.GoesTo(destination)));
         }
         
         public GatherConfiguration.GatherFilter ArrivalsComeFrom(Station origin)
         {
-            return (s => s.ComesFrom(origin));
+            return (s => s.Where(service => service.ComesFrom(origin)));
         }
     }
 }

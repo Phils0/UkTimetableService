@@ -17,7 +17,7 @@ namespace Timetable
         private readonly GatherConfiguration _config;
         private readonly TimesToUse _arrivalsOrDestinations;
 
-        private GatherConfiguration.GatherFilter SatisfiesFilter => _config.Filter;
+        private GatherConfiguration.GatherFilter FilterFoundServices => _config.Filter;
         
         internal ScheduleGatherer(IGathererScheduleData schedule, GatherConfiguration config, TimesToUse arrivalsOrDestinations)
         {
@@ -59,7 +59,7 @@ namespace Timetable
                 while (found < quantity && idx >= 0)
                 {
                     var pair = _schedule.ValuesAt(idx);
-                    foreach (var stop in CheckServicesForIndex(pair.services, pair.time, onDate))
+                    foreach (var stop in ResolveServices(pair.services, pair.time, onDate))
                     {
                         found++;
                         yield return stop;
@@ -69,17 +69,23 @@ namespace Timetable
                 }
             }
         }
-        
-        private IEnumerable<ResolvedServiceStop> CheckServicesForIndex(Service[] services, Time atTime, DateTime onDate)
+
+        private IEnumerable<ResolvedServiceStop> ResolveServices(Service[] services, Time atTime, DateTime onDate)
         {
-            foreach (var service in services)
+            var source = MatchServiceStop();
+            return FilterFoundServices(source);
+            
+            IEnumerable<ResolvedServiceStop> MatchServiceStop()
             {
-                var find = new StopSpecification(_schedule.Location, atTime, onDate, _arrivalsOrDestinations);
-                if (service.TryFindScheduledStop(find, out var stop)  && SatisfiesFilter(stop))
+                foreach (var service in services)
+                {
+                    var find = new StopSpecification(_schedule.Location, atTime, onDate, _arrivalsOrDestinations);
+                    if (service.TryFindScheduledStop(find, out var stop))
                         yield return stop;
+                }
             }
         }
-
+        
         private IEnumerable<ResolvedServiceStop> SelectServicesAfter(int startIdx, int quantity, DateTime date)
         {
             int stopIterating = _schedule.Count;
@@ -99,7 +105,7 @@ namespace Timetable
                 while (found < quantity && idx < stopIterating)
                 {
                     var pair = _schedule.ValuesAt(idx);
-                    foreach (var stop in CheckServicesForIndex(pair.services, pair.time, date))
+                    foreach (var stop in ResolveServices(pair.services, pair.time, date))
                     {
                         found++;
                         yield return stop;
