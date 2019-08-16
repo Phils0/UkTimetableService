@@ -8,6 +8,7 @@ namespace Timetable
         GatherConfiguration.GatherFilter NoFilter { get; }
         GatherConfiguration.GatherFilter DeparturesGoTo(Station destination);
         GatherConfiguration.GatherFilter ArrivalsComeFrom(Station origin);
+        GatherConfiguration.GatherFilter ProvidedByToc(string tocs, GatherConfiguration.GatherFilter innerFilter);
     }
 
     public class GatherFilterFactory : IFilterFactory
@@ -24,6 +25,12 @@ namespace Timetable
         public GatherConfiguration.GatherFilter ArrivalsComeFrom(Station origin)
         {
             return (s => s.Where(service => service.ComesFrom(origin)));
+        }
+        
+        public GatherConfiguration.GatherFilter ProvidedByToc(string tocs, GatherConfiguration.GatherFilter innerFilter)
+        {
+            return (s => innerFilter(s).
+                Where(service => tocs.Contains(service.Details.Operator.Code)));
         }
     }
 }

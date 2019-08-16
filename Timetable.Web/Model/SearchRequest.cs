@@ -1,3 +1,5 @@
+using System;
+
 namespace Timetable.Web.Model
 {
     /// <summary>
@@ -35,14 +37,29 @@ namespace Timetable.Web.Model
         /// Request type
         /// </summary>
         public string Type { get; set; } = "";
+
+        /// <summary>
+        /// Only services from these TOCs returned
+        /// </summary>
+        public string TocFilter { get; set; } = "";
+
+        public void SetTocs(string[] tocs)
+        {
+            TocFilter = tocs == null ? "" : String.Join('|', tocs).ToUpper();
+        }
         
         public override string ToString()
         {
-            return string.IsNullOrEmpty(ComingFromGoingTo) ? 
+            var tocs = string.IsNullOrEmpty(TocFilter) ? "" : $" ({TocFilter}) ";
+            var fullDay = At.FullDay ? "Day " : "";
+            
+            var request =  string.IsNullOrEmpty(ComingFromGoingTo) ? 
                 $"{Location}@{At}" :
                 Type == DEPARTURES ?
                     $"{Location}@{At} to {ComingFromGoingTo}" :
                     $"{Location}@{At} from {ComingFromGoingTo}" ;
+
+            return $"{fullDay}{request}{tocs}";
         }
     }
 }

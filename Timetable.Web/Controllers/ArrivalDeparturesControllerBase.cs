@@ -25,35 +25,33 @@ namespace Timetable.Web.Controllers
 
         protected abstract GatherConfiguration.GatherFilter CreateFilter(Station station);
         
-        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType)
+        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs)
         {
-            return new SearchRequest()
+            return CreateRequest(location, at, toFrom, before, after, requestType, tocs, false);
+        }
+
+        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs, bool fullDay)
+        {
+            var request = new SearchRequest()
             {
                 Location = location,
                 At = new Window()
                 {
                     At = at,
                     Before = before,
-                    After = after
+                    After = after,
+                    FullDay = fullDay
                 },
                 ComingFromGoingTo = toFrom,
                 Type = requestType
             };
+            request.SetTocs(tocs);
+            return request;
         }
-
-        protected SearchRequest CreateFullDayRequest(string location, DateTime at, string toFrom, string requestType)
+        
+        protected SearchRequest CreateFullDayRequest(string location, DateTime at, string toFrom, string requestType, string[] tocs)
         {
-            return new SearchRequest()
-            {
-                Location = location,
-                At = new Window()
-                {
-                    At = at,
-                    FullDay = true
-                },
-                ComingFromGoingTo = toFrom,
-                Type = requestType
-            };
+            return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true);
         }
         
         protected async Task<IActionResult> Process(SearchRequest request, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find)
@@ -88,22 +86,25 @@ namespace Timetable.Web.Controllers
             }
         }
         
-        protected GatherConfiguration CreateGatherConfig(ushort before, ushort after, string toFrom)
+        protected GatherConfiguration CreateGatherConfig(SearchRequest request)
         {
-            var filter = CreateFilter(toFrom);
-            return new GatherConfiguration(before, after, filter);
+            var filter = CreateFilter(request);
+            return new GatherConfiguration(request.At.Before, request.At.After, filter);
         }
         
-        protected GatherConfiguration.GatherFilter CreateFilter(string toFrom)
+        protected GatherConfiguration.GatherFilter CreateFilter(SearchRequest request)
         {
-            var filter = _filters.NoFilter;
-            if(string.IsNullOrEmpty(toFrom))
-                return _filters.NoFilter;
+            GatherConfiguration.GatherFilter filter = _filters.NoFilter;
+            if (!string.IsNullOrEmpty(request.ComingFromGoingTo))
+            {
+                if (_timetable.TryGetLocation(request.ComingFromGoingTo, out Station station))
+                    filter = CreateFilter(station);
+                else
+                    _logger.Warning("Not adding filter.  Did not find location {toFrom}", request.ComingFromGoingTo);                
+            }
             
-            if (_timetable.TryGetLocation(toFrom, out Station station))
-                filter = CreateFilter(station);
-            else
-                _logger.Warning("Not adding filter.  Did not find location {toFrom}", toFrom);
+            if (!string.IsNullOrEmpty(request.TocFilter))
+                filter = _filters.ProvidedByToc(request.TocFilter, filter);
             
             return filter;
         }
@@ -111,7 +112,6 @@ namespace Timetable.Web.Controllers
         private ObjectResult CreateNoServiceResponse(FindStatus status, SearchRequest request)
         {
             var reason = "";
-            var day = request.At.FullDay ? " day" : "";
             
             switch (status)
             {
@@ -119,10 +119,10 @@ namespace Timetable.Web.Controllers
                     reason = $"Did not find location {request.Location}";
                     return  NotFound(CreateResponseObject());
                 case FindStatus.NoServicesForLocation :
-                    reason = $"Did not find services for{day} {request}";
+                    reason = $"Did not find services for {request}";
                     return  NotFound(CreateResponseObject());
                 case FindStatus.Error :
-                    reason = $"Error while finding services for{day} {request}";
+                    reason = $"Error while finding services for {request}";
                     return StatusCode(500,  CreateResponseObject());
                 default:
                     reason = $"Unknown reason why could not find anything";

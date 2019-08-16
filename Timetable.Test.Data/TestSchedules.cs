@@ -5,8 +5,33 @@ namespace Timetable.Test.Data
 {
     public static class TestSchedules
     {
-        private static readonly Toc VirginTrains = new Toc() {Code = "VT", Name = "Virgin Trains"};
+        private static Toc VirginTrains => new Toc() {Code = "VT", Name = "Virgin Trains"};
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
+        
+        public static ResolvedServiceStop CreateResolvedArrivalStop(
+            string timetableId = "X12345",
+            StpIndicator indicator = StpIndicator.Permanent,
+            ICalendar calendar = null, 
+            ScheduleLocation[] stops = null,
+            int id = 1,
+            Service service = null,
+            string retailServiceId = null,
+            DateTime on =  default(DateTime),
+            bool isCancelled = false,
+            Station atLocation = null,
+            Time when = default(Time))
+        {
+            on = on == default(DateTime) ? MondayAugust12 : on;
+            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, id, service, retailServiceId);
+            var resolved = new ResolvedService(schedule, on, isCancelled);
+
+            var origin = schedule.Locations.First() as ScheduleOrigin; 
+            atLocation = atLocation ?? origin.Station;
+            when = when.Equals(default(Time)) ? origin.Departure : when;
+            var find = new StopSpecification(atLocation, when, on, TimesToUse.Arrivals);
+            resolved.TryFindStop(find, out var stop);
+            return stop;
+        }
         
         public static ResolvedServiceStop CreateResolvedDepartureStop(
             string timetableId = "X12345",

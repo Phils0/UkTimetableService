@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -115,6 +116,41 @@ namespace Timetable.Web.Test.Controllers
                 filterFactory.DidNotReceive().DeparturesGoTo(Arg.Any<Station>());
         }
         
+        public static IEnumerable<object[]> Tocs
+        {
+            get
+            {
+                yield return new object[] {new [] {"VT"}, "VT", true};
+                yield return new object[] {new [] {"vt"}, "VT", true};
+                yield return new object[] {new [] {"VT", "GR"}, "VT|GR", true};
+                yield return new object[] {new [] {"VT", "GR", "GW"}, "VT|GR|GW", true};
+                yield return new object[] {new string[0], "", false};
+                yield return new object[] {null, "", false};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(Tocs))]
+        public async Task SetsTocFilter(string[] tocs, string expectedTocFilter, bool expectedToHaveFilter)
+        {
+            var data = Substitute.For<ILocationData>();
+            data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
+                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
+
+            var filter = Substitute.For<GatherConfiguration.GatherFilter>();
+            var filterFactory = Substitute.For<IFilterFactory>();
+            filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
+            filterFactory.ProvidedByToc(expectedTocFilter, GatherFilterFactory.NoFilter).Returns(filter);
+            
+            var controller = new DeparturesController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.Departures("SUR", Aug12AtTen, toc: tocs) as ObjectResult;
+
+            if (expectedToHaveFilter)
+                filterFactory.Received().ProvidedByToc(expectedTocFilter, GatherFilterFactory.NoFilter);
+            else
+                filterFactory.DidNotReceive().ProvidedByToc(Arg.Any<string>(), Arg.Any<GatherConfiguration.GatherFilter>());
+        }
+        
         [Theory]
         [InlineData("SUR")]
         [InlineData("sur")]
@@ -135,7 +171,7 @@ namespace Timetable.Web.Test.Controllers
         }
         
         [InlineData(FindStatus.LocationNotFound,  "Did not find location SUR")]
-        [InlineData(FindStatus.NoServicesForLocation, "Did not find services for day SUR@2019-08-12T00:00:00")]
+        [InlineData(FindStatus.NoServicesForLocation, "Did not find services for Day SUR@2019-08-12T00:00:00")]
         [Theory]
         public async Task DeparturesForDayReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
@@ -166,7 +202,7 @@ namespace Timetable.Web.Test.Controllers
             Assert.Equal(500, response.StatusCode);
 
             var notFound = response.Value as Model.NotFoundResponse;
-            Assert.Equal("Error while finding services for day SUR@2019-08-12T00:00:00", notFound.Reason);
+            Assert.Equal("Error while finding services for Day SUR@2019-08-12T00:00:00", notFound.Reason);
             AssertRequestSetInResponse(notFound);
         }
     }
