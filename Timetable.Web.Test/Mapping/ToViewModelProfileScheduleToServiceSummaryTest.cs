@@ -34,7 +34,7 @@ namespace Timetable.Web.Test.Mapping
 
             var resolved = new ResolvedService(schedule, TestDate, isCancelled);
             
-            return mapper.Map<Timetable.ResolvedService, Model.ServiceSummary>(resolved);
+            return mapper.Map<Timetable.ResolvedService, Model.ServiceSummary>(resolved, opts => opts.Items["On"] = resolved.On);
         }
 
         [Fact]

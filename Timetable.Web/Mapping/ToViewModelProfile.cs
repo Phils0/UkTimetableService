@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Timetable.Web.Model;
@@ -35,7 +36,7 @@ namespace Timetable.Web.Mapping
             CreateMap<Timetable.Schedule, Model.Service>()
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
-                .ForMember(d => d.Stops, o => o.MapFrom(s => s.Locations));
+                .ForMember(d => d.Stops, o => o.MapFrom((s, d, dm, c) => MapStops(s.Locations, c)));
             CreateMap<Timetable.Schedule, Model.ServiceSummary>()
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
@@ -58,50 +59,46 @@ namespace Timetable.Web.Mapping
             return date.Add(time.Value);
         }
 
+        private ScheduledStop[] MapStops(IReadOnlyList<ScheduleLocation> source, ResolutionContext context)
+        {
+            return source.Select(s => ConvertToStop(s, context)).ToArray();
+        }
         private Model.ScheduledStop ConvertToStop(ScheduleLocation scheduleLocation, ResolutionContext context)
         {
             return (Model.ScheduledStop) context.Mapper
                 .Map(scheduleLocation, scheduleLocation.GetType(), typeof(Model.ScheduledStop),
-                    o => { o.Items["On"] = context.Items["On"]; });
+                    o => o.Items["On"] = context.Items["On"]);
         }
         
         private Model.Service MapService(Timetable.ResolvedService source, Model.Service notUsed, ResolutionContext context)
         {
-            SetDateInContext(source, context);
-            var service = context.Mapper.Map<Model.Service>(source.Details);
+            var service = context.Mapper.Map<Model.Service>(source.Details, opts => opts.Items["On"] = source.On);
             service.Date = source.On;
             service.IsCancelled = source.IsCancelled;
             return service;
         }
-
-        private void SetDateInContext(ResolvedService source, ResolutionContext context)
-        {
-            context.Options.Items["On"] = source.On;
-        }
-
+        
         private Model.ServiceSummary MapServiceSummary(ResolvedService source, Model.ServiceSummary notUsed, ResolutionContext context)
         {
-            SetDateInContext(source, context);
             return CreateServiceSummary(source, context);
         }
 
         private ServiceSummary CreateServiceSummary(ResolvedService source, ResolutionContext context)
         {
-            var service = context.Mapper.Map<Model.ServiceSummary>(source.Details);
+            var service = context.Mapper.Map<Model.ServiceSummary>(source.Details, opts => opts.Items["On"] = source.On);
             service.Date = source.On;
             service.IsCancelled = source.IsCancelled;
             return service;
         }
-
+        
         private FoundItem MapFoundService(Timetable.ResolvedServiceStop source, FoundItem notUsed, ResolutionContext context)
         {
-            SetDateInContext(source, context);
             return new FoundItem()
             {
                 Service = CreateServiceSummary(source, context),
-                At = context.Mapper.Map<Model.ScheduledStop>(source.Stop),
-                To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop),
-                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop)
+                At = context.Mapper.Map<Model.ScheduledStop>(source.Stop, opts => opts.Items["On"] = source.On),
+                To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop, opts => opts.Items["On"] = source.On),
+                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop, opts => opts.Items["On"] = source.On)
             };
         }
     }

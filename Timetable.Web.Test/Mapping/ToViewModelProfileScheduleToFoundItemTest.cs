@@ -48,7 +48,7 @@ namespace Timetable.Web.Test.Mapping
                 stop.ComesFrom(from);
             
             var mapper = ToViewProfileConfiguration.CreateMapper();
-            return mapper.Map<Timetable.ResolvedServiceStop, Model.FoundItem>(stop);
+            return mapper.Map<Timetable.ResolvedServiceStop, Model.FoundItem>(stop, opts => opts.Items["On"] = stop.On);
         }
 
         [Fact]

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -65,7 +66,9 @@ namespace Timetable.Web.Controllers
 
                     if (findStatus == FindStatus.Success)
                     {
-                        var items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundItem[]>(services);
+                        var onDate = services.First().On;
+                        var items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundItem[]>(services,
+                            opts => opts.Items["On"] = onDate);
                         return Ok(new Model.FoundResponse()
                         {
                             Request = request,

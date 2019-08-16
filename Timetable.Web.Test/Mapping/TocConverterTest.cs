@@ -25,7 +25,7 @@ namespace Timetable.Web.Test.Mapping
                 {
                     {"VT", VT}
                 });
-            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), null);
+            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), Substitute.For<IRuntimeMapper>());
             context.Items.Add("Tocs", lookup);
             
             var converter = new TocConverter();
@@ -43,7 +43,7 @@ namespace Timetable.Web.Test.Mapping
                 {
                     {"VT", new Toc() {Code = "VT"}}
                 });
-            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), null);
+            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), Substitute.For<IRuntimeMapper>());
             context.Items.Add("Tocs", lookup);
 
             var converter = new TocConverter();
@@ -56,7 +56,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void ThrowsExceptionIfDoNotPassTocs()
         {
-            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), null);
+            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), Substitute.For<IRuntimeMapper>());
             
             var converter = new TocConverter();
 
