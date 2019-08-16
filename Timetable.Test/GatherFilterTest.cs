@@ -109,6 +109,7 @@ namespace Timetable.Test
         [InlineData("VT", 2)]
         [InlineData("GR", 1)]
         [InlineData("GR|VT", 3)]
+        [InlineData("GW", 0)]
         public void FilterTocs(string tocFilterString, int expected)
         {
             var source = ComesFromSource;
@@ -122,6 +123,17 @@ namespace Timetable.Test
             var results = filter(source).ToArray();
             
             Assert.Equal(expected, results.Length);
+        }
+
+        [Fact]
+        public void HandlesBeingPassedAnEmptyEnumerable()
+        {
+            var source = Enumerable.Empty<ResolvedServiceStop>();
+    
+            var filter = Factory.ProvidedByToc("VT", Factory.NoFilter);
+
+            var results = filter(source);
+            Assert.Empty(results);
         }
     }
 }
