@@ -3,9 +3,9 @@ using System;
 namespace Timetable.Web.Model
 {
     /// <summary>
-    /// Service not returned response
+    /// Service not found response
     /// </summary>
-    public class ServiceNotReturned
+    public class ServiceNotFound
     {
         /// <summary>
         /// Timetable Id or Retail ServiceId
@@ -19,19 +19,5 @@ namespace Timetable.Web.Model
         /// Reason not found
         /// </summary>
         public string Reason { get; set; }
-    }
-    
-    /// <summary>
-    /// Service not found
-    /// </summary>
-    public class ServiceNotFound : ServiceNotReturned
-    {
-    }
-    
-    /// <summary>
-    /// Service cancelled
-    /// </summary>
-    public class ServiceCancelled : ServiceNotReturned
-    {
     }
 }

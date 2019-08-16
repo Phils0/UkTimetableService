@@ -45,7 +45,7 @@ namespace Timetable.Web
                 .AddSingleton<ILocationData>(data.Locations)
                 .AddSingleton<ITimetable>(data.Timetable)
                 .AddSingleton<IFilterFactory>(new GatherFilterFactory())
-                .AddSingleton<IMapper>(factory.CreateMapper())    //TODO Swap to scoped
+                .AddSingleton<IMapper>(factory.CreateMapper()) //TODO Swap to scoped
                 .AddSingleton<ILogger>(Log.Logger)
                 .AddSwaggerGen(ConfigureSwagger)
                 .AddMvc()
@@ -80,7 +80,21 @@ namespace Timetable.Web
 
         private void ConfigureSwagger(SwaggerGenOptions options)
         {
-            options.SwaggerDoc("v0", new Info {Title = "Seatbox", Version = "v0"});
+            options.SwaggerDoc("v1", new Info
+            {
+                Version = "v1",
+                Title = "Timetable Service",
+                Description = "A simple UK rail timetable service.  Look up services and departures and arrivals",
+                Contact = new Contact()
+                {
+                    Name = "Phil Sharp",
+                },
+                License = new License()
+                {
+                    Name = "MIT",
+                    Url = @"https://github.com/Phils0/UkTimetableService/blob/master/LICENSE"
+                }           
+            });
 
             var controllerAssembly = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var controllerPath = Path.Combine(AppContext.BaseDirectory, controllerAssembly);
@@ -102,7 +116,7 @@ namespace Timetable.Web
             }
 
             app.UseSwagger();
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v0/swagger.json", "Timetable V0"); });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Timetable Service V1"); });
 
             app.UseStaticFiles();
             app.UseCookiePolicy();

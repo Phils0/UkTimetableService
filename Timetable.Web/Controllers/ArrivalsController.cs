@@ -7,6 +7,7 @@ using Timetable.Web.Model;
 
 namespace Timetable.Web.Controllers
 {
+    [Produces("application/json")]
     [Route("api/timetable")]
     [ApiController]
     public class ArrivalsController : ArrivalDeparturesControllerBase
@@ -23,13 +24,20 @@ namespace Timetable.Web.Controllers
         /// <param name="from">Optional to location filter </param>
         /// <param name="before">Number of services to return that depart before the time</param>
         /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
-        /// <returns></returns>
+        /// <param name="fullDay">Return full day of departures.  fullDay=true and before\after are mutually exclusive.  If both provided fullDay will take precedence</param>
+        /// <returns>Set of arrivals</returns>
+        /// <response code="200">Ok</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Model.FoundResponse))]
+        [ProducesResponseType(404, Type = typeof(Model.NotFoundResponse))]
+        [ProducesResponseType(500, Type = typeof(Model.NotFoundResponse))]
         [Route("arrivals/{location}")]
         [HttpGet]
         public async Task<IActionResult> Arrivals(string location, [FromQuery] string from = "",
-            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3)
+            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3, [FromQuery] bool fullDay = false)
         {
-            return await Arrivals(location, DateTime.Now, from, before, after);
+            return await Arrivals(location, DateTime.Now, from, before, after, fullDay);
         }
 
         /// <summary>
@@ -40,12 +48,22 @@ namespace Timetable.Web.Controllers
         /// <param name="from">Optional to location filter </param>
         /// <param name="before">Number of services to return that depart before the time</param>
         /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
-        /// <returns></returns>
+        /// <param name="fullDay">Return full day of departures.  fullDay=true and before\after are mutually exclusive.  If both provided fullDay will take precedence</param>
+        /// <returns>Set of arrivals</returns>
+        /// <response code="200">Ok</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Model.FoundResponse))]
+        [ProducesResponseType(404, Type = typeof(Model.NotFoundResponse))]
+        [ProducesResponseType(500, Type = typeof(Model.NotFoundResponse))]
         [Route("arrivals/{location}/{at}")]
         [HttpGet]
         public async Task<IActionResult> Arrivals(string location, DateTime at, [FromQuery] string from = "",
-            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3)
+            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3, [FromQuery] bool fullDay = false)
         {
+            if (fullDay)
+                return await FullDayArrivals(location, at.Date, from);
+            
             var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS);
             return await Process(request, async () =>
             {
@@ -55,16 +73,7 @@ namespace Timetable.Web.Controllers
             });
         }
         
-        /// <summary>
-        /// Returns arrivals at a location for the whole day
-        /// </summary>
-        /// <param name="location">Three letter code</param>
-        /// <param name="onDate">Datetime</param>
-        /// <param name="from">Optional from location filter </param>
-        /// <returns>A list of arriving services</returns>
-        [Route("arrivals/{location}/day/{onDate}")]
-        [HttpGet]
-        public async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, [FromQuery] string from = "")
+        private async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, string from = "")
         {
             var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS);
             return await Process(request, async () =>

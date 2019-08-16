@@ -111,16 +111,18 @@ namespace Timetable.Web.Controllers
         private ObjectResult CreateNoServiceResponse(FindStatus status, SearchRequest request)
         {
             var reason = "";
+            var day = request.At.FullDay ? " day" : "";
+            
             switch (status)
             {
                 case FindStatus.LocationNotFound :
                     reason = $"Did not find location {request.Location}";
                     return  NotFound(CreateResponseObject());
                 case FindStatus.NoServicesForLocation :
-                    reason = $"Did not find services for {request}";
+                    reason = $"Did not find services for{day} {request}";
                     return  NotFound(CreateResponseObject());
                 case FindStatus.Error :
-                    reason = $"Error while finding services for {request}";
+                    reason = $"Error while finding services for{day} {request}";
                     return StatusCode(500,  CreateResponseObject());
                 default:
                     reason = $"Unknown reason why could not find anything";

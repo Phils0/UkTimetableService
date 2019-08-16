@@ -15,6 +15,7 @@ namespace Timetable.Web.Controllers
     /// </summary>
     [Route("api/timetable/")]
     [ApiController]
+    [Produces("application/json")]
     public class ServiceController : ControllerBase
     {
         private readonly ITimetable _timetable;
@@ -34,6 +35,11 @@ namespace Timetable.Web.Controllers
         /// <param name="serviceId">Timetable UID - letter plus 5 digits</param>
         /// <param name="on">Date</param>
         /// <returns></returns>
+        /// <response code="200">Ok</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Model.Service))]
+        [ProducesResponseType(404, Type = typeof(Model.ServiceNotFound))]
         [Route("service/{serviceId}/{on}")]
         [HttpGet]
         public async Task<IActionResult> GetServiceByTimetableId(string serviceId, DateTime @on)
@@ -44,10 +50,10 @@ namespace Timetable.Web.Controllers
                 if (service.status == LookupStatus.Success)
                 {
                     var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service);
-                    return Ok(model);             
+                    return await Task.FromResult(Ok(model));             
                 }
                 
-                return CreateNoServiceResponse(service.status, serviceId, @on);
+                return await Task.FromResult(CreateNoServiceResponse(service.status, serviceId, @on));
             }
             catch (Exception e)
             {
@@ -87,7 +93,12 @@ namespace Timetable.Web.Controllers
         /// </summary>
         /// <param name="serviceId">Retail Service Id, two letters plus 6 or 4 digits</param>
         /// <param name="on">date</param>
-        /// <returns></returns>
+        /// <returns>Set of services</returns>
+        /// <response code="200">Ok</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Model.Service[]))]
+        [ProducesResponseType(404, Type = typeof(Model.ServiceNotFound))]
         [Route("retailService/{serviceId}/{on}")]
         [HttpGet]
         public async Task<IActionResult> GetServiceByRetailServiceId(string serviceId, DateTime @on)
@@ -98,10 +109,10 @@ namespace Timetable.Web.Controllers
                 if (service.status == LookupStatus.Success)
                 {
                      var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services);
-                     return Ok(model);               
+                     return await Task.FromResult(Ok(model));               
                 }    
 
-                return CreateNoServiceResponse(service.status, serviceId, @on);
+                return await Task.FromResult(CreateNoServiceResponse(service.status, serviceId, @on));
             }
             catch (Exception e)
             {
@@ -117,7 +128,13 @@ namespace Timetable.Web.Controllers
         /// <param name="toc">Two letter TOC code</param>
         /// <param name="on">date</param>
         /// <param name="includeStops">Whether to return a full schedule</param>
-        /// <returns></returns>
+        /// <returns>Set of services</returns>
+        /// <response code="200">Ok</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Model.Service[]))]
+        [ProducesResponseType(200, Type = typeof(Model.ServiceSummary[]))]
+        [ProducesResponseType(404, Type = typeof(Model.ServiceNotFound))]
         [Route("toc/{toc}/{on}")]
         [HttpGet]
         public async Task<IActionResult> GetTocServices(string toc, DateTime @on, [FromQuery] bool includeStops = false)
@@ -130,15 +147,15 @@ namespace Timetable.Web.Controllers
                     if (includeStops)
                     {
                         var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services);
-                        return Ok(model);                               
+                        return await Task.FromResult(Ok(model));                               
                     }
                     else
                     {
                         var model = _mapper.Map<Timetable.ResolvedService[], Model.ServiceSummary[]>(service.services);
-                        return Ok(model);                               
+                        return await Task.FromResult(Ok(model));                               
                     }
                 }
-                return CreateNoServiceResponse(service.status, toc, @on);
+                return await Task.FromResult(CreateNoServiceResponse(service.status, toc, @on));
             }
             catch (Exception e)
             {

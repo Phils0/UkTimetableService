@@ -18,6 +18,7 @@ namespace Timetable.Web.Test.Controllers
         private static readonly MapperConfiguration _config = new MapperConfiguration(
             cfg => cfg.AddProfile<ToViewModelProfile>());
 
+        private static readonly DateTime Aug12 = new DateTime(2019, 8, 12, 0, 0, 0);
         private static readonly DateTime Aug12AtTenFifteen = new DateTime(2019, 8, 12, 10, 15, 0);
         
         [Theory]
@@ -125,11 +126,11 @@ namespace Timetable.Web.Test.Controllers
         public async Task FullDayArrivalsReturnsServices(string clapham)
         {
             var data = Substitute.For<ILocationData>();
-            data.AllArrivals("CLJ", Aug12AtTenFifteen, Arg.Any<GatherConfiguration.GatherFilter>())
+            data.AllArrivals("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>())
                 .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
 
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.FullDayArrivals(clapham, Aug12AtTenFifteen) as ObjectResult;;
+            var response = await controller.Arrivals(clapham, Aug12, fullDay: true) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
 
@@ -139,7 +140,7 @@ namespace Timetable.Web.Test.Controllers
         }
 
         [InlineData(FindStatus.LocationNotFound,  "Did not find location CLJ")]
-        [InlineData(FindStatus.NoServicesForLocation, "Did not find services for CLJ@2019-08-12T10:15:00")]
+        [InlineData(FindStatus.NoServicesForLocation, "Did not find services for day CLJ@2019-08-12T00:00:00")]
         [Theory]
         public async Task ArrivalsForDayReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
@@ -148,7 +149,7 @@ namespace Timetable.Web.Test.Controllers
                 .Returns((status, new ResolvedServiceStop[0]));
 
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.FullDayArrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;
+            var response = await controller.Arrivals("CLJ", Aug12, fullDay: true) as ObjectResult;
             
             Assert.Equal(404, response.StatusCode);
 
@@ -165,12 +166,12 @@ namespace Timetable.Web.Test.Controllers
                 .Throws(new Exception("Something went wrong"));
 
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.FullDayArrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;
+            var response = await controller.Arrivals("CLJ", Aug12, fullDay: true) as ObjectResult;
             
             Assert.Equal(500, response.StatusCode);
 
             var notFound = response.Value as Model.NotFoundResponse;
-            Assert.Equal("Error while finding services for CLJ@2019-08-12T10:15:00", notFound.Reason);
+            Assert.Equal("Error while finding services for day CLJ@2019-08-12T00:00:00", notFound.Reason);
             AssertRequestSetInResponse(notFound);
         }
     }
