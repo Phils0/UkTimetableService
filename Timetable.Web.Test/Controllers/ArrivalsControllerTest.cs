@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -157,6 +158,28 @@ namespace Timetable.Web.Test.Controllers
         }
         
         [Theory]
+        [MemberData(nameof(Tocs))]
+        public async Task ArrivalsNowSetsTocFilter(string[] tocs, string expectedTocFilter, bool expectedToHaveFilter)
+        {
+            var data = Substitute.For<ILocationData>();
+            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
+                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
+
+            var filter = Substitute.For<GatherConfiguration.GatherFilter>();
+            var filterFactory = Substitute.For<IFilterFactory>();
+            filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
+            filterFactory.ProvidedByToc(expectedTocFilter, GatherFilterFactory.NoFilter).Returns(filter);
+            
+            var controller = new ArrivalsController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.Arrivals("CLJ",  toc: tocs) as ObjectResult;
+
+            if (expectedToHaveFilter)
+                filterFactory.Received().ProvidedByToc(expectedTocFilter, GatherFilterFactory.NoFilter);
+            else
+                filterFactory.DidNotReceive().ProvidedByToc(Arg.Any<string>(), Arg.Any<GatherConfiguration.GatherFilter>());
+        }
+        
+        [Theory]
         [InlineData("CLJ")]
         [InlineData("clj")]
         public async Task FullDayArrivalsReturnsServices(string clapham)
@@ -209,6 +232,45 @@ namespace Timetable.Web.Test.Controllers
             var notFound = response.Value as Model.NotFoundResponse;
             Assert.Equal("Error while finding services for Day CLJ@2019-08-12T00:00:00", notFound.Reason);
             AssertRequestSetInResponse(notFound);
+        }
+        
+        public static IEnumerable<object[]> ReturnsStops
+        {
+            get
+            {
+                yield return new object[] {false, typeof(FoundSummaryItem)};                
+                yield return new object[] {true, typeof(FoundServiceItem)};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(ReturnsStops))]
+        public async Task ReturnsServicesWithStops(bool includeStops, Type expected)
+        {
+            var data = Substitute.For<ILocationData>();
+            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
+                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
+            
+            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen, includeStops: includeStops) as ObjectResult;
+            var found = response.Value as Model.FoundResponse;
+
+            Assert.IsType(expected, found.Services[0]);
+        }
+        
+        [Theory]
+        [MemberData(nameof(ReturnsStops))]
+        public async Task ArrivalsNowReturnsServicesWithStops(bool includeStops, Type expected)
+        {
+            var data = Substitute.For<ILocationData>();
+            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
+                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
+            
+            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.Arrivals("CLJ", includeStops: includeStops) as ObjectResult;
+            var found = response.Value as Model.FoundResponse;
+
+            Assert.IsType(expected, found.Services[0]);
         }
     }
 }

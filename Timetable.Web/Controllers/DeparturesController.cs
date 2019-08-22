@@ -29,6 +29,7 @@ namespace Timetable.Web.Controllers
         /// <param name="before">Number of services to return that depart before the time</param>
         /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
         /// <param name="fullDay">Return full day of departures.  fullDay=true and before\after are mutually exclusive.  If both provided fullDay will take precedence</param>
+        /// <param name="includeStops">Whether to return a full schedule</param>
         /// <param name="toc">Only services from included TOCs included.  Can add multiple to querystring, then any service ran by any of them returned</param>
         /// <returns>A list of departing services</returns>
         /// <response code="200">Ok</response>
@@ -40,9 +41,9 @@ namespace Timetable.Web.Controllers
         [Route("departures/{location}")]
         [HttpGet]
         public async Task<IActionResult> Departures(string location, [FromQuery] string to = "", 
-            [FromQuery] ushort before = 1, [FromQuery] ushort after = 5, [FromQuery] bool fullDay = false, [FromQuery] string[] toc = null)
+            [FromQuery] ushort before = 1, [FromQuery] ushort after = 5, [FromQuery] bool fullDay = false, [FromQuery] bool includeStops = false, [FromQuery] string[] toc = null)
         {
-            return await Departures(location, DateTime.Now, to, before, after, fullDay);
+            return await Departures(location, DateTime.Now, to, before, after, fullDay, includeStops, toc);
         }
 
         /// <summary>
@@ -54,6 +55,7 @@ namespace Timetable.Web.Controllers
         /// <param name="before">Number of services to return that depart before the time</param>
         /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
         /// <param name="fullDay">Return full day of departures.  fullDay=true and before\after are mutually exclusive.  If both provided fullDay will take precedence</param>
+        /// <param name="includeStops">Whether to return a full schedule</param>
         /// <param name="toc">Only services from included TOCs included.  Can add multiple to querystring, then any service ran by any of them returned</param>
         /// <returns>A list of departing services</returns>
         /// <response code="200">Ok</response>
@@ -65,10 +67,10 @@ namespace Timetable.Web.Controllers
         [Route("departures/{location}/{at}")]
         [HttpGet]
         public async Task<IActionResult> Departures(string location, DateTime at, [FromQuery] string to = "", 
-            [FromQuery] ushort before = 1, [FromQuery] ushort after = 5, [FromQuery] bool fullDay = false, [FromQuery] string[] toc = null)
+            [FromQuery] ushort before = 1, [FromQuery] ushort after = 5, [FromQuery] bool fullDay = false, [FromQuery] bool includeStops = false, [FromQuery] string[] toc = null)
         {
             if (fullDay)
-                return await FullDayDepartures(location, at.Date, to, toc);
+                return await FullDayDepartures(location, at.Date, to, includeStops, toc);
             
             var request = CreateRequest(location, at, to, before, after, SearchRequest.DEPARTURES, toc);
             return await Process(request, async () =>
@@ -76,10 +78,10 @@ namespace Timetable.Web.Controllers
                 var config = CreateGatherConfig(request);
                 var result = _timetable.FindDepartures(request.Location, at, config);
                 return await Task.FromResult(result);
-            });
+            }, includeStops);
         }
         
-        private async Task<IActionResult> FullDayDepartures(string location, DateTime onDate, string to, string[] tocs)
+        private async Task<IActionResult> FullDayDepartures(string location, DateTime onDate, string to, bool includeStops, string[] tocs)
         {
             var request = CreateFullDayRequest(location, onDate, to, SearchRequest.DEPARTURES, tocs);
             return await Process(request, async () =>
@@ -87,7 +89,7 @@ namespace Timetable.Web.Controllers
                 var filter = CreateFilter(request);
                 var result = _timetable.AllDepartures(request.Location, onDate, filter);
                 return await Task.FromResult(result);
-            });
+            }, includeStops);
         }
         
         protected override GatherConfiguration.GatherFilter CreateFilter(Station station)

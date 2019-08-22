@@ -46,7 +46,9 @@ namespace Timetable.Web.Mapping
                 .ConvertUsing(MapService);
             CreateMap<Timetable.ResolvedService, Model.ServiceSummary>()
                 .ConvertUsing(MapServiceSummary);        
-            CreateMap<Timetable.ResolvedServiceStop, Model.FoundItem>()
+            CreateMap<Timetable.ResolvedServiceStop, Model.FoundSummaryItem>()
+                .ConvertUsing(MapFoundServiceSummary);
+            CreateMap<Timetable.ResolvedServiceStop, Model.FoundServiceItem>()
                 .ConvertUsing(MapFoundService);
         }
         
@@ -72,12 +74,17 @@ namespace Timetable.Web.Mapping
         
         private Model.Service MapService(Timetable.ResolvedService source, Model.Service notUsed, ResolutionContext context)
         {
+            return CreateService(source, context);
+        }
+
+        private Model.Service CreateService(ResolvedService source, ResolutionContext context)
+        {
             var service = context.Mapper.Map<Model.Service>(source.Details, opts => opts.Items["On"] = source.On);
             service.Date = source.On;
             service.IsCancelled = source.IsCancelled;
             return service;
         }
-        
+
         private Model.ServiceSummary MapServiceSummary(ResolvedService source, Model.ServiceSummary notUsed, ResolutionContext context)
         {
             return CreateServiceSummary(source, context);
@@ -91,11 +98,22 @@ namespace Timetable.Web.Mapping
             return service;
         }
         
-        private FoundItem MapFoundService(Timetable.ResolvedServiceStop source, FoundItem notUsed, ResolutionContext context)
+        private FoundSummaryItem MapFoundServiceSummary(Timetable.ResolvedServiceStop source, FoundItem notUsed, ResolutionContext context)
         {
-            return new FoundItem()
+            return new FoundSummaryItem()
             {
                 Service = CreateServiceSummary(source, context),
+                At = context.Mapper.Map<Model.ScheduledStop>(source.Stop, opts => opts.Items["On"] = source.On),
+                To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop, opts => opts.Items["On"] = source.On),
+                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop, opts => opts.Items["On"] = source.On)
+            };
+        }
+        
+        private FoundServiceItem MapFoundService(Timetable.ResolvedServiceStop source, FoundItem notUsed, ResolutionContext context)
+        {
+            return new FoundServiceItem()
+            {
+                Service = CreateService(source, context),
                 At = context.Mapper.Map<Model.ScheduledStop>(source.Stop, opts => opts.Items["On"] = source.On),
                 To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop, opts => opts.Items["On"] = source.On),
                 From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop, opts => opts.Items["On"] = source.On)

@@ -1,7 +1,5 @@
 using System;
 using AutoMapper;
-using Microsoft.Extensions.Options;
-using Timetable.Test.Data;
 using Timetable.Web.Test.Cif;
 using Xunit;
 using TestSchedules = Timetable.Test.Data.TestSchedules;
@@ -9,7 +7,7 @@ using TestStations = Timetable.Test.Data.TestStations;
 
 namespace Timetable.Web.Test.Mapping
 {
-    public class ToViewModelProfileScheduleToFoundItemTest
+    public class ToViewModelProfileScheduleToFoundServiceItemTest
     {
         private static readonly DateTime TestDate = TestTime.August1;
         
@@ -31,7 +29,7 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal(TestDate, service.Date);
         }
 
-        private static Model.FoundItem MapResolvedStop(Timetable.Schedule schedule = null, 
+        private static Model.FoundServiceItem MapResolvedStop(Timetable.Schedule schedule = null, 
             Timetable.Station at = null, Time? time = null,
             Timetable.Station from = null, Timetable.Station to = null)
         {
@@ -48,7 +46,7 @@ namespace Timetable.Web.Test.Mapping
                 stop.ComesFrom(from);
             
             var mapper = ToViewProfileConfiguration.CreateMapper();
-            return mapper.Map<Timetable.ResolvedServiceStop, Model.FoundItem>(stop, opts => opts.Items["On"] = stop.On);
+            return mapper.Map<Timetable.ResolvedServiceStop, Model.FoundServiceItem>(stop, opts => opts.Items["On"] = stop.On);
         }
 
         [Fact]

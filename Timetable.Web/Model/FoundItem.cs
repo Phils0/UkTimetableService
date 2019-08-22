@@ -3,13 +3,8 @@ namespace Timetable.Web.Model
     /// <summary>
     /// Departure/Arrival
     /// </summary>
-    public class FoundItem
+    public abstract class FoundItem
     {
-        /// <summary>
-        /// Service Details
-        /// </summary>
-        public ServiceSummary Service { get; set; }
-
         /// <summary>
         /// Service times at
         /// </summary>
@@ -24,5 +19,27 @@ namespace Timetable.Web.Model
         /// Details for Going To location - Departures only
         /// </summary>
         public ScheduledStop To { get; set; }
+    }
+    
+    /// <summary>
+    /// Departure/Arrival
+    /// </summary>
+    public class FoundSummaryItem : FoundItem
+    {
+        /// <summary>
+        /// Service Details
+        /// </summary>
+        public ServiceSummary Service { get; set; }
+    }
+    
+    /// <summary>
+    /// Departure/Arrival
+    /// </summary>
+    public class FoundServiceItem : FoundItem
+    {
+        /// <summary>
+        /// Service Details
+        /// </summary>
+        public Service Service { get; set; }
     }
 }

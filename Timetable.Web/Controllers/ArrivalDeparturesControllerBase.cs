@@ -55,7 +55,7 @@ namespace Timetable.Web.Controllers
             return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true);
         }
         
-        protected async Task<IActionResult> Process(SearchRequest request, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find)
+        protected async Task<IActionResult> Process(SearchRequest request, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find, bool includeStops)
         {
             using (LogContext.PushProperty("Request", request, true))
             {
@@ -67,8 +67,14 @@ namespace Timetable.Web.Controllers
                     if (findStatus == FindStatus.Success)
                     {
                         var onDate = services.First().On;
-                        var items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundItem[]>(services,
-                            opts => opts.Items["On"] = onDate);
+                        FoundItem[] items;
+                        if(includeStops)
+                            items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundServiceItem[]>(services,
+                                opts => opts.Items["On"] = onDate);
+                        else
+                            items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundSummaryItem[]>(services,
+                                opts => opts.Items["On"] = onDate);
+                        
                         return Ok(new Model.FoundResponse()
                         {
                             Request = request,
