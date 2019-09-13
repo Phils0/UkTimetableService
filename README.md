@@ -29,11 +29,6 @@ Edit `Timetable.Web/appsettings.json`, to set  `TimetableArchive` to match the n
 
 ## Build and Test
 
-Run `dotnet build` and `dotnet test` from the repos root directory (the one containing `TimetableService.sln`).
+Run `dotnet build` and `dotnet test` from the repos root directory (containing `TimetableService.sln`).
 
 Alternatively open the solution `TimetableService.sln` in Visual Studio or Rider and it should just work.
-
-### Development Dependencies
-
-The solution `TimetableService.sln` contains 8 projects, the 4 in this repo plus those from the CifParser repo.  It assumes that the CifParser repo has been cloned as a sibling of the `UkTimetableService` repo.  At some point I will look to change this to reference a Nuget package.
-
