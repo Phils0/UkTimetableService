@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using CifExtractor;
 using CifParser;
+using CifParser.Archives;
 using NSubstitute;
 using Serilog;
 using Timetable.Web.Mapping;
@@ -37,16 +37,12 @@ namespace Timetable.Web.Test
             }
         }
 
-        private DataLoader CreateLoader(IArchive archive, IParser cifParser = null)
+        private DataLoader CreateLoader(IArchive archive = null, ICifParser cifParser = null)
         {
-            var reader = Substitute.For<TextReader>();
-            var extractor = Substitute.For<IArchiveFileExtractor>();
-            extractor.ExtractFile(RdgZipExtractor.StationExtension).Returns(reader);
-
-            cifParser = cifParser ?? Substitute.For<IParser>();
-
-            var stationParser = Substitute.For<IParser>();
-            stationParser.Read(reader)
+            archive = archive ?? RdgArchive;
+            
+            var stationParser = Substitute.For<IArchiveParser>();
+            stationParser.ReadFile(RdgZipExtractor.StationExtension)
                 .Returns(new[]
                 {
                     Cif.TestStations.Surbiton,
@@ -54,9 +50,14 @@ namespace Timetable.Web.Test
                     Cif.TestStations.WaterlooWindsor
                 });
 
+            archive.CreateParser().Returns(stationParser);
+            
+            cifParser = cifParser ?? Substitute.For<ICifParser>();
+            archive.CreateCifParser().Returns(cifParser);
+            
             var logger = Substitute.For<ILogger>();
 
-            var loader = new DataLoader(extractor, cifParser, stationParser, _mapperConfig.CreateMapper(), archive, logger);
+            var loader = new DataLoader(archive, _mapperConfig.CreateMapper(), logger);
             return loader;
         }
 
@@ -74,7 +75,7 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadTimetableSetsLocations()
         {
-            var loader = CreateLoader(RdgArchive);
+            var loader = CreateLoader();
             var data = await loader.LoadAsync(CancellationToken.None);
 
             var locationData = data.Locations;
@@ -85,15 +86,15 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadTimetableDataSetsNlcs()
         {
-            var parser = Substitute.For<IParser>();
-            parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
+            var parser = Substitute.For<ICifParser>();
+            parser.Read().Returns(new IRecord[]
             {
                 Cif.TestCifLocations.Surbiton,
                 Cif.TestCifLocations.WaterlooMain,
                 Cif.TestCifLocations.WaterlooWindsor
             });
             
-            var loader = CreateLoader(RdgArchive, parser);
+            var loader = CreateLoader(cifParser: parser);
 
             var data = await loader.LoadAsync(CancellationToken.None);
             var locationData = data.Locations;
@@ -106,13 +107,13 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadSchedulesSetsTimetableUidMap()
         {
-            var parser = Substitute.For<IParser>();
-            parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
+            var parser = Substitute.For<ICifParser>();
+            parser.Read().Returns(new IRecord[]
             {
                 Cif.TestSchedules.Test
             });
             
-            var loader = CreateLoader(RdgArchive, parser);
+            var loader = CreateLoader(cifParser: parser);
 
             var data = await loader.LoadAsync(CancellationToken.None);
             var services = data.Timetable;
@@ -125,13 +126,13 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadSchedulesSetsRetailServiceIdMap()
         {
-            var parser = Substitute.For<IParser>();
-            parser.Read(Arg.Any<TextReader>()).Returns(new IRecord[]
+            var parser = Substitute.For<ICifParser>();
+            parser.Read().Returns(new IRecord[]
             {
                 Cif.TestSchedules.Test
             });
             
-            var loader = CreateLoader(RdgArchive, parser);
+            var loader = CreateLoader(cifParser: parser);
 
             var data = await loader.LoadAsync(CancellationToken.None);
             var services = data.Timetable;

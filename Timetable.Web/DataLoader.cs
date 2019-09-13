@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using CifExtractor;
 using CifParser;
+using CifParser.Archives;
 using CifParser.Records;
 using Serilog;
 
@@ -14,20 +14,13 @@ namespace Timetable.Web
     public class DataLoader : IDataLoader
     {
         private const int LogAfter = 100000;
-
-        private IArchiveFileExtractor _extractor;
-        private readonly IParser _cifParser;
-        private IParser _stationParser;
+        
         private IMapper _mapper;
         private readonly IArchive _archive;
         private readonly ILogger _logger;
 
-        public DataLoader(IArchiveFileExtractor extractor, IParser cifParser, IParser stationParser, IMapper mapper,
-            IArchive archive, ILogger logger)
+        public DataLoader(IArchive archive, IMapper mapper, ILogger logger)
         {
-            _extractor = extractor;
-            _cifParser = cifParser;
-            _stationParser = stationParser;
             _mapper = mapper;
             _archive = archive;
             _logger = logger;
@@ -41,10 +34,9 @@ namespace Timetable.Web
             return await Task.Run(() =>
             {
                 _logger.Information("Loading Master Station List in {file}", _archive.FullName);
-                var reader = _extractor.ExtractFile(RdgZipExtractor.StationExtension);
-                var stationRecords = _stationParser.Read(reader).OfType<CifParser.RdgRecords.Station>();
-                var locations = _mapper.Map<IEnumerable<CifParser.RdgRecords.Station>, IEnumerable<Timetable.Location>>(
-                    stationRecords);
+                var parser = _archive.CreateParser();
+                var stationRecords = parser.ReadFile(RdgZipExtractor.StationExtension).OfType<CifParser.RdgRecords.Station>();
+                var locations = _mapper.Map<IEnumerable<CifParser.RdgRecords.Station>, IEnumerable<Timetable.Location>>(stationRecords);
                 _logger.Information("Loaded Master Station List");
                 return locations;
             }, token).ConfigureAwait(false);
@@ -62,8 +54,8 @@ namespace Timetable.Web
             return await Task.Run(() =>
             {
                 _logger.Information("Loading Cif timetable in {file}", _archive.FullName);
-                var reader = _extractor.ExtractFile(RdgZipExtractor.CifExtension);
-                var records = _cifParser.Read(reader);
+                var parser = _archive.CreateCifParser();
+                var records = parser.Read();
                 var data = Add(records, locations);
                 _logger.Information("Loaded timetable");
                 return data;

@@ -31,7 +31,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\CifParser\CifExtractor\CifExtractor.csproj" />
       <ProjectReference Include="..\..\CifParser\CifParser\CifParser.csproj" />
       <ProjectReference Include="..\Timetable\Timetable.csproj" />
     </ItemGroup>

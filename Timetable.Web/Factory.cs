@@ -1,7 +1,7 @@
 using System;
 using AutoMapper;
-using CifExtractor;
 using CifParser;
+using CifParser.Archives;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Timetable.Web.Mapping;
@@ -39,23 +39,7 @@ namespace Timetable.Web
         
         internal IDataLoader CreateDataLoader()
         {
-            var extractor = new RdgZipExtractor(Archive, _logger);
-            return new DataLoader(extractor, CreateCifParser(), CreateStationParser(), CreateMapper(), Archive, _logger);
-            
-            IParser CreateCifParser()
-            {
-                var cifFactory = new ConsolidatorFactory(_logger);
-                return cifFactory.CreateParser();
-            }
-            
-            IParser CreateStationParser()
-            {
-                var stationParserFactory = new StationParserFactory(_logger);
-                var ignoreLines = Archive.IsDtdZip
-                    ? StationParserFactory.DtdIgnoreLines
-                    : StationParserFactory.TtisIgnoreLines;
-                return stationParserFactory.CreateParser(ignoreLines);
-            }
+            return new DataLoader(Archive, CreateMapper(), _logger);
         }
     }
 }
