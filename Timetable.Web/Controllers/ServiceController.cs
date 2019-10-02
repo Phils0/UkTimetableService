@@ -59,7 +59,7 @@ namespace Timetable.Web.Controllers
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Error when processing : {serviceId} on {on:d}", serviceId, on);
+                _logger.Error(e, "Error when processing : {serviceId} on {on}", serviceId, on.ToYMD());
                 throw;
             }
         }
@@ -73,10 +73,10 @@ namespace Timetable.Web.Controllers
                     reason = $"{serviceId} not found in timetable";
                     break;
                 case LookupStatus.NoScheduleOnDate:
-                    reason = $"{serviceId} does not run on {date:d}";
+                    reason = $"{serviceId} does not run on {date.ToYMD()}";
                     break;
                 default:
-                    reason = $"Unknown reason why could not find {serviceId} on {date:d}";
+                    reason = $"Unknown reason why could not find {serviceId} on {date.ToYMD()}";
                     _logger.Error(reason);
                     break;
             }
@@ -120,7 +120,7 @@ namespace Timetable.Web.Controllers
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Error when processing : {serviceId} on {on:d}", serviceId, on);
+                _logger.Error(e, "Error when processing : {serviceId} on {on}", serviceId, on.ToYMD());
                 throw;
             }
         }
@@ -166,7 +166,7 @@ namespace Timetable.Web.Controllers
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Error when processing : {toc} on {on:d}", toc, on);
+                _logger.Error(e, "Error when processing : {toc} on {on}", toc, on.ToYMD());
                 throw;
             }
         }

@@ -186,8 +186,8 @@ namespace Timetable
         public override string ToString()
         {
             return BankHolidays == BankHolidayRunning.RunsOnBankHoliday
-                ? $"{RunsFrom:d}-{RunsTo:d} {DayMask.ToStringEx()}"
-                : $"{RunsFrom:d}-{RunsTo:d} {DayMask.ToStringEx()} ({BankHolidays.ToStringEx()})";
+                ? $"{RunsFrom.ToYMD()}=>{RunsTo.ToYMD()} {DayMask.ToStringEx()}"
+                : $"{RunsFrom.ToYMD()}=>{RunsTo.ToYMD()} {DayMask.ToStringEx()} ({BankHolidays.ToStringEx()})";
         }
     }
 }

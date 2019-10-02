@@ -14,7 +14,7 @@ namespace Timetable.Test
         {
             var service =  TestSchedules.CreateService();
             var stop = new ResolvedServiceStop(service, service.Details.Locations[0]);
-            Assert.Equal("X12345 12/08/2019 10:00 SUR-SURBITN", stop.ToString());
+            Assert.Equal("X12345 2019-08-12 10:00 SUR-SURBITN", stop.ToString());
         }
         
         public static IEnumerable<object[]> ToStations

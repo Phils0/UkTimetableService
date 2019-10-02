@@ -41,7 +41,7 @@ namespace Timetable
 
         public override string ToString()
         {
-            return IsCancelled ? $"{Details.TimetableUid} {On:d} CANCELLED" : $"{Details.TimetableUid} {On:d}";
+            return IsCancelled ? $"{Details.TimetableUid} {On.ToYMD()} CANCELLED" : $"{Details.TimetableUid} {On.ToYMD()}";
         }
     }
 }

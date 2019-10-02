@@ -11,7 +11,7 @@ namespace Timetable.Test
         {
             var calendar = TestSchedules.EverydayAugust2019;
 
-            Assert.Equal("01/08/2019-31/08/2019 MoTuWeThFrSaSu", calendar.ToString());
+            Assert.Equal("2019-08-01=>2019-08-31 MoTuWeThFrSaSu", calendar.ToString());
         }
 
         [Fact]
@@ -19,7 +19,7 @@ namespace Timetable.Test
         {
             var calendar = TestSchedules.CreateAugust2019Calendar(bankHolidays: BankHolidayRunning.DoesNotRunOnEnglishBankHolidays);
 
-            Assert.Equal("01/08/2019-31/08/2019 MoTuWeThFrSaSu (E)", calendar.ToString());
+            Assert.Equal("2019-08-01=>2019-08-31 MoTuWeThFrSaSu (E)", calendar.ToString());
         }
 
         public static TheoryData<DateTime, bool> CalendarBoundaries =>

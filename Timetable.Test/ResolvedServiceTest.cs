@@ -9,8 +9,8 @@ namespace Timetable.Test
         private static readonly DateTime TestDate = new DateTime(2019, 8, 12);
         
         [Theory]
-        [InlineData(true, "X12345 12/08/2019 CANCELLED")]
-        [InlineData(false, "X12345 12/08/2019")]
+        [InlineData(true, "X12345 2019-08-12 CANCELLED")]
+        [InlineData(false, "X12345 2019-08-12")]
         public void ToStringReturnsTimetableUidAndDate(bool isCancelled, string expected)
         {
             var service =  new ResolvedService(TestSchedules.CreateSchedule(), TestDate, isCancelled);

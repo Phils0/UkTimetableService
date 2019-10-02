@@ -65,7 +65,7 @@ namespace Timetable.Web.Model
         
         public override string ToString()
         {
-            return $"{TimetableUid} {Date:d}";
+            return $"{TimetableUid} {Date.ToYMD()}";
         }
     }
 }
