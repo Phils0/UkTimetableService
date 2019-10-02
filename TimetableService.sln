@@ -13,6 +13,8 @@ ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
 	LICENSE = LICENSE
 	README.md = README.md
+	azure-pipelines.yml = azure-pipelines.yml
+	GitVersion.yml = GitVersion.yml
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timetable.Test.Data", "Timetable.Test.Data\Timetable.Test.Data.csproj", "{9A2E7F7C-40A0-4F33-B1F6-94001A0E86D8}"

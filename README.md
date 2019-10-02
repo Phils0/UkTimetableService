@@ -3,6 +3,8 @@ A simple timetable service for GB rail using aspnetcore.
 
 It loads a GB timetable in the CIF file format and provides a simple API to query.
 
+[![Build Status](https://dev.azure.com/phils0oss/UkRailProjects/_apis/build/status/Phils0.UkTimetableService?branchName=master)](https://dev.azure.com/phils0oss/UkRailProjects/_build/latest?definitionId=2&branchName=master)
+
 ## API
 
 * `/api/Timetable//service/C26193/2019-08-11`  - request a service for a date using the TimetableUID
