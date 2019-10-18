@@ -40,7 +40,7 @@ namespace Timetable.Web
         {
             var factory = new Factory(Factory.MapperConfiguration, Configuration, Log.Logger);
             var data = LoadData(factory);
-
+            
             services
                 .AddSingleton<ILocationData>(data.Locations)
                 .AddSingleton<ITimetable>(data.Timetable)
@@ -50,6 +50,7 @@ namespace Timetable.Web
                 .AddSwaggerGen(ConfigureSwagger)
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddHealthChecks();
         }
 
         private static Data LoadData(Factory factory)
@@ -115,6 +116,7 @@ namespace Timetable.Web
                 app.UseHsts();
             }
 
+            app.UseHealthChecks("/health");
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Timetable Service V1"); });
 
