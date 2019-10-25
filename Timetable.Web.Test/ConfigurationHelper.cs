@@ -1,19 +1,17 @@
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using NSubstitute;
 
 namespace Timetable.Web.Test
 {
     public static class ConfigurationHelper
     {
-        public static IConfigurationRoot GetIConfigurationRoot(string path)
+        public static IConfigurationRoot GetConfiguration()
         {
-            var directory = new DirectoryInfo(path);
+            var appSettings = Substitute.For<IConfigurationRoot>();
+            appSettings["TimetableArchive"].Returns("ttis144.zip");
             
-            return new ConfigurationBuilder()
-                .SetBasePath(directory.FullName)
-                .AddJsonFile("appsettings.json", optional: true)
-                .AddEnvironmentVariables()
-                .Build();
+            return appSettings;
         }
     }
 }

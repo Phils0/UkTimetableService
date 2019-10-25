@@ -18,7 +18,7 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadStations()
         {
-            var config = new LoaderConfig(ConfigurationHelper.GetIConfigurationRoot("."));
+            var config = new LoaderConfig(ConfigurationHelper.GetConfiguration());
             
             var factory = new Factory(_mapperConfig, config, Substitute.For<ILogger>());
             var loader = factory.CreateDataLoader();
@@ -31,7 +31,7 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadCif()
         {
-            var config = new LoaderConfig(ConfigurationHelper.GetIConfigurationRoot("."));
+            var config = new LoaderConfig(ConfigurationHelper.GetConfiguration());
             
             var factory = new Factory(_mapperConfig, config, Substitute.For<ILogger>());
             var loader = factory.CreateDataLoader();
