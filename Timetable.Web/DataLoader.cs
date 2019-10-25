@@ -56,13 +56,13 @@ namespace Timetable.Web
                 _logger.Information("Loading Cif timetable in {file}", _archive.FullName);
                 var parser = _archive.CreateCifParser();
                 var records = parser.Read();
-                var data = Add(records, locations);
+                var data = Add(records, locations, _archive.FullName); 
                 _logger.Information("Loaded timetable");
                 return data;
             }, token).ConfigureAwait(false);
         }
 
-        private Data Add(IEnumerable<IRecord> records, LocationData locations)
+        private Data Add(IEnumerable<IRecord> records, LocationData locations, string archiveFile)
         {
             var tocLookup = new TocLookup(_logger, new Dictionary<string, Toc>());
             var timetable = new TimetableData();
@@ -105,6 +105,7 @@ namespace Timetable.Web
 
             return new Data()
             {
+                Archive = archiveFile,
                 Locations = locations,
                 Timetable = timetable
             };

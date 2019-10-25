@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +55,8 @@ namespace Timetable.Web.Test
             
             cifParser = cifParser ?? Substitute.For<ICifParser>();
             archive.CreateCifParser().Returns(cifParser);
-            
+
+            archive.FullName.Returns(@"TestData.zip");
             var logger = Substitute.For<ILogger>();
 
             var loader = new DataLoader(archive, _mapperConfig.CreateMapper(), logger);
@@ -140,6 +142,15 @@ namespace Timetable.Web.Test
             var schedule = services.GetScheduleByRetailServiceId(Cif.TestSchedules.SW1234, new DateTime(2019, 8, 1));
             
             Assert.NotEmpty(schedule.services);            
+        }
+        
+        [Fact]
+        public async Task SetArchiveName()
+        {
+            var loader = CreateLoader();
+            var data = await loader.LoadAsync(CancellationToken.None);
+            
+            Assert.Equal("TestData.zip", data.Archive);
         }
     }
 }

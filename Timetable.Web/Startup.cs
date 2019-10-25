@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Timetable.Web.Model;
 using ILogger = Serilog.ILogger;
 
 namespace Timetable.Web
@@ -40,17 +42,27 @@ namespace Timetable.Web
         {
             var factory = new Factory(Factory.MapperConfiguration, Configuration, Log.Logger);
             var data = LoadData(factory);
-            
+
             services
                 .AddSingleton<ILocationData>(data.Locations)
                 .AddSingleton<ITimetable>(data.Timetable)
                 .AddSingleton<IFilterFactory>(new GatherFilterFactory())
                 .AddSingleton<IMapper>(factory.CreateMapper()) //TODO Swap to scoped
                 .AddSingleton<ILogger>(Log.Logger)
+                .AddSingleton<Model.Configuration>(CreateConfiguration())
                 .AddSwaggerGen(ConfigureSwagger)
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHealthChecks();
+
+            Configuration CreateConfiguration()
+            {
+                return new Model.Configuration()
+                {
+                    Version = GetType().Assembly.GetName().Version.ToString(),
+                    Data = data.Archive
+                };
+            }
         }
 
         private static Data LoadData(Factory factory)
