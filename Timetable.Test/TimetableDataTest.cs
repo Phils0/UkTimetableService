@@ -88,14 +88,15 @@ namespace Timetable.Test
         
         [Theory]
         [InlineData("VT1000", "VT1000")]
-        [InlineData("VT2000", "VT2000")]
+        [InlineData("VT2000", "VT200000")]
+        [InlineData("VT200000", "VT200000")]
         [InlineData("VT3000", null)]
         public void FindScheduleBasedUponRetailServiceId(string retailServiceId, string expected)
         {
             var timetable = new TimetableData();
             
             TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A00001", retailServiceId: "VT1000");
-            TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A00002", retailServiceId: "VT2000");
+            TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A00002", retailServiceId: "VT200000");
 
             var services = timetable.GetScheduleByRetailServiceId(retailServiceId, MondayAugust12);
             var service =  services.services.FirstOrDefault()?.Details;
@@ -129,6 +130,20 @@ namespace Timetable.Test
             var found = timetable.GetScheduleByRetailServiceId("VT999900", MondayAugust12);
             Assert.Empty(found.services);
             Assert.Equal(LookupStatus.ServiceNotFound, found.status);
+        }
+        
+        [Theory]
+        [InlineData("ABC")]
+        [InlineData("")]
+        [InlineData("")]
+        public void GetScheduleByRetailServiceIdInvalidRetailServiceId(string retailServiceId)
+        {
+            var timetable = new TimetableData();           
+            TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            
+            var found = timetable.GetScheduleByRetailServiceId(retailServiceId, MondayAugust12);
+            Assert.Empty(found.services);
+            Assert.Equal(LookupStatus.InvalidRetailServiceId, found.status);
         }
         
         [Fact]
@@ -197,7 +212,7 @@ namespace Timetable.Test
         }
         
         [Fact]
-        public void TocScheduleNotFounds()
+        public void TocScheduleNotFound()
         {
             var timetable = new TimetableData();           
 

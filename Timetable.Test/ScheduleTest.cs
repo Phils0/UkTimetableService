@@ -12,14 +12,34 @@ namespace Timetable.Test
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
 
         [Theory]
-        [InlineData("VT123400", true)]
-        [InlineData("VT999900", false)]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        public void IsRetailServiceId(string retailServiceId, bool expected)
+        [InlineData("VT123400", "VT1234", true)]
+        [InlineData("VT123400", "VT123400", true)]
+        [InlineData("VT123400", "VT123401", true)]
+        [InlineData("VT123400", "VT999900", false)]
+        [InlineData("VT123400", "", false)]
+        [InlineData("VT123400", null, false)]
+        [InlineData("", "VT999900", false)]
+        [InlineData("", "", false)]
+        [InlineData("", null, false)]
+        [InlineData(null, "VT999900", false)]
+        [InlineData(null, "", false)]
+        [InlineData(null, null, false)]
+        public void HasRetailServiceIdChecksUsingTheShortRetailServiceId(string retailsServiceId, string testId, bool expected)
         {
             var schedule = TestSchedules.CreateSchedule();
-            Assert.Equal(expected, schedule.HasRetailServiceId(retailServiceId));
+            schedule.RetailServiceId = retailsServiceId;
+            Assert.Equal(expected, schedule.HasRetailServiceId(testId));
+        }
+        
+        [Theory]
+        [InlineData("VT123400", "VT1234")]
+        [InlineData("", "")]
+        [InlineData(null, "")]
+        public void ShortRetailServiceId(string retailServiceId, string expected)
+        {
+            var schedule = TestSchedules.CreateSchedule();
+            schedule.RetailServiceId = retailServiceId;
+            Assert.Equal(expected, schedule.ShortRetailServiceId);
         }
         
         [Fact]

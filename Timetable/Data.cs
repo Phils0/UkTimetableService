@@ -4,6 +4,6 @@ namespace Timetable
     {
         public string Archive { get; set; }
         public ILocationData Locations { get; set; }
-        public TimetableData Timetable { get; set; }
+        public ITimetable Timetable { get; set; }
     }
 }

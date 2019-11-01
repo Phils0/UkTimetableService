@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Timetable
 {
@@ -8,7 +9,8 @@ namespace Timetable
     {
         Success,
         ServiceNotFound,
-        NoScheduleOnDate
+        NoScheduleOnDate,
+        InvalidRetailServiceId
     }
     
     public interface ITimetable
@@ -27,10 +29,10 @@ namespace Timetable
         {
             void AddToRetailServiceMap(Service trainService)
             {
-                if (!_retailServiceIdMap.TryGetValue(schedule.RetailServiceId, out var services))
+                if (!_retailServiceIdMap.TryGetValue(schedule.ShortRetailServiceId, out var services))
                 {
                     services = new List<Service>();
-                    _retailServiceIdMap.Add(schedule.RetailServiceId, services);
+                    _retailServiceIdMap.Add(schedule.ShortRetailServiceId, services);
                 }
 
                 if (!services.Contains(trainService))
@@ -62,8 +64,24 @@ namespace Timetable
             return (LookupStatus.Success ,schedule);
         }
 
+        private Regex RetailServiceIdRegex = new Regex(@"^(\w\w\d{4})\d{0,2}");
+
+        private bool TryToNormaliseRetailServiceId(ref string retailServiceId)
+        {
+            if (string.IsNullOrEmpty(retailServiceId))
+                return false;
+
+            var match = RetailServiceIdRegex.Match(retailServiceId);
+            if (match.Success)
+                retailServiceId = match.Groups[1].Value;
+            return match.Success;
+        }
+        
         public (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date)
         {
+            if(!TryToNormaliseRetailServiceId(ref retailServiceId))
+                return (LookupStatus.InvalidRetailServiceId, new ResolvedService[0]);
+                
             if (!_retailServiceIdMap.TryGetValue(retailServiceId, out var services))
                 return (LookupStatus.ServiceNotFound, new ResolvedService[0]);
 

@@ -75,6 +75,14 @@ namespace Timetable.Web.Controllers
                 case LookupStatus.NoScheduleOnDate:
                     reason = $"{serviceId} does not run on {date.ToYMD()}";
                     break;
+                case LookupStatus.InvalidRetailServiceId:
+                    reason = $"Retail Service Id {serviceId} is invalid";
+                    return BadRequest(new ServiceNotFound()
+                    {
+                        Id = serviceId,
+                        Date = date,
+                        Reason = reason
+                    });
                 default:
                     reason = $"Unknown reason why could not find {serviceId} on {date.ToYMD()}";
                     _logger.Error(reason);

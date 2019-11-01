@@ -70,10 +70,26 @@ namespace Timetable
         
         public ICalendar Calendar { get; set; }
         /// <summary>
-        /// Retail Service ID - used by NRS
+        /// 2 char\6 digit Retail Service ID - used by NRS
         /// </summary>
+        /// <remarks>
+        /// First 4 digits indicate the logical service
+        /// with last 2 digits for splits and joins
+        /// </remarks>
         public string RetailServiceId { get; set; }
 
+        /// <summary>
+        /// 2 char\4 digit Retail Service ID - used by NRS
+        /// </summary>
+        /// <remarks>
+        /// Indicates the retail service in NRS
+        /// Use to not have to worry about splits and joins
+        /// </remarks>
+        public string ShortRetailServiceId
+        {
+            get { return string.IsNullOrEmpty(RetailServiceId) ? "" : RetailServiceId.Substring(0, 6); }
+        }
+        
         /// <summary>
         /// Train Identity - sometimes called HeadCode
         /// </summary>
@@ -132,7 +148,9 @@ namespace Timetable
 
         public bool HasRetailServiceId(string retailServiceId)
         {
-            return RetailServiceId == retailServiceId;
+            return !string.IsNullOrEmpty(RetailServiceId) && 
+                   retailServiceId != null && 
+                   retailServiceId.StartsWith(ShortRetailServiceId);
         }
 
         public bool OperatedBy(string toc)

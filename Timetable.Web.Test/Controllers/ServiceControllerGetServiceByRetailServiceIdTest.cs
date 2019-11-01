@@ -71,5 +71,22 @@ namespace Timetable.Web.Test.Controllers
             Assert.Equal("VT123400", service.RetailServiceId);
             Assert.True(service.IsCancelled);
         }
+        
+        [Fact]
+        public async Task ServiceByRetailServiceIdReturnsInvalidWithReason()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Returns((LookupStatus.InvalidRetailServiceId, new ResolvedService[0]));
+
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetServiceByRetailServiceId("", April1) as ObjectResult;;
+            
+            Assert.Equal(400, response.StatusCode);
+            var notFound = response.Value as ServiceNotFound;
+            Assert.Equal("", notFound.Id);
+            Assert.Equal(April1, notFound.Date);
+            Assert.Equal("Retail Service Id  is invalid", notFound.Reason);
+        }
     }
 }
