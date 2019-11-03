@@ -85,7 +85,7 @@ namespace Timetable
         /// Indicates the retail service in NRS
         /// Use to not have to worry about splits and joins
         /// </remarks>
-        public string ShortRetailServiceId
+        public string NrsRetailServiceId
         {
             get { return string.IsNullOrEmpty(RetailServiceId) ? "" : RetailServiceId.Substring(0, 6); }
         }
@@ -150,7 +150,7 @@ namespace Timetable
         {
             return !string.IsNullOrEmpty(RetailServiceId) && 
                    retailServiceId != null && 
-                   retailServiceId.StartsWith(ShortRetailServiceId);
+                   retailServiceId.StartsWith(NrsRetailServiceId);
         }
 
         public bool OperatedBy(string toc)

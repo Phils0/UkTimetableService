@@ -20,9 +20,13 @@ namespace Timetable.Web.Model
         /// </summary>
         public bool IsCancelled { get; set; }
         /// <summary>
-        /// Retail Service ID - used by NRS
+        /// Retail Service ID
         /// </summary>
         public string RetailServiceId { get; set; }
+        /// <summary>
+        /// Retail Service ID - short version to use when calling NRS to avoid having to worry about splits and joins
+        /// </summary>
+        public string NrsRetailServiceId { get; set; }
         /// <summary>
         /// Train Identity - sometimes called HeadCode
         /// </summary>

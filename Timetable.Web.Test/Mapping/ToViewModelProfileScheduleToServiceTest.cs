@@ -50,6 +50,12 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal("VT123400", output.RetailServiceId);         
         }
         
+        [Fact]
+        public void MapNrsRetailServiceId()
+        {
+            var output = MapSchedule();
+            Assert.Equal("VT1234", output.NrsRetailServiceId);         
+        }
                 
         [Fact]
         public void MapTrainIdentity()

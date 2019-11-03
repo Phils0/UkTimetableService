@@ -24,6 +24,10 @@ namespace Timetable.Web.Model
         /// </summary>
         public string RetailServiceId { get; set; }
         /// <summary>
+        /// Retail Service ID - short version to use when calling NRS to avoid having to worry about splits and joins
+        /// </summary>
+        public string NrsRetailServiceId { get; set; }
+        /// <summary>
         /// Train Identity - sometimes called HeadCode
         /// </summary>
         public string TrainIdentity { get; set; }
