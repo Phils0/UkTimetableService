@@ -1,0 +1,104 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Timetable
+{
+    public enum AssociationCategory
+    {
+        None,
+        Join,          // JJ
+        Split,         // VV
+        NextPrevious   // NP
+    }
+    
+    public enum AssociationDateIndicator
+    {
+        None,
+        Standard,      // S
+        NextDay,       // N
+        PreviousDay    // P
+    }
+
+    /// <summary>
+    /// An indivdual schedule
+    /// </summary>
+    public class Association
+    {
+        /// <summary>
+        /// Unique internal id
+        /// </summary>
+        public int Id { get; }
+        
+        /// <summary>
+        /// Main Timetable Id
+        /// </summary>
+        public string MainTimetableUid { get; set; }
+        
+        public Service MainService { get; private set;  }
+
+        /// <summary>
+        /// Main Timetable Id
+        /// </summary>
+        public string AssociatedTimetableUid { get; set; }
+        
+        public Service AssociatedService { get; private set;  }
+        
+        /// <summary>
+        /// STP (Short Term Plan) Indicator
+        /// </summary>
+        /// <remarks>
+        /// P - Permanent schedule
+        /// O - STP overlay of Permanent schedule
+        /// N - New STP schedule (not an overlay)
+        /// C - STP Cancellation of Permanent schedule
+        /// </remarks>
+        public StpIndicator StpIndicator { get; set; }
+
+        public bool IsCancelled() => StpIndicator.Cancelled == StpIndicator;
+        
+        public ICalendar Calendar { get; set; }
+        
+        public AssociationDateIndicator DateIndicator { get; set; }
+        
+        public AssociationCategory Category { get; set; }
+        
+        public Association(int id)
+        {
+            Id = id;
+        }
+
+        public void AddToService(Service service, bool isMain)
+        {
+            if (isMain)
+            {
+                CheckMatchingTimetableId(service, MainTimetableUid);
+                MainService = service;
+            }
+            else
+            {
+                CheckMatchingTimetableId(service, AssociatedTimetableUid);
+                AssociatedService = service;
+            }
+            service.AddAssociation(this, isMain);
+        }
+
+        private void CheckMatchingTimetableId(Service service, string associationTimetableUid)
+        {
+            if(service.TimetableUid != associationTimetableUid)
+                throw new ArgumentException($"Service {service} not valid for association id:{Id} {associationTimetableUid}");
+        }
+
+        public Location AtLocation { get; set; }
+        
+        public bool AppliesOn(DateTime date)
+        {
+            return Calendar.IsActiveOn(date);
+        }
+        
+        public override string ToString()
+        {
+            return $"{MainTimetableUid}-{AssociatedTimetableUid} -{StpIndicator} {Calendar} ({Id})";
+        }
+    }
+}

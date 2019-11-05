@@ -131,6 +131,10 @@ namespace Timetable
 
         public void AddToService(Service service)
         {
+            if (service.TimetableUid != TimetableUid)
+                throw new ArgumentException(
+                    $"Service: {TimetableUid}  TimetableUID does not match. Failed to add schedule: {service}");  
+            
             service.Add(this);            
             Service = service;
         }

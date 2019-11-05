@@ -1,22 +1,14 @@
 using System;
+using System.Collections.Generic;
+using ReflectionMagic;
 using Timetable.Test.Data;
 using Xunit;
 using Xunit.Sdk;
 
 namespace Timetable.Test
 {
-    public class ServiceTest
+    public class Service_SchedulesTest
     {
-        [Fact]
-        public void ParentSetToService()
-        {
-            var service = new Service("X12345");
-            var schedule = TestSchedules.CreateSchedule();
-            schedule.AddToService(service);
-
-            Assert.Same(service, schedule.Service);
-        }
-        
         [Fact]
         public void CanAddSchedulesWithDifferentStpIndicator()
         {
@@ -24,13 +16,18 @@ namespace Timetable.Test
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.EverydayAugust2019);
             
-            permanent.AddToService(service);
-            overlay.AddToService(service);
-            
-            Assert.Same(service, permanent.Service);
-            Assert.Same(service, overlay.Service);
+            service.Add(permanent);
+            service.Add(overlay);
+
+            var schedules = GetSchedules(service);
+            Assert.Equal(2, schedules.Count);
         }
-        
+
+        private static SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> GetSchedules(Service service)
+        {
+            return (SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>) service.AsDynamic()._multipleSchedules.RealObject;
+        }
+
         // It happens we order by the calendar as need a unique order for the SortedList but could be anything that creates uniqueness
         [Fact]
         public void CanAddSchedulesWithSameStpIndicator()
@@ -39,11 +36,23 @@ namespace Timetable.Test
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var permanent2 = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
-            permanent.AddToService(service);
-            permanent2.AddToService(service);
+            service.Add(permanent);
+            service.Add(permanent2);
             
-            Assert.Same(service, permanent.Service);
-            Assert.Same(service, permanent2.Service);
+            var schedules = GetSchedules(service);
+            Assert.Equal(2, schedules.Count);
+        }
+        
+        [Fact]
+        public void CannotAddSameSchedulesTwice()
+        {
+            var service = new Service("X12345");
+            var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            
+            service.Add(permanent);
+            var ex = Assert.Throws<ArgumentException>(() =>  service.Add(permanent));
+            
+            Assert.StartsWith("Schedule already added", ex.Message);
         }
         
         [Fact]
@@ -52,16 +61,6 @@ namespace Timetable.Test
             //TODO
         }
         
-        [Fact]
-        public void CannotAddScheduleWithDifferentTimetableUid()
-        {
-            var schedule = TestSchedules.CreateSchedule(timetableId: "A00002", indicator: StpIndicator.Permanent);
-            
-            var service = new Service("A00001");
-            
-            Assert.Throws<ArgumentException>(() => schedule.AddToService(service));
-        }
-
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
 
         [Fact]

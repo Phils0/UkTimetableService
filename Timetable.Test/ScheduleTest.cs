@@ -11,6 +11,55 @@ namespace Timetable.Test
     {
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
 
+        [Fact]
+        public void ParentSetToService()
+        {
+            var service = new Service("X12345");
+            var schedule = TestSchedules.CreateSchedule();
+            schedule.AddToService(service);
+
+            Assert.Same(service, schedule.Service);
+        }
+        
+        [Fact]
+        public void CanAddSchedulesWithDifferentStpIndicator()
+        {
+            var service = new Service("X12345");
+            var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
+            var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.EverydayAugust2019);
+            
+            permanent.AddToService(service);
+            overlay.AddToService(service);
+            
+            Assert.Same(service, permanent.Service);
+            Assert.Same(service, overlay.Service);
+        }
+        
+        // It happens we order by the calendar as need a unique order for the SortedList but could be anything that creates uniqueness
+        [Fact]
+        public void CanAddSchedulesWithSameStpIndicator()
+        {
+            var service = new Service("X12345");
+            var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
+            var permanent2 = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            
+            permanent.AddToService(service);
+            permanent2.AddToService(service);
+            
+            Assert.Same(service, permanent.Service);
+            Assert.Same(service, permanent2.Service);
+        }
+        
+        [Fact]
+        public void CannotAddScheduleWithDifferentTimetableUid()
+        {
+            var schedule = TestSchedules.CreateSchedule(timetableId: "A00002", indicator: StpIndicator.Permanent);
+            
+            var service = new Service("A00001");
+            
+            Assert.Throws<ArgumentException>(() => schedule.AddToService(service));
+        }
+        
         [Theory]
         [InlineData("VT123400", "VT1234", true)]
         [InlineData("VT123400", "VT123400", true)]

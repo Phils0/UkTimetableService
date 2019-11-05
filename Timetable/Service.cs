@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Timetable
@@ -23,7 +24,7 @@ namespace Timetable
                 return compare != 0 ? compare : x.calendar.CompareTo(y.calendar);
             }
         }
-
+        
         public string TimetableUid { get; }
 
         private Schedule _schedule;
@@ -31,18 +32,17 @@ namespace Timetable
         private SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> _multipleSchedules;
 
         private Multiplicity _stateType = Multiplicity.None;
+        
+        private Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> _associations;
 
         public Service(string timetableUid)
         {
             TimetableUid = timetableUid;
         }
 
+        // Used by Schedule, do not use.  Use Schedule.AddToService
         internal void Add(Schedule schedule)
         {
-            if (schedule.TimetableUid != TimetableUid)
-                throw new ArgumentException(
-                    $"Service: {TimetableUid}  TimetableUID does not match. Failed to add schedule: {schedule}");
-
             if (_stateType == Multiplicity.None)
             {
                 SetSingleSchedule();
@@ -53,7 +53,14 @@ namespace Timetable
                 MoveToMultipleSchedules();
             }
 
-            _multipleSchedules.Add((schedule.StpIndicator, schedule.Calendar), schedule);
+            try
+            {
+                _multipleSchedules.Add((schedule.StpIndicator, schedule.Calendar), schedule);
+            }
+            catch (ArgumentException e)
+            {
+                throw new ArgumentException($"Schedule already added {schedule}", e);
+            }
 
             void SetSingleSchedule()
             {
@@ -124,6 +131,35 @@ namespace Timetable
             return false;
         }
 
+        internal void AddAssociation(Association association, bool isMain)
+        {
+            if (_associations == null)
+                _associations = new Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>();
+
+            if (isMain)
+                Add(association.AssociatedTimetableUid);
+            else
+                Add(association.MainTimetableUid);
+
+            void Add(string uid)
+            {
+                if (!_associations.TryGetValue(uid, out var values))
+                {
+                    values = new SortedList<(StpIndicator indicator, ICalendar calendar), Association>();
+                    _associations.Add(uid, values);
+                }
+
+                try
+                {
+                    values.Add((association.StpIndicator, association.Calendar), association);
+                }
+                catch (ArgumentException e)
+                {
+                    throw new ArgumentException($"Association already added {association}", e);
+                }
+            }
+        }
+        
         public override string ToString()
         {
             return TimetableUid;
