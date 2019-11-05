@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace Timetable.Web.Mapping
 {
-    public class CalendarConverter : IValueConverter<ScheduleDetails, Calendar>
+    public class CalendarConverter : IValueConverter<ScheduleDetails, Calendar>, IValueConverter<CifParser.Records.Association, Calendar>
     {
         private ConcurrentDictionary<Calendar, Calendar> _lookup = new ConcurrentDictionary<Calendar, Calendar>();
 
@@ -53,6 +53,19 @@ namespace Timetable.Web.Mapping
                 default:
                     throw new ArgumentOutOfRangeException($"Unknown bank holiday value: {bankHoliday}");
             }
+        }
+
+        public Calendar Convert(CifParser.Records.Association source, ResolutionContext context)
+        {
+            var calendar = new Calendar(
+                    source.RunsFrom,
+                    source.RunsTo.Value,
+                    MapMask(source.DayMask),
+                    BankHolidayRunning.RunsOnBankHoliday)    // Default to applies Bank holidays
+                ;
+            var actual = _lookup.GetOrAdd(calendar, calendar);
+            actual.Generate();
+            return actual;
         }
     }
 }

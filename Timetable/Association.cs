@@ -25,7 +25,6 @@ namespace Timetable
     /// </summary>
     public class Association
     {
-       
         /// <summary>
         /// Main Timetable Id
         /// </summary>
@@ -34,12 +33,14 @@ namespace Timetable
         public Service MainService { get; private set;  }
 
         /// <summary>
-        /// Main Timetable Id
+        /// Associated Timetable Id
         /// </summary>
         public string AssociatedTimetableUid { get; set; }
         
         public Service AssociatedService { get; private set;  }
         
+        public Location AtLocation { get; set; }
+
         /// <summary>
         /// STP (Short Term Plan) Indicator
         /// </summary>
@@ -59,6 +60,7 @@ namespace Timetable
         
         public AssociationCategory Category { get; set; }
         
+        public bool IsPublic { get; set; }
 
         public void AddToService(Service service, bool isMain)
         {
@@ -80,8 +82,6 @@ namespace Timetable
             if(service.TimetableUid != associationUid)
                 throw new ArgumentException($"Service {service} not valid for association {this} ({whichUid})");
         }
-
-        public Location AtLocation { get; set; }
         
         public bool AppliesOn(DateTime date)
         {

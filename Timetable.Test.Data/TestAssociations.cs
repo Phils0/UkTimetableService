@@ -14,7 +14,7 @@ namespace Timetable.Test.Data
             AssociationDateIndicator dateIndicator = AssociationDateIndicator.Standard,
             Service service = null)
         {
-            var assocation = new Association()
+            var association = new Association()
             {
                 MainTimetableUid = mainUid,
                 AssociatedTimetableUid = associatedUid,
@@ -28,10 +28,10 @@ namespace Timetable.Test.Data
             if (service != null)
             {
                 bool isMain = service.TimetableUid == mainUid;
-                assocation.AddToService(service, isMain);
+                association.AddToService(service, isMain);
             }
             
-            return assocation;
+            return association;
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Timetable
     }
 
     /// <summary>
-    /// An indivdual schedule
+    /// An individual schedule
     /// </summary>
     public class Schedule
     {

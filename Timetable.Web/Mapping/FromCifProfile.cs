@@ -6,6 +6,8 @@ namespace Timetable.Web.Mapping
 {
     public class FromCifProfile : Profile
     {
+        private const string PassengerAssociation = "P";
+        
         public FromCifProfile()
         {
             CreateMap<CifParser.RdgRecords.Station, Timetable.Location>().
@@ -30,10 +32,21 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Operator, o => o.ConvertUsing(new TocConverter(), s => s.Toc))
                 .ForAllOtherMembers(o => o.Ignore());
 
+            var locationConverter = new LocationsConverter();
+            CreateMap<CifParser.Records.Association, Association>()
+                .ForMember(d => d.MainTimetableUid, o => o.MapFrom(s => s.MainUid))
+                .ForMember(d => d.AssociatedTimetableUid, o => o.MapFrom(s => s.AssociatedUid))
+                .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
+                .ForMember(d => d.AtLocation, o => o.ConvertUsing(locationConverter, s => s.Location))
+                .ForMember(d => d.Category, o => o.MapFrom(s => AssociationConverter.ConvertCategory(s.Category)))
+                .ForMember(d => d.DateIndicator, o => o.MapFrom(s => AssociationConverter.ConvertDateIndicator(s.DateIndicator)))
+                .ForMember(d => d.IsPublic, o => o.MapFrom(s => PassengerAssociation.Equals(s.AssociationType)))
+                .ForMember(d => d.MainService, o => o.Ignore())
+                .ForMember(d => d.AssociatedService, o => o.Ignore());
+            
             CreateMap<TimeSpan, Time>()
                 .ConvertUsing(t => new Time(t));
             // Schedule location records
-            var locationConverter = new LocationsConverter();
             CreateMap<CifParser.Records.OriginLocation, ScheduleOrigin>()
                 .ForMember(d => d.Departure, o => o.MapFrom(s => s.PublicDeparture))
                 .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
