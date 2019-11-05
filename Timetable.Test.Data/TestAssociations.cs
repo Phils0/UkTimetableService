@@ -12,10 +12,9 @@ namespace Timetable.Test.Data
             Location location = null,
             AssociationCategory category = AssociationCategory.Join,
             AssociationDateIndicator dateIndicator = AssociationDateIndicator.Standard,
-            int id = 1, 
             Service service = null)
         {
-            var assocation = new Association(id)
+            var assocation = new Association()
             {
                 MainTimetableUid = mainUid,
                 AssociatedTimetableUid = associatedUid,

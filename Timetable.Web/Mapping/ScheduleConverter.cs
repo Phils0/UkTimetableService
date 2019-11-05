@@ -11,19 +11,17 @@ namespace Timetable.Web.Mapping
     internal class ScheduleConverter : ITypeConverter<CifParser.Schedule, Timetable.Schedule>
     {
         private readonly ILogger _logger;
-        private readonly Sequence _sequence;
 
-        internal ScheduleConverter(ILogger logger, Sequence sequence)
+        internal ScheduleConverter(ILogger logger)
         {
             _logger = logger;
-            _sequence = sequence;
         }
 
         public Schedule Convert(CifParser.Schedule source, Schedule destination, ResolutionContext context)
         {
             var timetable = context.Items["Timetable"] as TimetableData;
 
-            var schedule = new Schedule(_sequence.GetNext());           
+            var schedule = new Schedule();           
             schedule = context.Mapper
                     .Map<CifParser.Records.ScheduleDetails, Timetable.Schedule>(source.GetScheduleDetails(), schedule);
             
@@ -56,6 +54,7 @@ namespace Timetable.Web.Mapping
             {
                 var locations = new List<ScheduleLocation>(16);
                 var start = Time.NotValid;
+                var sequence = new Sequence();
  
                 foreach (var record in records)
                 {
@@ -85,7 +84,7 @@ namespace Timetable.Web.Mapping
                     {
                         EnsureTimesGoToTheFuture(working);
                         working.SetParent(schedule);
-                        working.Id = _sequence.GetNext();
+                        working.Id = sequence.GetNext();
                     }
                 }
 

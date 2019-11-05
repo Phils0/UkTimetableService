@@ -25,11 +25,7 @@ namespace Timetable
     /// </summary>
     public class Association
     {
-        /// <summary>
-        /// Unique internal id
-        /// </summary>
-        public int Id { get; }
-        
+       
         /// <summary>
         /// Main Timetable Id
         /// </summary>
@@ -63,30 +59,26 @@ namespace Timetable
         
         public AssociationCategory Category { get; set; }
         
-        public Association(int id)
-        {
-            Id = id;
-        }
 
         public void AddToService(Service service, bool isMain)
         {
             if (isMain)
             {
-                CheckMatchingTimetableId(service, MainTimetableUid);
+                CheckMatchingTimetableId(service, MainTimetableUid,  "Main");
                 MainService = service;
             }
             else
             {
-                CheckMatchingTimetableId(service, AssociatedTimetableUid);
+                CheckMatchingTimetableId(service, AssociatedTimetableUid, "Associated");
                 AssociatedService = service;
             }
             service.AddAssociation(this, isMain);
         }
 
-        private void CheckMatchingTimetableId(Service service, string associationTimetableUid)
+        private void CheckMatchingTimetableId(Service service, string associationUid, string whichUid)
         {
-            if(service.TimetableUid != associationTimetableUid)
-                throw new ArgumentException($"Service {service} not valid for association id:{Id} {associationTimetableUid}");
+            if(service.TimetableUid != associationUid)
+                throw new ArgumentException($"Service {service} not valid for association {this} ({whichUid})");
         }
 
         public Location AtLocation { get; set; }
@@ -98,7 +90,7 @@ namespace Timetable
         
         public override string ToString()
         {
-            return $"{MainTimetableUid}-{AssociatedTimetableUid} -{StpIndicator} {Calendar} ({Id})";
+            return $"{MainTimetableUid}-{AssociatedTimetableUid} -{StpIndicator} {Calendar}";
         }
     }
 }

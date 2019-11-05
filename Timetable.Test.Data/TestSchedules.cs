@@ -22,7 +22,7 @@ namespace Timetable.Test.Data
             Time when = default(Time))
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
-            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, id, service, retailServiceId);
+            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
             var resolved = new ResolvedService(schedule, on, isCancelled);
 
             var origin = schedule.Locations.First() as ScheduleOrigin; 
@@ -38,7 +38,6 @@ namespace Timetable.Test.Data
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            int id = 1,
             Service service = null,
             string retailServiceId = null,
             DateTime on =  default(DateTime),
@@ -47,7 +46,7 @@ namespace Timetable.Test.Data
             Time when = default(Time))
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
-            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, id, service, retailServiceId);
+            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
             var resolved = new ResolvedService(schedule, on, isCancelled);
 
             var origin = schedule.Locations.First() as ScheduleOrigin; 
@@ -63,14 +62,13 @@ namespace Timetable.Test.Data
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            int id = 1,
             Service service = null,
             string retailServiceId = null,
             DateTime on =  default(DateTime),
             bool isCancelled = false)
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
-            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, id, service, retailServiceId);
+            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
             return new ResolvedService(schedule, on, isCancelled);
         }
         
@@ -78,11 +76,10 @@ namespace Timetable.Test.Data
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            int id = 1,
             Service service = null,
             string retailServiceId = null)
         {
-            var schedule = new Schedule(id)
+            var schedule = new Schedule()
             {
                 TimetableUid = timetableId,
                 StpIndicator = indicator,
@@ -113,12 +110,11 @@ namespace Timetable.Test.Data
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            int id = 1,
             Service service = null)
         {
             service = service ?? new Service(timetableId);
 
-            return CreateSchedule(timetableId, indicator, calendar, stops, id, service);
+            return CreateSchedule(timetableId, indicator, calendar, stops, service);
         }
 
         public static Schedule CreateScheduleInTimetable(TimetableData timetable, 
@@ -126,10 +122,9 @@ namespace Timetable.Test.Data
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            int id = 1,
             string retailServiceId = null)
         {
-            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, id, retailServiceId: retailServiceId);
+            var schedule = CreateSchedule(timetableId, indicator, calendar, stops, retailServiceId: retailServiceId);
 
             timetable.AddSchedule(schedule);
 

@@ -76,7 +76,6 @@ namespace Timetable.Web.Test.Mapping
                 .Count();
             
             Assert.Equal(output.Locations.Count(), uniqueIds);
-            Assert.DoesNotContain(output.Id, output.Locations.Select(l => l.Id));
         }
         
         [Fact]

@@ -21,7 +21,6 @@ namespace Timetable.Web.Mapping
                 .DisableCtorValidation()
                 .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
                 .ForMember(d => d.Service, o => o.Ignore())
-                .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.RetailServiceId, o => o.Ignore())
                 .ForMember(d => d.Operator, o => o.Ignore())
                 .ForMember(d => d.Locations, o => o.Ignore());
@@ -69,7 +68,7 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Id, o => o.Ignore())
                 .AfterMap((s, d) => d.UpdateAdvertisedStop());
 
-            var scheduleConverter = new ScheduleConverter(Log.Logger, new Sequence());
+            var scheduleConverter = new ScheduleConverter(Log.Logger);
             CreateMap<CifParser.Schedule, Timetable.Schedule>()
                 .ConvertUsing(scheduleConverter);            
         }

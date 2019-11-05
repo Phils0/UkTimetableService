@@ -44,11 +44,6 @@ namespace Timetable
     /// </summary>
     public class Schedule
     {
-        /// <summary>
-        /// Unique internal id
-        /// </summary>
-        public int Id { get; }
-
         public Service Service { get; private set;  }
         /// <summary>
         /// Timetable Id
@@ -123,12 +118,7 @@ namespace Timetable
         /// </summary>
         /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Category </remarks>
         public string Category { get; set; }
-
-        public Schedule(int id)
-        {
-            Id = id;
-        }
-
+        
         public void AddToService(Service service)
         {
             if (service.TimetableUid != TimetableUid)
@@ -170,7 +160,7 @@ namespace Timetable
         
         public override string ToString()
         {
-            return $"{TimetableUid} -{StpIndicator} {Calendar} ({Id})";
+            return $"{TimetableUid} -{StpIndicator} {Calendar}";
         }
     }
 }

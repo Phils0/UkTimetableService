@@ -264,14 +264,5 @@ namespace Timetable.Web.Test.Mapping
             var destination = output.Locations[4] as ScheduleDestination;
             Assert.True(destination.Arrival.IsNextDay);
         }
-        
-        [Fact]
-        public void SetUniqueIds()
-        {
-            var schedule1 = MapSchedule();
-            var schedule2 = MapSchedule();
-            
-            Assert.NotEqual(schedule1.Id, schedule2.Id);
-        }
     }
 }
