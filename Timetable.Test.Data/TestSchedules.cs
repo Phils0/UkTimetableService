@@ -10,6 +10,8 @@ namespace Timetable.Test.Data
         private static Toc VirginTrains => new Toc() {Code = "VT", Name = "Virgin Trains"};
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
         
+        public static ResolvedAssociation[] NoAssociations => new ResolvedAssociation[0];
+        
         public static ResolvedServiceStop CreateResolvedArrivalStop(
             string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
@@ -25,7 +27,7 @@ namespace Timetable.Test.Data
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
-            var resolved = new ResolvedService(schedule, on, isCancelled);
+            var resolved = new ResolvedService(schedule, on, isCancelled, NoAssociations);
 
             var origin = schedule.Locations.First() as ScheduleOrigin; 
             atLocation = atLocation ?? origin.Station;
@@ -49,7 +51,7 @@ namespace Timetable.Test.Data
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
-            var resolved = new ResolvedService(schedule, on, isCancelled);
+            var resolved = new ResolvedService(schedule, on, isCancelled, NoAssociations);
 
             var origin = schedule.Locations.First() as ScheduleOrigin; 
             atLocation = atLocation ?? origin.Station;
@@ -71,7 +73,7 @@ namespace Timetable.Test.Data
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
-            return new ResolvedService(schedule, on, isCancelled);
+            return new ResolvedService(schedule, on, isCancelled, NoAssociations);
         }
         
         public static Schedule CreateSchedule(string timetableId = "X12345",

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Serilog;
 
@@ -83,12 +84,18 @@ namespace Timetable
             }
         }
 
+        public bool TryFindScheduleOn(DateTime date, out ResolvedService schedule)
+        {
+            schedule = GetScheduleOn(date);
+            return schedule != null;
+        }
+        
         public ResolvedService GetScheduleOn(DateTime date)
         {
             if (_schedule != null)
             {
                 if (_schedule.RunsOn(date))
-                    return new ResolvedService(_schedule, date, _schedule.IsCancelled());
+                    return new ResolvedService(_schedule, date, _schedule.IsCancelled(), GetAssociationsOn(date));
 
                 return null;
             }
@@ -101,17 +108,35 @@ namespace Timetable
                     if (schedule.IsCancelled())
                         isCancelled = true;
                     else
-                        return new ResolvedService(schedule, date, isCancelled);
+                        return new ResolvedService(schedule, date, isCancelled, GetAssociationsOn(date));
                 }
             }
 
             return null;
         }
 
-        public bool TryFindScheduleOn(DateTime date, out ResolvedService schedule)
+        private ResolvedAssociation[] GetAssociationsOn(DateTime date)
         {
-            schedule = GetScheduleOn(date);
-            return schedule != null;
+            if(_associations == null)
+                return new ResolvedAssociation[0];
+
+            var associations = new List<ResolvedAssociation>();
+            foreach (var versions in _associations.Values)
+            {
+                var isCancelled = false;
+                foreach (var association in versions.Values)
+                {
+                    if (association.AppliesOn(date))
+                    {
+                        if (association.IsCancelled())
+                            isCancelled = true;
+                        else
+                            associations.Add(new ResolvedAssociation(association, date, isCancelled));
+                    }
+                }
+            }
+
+            return associations.ToArray();
         }
 
         public bool TryFindScheduledStop(StopSpecification find, out ResolvedServiceStop stop)
@@ -150,7 +175,7 @@ namespace Timetable
             {
                 if (!_associations.TryGetValue(uid, out var values))
                 {
-                    values = new SortedList<(StpIndicator indicator, ICalendar calendar), Association>();
+                    values = new SortedList<(StpIndicator indicator, ICalendar calendar), Association>(new StpDescendingComparer());
                     _associations.Add(uid, values);
                 }
 
@@ -164,17 +189,32 @@ namespace Timetable
                     {
                         // Can have 2 associations that are different but for the same services, see tests
                         _logger.Warning("Removing Duplicate Associations {association} {duplicate}", association, duplicate);
-                        values.Remove((association.StpIndicator, association.Calendar));
+                        RemoveAssociation();
                     }
                     else
                         throw;
+                    
+                    void RemoveAssociation()
+                    {
+                        values.Remove((association.StpIndicator, association.Calendar));
+                        if (!values.Any())
+                            _associations.Remove(uid);
+                    }                    
                 }
+
+
             }
+        }
+
+
+        public bool HasAssociations()
+        {
+            return _associations != null && _associations.Any();
         }
         
         public override string ToString()
         {
-            return TimetableUid;
+            return HasAssociations() ? $"{TimetableUid} +{_associations.Count}" : TimetableUid;
         }
     }
 }

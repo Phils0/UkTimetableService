@@ -14,6 +14,7 @@ namespace Timetable.Test
 
             service.AddAssociation(association, true);
 
+            Assert.True(service.HasAssociations());
             var associations = service.GetAssociations();
             Assert.NotEmpty( associations["A98765"]);
         }
@@ -26,6 +27,7 @@ namespace Timetable.Test
 
             service.AddAssociation(association, false);
 
+            Assert.True(service.HasAssociations());
             var associations = service.GetAssociations();
             Assert.NotEmpty( associations["X12345"]);
         }
@@ -40,6 +42,7 @@ namespace Timetable.Test
             service.AddAssociation(permanent, true);
             service.AddAssociation(overlay, true);
 
+            Assert.True(service.HasAssociations());
             var associations = service.GetAssociations();
             Assert.Single(associations);
             Assert.Equal(2, associations["A98765"].Count);
@@ -56,6 +59,7 @@ namespace Timetable.Test
             service.AddAssociation(permanent, true);
             service.AddAssociation(permanent2, true);
 
+            Assert.True(service.HasAssociations());
             var associations = service.GetAssociations();
             Assert.Single(associations);
             Assert.Equal(2, associations["A98765"].Count);
@@ -75,8 +79,9 @@ namespace Timetable.Test
             service.AddAssociation(association, true);
             service.AddAssociation(reversed, false);
             
+            Assert.False(service.HasAssociations());
             var associations = service.GetAssociations();
-            Assert.Empty(associations["A67890"]);
+            Assert.Empty(associations);
         }
         
         // Implication of the above
@@ -89,8 +94,9 @@ namespace Timetable.Test
             service.AddAssociation(permanent, true);
             service.AddAssociation(permanent, true);
             
+            Assert.False(service.HasAssociations());
             var associations = service.GetAssociations();
-            Assert.Empty(associations["A98765"]);
+            Assert.Empty(associations);
         }
         
         [Fact]
@@ -109,10 +115,115 @@ namespace Timetable.Test
             service.AddAssociation(uid1, true);
             service.AddAssociation(uid2, true);
 
+            Assert.True(service.HasAssociations());
             var associations = service.GetAssociations();
             Assert.Equal(2, associations.Count);
             Assert.Single(associations["A12345"]);
             Assert.Single(associations["A67890"]);
+        }
+        
+        [Fact]
+        public void HasAssociationsFalseWhenNoAssociations()
+        {
+            var service = TestSchedules.CreateScheduleWithService().Service;
+            
+            Assert.False(service.HasAssociations());
+            var associations = service.GetAssociations();
+        }
+        
+        private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
+
+        [Fact]
+        public void GetsScheduleWithAssociationsApplyingOnDate()
+        {
+            var schedule = TestSchedules.CreateScheduleWithService();
+            var service = schedule.Service;
+  
+            var association1 = TestAssociations.CreateAssociation(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
+            var association2 = TestAssociations.CreateAssociation(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Thursday));
+
+            service.AddAssociation(association1, true);
+            service.AddAssociation(association2, true);
+            
+            var found = service.GetScheduleOn(MondayAugust12.AddDays(2));
+            Assert.Equal(association1, found.Associations[0].Details);
+            
+            found = service.GetScheduleOn(MondayAugust12.AddDays(3));
+            Assert.Equal(association2, found.Associations[0].Details);
+            
+            found = service.GetScheduleOn(MondayAugust12);
+            Assert.Empty(found.Associations);
+        }
+
+        [Fact]
+        public void NoAssociationsReturnedWhenNone()
+        {
+            var schedule = TestSchedules.CreateScheduleWithService();
+            var service = schedule.Service;
+            
+            var found = service.GetScheduleOn(MondayAugust12);
+            Assert.Empty(found.Associations);
+        }
+        
+        [Theory]
+        [InlineData(StpIndicator.Permanent, StpIndicator.New)]
+        [InlineData(StpIndicator.Override, StpIndicator.New)]
+        [InlineData(StpIndicator.Permanent, StpIndicator.Override)]
+        public void HighIndicatorsTakePriorityOverLow(StpIndicator lowIndicator, StpIndicator highIndicator)
+        {
+            var schedule = TestSchedules.CreateScheduleWithService();
+            var service = schedule.Service;
+  
+            var low = TestAssociations.CreateAssociation(indicator: lowIndicator);
+            var high = TestAssociations.CreateAssociation(indicator: highIndicator);
+
+            service.AddAssociation(low, true);
+            service.AddAssociation(high, true);
+            
+            var found = service.GetScheduleOn(MondayAugust12);
+            
+            Assert.Equal(high, found.Associations[0].Details);
+        }
+        
+        [Theory]
+        [InlineData(StpIndicator.Permanent)]
+        [InlineData(StpIndicator.Override)]
+        [InlineData(StpIndicator.New)]
+        public void CancelledAssociationsReturned(StpIndicator lowIndicator)
+        {
+            var schedule = TestSchedules.CreateScheduleWithService();
+            var service = schedule.Service;
+  
+            var low = TestAssociations.CreateAssociation(indicator: lowIndicator);
+            var cancelled = TestAssociations.CreateAssociation(indicator: StpIndicator.Cancelled);
+
+            service.AddAssociation(low, true);
+            service.AddAssociation(cancelled, true);
+            
+            var found = service.GetScheduleOn(MondayAugust12);
+            
+            Assert.True( found.Associations[0].IsCancelled);
+            Assert.Equal(low, found.Associations[0].Details);
+        }
+        
+        [Fact]
+        public void MultipleAssociationsWithCancelReturnsHighestPriority()
+        {
+            var schedule = TestSchedules.CreateScheduleWithService();
+            var service = schedule.Service;
+  
+            var low = TestAssociations.CreateAssociation(indicator: StpIndicator.Permanent);
+            var high = TestAssociations.CreateAssociation(indicator: StpIndicator.Override);
+            var cancelled = TestAssociations.CreateAssociation(indicator: StpIndicator.Cancelled);
+            
+            service.AddAssociation(low, true);
+            service.AddAssociation(high, true);
+            service.AddAssociation(cancelled, true);
+            
+            var found = service.GetScheduleOn(MondayAugust12);
+            
+            Assert.True( found.Associations[0].IsCancelled);
+            Assert.Equal(high, found.Associations[0].Details);
         }
     }
 }

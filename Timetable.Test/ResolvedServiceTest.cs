@@ -13,7 +13,7 @@ namespace Timetable.Test
         [InlineData(false, "X12345 2019-08-12")]
         public void ToStringReturnsTimetableUidAndDate(bool isCancelled, string expected)
         {
-            var service =  new ResolvedService(TestSchedules.CreateSchedule(), TestDate, isCancelled);
+            var service =  new ResolvedService(TestSchedules.CreateSchedule(), TestDate, isCancelled, TestSchedules.NoAssociations);
 
             Assert.Equal(expected, service.ToString());
         }
@@ -23,7 +23,7 @@ namespace Timetable.Test
         [InlineData(false)]
         public void FindStopIsIndependentOfWhetherCancelled(bool isCancelled)
         {
-            var service =  new ResolvedService(TestSchedules.CreateSchedule(), DateTime.Today, isCancelled);
+            var service =  new ResolvedService(TestSchedules.CreateSchedule(), DateTime.Today, isCancelled, TestSchedules.NoAssociations);
 
             var find = CreateFindSpec(TestSchedules.Ten);
             Assert.True(service.TryFindStop(find, out var stop));
@@ -38,7 +38,7 @@ namespace Timetable.Test
         [Fact]
         public void DoNotFindStop()
         {
-            var service =  new ResolvedService(TestSchedules.CreateSchedule(), DateTime.Today, false);
+            var service =  new ResolvedService(TestSchedules.CreateSchedule(), DateTime.Today, false, TestSchedules.NoAssociations);
 
             var find = CreateFindSpec(TestSchedules.TenThirty);
             Assert.False(service.TryFindStop(find, out var stop));

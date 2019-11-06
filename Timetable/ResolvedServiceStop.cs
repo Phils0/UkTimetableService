@@ -10,12 +10,12 @@ namespace Timetable
         public ScheduleLocation FoundFromStop { get; private set; } = null;
 
         public ResolvedServiceStop(ResolvedService service, ScheduleLocation stop)
-            : this(service.Details, stop, service.On, service.IsCancelled)
+            : this(service.Details, stop, service.On, service.IsCancelled, service.Associations)
         {
         }
 
-        public ResolvedServiceStop(Schedule service, ScheduleLocation stop, DateTime on, bool isCancelled)
-            : base(service, on, isCancelled)
+        public ResolvedServiceStop(Schedule service, ScheduleLocation stop, DateTime on, bool isCancelled, ResolvedAssociation[] associations)
+            : base(service, on, isCancelled, associations)
         {
             Stop = stop;
         }
