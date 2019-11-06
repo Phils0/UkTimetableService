@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -8,6 +9,7 @@ using AutoMapper;
 using CifParser;
 using CifParser.Archives;
 using NSubstitute;
+using ReflectionMagic;
 using Serilog;
 using Timetable.Web.Mapping;
 using Xunit;
@@ -123,6 +125,70 @@ namespace Timetable.Web.Test
             var schedule = services.GetScheduleByTimetableUid(Cif.TestSchedules.X12345, new DateTime(2019, 8, 1));
             
             Assert.NotNull(schedule.service);            
+        }
+        
+        [Fact]
+        public async Task OnlyLoadPassengerVisibleAssociations()
+        {
+            var parser = Substitute.For<ICifParser>();
+            parser.Read().Returns(new IRecord[]
+            {
+                Cif.TestAssociations.CreateAssociation("X12345", "A12345", type: "P"),
+                Cif.TestAssociations.CreateAssociation("X12345", "A67890", type: "O"),
+                Cif.TestSchedules.CreateSchedule("X12345"),
+                Cif.TestSchedules.CreateSchedule("A12345"),
+                Cif.TestSchedules.CreateSchedule("A67890"),
+            });
+            
+            var loader = CreateLoader(cifParser: parser);
+
+            var data = await loader.LoadAsync(CancellationToken.None);
+            var timetable = (TimetableData) data.Timetable;
+
+            var x12345 = GetService(timetable, "X12345");
+            Assert.Single(GetAssociations(x12345));            
+            var a12345 = GetService(timetable, "A12345");
+            Assert.Single(GetAssociations(a12345));            
+            var a67890 = GetService(timetable, "A67890");
+            Assert.Null(GetAssociations(a67890));            
+        }
+        
+        [Fact]
+        public async Task LoadCancelledPassengerAssociations()
+        {
+            var parser = Substitute.For<ICifParser>();
+            parser.Read().Returns(new IRecord[]
+            {
+                Cif.TestAssociations.CreateAssociation("X12345", "A12345", type: "P"),
+                Cif.TestAssociations.CreateAssociation("X12345", "A67890", CifParser.Records.StpIndicator.C, type: null),
+                Cif.TestSchedules.CreateSchedule("X12345"),
+                Cif.TestSchedules.CreateSchedule("A12345"),
+                Cif.TestSchedules.CreateSchedule("A67890"),
+            });
+            
+            var loader = CreateLoader(cifParser: parser);
+
+            var data = await loader.LoadAsync(CancellationToken.None);
+            var timetable = (TimetableData) data.Timetable;
+
+            var x12345 = GetService(timetable, "X12345");
+            Assert.Equal(2, GetAssociations(x12345).Count);            
+            var a12345 = GetService(timetable, "A12345");
+            Assert.Single(GetAssociations(a12345));            
+            var a67890 = GetService(timetable, "A67890");
+            Assert.Single(GetAssociations(a12345));            
+        }
+        
+        private static Service GetService(TimetableData timetable, string timetableUid)
+        {
+            var services = (Dictionary<string, Service>) timetable.AsDynamic()._timetableUidMap.RealObject;
+            return services[timetableUid];
+        }
+        
+        private static Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> GetAssociations(Service service)
+        {
+            var associations = service.AsDynamic()._associations;
+            return associations == null ? null : (Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>) associations.RealObject;
         }
         
         [Fact]

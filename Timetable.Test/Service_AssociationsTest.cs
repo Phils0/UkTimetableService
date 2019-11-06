@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using ReflectionMagic;
 using Timetable.Test.Data;
 using Xunit;
-using Xunit.Sdk;
 
 namespace Timetable.Test
 {
@@ -17,7 +14,7 @@ namespace Timetable.Test
 
             service.AddAssociation(association, true);
 
-            var associations = GetAssociations(service);
+            var associations = service.GetAssociations();
             Assert.NotEmpty( associations["A98765"]);
         }
         
@@ -29,7 +26,7 @@ namespace Timetable.Test
 
             service.AddAssociation(association, false);
 
-            var associations = GetAssociations(service);
+            var associations = service.GetAssociations();
             Assert.NotEmpty( associations["X12345"]);
         }
         
@@ -43,14 +40,9 @@ namespace Timetable.Test
             service.AddAssociation(permanent, true);
             service.AddAssociation(overlay, true);
 
-            var associations = GetAssociations(service);
+            var associations = service.GetAssociations();
             Assert.Single(associations);
             Assert.Equal(2, associations["A98765"].Count);
-        }
-
-        private static Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> GetAssociations(Service service)
-        {
-            return (Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>) service.AsDynamic()._associations.RealObject;
         }
 
         // It happens we order by the calendar as need a unique order for the SortedList but could be anything that creates uniqueness
@@ -64,21 +56,41 @@ namespace Timetable.Test
             service.AddAssociation(permanent, true);
             service.AddAssociation(permanent2, true);
 
-            var associations = GetAssociations(service);
+            var associations = service.GetAssociations();
             Assert.Single(associations);
             Assert.Equal(2, associations["A98765"].Count);
         }
         
+        // This is very dubious currently occurs once in the industry data 
+        // AANW80860W838501905201912131111100JJSRAMSGTE  TP                               P
+        // AANW83850W808601905201912131111100VVSRAMSGTE  TP                               P
+        // Remove both
         [Fact]
-        public void CannotAddSameAssociationTwice()
+        public void AddReversedAssociationTwiceResultsInNeitherBeingAdded()
+        {
+            var service = TestSchedules.CreateScheduleWithService("A12345").Service;
+            var association = TestAssociations.CreateAssociation(mainUid: "A12345", associatedUid: "A67890");
+            var reversed = TestAssociations.CreateAssociation(mainUid: "A67890", associatedUid: "A12345");
+           
+            service.AddAssociation(association, true);
+            service.AddAssociation(reversed, false);
+            
+            var associations = service.GetAssociations();
+            Assert.Empty(associations["A67890"]);
+        }
+        
+        // Implication of the above
+        [Fact]
+        public void AddSameAssociationTwiceResultsInNeitherBeingAdded()
         {
             var service = TestSchedules.CreateScheduleWithService().Service;
-            var permanent = TestAssociations.CreateAssociation(indicator: StpIndicator.Permanent);
+            var permanent = TestAssociations.CreateAssociation();
             
             service.AddAssociation(permanent, true);
-            var ex = Assert.Throws<ArgumentException>(() =>  service.AddAssociation(permanent, true));
+            service.AddAssociation(permanent, true);
             
-            Assert.StartsWith("Association already added", ex.Message);
+            var associations = service.GetAssociations();
+            Assert.Empty(associations["A98765"]);
         }
         
         [Fact]
@@ -97,7 +109,7 @@ namespace Timetable.Test
             service.AddAssociation(uid1, true);
             service.AddAssociation(uid2, true);
 
-            var associations = GetAssociations(service);
+            var associations = service.GetAssociations();
             Assert.Equal(2, associations.Count);
             Assert.Single(associations["A12345"]);
             Assert.Single(associations["A67890"]);

@@ -99,7 +99,8 @@ namespace Timetable.Web.Test.Mapping
         [InlineData(null, AssociationCategory.None)]
         public void MapCategory(string input, AssociationCategory expected)
         {
-            var association = Cif.TestAssociations.CreateAssociation(category: input);
+            var association = Cif.TestAssociations.CreateAssociation();
+            association.Category = input;
             var output = MapAssociation(association);
             
             Assert.Equal(expected, output.Category);
@@ -127,11 +128,10 @@ namespace Timetable.Web.Test.Mapping
         [InlineData(null, false)]
         public void MapIsPublic(string input, bool expected)
         {
-            var association = Cif.TestAssociations.CreateAssociation();
-            association.AssociationType = input;
+            var association = Cif.TestAssociations.CreateAssociation(type: input);
             var output = MapAssociation(association);
             
-            Assert.Equal(expected, output.IsPublic);
+            Assert.Equal(expected, output.IsPassenger);
         }
 
     }

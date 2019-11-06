@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using NSubstitute;
+using Serilog;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -16,7 +18,7 @@ namespace Timetable.Test
         [InlineData("A00003", null)]
         public void FindScheduleBasedUponTimetableUid(string timetableUid, string expected)
         {
-            var timetable = new TimetableData();
+            var timetable = CreateTimetable();
             
             TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A00001");
             TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A00002");
@@ -25,11 +27,16 @@ namespace Timetable.Test
             
             Assert.Equal(expected, service?.Details.TimetableUid);
         }
-        
+
+        private static TimetableData CreateTimetable()
+        {
+            return new TimetableData(Substitute.For<ILogger>());
+        }
+
         [Fact]
         public void GetsScheduleRunningOnDate()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
 
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
@@ -46,7 +53,7 @@ namespace Timetable.Test
         [Fact]
         public void ScheduleNotFound()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
             TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
             var found = timetable.GetScheduleByTimetableUid("Z98765", MondayAugust12);
@@ -57,7 +64,7 @@ namespace Timetable.Test
         [Fact]
         public void ScheduleNotRunningOnDate()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
                        
@@ -69,7 +76,7 @@ namespace Timetable.Test
         [Fact]
         public void ScheduleCancelledOnDate()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Weekdays));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
             schedule2.StpIndicator = StpIndicator.Cancelled;
@@ -93,7 +100,7 @@ namespace Timetable.Test
         [InlineData("VT3000", null)]
         public void FindScheduleBasedUponRetailServiceId(string retailServiceId, string expected)
         {
-            var timetable = new TimetableData();
+            var timetable = CreateTimetable();
             
             TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A00001", retailServiceId: "VT1000");
             TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A00002", retailServiceId: "VT200000");
@@ -107,7 +114,7 @@ namespace Timetable.Test
         [Fact]
         public void GetsScheduleRunningOnDateBasedUponRetailServiceId()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
 
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
@@ -124,7 +131,7 @@ namespace Timetable.Test
         [Fact]
         public void ScheduleNotFoundBasedUponRetailServiceId()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
             TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
             var found = timetable.GetScheduleByRetailServiceId("VT999900", MondayAugust12);
@@ -138,7 +145,7 @@ namespace Timetable.Test
         [InlineData("")]
         public void GetScheduleByRetailServiceIdInvalidRetailServiceId(string retailServiceId)
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
             TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
             var found = timetable.GetScheduleByRetailServiceId(retailServiceId, MondayAugust12);
@@ -149,7 +156,7 @@ namespace Timetable.Test
         [Fact]
         public void ScheduleNotFoundBasedUponRetailServiceIdWhenHaveTwoDifferentRetailServiceIdsForSameService()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
             TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday), retailServiceId: "VT999900");
             
@@ -161,7 +168,7 @@ namespace Timetable.Test
         [Fact]
         public void ScheduleNotRunningOnDateBasedUponRetailServiceId()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
                        
@@ -173,7 +180,7 @@ namespace Timetable.Test
         [Fact]
         public void ScheduleCancelledOnDateBasedUponRetailServiceId()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Weekdays));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
             schedule2.StpIndicator = StpIndicator.Cancelled;
@@ -192,7 +199,7 @@ namespace Timetable.Test
         [Fact]
         public void GetsTocSchedulesRunningOnDate()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
 
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
@@ -214,7 +221,7 @@ namespace Timetable.Test
         [Fact]
         public void TocScheduleNotFound()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
 
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
@@ -228,7 +235,7 @@ namespace Timetable.Test
         [Fact]
         public void GetsCancelledSchedulesRunningOnDate()
         {
-            var timetable = new TimetableData();           
+            var timetable = CreateTimetable();           
 
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Everyday));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));

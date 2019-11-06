@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace Timetable
 {
@@ -22,8 +23,14 @@ namespace Timetable
 
     public class TimetableData : ITimetable
     {
+        private readonly ILogger _logger;
         private Dictionary<string, Service> _timetableUidMap { get; } = new Dictionary<string, Service>(400000);
         private Dictionary<string, IList<Service>> _retailServiceIdMap { get; } = new Dictionary<string, IList<Service>>(400000);
+
+        public TimetableData(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         public void AddSchedule(Schedule schedule)
         {
@@ -41,7 +48,7 @@ namespace Timetable
 
             if (!_timetableUidMap.TryGetValue(schedule.TimetableUid, out var service))
             {
-                service = new Service(schedule.TimetableUid);
+                service = new Service(schedule.TimetableUid, _logger);
                 _timetableUidMap.Add(service.TimetableUid, service);
             }
             
@@ -118,6 +125,34 @@ namespace Timetable
             var reason = services.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
 
             return (reason, services.ToArray());
+        }
+
+        public int AddAssociations(IEnumerable<Association> associations)
+        {
+            int count = 0;
+            
+            void Add(Association association)
+            {
+                if (_timetableUidMap.TryGetValue(association.MainTimetableUid, out var mainService) &&
+                    _timetableUidMap.TryGetValue(association.AssociatedTimetableUid, out var otherService))
+                {
+                    mainService.AddAssociation(association, true);
+                    otherService.AddAssociation(association, false);
+                    count++;
+                }
+                else
+                {
+                    var which = mainService == null ? "main" : "associated";
+                    _logger.Information("Could not add {association} did not find {which}", association, which);
+                }
+            }
+
+            foreach (var association in associations)
+            {
+                Add(association);
+            }
+
+            return count;
         }
     }
 }

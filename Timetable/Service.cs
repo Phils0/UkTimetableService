@@ -2,12 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Serilog;
 
 namespace Timetable
 {
     public class Service
     {
+        private readonly ILogger _logger;
+
         private enum Multiplicity
         {
             None,
@@ -35,8 +39,9 @@ namespace Timetable
         
         private Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> _associations;
 
-        public Service(string timetableUid)
+        public Service(string timetableUid, ILogger logger)
         {
+            _logger = logger;
             TimetableUid = timetableUid;
         }
 
@@ -155,7 +160,14 @@ namespace Timetable
                 }
                 catch (ArgumentException e)
                 {
-                    throw new ArgumentException($"Association already added {association}", e);
+                    if(values.TryGetValue((association.StpIndicator, association.Calendar), out var duplicate))
+                    {
+                        // Can have 2 associations that are different but for the same services, see tests
+                        _logger.Warning("Removing Duplicate Associations {association} {duplicate}", association, duplicate);
+                        values.Remove((association.StpIndicator, association.Calendar));
+                    }
+                    else
+                        throw;
                 }
             }
         }

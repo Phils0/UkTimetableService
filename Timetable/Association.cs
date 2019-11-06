@@ -60,7 +60,7 @@ namespace Timetable
         
         public AssociationCategory Category { get; set; }
         
-        public bool IsPublic { get; set; }
+        public bool IsPassenger { get; set; }
 
         public void AddToService(Service service, bool isMain)
         {

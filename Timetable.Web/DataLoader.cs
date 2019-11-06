@@ -65,15 +65,24 @@ namespace Timetable.Web
         private Data Add(IEnumerable<IRecord> records, LocationData locations, string archiveFile)
         {
             var tocLookup = new TocLookup(_logger, new Dictionary<string, Toc>());
-            var timetable = new TimetableData();
+            var timetable = new TimetableData(_logger);
+            var associations = new List<Association>(6000);
             
-            Schedule MapSchedule(CifParser.Schedule schedule)
+            Timetable.Schedule MapSchedule(CifParser.Schedule schedule)
             {
                 return _mapper.Map<CifParser.Schedule, Timetable.Schedule>(schedule, o =>
                 {
                     o.Items.Add("Tocs", tocLookup);
                     o.Items.Add("Locations", locations);
                     o.Items.Add("Timetable", timetable);
+                });
+            }
+            
+            Timetable.Association MapAssociation(CifParser.Records.Association association)
+            {
+                return _mapper.Map<CifParser.Records.Association, Timetable.Association>(association, o =>
+                {
+                    o.Items.Add("Locations", locations);
                 });
             }
             
@@ -86,11 +95,13 @@ namespace Timetable.Web
                     case TiplocInsertAmend tiploc:
                         locations.UpdateLocationNlc(tiploc.Code, tiploc.Nalco);
                         break;
-                    case Association association:
-                        break;
                     case CifParser.Schedule schedule:
                         var s = MapSchedule(schedule);
                         break;
+                    case CifParser.Records.Association association:
+                        var a = MapAssociation(association);
+                        associations.Add(a);
+                        break;                    
                     default:
                         _logger.Warning("Unhandled record {recordType}: {record}", record.GetType(), record);
                         break;
@@ -103,6 +114,9 @@ namespace Timetable.Web
 
             _logger.Information("Loaded records: {count}", count);
 
+            var applied = timetable.AddAssociations(associations.Where(a => a.IsPassenger || a.IsCancelled()));
+            _logger.Information("Applied Associations: {applied} of {Count}", applied, associations.Count);
+            
             return new Data()
             {
                 Archive = archiveFile,

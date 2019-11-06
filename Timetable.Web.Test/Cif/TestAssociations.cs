@@ -11,7 +11,7 @@ namespace Timetable.Web.Test.Cif
             string mainUid = X12345, 
             string otherUid = A98765,
             CifParser.Records.StpIndicator stp = CifParser.Records.StpIndicator.P,
-            string category = "JJ")
+            string type = "P")
         {
             return new CifParser.Records.Association()
             {
@@ -22,9 +22,9 @@ namespace Timetable.Web.Test.Cif
                 RunsTo = new DateTime(2019, 8, 31),
                 DayMask = "1111100",
                 Location =  "SURBITN",
-                Category = category,
+                Category = "JJ",
                 DateIndicator = "S",
-                AssociationType = "P"
+                AssociationType = type
             };
         }
         

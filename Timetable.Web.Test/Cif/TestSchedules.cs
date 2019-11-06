@@ -23,19 +23,24 @@ namespace Timetable.Web.Test.Cif
     {
         internal const string X12345 = "X12345";
         internal const string SW1234 = "SW123400";
-        internal static CifParser.Schedule Test => new CifParser.Schedule()
+        internal static CifParser.Schedule Test => CreateSchedule(X12345);
+
+        internal static CifParser.Schedule CreateSchedule(string timetableUid)
         {
-            Records = new List<IRecord>(new IRecord[]
+            return new CifParser.Schedule()
             {
-                CreateScheduleDetails(),
-                CreateScheduleExtraDetails(),
-                CreateOriginLocation(),
-                CreateIntermediateLocation(),
-                CreatePassLocation(pass: TestTime.TenTwenty),
-                CreateIntermediateLocation(departure: TestTime.TenTwentyFive, sequence: 2),
-                CreateTerminalLocation()
-            })
-        };
+                Records = new List<IRecord>(new IRecord[]
+                {
+                    CreateScheduleDetails(timetableUid),
+                    CreateScheduleExtraDetails(),
+                    CreateOriginLocation(),
+                    CreateIntermediateLocation(),
+                    CreatePassLocation(pass: TestTime.TenTwenty),
+                    CreateIntermediateLocation(departure: TestTime.TenTwentyFive, sequence: 2),
+                    CreateTerminalLocation()
+                })
+            };
+        }
 
         internal static ScheduleDetails CreateScheduleDetails(
             string timetableUid = X12345, 

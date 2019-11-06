@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
-using ReflectionMagic;
+using NSubstitute;
+using Serilog;
 using Timetable.Test.Data;
 using Xunit;
-using Xunit.Sdk;
 
 namespace Timetable.Test
 {
@@ -12,41 +11,37 @@ namespace Timetable.Test
         [Fact]
         public void CanAddSchedulesWithDifferentStpIndicator()
         {
-            var service = new Service("X12345");
+            var service = new Service("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.EverydayAugust2019);
             
             service.Add(permanent);
             service.Add(overlay);
 
-            var schedules = GetSchedules(service);
+            var schedules = service.GetSchedules();
             Assert.Equal(2, schedules.Count);
         }
-
-        private static SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> GetSchedules(Service service)
-        {
-            return (SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>) service.AsDynamic()._multipleSchedules.RealObject;
-        }
+        
 
         // It happens we order by the calendar as need a unique order for the SortedList but could be anything that creates uniqueness
         [Fact]
         public void CanAddSchedulesWithSameStpIndicator()
         {
-            var service = new Service("X12345");
+            var service = new Service("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var permanent2 = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
             service.Add(permanent);
             service.Add(permanent2);
             
-            var schedules = GetSchedules(service);
+            var schedules = service.GetSchedules();
             Assert.Equal(2, schedules.Count);
         }
         
         [Fact]
         public void CannotAddSameSchedulesTwice()
         {
-            var service = new Service("X12345");
+            var service = new Service("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
             service.Add(permanent);

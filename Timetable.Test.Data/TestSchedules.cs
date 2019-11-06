@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using NSubstitute;
+using Serilog;
 
 namespace Timetable.Test.Data
 {
@@ -112,7 +114,7 @@ namespace Timetable.Test.Data
             ScheduleLocation[] stops = null,
             Service service = null)
         {
-            service = service ?? new Service(timetableId);
+            service = service ?? new Service(timetableId, Substitute.For<ILogger>());
 
             return CreateSchedule(timetableId, indicator, calendar, stops, service);
         }
@@ -131,8 +133,7 @@ namespace Timetable.Test.Data
             return schedule;
         }
 
-        public static ICalendar CreateEverydayCalendar(DateTime runsFrom,
-            DateTime runsTo)
+        public static ICalendar CreateEverydayCalendar(DateTime runsFrom, DateTime runsTo)
         {
             var calendar = new Calendar(
                 runsFrom,

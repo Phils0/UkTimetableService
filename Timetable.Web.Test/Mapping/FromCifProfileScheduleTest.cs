@@ -34,7 +34,7 @@ namespace Timetable.Web.Test.Mapping
             Substitute.For<ILogger>(),
             new Dictionary<string, Toc>());
         
-        private static TimetableData CreateTimetable() => new TimetableData();
+        private static TimetableData CreateTimetable() => new TimetableData(Substitute.For<ILogger>());
         
         public static Schedule MapSchedule(CifParser.Schedule input = null)
         {
