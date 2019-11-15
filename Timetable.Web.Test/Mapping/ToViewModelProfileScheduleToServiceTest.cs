@@ -31,7 +31,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
-            var resolved = new ResolvedService(schedule, TestDate, isCancelled, TestSchedules.NoAssociations);
+            var resolved = new ResolvedService(schedule, TestDate, isCancelled);
             
             return mapper.Map<Timetable.ResolvedService, Model.Service>(resolved, opts => opts.Items["On"] = resolved.On);
         }

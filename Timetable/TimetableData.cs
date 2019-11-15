@@ -67,10 +67,13 @@ namespace Timetable
             
             if(schedule == null)
                 return (LookupStatus.NoScheduleOnDate, null);
-            
-            return (LookupStatus.Success ,schedule);
-        }
 
+            if (schedule is ResolvedServiceWithAssociations hasAssociations)
+                hasAssociations.ResolveAssociations();
+            
+            return (LookupStatus.Success, schedule);
+        }
+        
         private Regex RetailServiceIdRegex = new Regex(@"^(\w\w\d{4})\d{0,2}");
 
         private bool TryToNormaliseRetailServiceId(ref string retailServiceId)

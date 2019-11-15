@@ -27,7 +27,7 @@ namespace Timetable.Test.Data
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
-            var resolved = new ResolvedService(schedule, on, isCancelled, NoAssociations);
+            var resolved = new ResolvedService(schedule, on, isCancelled);
 
             var origin = schedule.Locations.First() as ScheduleOrigin; 
             atLocation = atLocation ?? origin.Station;
@@ -51,7 +51,7 @@ namespace Timetable.Test.Data
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
-            var resolved = new ResolvedService(schedule, on, isCancelled, NoAssociations);
+            var resolved = new ResolvedService(schedule, on, isCancelled);
 
             var origin = schedule.Locations.First() as ScheduleOrigin; 
             atLocation = atLocation ?? origin.Station;
@@ -73,7 +73,7 @@ namespace Timetable.Test.Data
         {
             on = on == default(DateTime) ? MondayAugust12 : on;
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
-            return new ResolvedService(schedule, on, isCancelled, NoAssociations);
+            return new ResolvedService(schedule, on, isCancelled);
         }
         
         public static Schedule CreateSchedule(string timetableId = "X12345",

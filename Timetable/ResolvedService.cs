@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Timetable
 {
@@ -6,25 +7,22 @@ namespace Timetable
     {
         public bool IsCancelled { get; }
         
-        public ResolvedAssociation[] Associations { get; }
-
         public DateTime On { get; }
 
         public Schedule Details { get; }
 
-        public ResolvedService(Schedule service, DateTime on, bool isCancelled, ResolvedAssociation[] associations)
+        public ResolvedService(Schedule service, DateTime on, bool isCancelled)
         {
             Details = service;
             On = on;
             IsCancelled = isCancelled;
-            Associations = associations;
         }
 
         public bool HasRetailServiceId(string retailServiceId)
         {
             return Details.HasRetailServiceId(retailServiceId);
         }
-
+        
         public bool OperatedBy(string toc)
         {
             return Details.OperatedBy(toc);
@@ -41,7 +39,7 @@ namespace Timetable
             stop = null;
             return false;
         }
-
+        
         public override string ToString()
         {
             return IsCancelled ? $"{Details.TimetableUid} {On.ToYMD()} CANCELLED" : $"{Details.TimetableUid} {On.ToYMD()}";

@@ -11,15 +11,6 @@ namespace Timetable
 {
     public class Service
     {
-        private readonly ILogger _logger;
-
-        private enum Multiplicity
-        {
-            None,
-            SingleSchedule,
-            MultipleSchedules
-        }
-
         private sealed class StpDescendingComparer : IComparer<(StpIndicator indicator, ICalendar calendar)>
         {
             public int Compare((StpIndicator indicator, ICalendar calendar) x,
@@ -30,13 +21,13 @@ namespace Timetable
             }
         }
         
+        private readonly ILogger _logger;
+        
         public string TimetableUid { get; }
 
         private Schedule _schedule;
 
         private SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> _multipleSchedules;
-
-        private Multiplicity _stateType = Multiplicity.None;
         
         private Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> _associations;
 
@@ -49,15 +40,14 @@ namespace Timetable
         // Used by Schedule, do not use.  Use Schedule.AddToService
         internal void Add(Schedule schedule)
         {
-            if (_stateType == Multiplicity.None)
+            if(HasNoState)
             {
-                SetSingleSchedule();
+                _schedule = schedule;
                 return;
             }
-            else if (_stateType == Multiplicity.SingleSchedule)
-            {
+            
+            if(HasSingleSchedule)
                 MoveToMultipleSchedules();
-            }
 
             try
             {
@@ -67,23 +57,19 @@ namespace Timetable
             {
                 throw new ArgumentException($"Schedule already added {schedule}", e);
             }
-
-            void SetSingleSchedule()
-            {
-                _schedule = schedule;
-                _stateType = Multiplicity.SingleSchedule;
-            }
-
+            
             void MoveToMultipleSchedules()
             {
                 _multipleSchedules =
                     new SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>(new StpDescendingComparer());
                 _multipleSchedules.Add((_schedule.StpIndicator, _schedule.Calendar), _schedule);
                 _schedule = null;
-                _stateType = Multiplicity.MultipleSchedules;
             }
         }
 
+        private bool HasNoState => _schedule == null && _multipleSchedules == null;
+        private bool HasSingleSchedule => _schedule != null;
+        
         public bool TryFindScheduleOn(DateTime date, out ResolvedService schedule)
         {
             schedule = GetScheduleOn(date);
@@ -92,10 +78,17 @@ namespace Timetable
         
         public ResolvedService GetScheduleOn(DateTime date)
         {
-            if (_schedule != null)
+            ResolvedService CreateResolvedService(Schedule schedule, bool cancelled)
+            {
+                return HasAssociations()
+                    ? new ResolvedServiceWithAssociations(schedule, date, cancelled, _associations)
+                    : new ResolvedService(schedule, date, cancelled);
+            }
+            
+            if(HasSingleSchedule)
             {
                 if (_schedule.RunsOn(date))
-                    return new ResolvedService(_schedule, date, _schedule.IsCancelled(), GetAssociationsOn(date));
+                    return  CreateResolvedService(_schedule, _schedule.IsCancelled());;
 
                 return null;
             }
@@ -108,37 +101,13 @@ namespace Timetable
                     if (schedule.IsCancelled())
                         isCancelled = true;
                     else
-                        return new ResolvedService(schedule, date, isCancelled, GetAssociationsOn(date));
+                        return CreateResolvedService(schedule, isCancelled);
                 }
             }
 
             return null;
         }
-
-        private ResolvedAssociation[] GetAssociationsOn(DateTime date)
-        {
-            if(_associations == null)
-                return new ResolvedAssociation[0];
-
-            var associations = new List<ResolvedAssociation>();
-            foreach (var versions in _associations.Values)
-            {
-                var isCancelled = false;
-                foreach (var association in versions.Values)
-                {
-                    if (association.AppliesOn(date))
-                    {
-                        if (association.IsCancelled())
-                            isCancelled = true;
-                        else
-                            associations.Add(new ResolvedAssociation(association, date, isCancelled));
-                    }
-                }
-            }
-
-            return associations.ToArray();
-        }
-
+        
         public bool TryFindScheduledStop(StopSpecification find, out ResolvedServiceStop stop)
         {
             var found = TryFindStopOn(find, out stop);
@@ -163,8 +132,8 @@ namespace Timetable
 
         internal void AddAssociation(Association association, bool isMain)
         {
-            if (_associations == null)
-                _associations = new Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>();
+            if (!HasAssociations())
+                _associations = new Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>(1);
 
             if (isMain)
                 Add(association.AssociatedTimetableUid);
@@ -205,8 +174,7 @@ namespace Timetable
 
             }
         }
-
-
+        
         public bool HasAssociations()
         {
             return _associations != null && _associations.Any();

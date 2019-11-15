@@ -10,10 +10,15 @@ namespace Timetable.Test
     {
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
 
+        private static TimetableData CreateTimetable()
+        {
+            return new TimetableData(Substitute.For<ILogger>());
+        }
+        
         [Fact]
         public void AddAssociationToServices()
         {
-            var timetable = new TimetableData(Substitute.For<ILogger>());           
+            var timetable =  CreateTimetable();           
             TestSchedules.CreateScheduleInTimetable(timetable, "X12345");
             TestSchedules.CreateScheduleInTimetable(timetable, "A98765");
 
@@ -31,7 +36,7 @@ namespace Timetable.Test
         [Fact]
         public void AddMultipleVersionsOfAnAssociationToServices()
         {
-            var timetable = new TimetableData(Substitute.For<ILogger>());           
+            var timetable =  CreateTimetable();           
             TestSchedules.CreateScheduleInTimetable(timetable, "X12345");
             TestSchedules.CreateScheduleInTimetable(timetable, "A98765");
 
@@ -52,7 +57,7 @@ namespace Timetable.Test
         [Fact]
         public void AddMultipleAssociationToServices()
         {
-            var timetable = new TimetableData(Substitute.For<ILogger>());           
+            var timetable =  CreateTimetable();           
             TestSchedules.CreateScheduleInTimetable(timetable, "X12345");
             TestSchedules.CreateScheduleInTimetable(timetable, "A98765");
             TestSchedules.CreateScheduleInTimetable(timetable, "A12345");
@@ -73,7 +78,7 @@ namespace Timetable.Test
         [Fact]
         public void OnlyAddAssociationIfBothMainAndAssociatedServiceExist()
         {
-            var timetable = new TimetableData(Substitute.For<ILogger>());           
+            var timetable =  CreateTimetable();           
             TestSchedules.CreateScheduleInTimetable(timetable, "X12345");
 
             var associations = new [] {
@@ -89,5 +94,20 @@ namespace Timetable.Test
         }
 
 
+        [Fact]
+        public void ResolvedServiceAlsoIncludesAssociatedServices()
+        {
+            var timetable = CreateTimetable();
+            var main = TestSchedules.CreateScheduleInTimetable(timetable, "X12345").Service;
+            var associated = TestSchedules.CreateScheduleInTimetable(timetable, "A98765").Service;
+
+            var associations = new [] {
+                TestAssociations.CreateAssociationWithServices(main, associated)
+            };
+            
+            var found = timetable.GetScheduleByTimetableUid("X12345", MondayAugust12);
+            var withAssociations = found.service as ResolvedServiceWithAssociations;
+            Assert.NotEmpty(withAssociations.Associations);
+        }
     }
 }

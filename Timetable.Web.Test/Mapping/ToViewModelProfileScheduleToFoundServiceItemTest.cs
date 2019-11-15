@@ -38,7 +38,7 @@ namespace Timetable.Web.Test.Mapping
             time = time ?? TestSchedules.Ten;
             var find = new StopSpecification(at, time.Value, TestDate, TimesToUse.Departures);
             
-            var resolved = new ResolvedService(schedule, TestDate, false, TestSchedules.NoAssociations);
+            var resolved = new ResolvedService(schedule, TestDate, false);
             resolved.TryFindStop(find, out var stop);
             if(to != null)
                 stop.GoesTo(to);
