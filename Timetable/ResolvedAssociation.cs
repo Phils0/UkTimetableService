@@ -8,7 +8,6 @@ namespace Timetable
         public ResolvedService AssociatedService { get; }
         public DateTime On { get; }
         public Association Details { get; }
-        public ResolvedServiceWithAssociations Resolved { get; private set; }
 
         public ResolvedAssociation(Association association, DateTime on, bool isCancelled, ResolvedService associatedService)
         {
@@ -17,6 +16,8 @@ namespace Timetable
             IsCancelled = isCancelled;
             AssociatedService = associatedService;
         }
+
+        public Location AtLocation => Details.AtLocation;
         
         public override string ToString()
         {

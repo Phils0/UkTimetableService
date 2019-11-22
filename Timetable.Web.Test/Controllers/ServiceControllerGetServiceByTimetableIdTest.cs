@@ -30,10 +30,17 @@ namespace Timetable.Web.Test.Controllers
             var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
-            var service = response.Value as Model.Service;
+            var service = GetService(response);
             Assert.Equal("X12345", service.TimetableUid);
             Assert.False(service.IsCancelled);
         }
+
+        private Model.Service GetService(ObjectResult response)
+        {
+            var services = response.Value as Model.Service[];
+            return services?[0];
+        }
+        
         
         [Fact]
         public async Task ServiceByTimetableUidReturnsNotFoundWithReason()
@@ -63,7 +70,7 @@ namespace Timetable.Web.Test.Controllers
             var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;
             
             Assert.Equal(200, response.StatusCode);
-            var service = response.Value as Model.Service;
+            var service = GetService(response);;
             Assert.Equal("X12345", service.TimetableUid);
             Assert.True(service.IsCancelled);
         }

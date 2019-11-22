@@ -36,14 +36,17 @@ namespace Timetable.Web.Mapping
             CreateMap<Timetable.Schedule, Model.Service>()
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
+                .ForMember(d => d.Associations, o => o.Ignore())
                 .ForMember(d => d.Stops, o => o.MapFrom((s, d, dm, c) => MapStops(s.Locations, c)));
             CreateMap<Timetable.Schedule, Model.ServiceSummary>()
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
                 .ForMember(d => d.Origin, o => o.MapFrom(s => s.Locations.First()))
                 .ForMember(d => d.Destination, o => o.MapFrom(s => s.Locations.Last()));
-            CreateMap<Timetable.ResolvedService, Model.Service>()
-                .ConvertUsing(MapService);
+            CreateMap<Timetable.ResolvedService, Model.Service[]>()
+                .ConvertUsing((s, d, c) => MapService(s, c));
+            CreateMap<Timetable.ResolvedService[], Model.Service[]>()
+                .ConvertUsing((s, d, c) => MapServices(s, c));
             CreateMap<Timetable.ResolvedService, Model.ServiceSummary>()
                 .ConvertUsing(MapServiceSummary);        
             CreateMap<Timetable.ResolvedServiceStop, Model.FoundSummaryItem>()
@@ -72,9 +75,20 @@ namespace Timetable.Web.Mapping
                     o => o.Items["On"] = context.Items["On"]);
         }
         
-        private Model.Service MapService(Timetable.ResolvedService source, Model.Service notUsed, ResolutionContext context)
+        private Model.Service[] MapServices(Timetable.ResolvedService[] source, ResolutionContext context)
         {
-            return CreateService(source, context);
+            var services = new List<Model.Service>();
+            foreach (var sourceService in source)
+            {
+                services.AddRange(MapService(sourceService, context));
+            }
+            
+            return services.ToArray();
+        }
+        
+        private Model.Service[] MapService(Timetable.ResolvedService source, ResolutionContext context)
+        {
+            return new [] { CreateService(source, context) };
         }
 
         private Model.Service CreateService(ResolvedService source, ResolutionContext context)
