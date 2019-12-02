@@ -50,7 +50,7 @@ namespace Timetable.Web.Controllers
                 if (service.status == LookupStatus.Success)
                 {
                     var onDate = service.service.On;
-                    var model = _mapper.Map<Timetable.ResolvedService, Model.Service[]>(service.service,
+                    var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service,
                         opts => opts.Items["On"] = onDate);
                     return await Task.FromResult(Ok(model));
                 }

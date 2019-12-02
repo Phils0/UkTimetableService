@@ -67,16 +67,14 @@ namespace Timetable
             return Calendar.IsActiveOn(date);
         }
 
-        internal Service GetService(string timetableUid)
+        internal bool IsMain(string timetableUid)
         {
-            return Main.IsService(timetableUid) ? 
-                Main.Service :
-                Associated.Service;
+            return Main.IsService(timetableUid);
         }
 
         internal Service GetOtherService(string timetableUid)
         {
-            return Main.IsService(timetableUid) ? 
+            return IsMain(timetableUid) ? 
                 Associated.Service :
                 Main.Service;
         }

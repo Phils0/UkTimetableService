@@ -14,7 +14,7 @@ namespace Timetable.Test.Data
             AssociationCategory category = AssociationCategory.Join,
             AssociationDateIndicator dateIndicator = AssociationDateIndicator.Standard)
         {
-            location = location ?? TestLocations.Surbiton;
+            location = location ?? TestLocations.CLPHMJN;
             var main = new AssociationService()
             {
                 TimetableUid = mainUid,

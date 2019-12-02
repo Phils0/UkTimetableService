@@ -20,6 +20,11 @@ namespace Timetable
             Service = service;
             return true;
         }
+
+        public ScheduleLocation GetStop(ResolvedService service)
+        {
+            return service.Details.GetStop(AtLocation, Sequence);
+        }
         
         public override string ToString()
         {

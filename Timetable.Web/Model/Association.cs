@@ -6,9 +6,9 @@ namespace Timetable.Web.Model
     public class Association
     {
         /// <summary>
-        /// Other Timetable Id
+        /// Association is cancelled
         /// </summary>
-        public string TimetableUid { get; set; }
+        public bool IsCancelled { get; set; }
         
         /// <summary>
         /// Running date
@@ -21,8 +21,18 @@ namespace Timetable.Web.Model
         public string AssociationCategory { get; set; }
         
         /// <summary>
-        /// Split/Join location
+        /// Split/Join stop for this service
         /// </summary>
         public ScheduledStop Stop { get; set; }
+        
+        /// <summary>
+        /// Split/Join stop for other service
+        /// </summary>
+        public ScheduledStop AssociatedServiceStop { get; set; }
+        
+        /// <summary>
+        /// Other service
+        /// </summary>
+        public Service AssociatedService { get; set; }
     }
 }

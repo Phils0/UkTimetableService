@@ -16,10 +16,12 @@ namespace Timetable
             IsCancelled = isCancelled;
             AssociatedService = associatedService;
         }
-        public ScheduleLocation GetAssociationStop(string timetableId)
+        
+        public ScheduleLocation GetStop(ResolvedService service)
         {
-            var service = Details.GetService(timetableId);
-            throw new NotImplementedException();
+            return Details.IsMain(service.TimetableUid) ?
+                Details.Main.GetStop(service) :
+                Details.Associated.GetStop(service);
         }
         
         public override string ToString()

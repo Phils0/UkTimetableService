@@ -37,8 +37,7 @@ namespace Timetable.Web.Test.Controllers
 
         private Model.Service GetService(ObjectResult response)
         {
-            var services = response.Value as Model.Service[];
-            return services?[0];
+            return response.Value as Model.Service;
         }
         
         

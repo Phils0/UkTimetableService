@@ -7,7 +7,7 @@ using TestSchedules = Timetable.Test.Data.TestSchedules;
 
 namespace Timetable.Web.Test.Mapping
 {
-    public class ToViewModelProfileScheduleToServiceTest
+    public class ToViewModelProfileResolvedServiceToServiceTest
     {
         private static readonly DateTime TestDate = TestTime.August1;
         
@@ -33,8 +33,8 @@ namespace Timetable.Web.Test.Mapping
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
             var resolved = new ResolvedService(schedule, TestDate, isCancelled);
             
-            var services = mapper.Map<Timetable.ResolvedService, Model.Service[]>(resolved, opts => opts.Items["On"] = resolved.On);
-            return services[0];
+            var service = mapper.Map<Timetable.ResolvedService, Model.Service>(resolved, opts => opts.Items["On"] = resolved.On);
+            return service;
         }
 
         [Fact]

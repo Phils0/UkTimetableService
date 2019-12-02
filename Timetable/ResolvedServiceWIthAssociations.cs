@@ -17,7 +17,7 @@ namespace Timetable
             : this(service, on, isCancelled, ResolveAssociations(service.TimetableUid, on, associations))
         {
         }
-
+        
         internal ResolvedServiceWithAssociations(ResolvedService service, ResolvedAssociation[] associations)
             : this(service.Details, service.On, service.IsCancelled, associations)
         {
@@ -32,6 +32,11 @@ namespace Timetable
         public bool HasAssociations()
         {
             return Associations.Any();
+        }
+        
+        public override string ToString()
+        {
+            return HasAssociations() ? $"{base.ToString()} +{Associations.Length}" : base.ToString();
         }
         
         private static ResolvedAssociation[] ResolveAssociations(string timetableUid, DateTime on, IDictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> associations)
@@ -61,11 +66,6 @@ namespace Timetable
             }
             
             return  resolvedAssociations.ToArray();;
-        }
-        
-        public override string ToString()
-        {
-            return HasAssociations() ? $"{base.ToString()} +{Associations.Length}" : base.ToString();
         }
     }
 }
