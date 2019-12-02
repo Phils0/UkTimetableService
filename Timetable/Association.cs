@@ -52,25 +52,14 @@ namespace Timetable
         
         public bool IsPassenger { get; set; }
 
-        public void AddToService(Service service, bool isMain)
+        public void SetService(Service service, bool isMain)
         {
-            if (isMain)
+            var associationService = isMain ? Main : Associated;
+            if (!associationService.TrySetService(service))
             {
-                CheckMatchingTimetableId(service, Main.TimetableUid,  "Main");
-                Main.Service = service;
+                var msg = isMain ? "Main" : "Associated";
+                throw new ArgumentException($"Service {service} not valid for association {this} ({msg})");                    
             }
-            else
-            {
-                CheckMatchingTimetableId(service, Associated.TimetableUid, "Associated");
-                Associated.Service = service;
-            }
-            service.AddAssociation(this, isMain);
-        }
-
-        private void CheckMatchingTimetableId(Service service, string associationUid, string whichUid)
-        {
-            if(service.TimetableUid != associationUid)
-                throw new ArgumentException($"Service {service} not valid for association {this} ({whichUid})");
         }
         
         public bool AppliesOn(DateTime date)

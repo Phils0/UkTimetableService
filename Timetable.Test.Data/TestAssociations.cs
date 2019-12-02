@@ -58,9 +58,9 @@ namespace Timetable.Test.Data
             var association = CreateAssociation(mainService.TimetableUid, associatedService.TimetableUid, indicator, calendar, location, category,
                 dateIndicator);
             
-            association.AddToService(mainService, true);
-            association.AddToService(associatedService, false);        
-            
+            mainService.AddAssociation(association, true);
+            associatedService.AddAssociation(association, false);
+         
             return association;
         }
     }
