@@ -38,8 +38,8 @@ namespace Timetable.Test
             var association = TestAssociations.CreateAssociation();
             
             association.AddToService(schedule.Service, true);
-            Assert.Equal(schedule.Service, association.MainService);
-            Assert.Null(association.AssociatedService);
+            Assert.Equal(schedule.Service, association.Main.Service);
+            Assert.Null(association.Associated.Service);
         }
         
         [Fact]
@@ -49,8 +49,8 @@ namespace Timetable.Test
             var association = TestAssociations.CreateAssociation();
             
             association.AddToService(schedule.Service, false);
-            Assert.Equal(schedule.Service, association.AssociatedService);
-            Assert.Null(association.MainService);
+            Assert.Equal(schedule.Service, association.Associated.Service);
+            Assert.Null(association.Main.Service);
         }
         
         [Theory]

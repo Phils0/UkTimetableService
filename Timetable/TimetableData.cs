@@ -133,8 +133,8 @@ namespace Timetable
             
             void Add(Association association)
             {
-                if (_timetableUidMap.TryGetValue(association.MainTimetableUid, out var mainService) &&
-                    _timetableUidMap.TryGetValue(association.AssociatedTimetableUid, out var otherService))
+                if (_timetableUidMap.TryGetValue(association.Main.TimetableUid, out var mainService) &&
+                    _timetableUidMap.TryGetValue(association.Associated.TimetableUid, out var otherService))
                 {
                     mainService.AddAssociation(association, true);
                     otherService.AddAssociation(association, false);

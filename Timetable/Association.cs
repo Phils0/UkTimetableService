@@ -25,19 +25,9 @@ namespace Timetable
     /// </summary>
     public class Association
     {
-        /// <summary>
-        /// Main Timetable Id
-        /// </summary>
-        public string MainTimetableUid { get; set; }
+        public AssociationService Main { get; set;  }
         
-        public Service MainService { get; private set;  }
-
-        /// <summary>
-        /// Associated Timetable Id
-        /// </summary>
-        public string AssociatedTimetableUid { get; set; }
-        
-        public Service AssociatedService { get; private set;  }
+        public AssociationService Associated { get; set;  }
         
         public Location AtLocation { get; set; }
 
@@ -66,13 +56,13 @@ namespace Timetable
         {
             if (isMain)
             {
-                CheckMatchingTimetableId(service, MainTimetableUid,  "Main");
-                MainService = service;
+                CheckMatchingTimetableId(service, Main.TimetableUid,  "Main");
+                Main.Service = service;
             }
             else
             {
-                CheckMatchingTimetableId(service, AssociatedTimetableUid, "Associated");
-                AssociatedService = service;
+                CheckMatchingTimetableId(service, Associated.TimetableUid, "Associated");
+                Associated.Service = service;
             }
             service.AddAssociation(this, isMain);
         }
@@ -90,21 +80,21 @@ namespace Timetable
 
         internal Service GetService(string timetableUid)
         {
-            return MainTimetableUid == timetableUid ? 
-                MainService :
-                AssociatedService;
+            return Main.IsService(timetableUid) ? 
+                Main.Service :
+                Associated.Service;
         }
 
         internal Service GetOtherService(string timetableUid)
         {
-            return MainTimetableUid == timetableUid ? 
-                AssociatedService :
-                MainService;
+            return Main.IsService(timetableUid) ? 
+                Associated.Service :
+                Main.Service;
         }
         
         public override string ToString()
         {
-            return $"{MainTimetableUid}-{AssociatedTimetableUid} -{StpIndicator} {Calendar}";
+            return $"{Main}-{Associated} -{StpIndicator} {Calendar}";
         }
     }
 }

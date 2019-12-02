@@ -131,9 +131,9 @@ namespace Timetable
                 _associations = new Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>(1);
 
             if (isMain)
-                Add(association.AssociatedTimetableUid);
+                Add(association.Associated.TimetableUid);
             else
-                Add(association.MainTimetableUid);
+                Add(association.Main.TimetableUid);
 
             void Add(string uid)
             {
