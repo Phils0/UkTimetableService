@@ -163,6 +163,7 @@ namespace Timetable.Test.Data
         public static Time TenFifteen => Ten.AddMinutes(15);
         public static Time TenSixteen => Ten.AddMinutes(16);
         public static Time TenThirty => Ten.AddMinutes(30);
+        public static Time NineForty => Ten.AddMinutes(-30);
 
         public static ScheduleLocation[] DefaultLocations => CreateThreeStopSchedule(Ten);
         
@@ -173,5 +174,33 @@ namespace Timetable.Test.Data
             TestScheduleLocations.CreatePass(TestStations.Vauxhall, start.AddMinutes(20)),
             TestScheduleLocations.CreateDestination(TestStations.Waterloo, start.AddMinutes(30))
         };
+        
+        public static ScheduleLocation[] CreateWokingClaphamSchedule(Time start) => new[]
+        {
+            (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Woking, start),
+            TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, start.AddMinutes(30))
+        };
+        
+        public static ResolvedServiceWithAssociations CreateServiceWithAssociation(
+            DateTime on =  default(DateTime),
+            bool associationIsCancelled = false)
+        {
+            var resolved = CreateService(on: on);
+            var association = CreateAssociation(resolved, associationIsCancelled);
+            var resolvedWithAssociations = new ResolvedServiceWithAssociations(resolved, new [] { association });
+            return resolvedWithAssociations;
+        }
+
+        public static ResolvedAssociation CreateAssociation(ResolvedService main, bool associationIsCancelled = false)
+        {
+            var associated = CreateScheduleWithService("A98765", stops: CreateWokingClaphamSchedule(NineForty));
+            var association = TestAssociations.CreateAssociationWithServices(main.Details.Service, associated.Service);
+            var resolvedAssociated = new ResolvedService(associated, main.On, false);
+            return new ResolvedAssociation(
+                association,
+                main.On,
+                associationIsCancelled,
+                resolvedAssociated);
+        }
     }
 }

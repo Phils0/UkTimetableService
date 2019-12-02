@@ -87,6 +87,20 @@ namespace Timetable
         {
             return Calendar.IsActiveOn(date);
         }
+
+        internal Service GetService(string timetableUid)
+        {
+            return MainTimetableUid == timetableUid ? 
+                MainService :
+                AssociatedService;
+        }
+
+        internal Service GetOtherService(string timetableUid)
+        {
+            return MainTimetableUid == timetableUid ? 
+                AssociatedService :
+                MainService;
+        }
         
         public override string ToString()
         {

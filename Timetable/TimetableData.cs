@@ -67,9 +67,6 @@ namespace Timetable
             
             if(schedule == null)
                 return (LookupStatus.NoScheduleOnDate, null);
-
-            if (schedule is ResolvedServiceWithAssociations hasAssociations)
-                hasAssociations.ResolveAssociations();
             
             return (LookupStatus.Success, schedule);
         }

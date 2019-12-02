@@ -76,22 +76,17 @@ namespace Timetable
             return schedule != null;
         }
         
-        public ResolvedService GetScheduleOn(DateTime date)
+        public ResolvedService GetScheduleOn(DateTime date, bool resolveAssociations = true)
         {
             ResolvedService CreateResolvedService(Schedule schedule, bool cancelled)
             {
-                return HasAssociations()
+                return HasAssociations() && resolveAssociations
                     ? new ResolvedServiceWithAssociations(schedule, date, cancelled, _associations)
                     : new ResolvedService(schedule, date, cancelled);
             }
             
             if(HasSingleSchedule)
-            {
-                if (_schedule.RunsOn(date))
-                    return  CreateResolvedService(_schedule, _schedule.IsCancelled());;
-
-                return null;
-            }
+                return _schedule.RunsOn(date) ? CreateResolvedService(_schedule, _schedule.IsCancelled()) : null;
 
             var isCancelled = false;
             foreach (var schedule in _multipleSchedules.Values)

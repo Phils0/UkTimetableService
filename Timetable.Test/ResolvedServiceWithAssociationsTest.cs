@@ -35,8 +35,7 @@ namespace Timetable.Test
 
             ResolvedServiceWithAssociations CreateResolved(DateTime onDate)
             {
-                return new ResolvedServiceWithAssociations(schedule, onDate, false, associations).
-                    ResolveAssociations();
+                return new ResolvedServiceWithAssociations(schedule, onDate, false, associations);
             }
         }
         
@@ -54,8 +53,7 @@ namespace Timetable.Test
             var associations = service.AsDynamic()._associations.RealObject as
                     Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>;
             
-            var resolved = new ResolvedServiceWithAssociations(schedule, MondayAugust12, false, associations).
-                ResolveAssociations();
+            var resolved = new ResolvedServiceWithAssociations(schedule, MondayAugust12, false, associations);
             
             Assert.Equal(high, resolved.Associations[0].Details);
         }
@@ -74,8 +72,7 @@ namespace Timetable.Test
             var associations = service.AsDynamic()._associations.RealObject as 
                     Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>;
             
-            var resolved = new ResolvedServiceWithAssociations(schedule, MondayAugust12, false, associations).
-                ResolveAssociations();
+            var resolved = new ResolvedServiceWithAssociations(schedule, MondayAugust12, false, associations);
             
             Assert.True( resolved.Associations[0].IsCancelled);
             Assert.Equal(low, resolved.Associations[0].Details);
@@ -93,8 +90,7 @@ namespace Timetable.Test
             var associations = service.AsDynamic()._associations.RealObject as 
                     Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>;
             
-            var resolved = new ResolvedServiceWithAssociations(schedule, MondayAugust12, false, associations).
-                ResolveAssociations();
+            var resolved = new ResolvedServiceWithAssociations(schedule, MondayAugust12, false, associations);
 
             Assert.True( resolved.Associations[0].IsCancelled);
             Assert.Equal(high, resolved.Associations[0].Details);
@@ -111,8 +107,7 @@ namespace Timetable.Test
             var associations = service.AsDynamic()._associations.RealObject as 
                 Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>;
             
-            var resolved = new ResolvedServiceWithAssociations(schedule, MondayAugust12, false, associations).
-                ResolveAssociations();
+            var resolved = new ResolvedServiceWithAssociations(schedule, MondayAugust12, false, associations);
 
             Assert.Equal(2, resolved.Associations.Length);
             

@@ -73,6 +73,11 @@ namespace Timetable
 
         public abstract bool IsStopAt(StopSpecification spec);
 
+        public bool IsStop(Station at, int sequence)
+        {
+            return Station.Equals(at) && Sequence == sequence;
+        }
+
         public override string ToString()
         {
             return Sequence > 1 ? 
