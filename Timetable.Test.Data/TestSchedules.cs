@@ -183,17 +183,19 @@ namespace Timetable.Test.Data
         
         public static ResolvedServiceWithAssociations CreateServiceWithAssociation(
             DateTime on =  default(DateTime),
-            bool associationIsCancelled = false)
+            bool associationIsCancelled = false,
+            string mainUid = "X12345",
+            string associatedUid = "A98765")
         {
-            var resolved = CreateService(on: on);
-            var association = CreateAssociation(resolved, associationIsCancelled);
+            var resolved = CreateService(mainUid, on: on);
+            var association = CreateAssociation(resolved, associatedUid, associationIsCancelled);
             var resolvedWithAssociations = new ResolvedServiceWithAssociations(resolved, new [] { association });
             return resolvedWithAssociations;
         }
 
-        public static ResolvedAssociation CreateAssociation(ResolvedService main, bool associationIsCancelled = false)
+        public static ResolvedAssociation CreateAssociation(ResolvedService main, string associatedUid, bool associationIsCancelled = false)
         {
-            var associated = CreateScheduleWithService("A98765", stops: CreateWokingClaphamSchedule(NineForty));
+            var associated = CreateScheduleWithService(associatedUid, stops: CreateWokingClaphamSchedule(NineForty));
             var association = TestAssociations.CreateAssociationWithServices(main.Details.Service, associated.Service);
             var resolvedAssociated = new ResolvedService(associated, main.On, false);
             return new ResolvedAssociation(
