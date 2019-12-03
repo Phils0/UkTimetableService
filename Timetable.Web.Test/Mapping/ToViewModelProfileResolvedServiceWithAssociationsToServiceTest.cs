@@ -25,21 +25,36 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal("X12345", output.TimetableUid);
         }
 
-        private static Model.Service MapResolvedService(bool isCancelled = false)
+        private static Model.Service MapResolvedService(
+            bool isCancelled = false,
+            string mainUid = "X12345",
+            string associatedUid = "A98765")
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
-            var resolved = TestSchedules.CreateServiceWithAssociation(on: TestDate);
+            var resolved = TestSchedules.CreateServiceWithAssociation(on: TestDate, isCancelled, mainUid, associatedUid);
             
             var service = mapper.Map<Timetable.ResolvedService, Model.Service>(resolved, opts => opts.Items["On"] = resolved.On);
             return service;
         }
         
-        [Fact]
-        public void MapAssociationIsCancelled()
+        [Theory]
+        [InlineData("X12345", "A98765", true)]
+        [InlineData("A98765", "X12345", false)]
+        public void MapAssociationIsMain(string mainUid, string associatedUid, bool expected)
         {
-            var output = MapResolvedService();
+            var output = MapResolvedService(false, mainUid, associatedUid);
             var association = output.Associations[0];
-            Assert.False(association.IsCancelled);
+            Assert.Equal(expected, association.IsMain);
+        }
+        
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MapAssociationIsCancelled(bool isCancelled)
+        {
+            var output = MapResolvedService(isCancelled);
+            var association = output.Associations[0];
+            Assert.Equal(isCancelled, association.IsCancelled);
         }
         
         [Fact]

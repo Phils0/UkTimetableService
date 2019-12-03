@@ -19,9 +19,14 @@ namespace Timetable
         
         public ScheduleLocation GetStop(ResolvedService service)
         {
-            return Details.IsMain(service.TimetableUid) ?
+            return IsMain(service.TimetableUid) ?
                 Details.Main.GetStop(service) :
                 Details.Associated.GetStop(service);
+        }
+
+        public bool IsMain(string timetableUid)
+        {
+            return Details.IsMain(timetableUid);
         }
         
         public override string ToString()

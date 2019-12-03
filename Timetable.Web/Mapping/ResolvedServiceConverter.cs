@@ -39,8 +39,15 @@ namespace Timetable.Web.Mapping
             var associations = new List<Model.Association>();
             foreach (var sourceAssociation in source.Associations)
             {
-                var mapped = MapAssociation(sourceAssociation, source, context);
-                associations.Add(mapped);
+                try
+                {
+                    var mapped = MapAssociation(sourceAssociation, source, context);
+                    associations.Add(mapped);
+                }
+                catch (Exception e)
+                {
+                    _logger.Error(e, "Failed to add association : {sourceAssociation}", sourceAssociation);
+                }
             }
 
             thisService.Associations = associations.ToArray();
@@ -56,6 +63,7 @@ namespace Timetable.Web.Mapping
             {
                 Stop =  atStop,
                 IsCancelled = source.IsCancelled,
+                IsMain = source.IsMain(service.TimetableUid),
                 Date = (DateTime) context.Items["On"],
                 AssociationCategory = source.Details.Category.ToString(),
                 AssociatedService = associatedService,

@@ -6,6 +6,12 @@ namespace Timetable.Web.Model
     public class Association
     {
         /// <summary>
+        /// Parent schedule is main service
+        /// the one being joined to / split from
+        /// </summary>
+        public bool IsMain { get; set; }
+        
+        /// <summary>
         /// Association is cancelled
         /// </summary>
         public bool IsCancelled { get; set; }

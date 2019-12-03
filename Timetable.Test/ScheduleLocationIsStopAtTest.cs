@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -10,7 +11,27 @@ namespace Timetable.Test
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
         private static Time TenZeroOne => new Time(new TimeSpan(10, 1,0 ));
 
-        private readonly Station Surbiton = TestStations.Surbiton;
+        private static readonly Station Surbiton = TestStations.Surbiton;
+        private static readonly Station ClaphamJunction = TestStations.ClaphamJunction;      
+        
+        public static IEnumerable<object[]> Locations
+        {
+            get
+            {
+                yield return new object[] {Surbiton.Locations.Single(), false};
+                yield return new object[] {ClaphamJunction.Locations.First(), true};
+                yield return new object[] {ClaphamJunction.Locations.Last(), true};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(Locations))]
+        public void IsStopAtIfLocationMatches(Location location, bool expected)
+        {
+            var stop = TestScheduleLocations.CreateStop(location, TestSchedules.Ten);
+            var spec = CreateFindSpec(TestSchedules.Ten, TimesToUse.Arrivals, ClaphamJunction);
+            Assert.Equal(expected, stop.IsStopAt(spec));
+        }
         
         public static IEnumerable<object[]> StopTimes
         {
@@ -36,9 +57,11 @@ namespace Timetable.Test
             var spec = CreateFindSpec(findTime, arrivalOrDeparture);
             Assert.Equal(expected, stop.IsStopAt(spec));
         }
-        private StopSpecification CreateFindSpec(Time findTime, TimesToUse arrivalOrDeparture)
+        
+        private StopSpecification CreateFindSpec(Time findTime, TimesToUse arrivalOrDeparture, Station atLocation = null)
         {
-            return new StopSpecification(Surbiton, findTime, MondayAugust12, arrivalOrDeparture);
+            atLocation = atLocation ?? Surbiton;
+            return new StopSpecification(atLocation, findTime, MondayAugust12, arrivalOrDeparture);
         }
 
         public static IEnumerable<object[]> DepartureOnlyTimes
@@ -118,5 +141,23 @@ namespace Timetable.Test
             Assert.False(stop.IsStopAt(spec));
         }
         
+        public static IEnumerable<object[]> IsStopLocations
+        {
+            get
+            {
+                yield return new object[] {Surbiton.Locations.Single(), 1, false};
+                yield return new object[] {ClaphamJunction.Locations.First(), 1, true};
+                yield return new object[] {ClaphamJunction.Locations.First(), 2, false};
+                yield return new object[] {ClaphamJunction.Locations.Last(), 1, false};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(IsStopLocations))]
+        public void IsStopIfLocationMatches(Location location, int sequence, bool expected)
+        {
+            var stop = TestScheduleLocations.CreateStop(ClaphamJunction.Locations.First(), TestSchedules.Ten);
+            Assert.Equal(expected, stop.IsStop(location, sequence));
+        }
     }
 }
