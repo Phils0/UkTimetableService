@@ -14,15 +14,28 @@ namespace Timetable.Test.Data
             AssociationCategory category = AssociationCategory.Join,
             AssociationDateIndicator dateIndicator = AssociationDateIndicator.Standard)
         {
+            location = location ?? TestLocations.CLPHMJN;
+            var main = new AssociationService()
+            {
+                TimetableUid = mainUid,
+                AtLocation = location,
+                Sequence = 1,
+            };
+            var associated = new AssociationService()
+            {
+                TimetableUid = associatedUid,
+                AtLocation = location,
+                Sequence = 1,
+            };
+            
             var association = new Association()
             {
-                MainTimetableUid = mainUid,
-                AssociatedTimetableUid = associatedUid,
+                Main = main,
+                Associated = associated,
                 StpIndicator = indicator,
                 Category = category,
                 DateIndicator = dateIndicator,
-                Calendar = calendar ?? TestSchedules.EverydayAugust2019,
-                AtLocation = location ?? TestLocations.Surbiton
+                Calendar = calendar ?? TestSchedules.EverydayAugust2019
             };
 
             return association;
@@ -45,9 +58,9 @@ namespace Timetable.Test.Data
             var association = CreateAssociation(mainService.TimetableUid, associatedService.TimetableUid, indicator, calendar, location, category,
                 dateIndicator);
             
-            association.AddToService(mainService, true);
-            association.AddToService(associatedService, false);        
-            
+            mainService.AddAssociation(association, true);
+            associatedService.AddAssociation(association, false);
+         
             return association;
         }
     }

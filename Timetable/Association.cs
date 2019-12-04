@@ -25,19 +25,9 @@ namespace Timetable
     /// </summary>
     public class Association
     {
-        /// <summary>
-        /// Main Timetable Id
-        /// </summary>
-        public string MainTimetableUid { get; set; }
+        public AssociationService Main { get; set;  }
         
-        public Service MainService { get; private set;  }
-
-        /// <summary>
-        /// Associated Timetable Id
-        /// </summary>
-        public string AssociatedTimetableUid { get; set; }
-        
-        public Service AssociatedService { get; private set;  }
+        public AssociationService Associated { get; set;  }
         
         public Location AtLocation { get; set; }
 
@@ -62,35 +52,36 @@ namespace Timetable
         
         public bool IsPassenger { get; set; }
 
-        public void AddToService(Service service, bool isMain)
+        public void SetService(Service service, bool isMain)
         {
-            if (isMain)
+            var associationService = isMain ? Main : Associated;
+            if (!associationService.TrySetService(service))
             {
-                CheckMatchingTimetableId(service, MainTimetableUid,  "Main");
-                MainService = service;
+                var msg = isMain ? "Main" : "Associated";
+                throw new ArgumentException($"Service {service} not valid for association {this} ({msg})");                    
             }
-            else
-            {
-                CheckMatchingTimetableId(service, AssociatedTimetableUid, "Associated");
-                AssociatedService = service;
-            }
-            service.AddAssociation(this, isMain);
-        }
-
-        private void CheckMatchingTimetableId(Service service, string associationUid, string whichUid)
-        {
-            if(service.TimetableUid != associationUid)
-                throw new ArgumentException($"Service {service} not valid for association {this} ({whichUid})");
         }
         
         public bool AppliesOn(DateTime date)
         {
             return Calendar.IsActiveOn(date);
         }
+
+        internal bool IsMain(string timetableUid)
+        {
+            return Main.IsService(timetableUid);
+        }
+
+        internal Service GetOtherService(string timetableUid)
+        {
+            return IsMain(timetableUid) ? 
+                Associated.Service :
+                Main.Service;
+        }
         
         public override string ToString()
         {
-            return $"{MainTimetableUid}-{AssociatedTimetableUid} -{StpIndicator} {Calendar}";
+            return $"{Main}-{Associated} -{StpIndicator} {Calendar}";
         }
     }
 }

@@ -8,7 +8,6 @@ namespace Timetable
         public ResolvedService AssociatedService { get; }
         public DateTime On { get; }
         public Association Details { get; }
-        public ResolvedServiceWithAssociations Resolved { get; private set; }
 
         public ResolvedAssociation(Association association, DateTime on, bool isCancelled, ResolvedService associatedService)
         {
@@ -16,6 +15,18 @@ namespace Timetable
             On = on;
             IsCancelled = isCancelled;
             AssociatedService = associatedService;
+        }
+        
+        public ScheduleLocation GetStop(ResolvedService service)
+        {
+            return IsMain(service.TimetableUid) ?
+                Details.Main.GetStop(service) :
+                Details.Associated.GetStop(service);
+        }
+
+        public bool IsMain(string timetableUid)
+        {
+            return Details.IsMain(timetableUid);
         }
         
         public override string ToString()

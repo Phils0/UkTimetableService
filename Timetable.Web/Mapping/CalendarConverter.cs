@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AutoMapper;
 using CifParser.Records;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace Timetable.Web.Mapping
 {

@@ -10,7 +10,7 @@ namespace Timetable
         public DateTime On { get; }
 
         public Schedule Details { get; }
-
+        
         public ResolvedService(Schedule service, DateTime on, bool isCancelled)
         {
             Details = service;
@@ -23,10 +23,9 @@ namespace Timetable
             return Details.HasRetailServiceId(retailServiceId);
         }
         
-        public bool OperatedBy(string toc)
-        {
-            return Details.OperatedBy(toc);
-        }
+        public string TimetableUid => Details.TimetableUid;
+
+        public bool OperatedBy(string toc) => Details.OperatedBy(toc);
 
         public bool TryFindStop(StopSpecification find, out ResolvedServiceStop stop)
         {

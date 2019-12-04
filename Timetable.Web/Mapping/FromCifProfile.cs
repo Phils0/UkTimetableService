@@ -34,15 +34,14 @@ namespace Timetable.Web.Mapping
 
             var locationConverter = new LocationsConverter();
             CreateMap<CifParser.Records.Association, Association>()
-                .ForMember(d => d.MainTimetableUid, o => o.MapFrom(s => s.MainUid))
-                .ForMember(d => d.AssociatedTimetableUid, o => o.MapFrom(s => s.AssociatedUid))
+                .ForMember(d => d.Main, o => o.MapFrom(s => AssociationConverter.ConvertMain(s)))
+                .ForMember(d => d.Associated, o => o.MapFrom(s => AssociationConverter.ConvertAssociated(s)))
                 .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
                 .ForMember(d => d.AtLocation, o => o.ConvertUsing(locationConverter, s => s.Location))
                 .ForMember(d => d.Category, o => o.MapFrom(s => AssociationConverter.ConvertCategory(s.Category)))
                 .ForMember(d => d.DateIndicator, o => o.MapFrom(s => AssociationConverter.ConvertDateIndicator(s.DateIndicator)))
                 .ForMember(d => d.IsPassenger, o => o.MapFrom(s => PassengerAssociation.Equals(s.AssociationType)))
-                .ForMember(d => d.MainService, o => o.Ignore())
-                .ForMember(d => d.AssociatedService, o => o.Ignore());
+                .AfterMap((o, d) => AssociationConverter.SetServiceLocations(d));
             
             CreateMap<TimeSpan, Time>()
                 .ConvertUsing(t => new Time(t));

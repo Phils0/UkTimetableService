@@ -183,5 +183,27 @@ namespace Timetable.Test
             
             Assert.False(schedule.TryFindStop(find, out var stop));
         }
+        
+        public static IEnumerable<object[]> Locations
+        {
+            get
+            {
+                yield return new object[] {TestLocations.Woking, 1, true};
+                yield return new object[] {TestLocations.CLPHMJN, 1, false};
+                yield return new object[] {TestLocations.CLPHMJN, 2, true};
+                yield return new object[] {TestLocations.CLPHMJC, 1, true};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(Locations))]
+        public void GetStopFindsStop(Location location, int sequence, bool expectedException)
+        {
+            var schedule = TestSchedules.CreateSchedule();
+            if (expectedException)
+                Assert.Throws<ArgumentException>(() => schedule.GetStop(location, sequence));
+            else
+                Assert.NotNull(schedule.GetStop(location, sequence));
+        }
     }
 }

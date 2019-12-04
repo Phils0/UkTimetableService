@@ -27,7 +27,14 @@ namespace Timetable.Web.Test.Mapping
         public void MapMainTimetableUid()
         {
             var output = MapAssociation();
-            Assert.Equal("X12345", output.MainTimetableUid);
+            Assert.Equal("X12345", output.Main.TimetableUid);
+        }
+        
+        [Fact]
+        public void MapMainSequence()
+        {
+            var output = MapAssociation();
+            Assert.Equal(1, output.Main.Sequence);
         }
         
         public static Association MapAssociation(CifParser.Records.Association input = null)
@@ -44,7 +51,14 @@ namespace Timetable.Web.Test.Mapping
         public void MapAssociatedTimetableUid()
         {
             var output = MapAssociation();
-            Assert.Equal("A98765", output.AssociatedTimetableUid);
+            Assert.Equal("A98765", output.Associated.TimetableUid);
+        }
+        
+        [Fact]
+        public void MapAssociatedSequence()
+        {
+            var output = MapAssociation();
+            Assert.Equal(2, output.Associated.Sequence);
         }
         
         [Theory]

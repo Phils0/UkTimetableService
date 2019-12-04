@@ -158,6 +158,15 @@ namespace Timetable
             return stop != default;
         }
         
+        public ScheduleLocation GetStop(Location at, int sequence)
+        {
+            var stop = Locations.SingleOrDefault(s => s.IsStop(at, sequence));
+            return stop ?? throw new ArgumentException( 
+                        sequence > 1 ?
+                        $"Stop {at}({sequence}) not found in {this}" :                             
+                        $"Stop {at} not found in {this}");
+        }
+        
         public override string ToString()
         {
             return $"{TimetableUid} -{StpIndicator} {Calendar}";

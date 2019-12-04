@@ -22,6 +22,8 @@ namespace Timetable.Web.Test.Cif
                 RunsTo = new DateTime(2019, 8, 31),
                 DayMask = "1111100",
                 Location =  "SURBITN",
+                MainSequence = 1,
+                AssociationSequence = 2,
                 Category = "JJ",
                 DateIndicator = "S",
                 AssociationType = type

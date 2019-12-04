@@ -28,6 +28,12 @@ namespace Timetable
             if (Activities == null)
                 return;
             
+            if (Activities.Contains(Activity.StopNotAdvertised))
+            {
+                AdvertisedStop = PublicStop.No;
+                return;
+            }
+            
             if (Activities.Contains(Activity.PassengerStop))
             {
                 AdvertisedStop = PublicStop.Yes;
@@ -72,6 +78,11 @@ namespace Timetable
         public abstract void AddDay(Time start);
 
         public abstract bool IsStopAt(StopSpecification spec);
+
+        public bool IsStop(Location at, int sequence)
+        {
+            return Location.Equals(at) && Sequence == sequence;
+        }
 
         public override string ToString()
         {

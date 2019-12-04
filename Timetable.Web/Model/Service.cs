@@ -63,6 +63,11 @@ namespace Timetable.Web.Model
         /// </summary>
         public ScheduledStop[] Stops { get; set; }
         
+        /// <summary>
+        /// Associations
+        /// </summary>
+        public Association[] Associations { get; set; }
+        
         public override string ToString()
         {
             return $"{TimetableUid} {Date.ToYMD()}";

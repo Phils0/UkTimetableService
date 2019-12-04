@@ -49,9 +49,7 @@ namespace Timetable.Web.Controllers
                 var service = _timetable.GetScheduleByTimetableUid(serviceId, @on);
                 if (service.status == LookupStatus.Success)
                 {
-                    var onDate = service.service.On;
-                    var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service,
-                        opts => opts.Items["On"] = onDate);
+                    var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service, InitialiseContext);
                     return await Task.FromResult(Ok(model));
                 }
 
@@ -62,6 +60,11 @@ namespace Timetable.Web.Controllers
                 _logger.Error(e, "Error when processing : {serviceId} on {on}", serviceId, on.ToYMD());
                 throw;
             }
+        }
+
+        public static void InitialiseContext(IMappingOperationOptions opts)
+        {
+            opts.Items["Dummy"] = "";
         }
 
         private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string serviceId, DateTime date)
@@ -118,9 +121,7 @@ namespace Timetable.Web.Controllers
                 var service = _timetable.GetScheduleByRetailServiceId(serviceId, @on);
                 if (service.status == LookupStatus.Success)
                 {
-                    var onDate = service.services.First().On;
-                    var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services,
-                        opts => opts.Items["On"] = onDate);
+                    var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services, InitialiseContext);
                     return await Task.FromResult(Ok(model));
                 }
 
@@ -155,17 +156,14 @@ namespace Timetable.Web.Controllers
                 var service = _timetable.GetSchedulesByToc(toc, @on);
                 if (service.status == LookupStatus.Success)
                 {
-                    var onDate = service.services.First().On;
                     if (includeStops)
                     {
-                        var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services,
-                            opts => opts.Items["On"] = onDate);
+                        var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services, InitialiseContext);
                         return await Task.FromResult(Ok(model));
                     }
                     else
                     {
-                        var model = _mapper.Map<Timetable.ResolvedService[], Model.ServiceSummary[]>(service.services,
-                            opts => opts.Items["On"] = onDate);
+                        var model = _mapper.Map<Timetable.ResolvedService[], Model.ServiceSummary[]>(service.services, InitialiseContext);
                         return await Task.FromResult(Ok(model));
                     }
                 }

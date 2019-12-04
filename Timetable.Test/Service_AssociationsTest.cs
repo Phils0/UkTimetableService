@@ -22,7 +22,7 @@ namespace Timetable.Test
         [Fact]
         public void WhenIsAssociatedAddMainUid()
         {
-            var service = TestSchedules.CreateScheduleWithService().Service;
+            var service = TestSchedules.CreateScheduleWithService("A98765").Service;
             var association = TestAssociations.CreateAssociation();
 
             service.AddAssociation(association, false);

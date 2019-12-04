@@ -143,6 +143,15 @@ namespace Timetable.Test
         }
 
         [Fact]
+        public void AttributesIncludesNThenNotAnAdvertisedStop()
+        {
+            var scheduleLocation = TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, "T"); 
+            scheduleLocation.Activities = new HashSet<string>(new [] {"T", "N"});
+            scheduleLocation.UpdateAdvertisedStop();
+            Assert.Equal(PublicStop.No, scheduleLocation.AdvertisedStop);
+        }
+
+        [Fact]
         public void SchedulePassSetsStopTypeWhenMultipleAttributes()
         {
             var scheduleLocation =  new ScheduleStop()

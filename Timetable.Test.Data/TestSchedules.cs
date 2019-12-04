@@ -163,6 +163,7 @@ namespace Timetable.Test.Data
         public static Time TenFifteen => Ten.AddMinutes(15);
         public static Time TenSixteen => Ten.AddMinutes(16);
         public static Time TenThirty => Ten.AddMinutes(30);
+        public static Time NineForty => Ten.AddMinutes(-20);
 
         public static ScheduleLocation[] DefaultLocations => CreateThreeStopSchedule(Ten);
         
@@ -173,5 +174,37 @@ namespace Timetable.Test.Data
             TestScheduleLocations.CreatePass(TestStations.Vauxhall, start.AddMinutes(20)),
             TestScheduleLocations.CreateDestination(TestStations.Waterloo, start.AddMinutes(30))
         };
+        
+        public static ScheduleLocation[] CreateWokingClaphamSchedule(Time start) => new[]
+        {
+            (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Woking, start),
+            TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, start.AddMinutes(30))
+        };
+        
+        public static ResolvedServiceWithAssociations CreateServiceWithAssociation(
+            DateTime on =  default(DateTime),
+            bool associationIsCancelled = false,
+            string mainUid = "X12345",
+            string associatedUid = "A98765", 
+            bool isNextDay = false)
+        {
+            var resolved = CreateService(mainUid, on: on);
+            var association = CreateAssociation(resolved, associatedUid, associationIsCancelled, isNextDay);
+            var resolvedWithAssociations = new ResolvedServiceWithAssociations(resolved, new [] { association });
+            return resolvedWithAssociations;
+        }
+
+        public static ResolvedAssociation CreateAssociation(ResolvedService main, string associatedUid, bool associationIsCancelled = false, bool isNextDay = false)
+        {
+            var associated = CreateScheduleWithService(associatedUid, stops: CreateWokingClaphamSchedule(NineForty));
+            var association = TestAssociations.CreateAssociationWithServices(main.Details.Service, associated.Service);
+            var associatedDate = isNextDay ? main.On.AddDays(1) : main.On;
+            var resolvedAssociated = new ResolvedService(associated, associatedDate, false);
+            return new ResolvedAssociation(
+                association,
+                main.On,
+                associationIsCancelled,
+                resolvedAssociated);
+        }
     }
 }

@@ -6,67 +6,82 @@ namespace Timetable
 {
     public class ResolvedServiceWithAssociations : ResolvedService
     {
-        private readonly Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> _associations;
-        public ResolvedAssociation[] Associations { get; private set; } = new ResolvedAssociation[0];
-        public bool FullyResolved { get; private set; } = false;
-
-        public ResolvedServiceWithAssociations(ResolvedService service, Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> associations)
+        public ResolvedAssociation[] Associations { get; }
+        
+        public  ResolvedServiceWithAssociations(ResolvedService service, IDictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> associations)
             : this(service.Details, service.On, service.IsCancelled, associations)
         {
         }
 
-        public ResolvedServiceWithAssociations(Schedule service,DateTime on, bool isCancelled, Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> associations)
+        public ResolvedServiceWithAssociations(Schedule service, DateTime on, bool isCancelled, IDictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> associations)
+            : this(service, on, isCancelled, ResolveAssociations(service.TimetableUid, on, associations))
+        {
+        }
+        
+        internal ResolvedServiceWithAssociations(ResolvedService service, ResolvedAssociation[] associations)
+            : this(service.Details, service.On, service.IsCancelled, associations)
+        {
+        }
+        
+        internal ResolvedServiceWithAssociations(Schedule service, DateTime on, bool isCancelled, ResolvedAssociation[] associations)
             : base(service, on, isCancelled)
         {
-            _associations = associations;
+            Associations = associations;
         }
-
+        
         public bool HasAssociations()
         {
             return Associations.Any();
         }
         
-        public ResolvedServiceWithAssociations ResolveAssociations()
+        public override string ToString()
         {
-            if(_associations == null)
-            {
-                FullyResolved = true;
-                return this;
-            }
-            
-
-            var associations = new List<ResolvedAssociation>();
-            foreach (var versions in _associations.Values)
+            return HasAssociations() ? $"{base.ToString()} +{Associations.Length}" : base.ToString();
+        }
+        
+        private static ResolvedAssociation[] ResolveAssociations(string timetableUid, DateTime on, IDictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> associations)
+        {
+            if(associations == null)
+                return new ResolvedAssociation[0];
+          
+            var resolvedAssociations = new List<ResolvedAssociation>();
+            foreach (var versions in associations.Values)
             {
                 var isCancelled = false;
                 foreach (var association in versions.Values)
                 {
-                    if (association.AppliesOn(On))
+                    if (association.AppliesOn(on))
                     {
                         if (association.IsCancelled())
                             isCancelled = true;
                         else
                         {
-                            var service = Details.TimetableUid == association.MainTimetableUid ? 
-                                association.AssociatedService :
-                                association.MainService;
-                            var resolved = service.GetScheduleOn(On);
-                            associations.Add(new ResolvedAssociation(association, On, isCancelled, resolved));
+                            var other = association.GetOtherService(timetableUid);
+                            var otherDate = ResolveDate(on, association.DateIndicator, association.IsMain(timetableUid));
+                            var resolved = other.GetScheduleOn(otherDate, false);
+                            resolvedAssociations.Add(new ResolvedAssociation(association, on, isCancelled, resolved));
                             break;
                         }
                     }
                 }
             }
-
-            Associations = associations.ToArray();
-            FullyResolved = true;
-            return this;
+            
+            return  resolvedAssociations.ToArray();;
         }
-        
-        public override string ToString()
+
+        private static DateTime ResolveDate(DateTime onDate, AssociationDateIndicator indicator, bool isMain)
         {
-            return FullyResolved ? $"{base.ToString()} Not resolved" : 
-                HasAssociations() ? $"{base.ToString()} +{Associations.Length}" : base.ToString();
+            switch (indicator)
+            {
+                case AssociationDateIndicator.Standard:
+                    return onDate;
+                case AssociationDateIndicator.NextDay:
+                    return isMain ? onDate.AddDays(1) : onDate.AddDays(-1);
+                case AssociationDateIndicator.PreviousDay:
+                    return isMain ? onDate.AddDays(-1) : onDate.AddDays(1);
+                default:
+                    throw new ArgumentException($"Unhandled DateIndicator value {indicator}", nameof(indicator));
+            }
         }
     }
 }

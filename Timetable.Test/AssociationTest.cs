@@ -37,9 +37,9 @@ namespace Timetable.Test
             var schedule = TestSchedules.CreateScheduleWithService();
             var association = TestAssociations.CreateAssociation();
             
-            association.AddToService(schedule.Service, true);
-            Assert.Equal(schedule.Service, association.MainService);
-            Assert.Null(association.AssociatedService);
+            association.SetService(schedule.Service, true);
+            Assert.Equal(schedule.Service, association.Main.Service);
+            Assert.Null(association.Associated.Service);
         }
         
         [Fact]
@@ -48,9 +48,9 @@ namespace Timetable.Test
             var schedule = TestSchedules.CreateScheduleWithService("A98765");
             var association = TestAssociations.CreateAssociation();
             
-            association.AddToService(schedule.Service, false);
-            Assert.Equal(schedule.Service, association.AssociatedService);
-            Assert.Null(association.MainService);
+            association.SetService(schedule.Service, false);
+            Assert.Equal(schedule.Service, association.Associated.Service);
+            Assert.Null(association.Main.Service);
         }
         
         [Theory]
@@ -61,7 +61,7 @@ namespace Timetable.Test
             var schedule = TestSchedules.CreateScheduleWithService("Q11111");
             var association = TestAssociations.CreateAssociation();
             
-            var ex = Assert.Throws<ArgumentException>(() => association.AddToService(schedule.Service, isMain));
+            var ex = Assert.Throws<ArgumentException>(() => association.SetService(schedule.Service, isMain));
         }
     }
 }
