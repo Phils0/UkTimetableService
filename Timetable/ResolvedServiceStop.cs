@@ -39,10 +39,11 @@ namespace Timetable
         
         public bool GoesTo(Station destination)
         {
-            foreach (var arrival in Details.Locations.OfType<IArrival>().Where(a => a.IsPublic).Reverse())
+            var departureTime = ((IDeparture) Stop).Time;
+            foreach (var arrival in Details.Locations.Where(l => l.HasAdvertisedTime(false)).OfType<IArrival>().Reverse())
             {
-                // Check if got to Stop, if so can shortcut as it doesn't go there although this is slightly dodgy
-                if (Stop.Station.Equals(arrival.Station))
+                // If arrival before Stop departure got to found stop so know that it does not go to location
+                if (arrival.Time.IsBefore(departureTime))
                     return false;
 
                 if (destination.Equals(arrival.Station))
@@ -57,10 +58,11 @@ namespace Timetable
 
         public bool ComesFrom(Station origin)
         {
-            foreach (var departure in Details.Locations.OfType<IDeparture>().Where(a => a.IsPublic))
+            var arrivalTime = ((IArrival) Stop).Time;
+            foreach (var departure in Details.Locations.Where(l => l.HasAdvertisedTime(true)).OfType<IDeparture>())
             {
-                // Check if got to Stop, if so can shortcut as it doesn't go there although this is slightly dodgy
-                if (Stop.Station.Equals(departure.Station))
+                // If arrival at Stop before departure got to found stop so know that it does not come from location
+                if (arrivalTime.IsBefore(departure.Time))
                     return false;
 
                 if (origin.Equals(departure.Station))

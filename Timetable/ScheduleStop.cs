@@ -35,7 +35,7 @@ namespace Timetable
 
         public override bool IsStopAt(StopSpecification spec)
         {
-            return Station.Equals(spec.Location) && IsAt(spec);
+            return IsStopAt(spec.Location) && HasAdvertisedTime(spec.UseDeparture) && IsAt(spec);
         }
 
         private bool IsAt(StopSpecification spec)

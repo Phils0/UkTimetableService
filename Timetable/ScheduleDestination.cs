@@ -23,7 +23,7 @@ namespace Timetable
 
         public override bool IsStopAt(StopSpecification spec)
         {
-            return spec.UseArrival && Station.Equals(spec.Location) && Arrival.IsSameTime(spec.Time);
+            return IsStopAt(spec.Location) && HasAdvertisedTime(spec.UseDeparture) &&  Arrival.IsSameTime(spec.Time);
         }
 
         public override string ToString()

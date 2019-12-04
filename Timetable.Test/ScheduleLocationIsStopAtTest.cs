@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ReflectionMagic;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -30,6 +31,35 @@ namespace Timetable.Test
         {
             var stop = TestScheduleLocations.CreateStop(location, TestSchedules.Ten);
             var spec = CreateFindSpec(TestSchedules.Ten, TimesToUse.Arrivals, ClaphamJunction);
+            Assert.Equal(expected, stop.IsStopAt(spec));
+        }
+
+        public static TheoryData<PublicStop, bool, bool> AdvertisedStop =>
+            new TheoryData<PublicStop, bool, bool>()
+            {
+                {PublicStop.No, true, false},
+                {PublicStop.No, false, false},
+                {PublicStop.Yes, true, true},
+                {PublicStop.Yes, false, true},          
+                {PublicStop.PickUpOnly, true, false},
+                {PublicStop.PickUpOnly, false, true},
+                {PublicStop.SetDownOnly, true, true},
+                {PublicStop.SetDownOnly, false, false},                  
+                {PublicStop.Request, true, true},
+                {PublicStop.Request, false, true}
+            };
+        
+        [Theory]
+        [MemberData(nameof(AdvertisedStop))]
+        public void OnlyIncludeStopsWhereAdvertisedStopIsRight(PublicStop advertised, bool useArrivals, bool expected)
+        {
+            var stop = TestScheduleLocations.CreateStop(ClaphamJunction, TestSchedules.Ten);
+            var updateable = stop.AsDynamic();
+            updateable.AdvertisedStop = advertised;
+
+            var arrivalsDepartures = useArrivals ? TimesToUse.Arrivals : TimesToUse.Departures;
+            var findAt = useArrivals ? TestSchedules.Ten : TestSchedules.Ten.AddMinutes(1);
+            var spec = CreateFindSpec(findAt, arrivalsDepartures, ClaphamJunction);
             Assert.Equal(expected, stop.IsStopAt(spec));
         }
         

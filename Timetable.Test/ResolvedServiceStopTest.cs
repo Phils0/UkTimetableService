@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ReflectionMagic;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -49,20 +50,25 @@ namespace Timetable.Test
             }
         }
 
-        [Fact]
-        public void GoesToAtPickUpOnlyIsFalse()
+        [Theory]
+        [InlineData(PublicStop.No, false)]
+        [InlineData(PublicStop.Yes, true)]
+        [InlineData(PublicStop.Request, true)]
+        [InlineData(PublicStop.PickUpOnly, false)]
+        [InlineData(PublicStop.SetDownOnly, true)]
+        public void GoesToIsFalseIfNotPublicArrival(PublicStop advertised, bool expected)
         {
             var service =  TestSchedules.CreateService();
             var surbiton = service.Details.Locations[0];
             var clapham = service.Details.Locations[1] as ScheduleStop;
-            clapham.Arrival = Time.NotValid;
-            clapham.Activities = new HashSet<string>(new [] {Activity.PickUpOnlyStop});
-            clapham.UpdateAdvertisedStop();
+            
+            var updateable = clapham.AsDynamic();
+            updateable.AdvertisedStop = advertised;
             
             var stop = new ResolvedServiceStop(service, surbiton);
             
-            Assert.False(stop.GoesTo(clapham.Station));
-            Assert.Null(stop.FoundToStop);
+            Assert.Equal(expected, stop.GoesTo(clapham.Station));
+            Assert.Equal(expected, stop.FoundToStop != null);
         }
         
         public static IEnumerable<object[]> FromStations
@@ -97,20 +103,24 @@ namespace Timetable.Test
             }
         }
         
-        [Fact]
-        public void ComesFromAtSetDownOnlyIsFalse()
+        [Theory]
+        [InlineData(PublicStop.No, false)]
+        [InlineData(PublicStop.Yes, true)]
+        [InlineData(PublicStop.Request, true)]
+        [InlineData(PublicStop.PickUpOnly, true)]
+        [InlineData(PublicStop.SetDownOnly, false)]
+        public void ComesFromIsFalseIfNotPublicDeparture(PublicStop advertised, bool expected)
         {
             var service =  TestSchedules.CreateService();
             var waterloo = service.Details.Locations[3];
             var clapham = service.Details.Locations[1] as ScheduleStop;
-            clapham.Departure = Time.NotValid;
-            clapham.Activities = new HashSet<string>(new [] {Activity.SetDownOnlyStop});
-            clapham.UpdateAdvertisedStop();
+            var updateable = clapham.AsDynamic();
+            updateable.AdvertisedStop = advertised;
             
             var stop = new ResolvedServiceStop(service, waterloo);
             
-            Assert.False(stop.GoesTo(clapham.Station));
-            Assert.Null(stop.FoundFromStop);
+            Assert.Equal(expected, stop.ComesFrom(clapham.Station));
+            Assert.Equal(expected, stop.FoundFromStop != null);
         }
         
         public static IEnumerable<object[]> StartTimes

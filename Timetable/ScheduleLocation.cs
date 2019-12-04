@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Serilog.Context;
 
 namespace Timetable
 {
@@ -79,6 +80,29 @@ namespace Timetable
 
         public abstract bool IsStopAt(StopSpecification spec);
 
+        public bool IsStopAt(Station at)
+        {
+            return Station.Equals(at);
+        }
+        
+        public bool HasAdvertisedTime(bool useDepartures)
+        {
+            switch (AdvertisedStop)
+            {
+                case PublicStop.Yes:
+                case PublicStop.Request:
+                    return true;
+                case PublicStop.No:
+                    return false;
+                case PublicStop.PickUpOnly:
+                    return useDepartures;
+                case PublicStop.SetDownOnly:
+                    return !useDepartures;
+                default:
+                    return false;
+            }
+        }
+        
         public bool IsStop(Location at, int sequence)
         {
             return Location.Equals(at) && Sequence == sequence;
