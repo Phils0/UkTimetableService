@@ -114,5 +114,47 @@ namespace Timetable.Test
             Assert.Equal(association1, resolved.Associations[0].Details);
             Assert.Equal(association2, resolved.Associations[1].Details);
         }
+        
+        
+        public static TheoryData<AssociationDateIndicator, bool, DateTime> DataIndicatorScenarios =>
+            new TheoryData<AssociationDateIndicator, bool, DateTime>()
+            {
+                { AssociationDateIndicator.Standard, true, MondayAugust12 }, 
+                { AssociationDateIndicator.Standard, false, MondayAugust12 }, 
+                { AssociationDateIndicator.PreviousDay, true, MondayAugust12.AddDays(-1) }, 
+                { AssociationDateIndicator.PreviousDay, false, MondayAugust12.AddDays(1) },
+                { AssociationDateIndicator.NextDay, true, MondayAugust12.AddDays(1) }, 
+                { AssociationDateIndicator.NextDay, false, MondayAugust12.AddDays(-1) },                 
+            };
+        
+        [Theory]
+        [MemberData(nameof(DataIndicatorScenarios))]
+        public void GetsScheduleWithAssociationsApplyingMovingDateBAsedUponDateIndicator(AssociationDateIndicator indicator, bool isMain, DateTime expected)
+        {
+            
+            var association = TestAssociations.CreateAssociationWithServices(dateIndicator: indicator);
+
+            var service = isMain ? association.Main.Service : association.Associated.Service;
+            var other = isMain ? association.Associated.Service : association.Main.Service;
+            
+            var resolved = new ResolvedServiceWithAssociations(
+                service.AsDynamic()._schedule.RealObject, 
+                MondayAugust12, 
+                false, 
+                Associations(other.TimetableUid) );
+
+            Assert.True(resolved.HasAssociations());
+            Assert.Equal(expected, resolved.Associations[0].AssociatedService.On);
+
+            Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> Associations(string uid)
+            {
+                var values = new SortedList<(StpIndicator indicator, ICalendar calendar), Association>();
+                values.Add((StpIndicator.Permanent, association.Calendar), association);
+                return new Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>()
+                {
+                    {uid, values}
+                };
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace Timetable
     {
         public ResolvedAssociation[] Associations { get; }
         
-        public  ResolvedServiceWithAssociations(ResolvedService service, Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> associations)
+        public  ResolvedServiceWithAssociations(ResolvedService service, IDictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> associations)
             : this(service.Details, service.On, service.IsCancelled, associations)
         {
         }
@@ -57,7 +57,8 @@ namespace Timetable
                         else
                         {
                             var other = association.GetOtherService(timetableUid);
-                            var resolved = other.GetScheduleOn(on, false);
+                            var otherDate = ResolveDate(on, association.DateIndicator, association.IsMain(timetableUid));
+                            var resolved = other.GetScheduleOn(otherDate, false);
                             resolvedAssociations.Add(new ResolvedAssociation(association, on, isCancelled, resolved));
                             break;
                         }
@@ -66,6 +67,21 @@ namespace Timetable
             }
             
             return  resolvedAssociations.ToArray();;
+        }
+
+        private static DateTime ResolveDate(DateTime onDate, AssociationDateIndicator indicator, bool isMain)
+        {
+            switch (indicator)
+            {
+                case AssociationDateIndicator.Standard:
+                    return onDate;
+                case AssociationDateIndicator.NextDay:
+                    return isMain ? onDate.AddDays(1) : onDate.AddDays(-1);
+                case AssociationDateIndicator.PreviousDay:
+                    return isMain ? onDate.AddDays(-1) : onDate.AddDays(1);
+                default:
+                    throw new ArgumentException($"Unhandled DateIndicator value {indicator}", nameof(indicator));
+            }
         }
     }
 }
