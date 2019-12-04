@@ -56,21 +56,38 @@ namespace Timetable.Web.Mapping
         
         private Model.Association MapAssociation(ResolvedAssociation source, ResolvedService service, ResolutionContext context)
         {
-            var associatedService = CreateService(source.AssociatedService, context);
             var atStop = Map(source.GetStop(service), context);
-            var associatedStop = Map(source.GetStop(source.AssociatedService), context);
+            var (associatedService, associatedStop) = MapOtherService();
+
             var association = new Model.Association()
             {
                 Stop =  atStop,
                 IsCancelled = source.IsCancelled,
                 IsMain = source.IsMain(service.TimetableUid),
-                Date = (DateTime) context.Items["On"],
+                Date = source.On,
                 AssociationCategory = source.Details.Category.ToString(),
                 AssociatedService = associatedService,
                 AssociatedServiceStop = associatedStop
             };
             
             return association;
+
+            (Model.Service, Model.ScheduledStop) MapOtherService()
+            {
+                // Remember original service date as can change
+                var originalDate = context.Items["On"];
+                try
+                {
+                    var otherService = CreateService(source.AssociatedService, context);
+                    var otherStop = Map(source.GetStop(source.AssociatedService), context);
+                    return (otherService, otherStop);
+                }
+                finally
+                {
+                    // Reset service date
+                    context.Items["On"] = originalDate;
+                }
+            }
         }
 
         private Model.ScheduledStop Map(Timetable.ScheduleLocation stop, ResolutionContext context)

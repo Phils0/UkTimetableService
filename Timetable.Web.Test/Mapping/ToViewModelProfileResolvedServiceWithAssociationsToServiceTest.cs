@@ -28,10 +28,11 @@ namespace Timetable.Web.Test.Mapping
         private static Model.Service MapResolvedService(
             bool isCancelled = false,
             string mainUid = "X12345",
-            string associatedUid = "A98765")
+            string associatedUid = "A98765", 
+            bool isNextDay = false)
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
-            var resolved = TestSchedules.CreateServiceWithAssociation(on: TestDate, isCancelled, mainUid, associatedUid);
+            var resolved = TestSchedules.CreateServiceWithAssociation(on: TestDate, isCancelled, mainUid, associatedUid, isNextDay);
             
             var service = mapper.Map<Timetable.ResolvedService, Model.Service>(resolved, opts => opts.Items["On"] = resolved.On);
             return service;
@@ -100,6 +101,20 @@ namespace Timetable.Web.Test.Mapping
             var association = output.Associations[0].AssociatedServiceStop;
             Assert.Equal("CLJ", association.Location.ThreeLetterCode);
             Assert.Equal(TestDate.Add(TenTen), association.Arrival);
+        }
+        
+        [Fact]
+        public void MapAssociationIsNextDay()
+        {
+            var output = MapResolvedService(isNextDay: true);
+            
+            Assert.Equal(TestDate, output.Date);
+            
+            var association = output.Associations[0];
+            Assert.Equal(TestDate, association.Date);
+            Assert.Equal(TestDate.Add(TestSchedules.TenFifteen.Value), association.Stop.Arrival);
+            Assert.Equal(TestDate.AddDays(1), association.AssociatedService.Date);
+            Assert.Equal(TestDate.AddDays(1).Add(TenTen), association.AssociatedServiceStop.Arrival);
         }
     }
 }
