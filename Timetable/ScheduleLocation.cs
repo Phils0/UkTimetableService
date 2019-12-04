@@ -28,6 +28,12 @@ namespace Timetable
             if (Activities == null)
                 return;
             
+            if (Activities.Contains(Activity.StopNotAdvertised))
+            {
+                AdvertisedStop = PublicStop.No;
+                return;
+            }
+            
             if (Activities.Contains(Activity.PassengerStop))
             {
                 AdvertisedStop = PublicStop.Yes;
