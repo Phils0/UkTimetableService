@@ -20,6 +20,10 @@ namespace Timetable.Web.Model
         /// Return services for whole day
         /// </summary>
         public bool FullDay { get; set; } = false;
+        /// <summary>
+        /// Return services for whole day
+        /// </summary>
+        public bool UseRailDay { get; set; } = false;
         public override string ToString()
         {
             return At.ToString("s");

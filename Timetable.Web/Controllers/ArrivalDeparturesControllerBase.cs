@@ -28,10 +28,10 @@ namespace Timetable.Web.Controllers
         
         protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs)
         {
-            return CreateRequest(location, at, toFrom, before, after, requestType, tocs, false);
+            return CreateRequest(location, at, toFrom, before, after, requestType, tocs, false, false);
         }
 
-        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs, bool fullDay)
+        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs, bool fullDay,  bool useRailDay)
         {
             var request = new SearchRequest()
             {
@@ -50,9 +50,9 @@ namespace Timetable.Web.Controllers
             return request;
         }
         
-        protected SearchRequest CreateFullDayRequest(string location, DateTime at, string toFrom, string requestType, string[] tocs)
+        protected SearchRequest CreateFullDayRequest(string location, DateTime at, string toFrom, string requestType, string[] tocs,  bool useRailDay)
         {
-            return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true);
+            return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true, useRailDay);
         }
         
         protected async Task<IActionResult> Process(SearchRequest request, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find, bool includeStops)
