@@ -142,7 +142,6 @@ namespace Timetable.Test
         [Theory]
         [InlineData("ABC")]
         [InlineData("")]
-        [InlineData("")]
         public void GetScheduleByRetailServiceIdInvalidRetailServiceId(string retailServiceId)
         {
             var timetable = CreateTimetable();           
