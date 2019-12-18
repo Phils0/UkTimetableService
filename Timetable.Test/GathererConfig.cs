@@ -10,7 +10,7 @@ namespace Timetable.Test
         
         internal static GatherConfiguration Create(ushort before, ushort after)
         {
-            return new GatherConfiguration(before, after, GatherFilterFactory.NoFilter);
+            return new GatherConfiguration(before, after, false, GatherFilterFactory.NoFilter);
         }
     }
 }

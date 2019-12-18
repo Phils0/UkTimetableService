@@ -34,7 +34,7 @@ namespace Timetable
         /// <summary>
         /// Timetable for Station
         /// </summary>
-        public LocationTimetable Timetable { get; }
+        internal LocationTimetable Timetable { get; }
 
         public Station()
         {

@@ -9,6 +9,8 @@ namespace Timetable
         Station Location { get; }
         (Time time, Service[] services) ValuesAt(int index);
         int Count { get; }
+        IEnumerable<KeyValuePair<Time, Service[]>> GetValuesBefore(int index);
+        IEnumerable<KeyValuePair<Time, Service[]>> GetValuesAtAndAfter(int index);
     }
     
     internal class ScheduleGatherer
@@ -36,11 +38,14 @@ namespace Timetable
         /// <returns>Array of services running on day</returns>
         internal ResolvedServiceStop[] Gather(int startIdx, DateTime onDate)
         {
+            if (_config.All)
+                return SelectAllServices(startIdx, onDate).ToArray();
+            
             var beforeServices = SelectServicesBefore(startIdx - 1,  _config.ServicesBefore, onDate).Reverse();
             var afterServices = SelectServicesAfter(startIdx, _config.ServicesAfter,  onDate);
             return beforeServices.Concat(afterServices).ToArray();
         }
-
+        
         private IEnumerable<ResolvedServiceStop>  SelectServicesBefore(int startIdx, int quantity, DateTime onDate)
         {
             return DoNotIterate() ? 
@@ -113,6 +118,22 @@ namespace Timetable
 
                     idx++;
                 }
+            }
+        }
+        
+        private IEnumerable<ResolvedServiceStop> SelectAllServices(int startIdx, DateTime date)
+        {
+            foreach (var pair  in _schedule.GetValuesAtAndAfter(startIdx))
+            {
+                foreach (var stop in ResolveServices(pair.Value, pair.Key, date))
+                    yield return stop;
+            }
+
+            var nextDay = date.AddDays(1);
+            foreach (var pair in _schedule.GetValuesBefore(startIdx))
+            {
+                foreach (var stop in ResolveServices(pair.Value, pair.Key, nextDay))
+                    yield return stop;
             }
         }
     }

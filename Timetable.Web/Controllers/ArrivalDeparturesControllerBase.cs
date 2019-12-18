@@ -95,7 +95,7 @@ namespace Timetable.Web.Controllers
         protected GatherConfiguration CreateGatherConfig(SearchRequest request)
         {
             var filter = CreateFilter(request);
-            return new GatherConfiguration(request.At.Before, request.At.After, filter);
+            return new GatherConfiguration(request.At.Before, request.At.After, false, filter);
         }
         
         protected GatherConfiguration.GatherFilter CreateFilter(SearchRequest request)

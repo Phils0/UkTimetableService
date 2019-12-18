@@ -90,9 +90,8 @@ namespace Timetable.Test
             if(found)
                 Assert.Equal(threeLetterCode, location.ThreeLetterCode);
         }
-
-
         private static readonly DateTime Ten = new DateTime(2019, 8, 12, 10, 0, 0);
+        private static readonly DateTime Aug12 = Ten.Date;
         
         [Theory]
         [InlineData("SUR", FindStatus.Success)]
@@ -129,7 +128,7 @@ namespace Timetable.Test
         public void AllDeparture(string threeLetterCode, FindStatus found)
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllDepartures(threeLetterCode, Ten, GatherFilterFactory.NoFilter);
+            var find = data.AllDepartures(threeLetterCode, Aug12, GatherFilterFactory.NoFilter, false);
             
             Assert.Equal(found, find.status);
             if(found == FindStatus.Success)
@@ -137,12 +136,53 @@ namespace Timetable.Test
             else
                 Assert.Empty(find.services);
         }
+
+        [Fact]
+        public void AllDeparturesIgnoresTime()
+        {
+            var expectedFirstTime = new TimeSpan(0, 7, 0);
+            var expectedFirstDate = Aug12;
+
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.AllDepartures("SUR", Ten, GatherFilterFactory.NoFilter, false);
+            
+            var first = find.services.First();
+            AssertDeparture(expectedFirstDate, expectedFirstTime, first);
+        }
+        
+        public static TheoryData<bool, DateTime, TimeSpan, DateTime, TimeSpan> FirstAndLastDepartureTimes =>
+            new TheoryData<bool, DateTime, TimeSpan, DateTime, TimeSpan>()
+            {
+                { false, Aug12, new TimeSpan(0, 7, 0), Aug12, new TimeSpan(23, 52, 0) }, 
+                { true, Aug12, new TimeSpan(2, 37, 0), Aug12.AddDays(1), new TimeSpan(2, 22, 0) }
+            };
+        
+        [Theory]
+        [MemberData(nameof(FirstAndLastDepartureTimes))]
+        public void AllDepartureTimes(bool useRailDay, DateTime expectedFirstDate, TimeSpan expectedFirstTime, DateTime expectedLastDate, TimeSpan expectedLastTime)
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.AllDepartures("SUR", Aug12, GatherFilterFactory.NoFilter, useRailDay);
+
+            var first = find.services.First();
+            AssertDeparture(expectedFirstDate, expectedFirstTime, first);
+            
+            var last = find.services.Last();
+            AssertDeparture(expectedLastDate, expectedLastTime, last);
+        }
+        
+        private static void AssertDeparture(DateTime expectedDate, TimeSpan expectedTime, ResolvedServiceStop stop)
+        {
+            var origin = stop.Stop as ScheduleOrigin;
+            Assert.Equal(expectedTime, origin.Departure.Value);
+            Assert.Equal(expectedDate, stop.On);
+        }
         
         [Fact]
         public void EmptyDeparturesWhenNone()
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllDepartures("WAT", Ten, GatherFilterFactory.NoFilter);
+            var find = data.AllDepartures("WAT", Aug12, GatherFilterFactory.NoFilter, false);
             
             Assert.Equal(FindStatus.NoServicesForLocation, find.status);
             Assert.Empty(find.services);
@@ -183,7 +223,7 @@ namespace Timetable.Test
         public void AllArrivals(string threeLetterCode, FindStatus found)
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllArrivals(threeLetterCode, Ten, GatherFilterFactory.NoFilter);
+            var find = data.AllArrivals(threeLetterCode, Aug12, GatherFilterFactory.NoFilter, false);
             
             Assert.Equal(found, find.status);
             if(found == FindStatus.Success)
@@ -193,10 +233,53 @@ namespace Timetable.Test
         }
         
         [Fact]
+        public void AllArrivalsIgnoresTime()
+        {
+            // First arrival is from service that departed day before
+            var expectedFirstTime = new TimeSpan(1,0, 2, 0);
+            var expectedFirstDate = Aug12.AddDays(-1);
+
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.AllArrivals("WAT", Ten, GatherFilterFactory.NoFilter, false);
+            
+            var first = find.services.First();
+            AssertArrival(expectedFirstDate, expectedFirstTime, first);
+        }
+        
+        public static TheoryData<bool, DateTime, TimeSpan, DateTime, TimeSpan> FirstAndLastArrivalTimes =>
+            new TheoryData<bool, DateTime, TimeSpan, DateTime, TimeSpan>()
+            {
+                // First arrival is from service that departed day before
+                { false, Aug12.AddDays(-1), new TimeSpan(1,0, 2, 0), Aug12, new TimeSpan(23, 47, 0) }, 
+                { true, Aug12, new TimeSpan(2, 32, 0), Aug12.AddDays(1), new TimeSpan(2, 17, 0) }
+            };
+        
+        [Theory]
+        [MemberData(nameof(FirstAndLastArrivalTimes))]
+        public void AllArrivalTimes(bool useRailDay, DateTime expectedFirstDate, TimeSpan expectedFirstTime, DateTime expectedLastDate, TimeSpan expectedLastTime)
+        {
+            var data = TestData.CreateTimetabledLocations();
+            var find = data.AllArrivals("WAT", Aug12, GatherFilterFactory.NoFilter, useRailDay);
+
+            var first = find.services.First();
+            AssertArrival(expectedFirstDate, expectedFirstTime, first);
+
+            var last = find.services.Last();
+            AssertArrival(expectedLastDate, expectedLastTime, last);
+        }
+
+        private static void AssertArrival(DateTime expectedDate, TimeSpan expectedTime, ResolvedServiceStop stop)
+        {
+            var destination = stop.Stop as ScheduleDestination;
+            Assert.Equal(expectedTime, destination.Arrival.Value);
+            Assert.Equal(expectedDate, stop.On);
+        }
+
+        [Fact]
         public void EmptyArrivalsWhenNone()
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllArrivals("SUR", Ten, GatherFilterFactory.NoFilter);
+            var find = data.AllArrivals("SUR", Aug12, GatherFilterFactory.NoFilter, false);
             
             Assert.Equal(FindStatus.NoServicesForLocation, find.status);
             Assert.Empty(find.services);

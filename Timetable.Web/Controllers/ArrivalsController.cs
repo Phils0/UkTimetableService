@@ -85,7 +85,7 @@ namespace Timetable.Web.Controllers
             return await Process(request, async () =>
             {
                 var filter = CreateFilter(request);
-                var result = _timetable.AllArrivals(request.Location, onDate, filter);
+                var result = _timetable.AllArrivals(request.Location, onDate, filter, useRailDay);
                 return await Task.FromResult(result);
             }, includeStops);
         }

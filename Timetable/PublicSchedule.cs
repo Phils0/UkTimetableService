@@ -8,7 +8,7 @@ namespace Timetable
     {
         void AddService(IServiceTime stop);
         ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config);
-        ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter);
+        ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay);
     }
 
     /// <summary>
@@ -17,6 +17,9 @@ namespace Timetable
     /// <remarks>Services are ordered by time</remarks>
     internal class PublicSchedule : IPublicSchedule, IGathererScheduleData
     {
+        // Rail day assumed to start at 02:30 
+        public static Time StartRailDay = new Time(new TimeSpan(2, 30,0));
+        public static Time Midnight = new Time(new TimeSpan(0, 0,0));
         public Station Location { get; }
 
         private readonly SortedList<Time, Service[]> _services;
@@ -54,6 +57,9 @@ namespace Timetable
             return (_services.Keys[index], _services.Values[index]);
         }
 
+        public IEnumerable<KeyValuePair<Time, Service[]>> GetValuesBefore(int index) => _services.Take(index);
+        public IEnumerable<KeyValuePair<Time, Service[]>> GetValuesAtAndAfter(int index) => _services.Skip(index);
+       
         public int Count => _services.Count;
 
         public ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config)
@@ -64,27 +70,29 @@ namespace Timetable
             var first = FindNearestTime(time);
             
             if (config.HasRequestedBeforeOnly && EqualsTime(first.index, time))
-                first.index = first.index + 1; 
+                first.index += 1; 
             
             //TODO if need to change day do we go forward or backward
             
             return GatherServices(first.index, onDate, config);
         }
 
-        private const int Lots = 10000;    // This should be more than we will see in any station for a day
-
         /// <summary>
         /// Gather all services
         /// </summary>
         /// <param name="onDate"></param>
         /// <param name="filter"></param>
+        /// <param name="useRailDay"></param>
         /// <returns>All services for day</returns>
         /// <remarks>Reuses standard Gather functionality, setting starting index to 0 and config to get all (actually lots) </remarks>
-        public ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter)
+        public ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay)
         {
-            var config = new GatherConfiguration(0, Lots, filter);
+            var time = useRailDay ? StartRailDay : Midnight;
+            var first = FindNearestTime(time);
+            
+            var config = new GatherConfiguration(0, 0, true, filter);
             var gatherer = new ScheduleGatherer(this, config, _arrivalsOrDepartures);
-            return gatherer.Gather(0, onDate);
+            return gatherer.Gather(first.index, onDate.Date);
         }
 
         private bool EqualsTime(int idx, Time time)

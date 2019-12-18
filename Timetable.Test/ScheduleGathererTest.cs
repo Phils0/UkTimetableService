@@ -179,7 +179,7 @@ namespace Timetable.Test
                 return Enumerable.Empty<ResolvedServiceStop>();
             }
 
-            var config = new GatherConfiguration(0, 3, Filter);
+            var config = new GatherConfiguration(0, 3, false, Filter);
             var gatherer = new ScheduleGatherer(schedule, config, TimesToUse.Departures);
             
             var services = gatherer.Gather(1, TestDate);

@@ -64,7 +64,7 @@ namespace Timetable
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
         /// <returns>Schedules of running services.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter);
+        (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay);
         
         /// <summary>
         /// Scheduled services arriving at location on date near to time
@@ -81,7 +81,7 @@ namespace Timetable
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
         /// <returns>Schedules of running services.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter);
+        (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay);
     }
 
     /// <summary>
@@ -168,9 +168,9 @@ namespace Timetable
             return Find(location, (station) => station.Timetable.FindDepartures(at, config));
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter)
+        public (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay)
         {
-            return Find(location, (station) => station.Timetable.AllDepartures(onDate, filter));
+            return Find(location, (station) => station.Timetable.AllDepartures(onDate, filter, useRailDay));
         }
 
         private (FindStatus status, ResolvedServiceStop[] services) Find(string location,  Func<Station, ResolvedServiceStop[]> findFunc)
@@ -195,9 +195,9 @@ namespace Timetable
             return Find(location, (station) => station.Timetable.FindArrivals(at, config));
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter)
+        public (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay)
         {
-            return Find(location, (station) => station.Timetable.AllArrivals(onDate, filter));
+            return Find(location, (station) => station.Timetable.AllArrivals(onDate, filter, useRailDay));
         }
     }
 }

@@ -5,42 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Timetable
 {
-    public interface ILocationTimetable
-    {
-        /// <summary>
-        /// Scheduled services departing on date near to time
-        /// </summary>
-        /// <param name="at">Date and Time</param>
-        /// <param name="config">Configuration for gathering the results</param>
-        /// <returns>Schedules of running services.  If a service departs at time counts as first of after.</returns>
-        ResolvedServiceStop[] FindDepartures(DateTime at, GatherConfiguration config);
-
-        /// <summary>
-        /// Scheduled services departing on date
-        /// </summary>
-        /// <param name="onDate">Date and Time</param>
-        /// <param name="filter">Any filter</param>
-        /// <returns>Schedules of running services.</returns>
-        ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherConfiguration.GatherFilter filter);
-        
-        /// <summary>
-        /// Scheduled services arriving on date near to time
-        /// </summary>
-        /// <param name="at">Date and Time</param>
-        /// <param name="config">Configuration for gathering the results</param>
-        /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
-        ResolvedServiceStop[] FindArrivals(DateTime at, GatherConfiguration config);
-        
-        /// <summary>
-        /// Scheduled services arriving on date
-        /// </summary>
-        /// <param name="onDate">Date and Time</param>
-        /// <param name="filter">Any filter</param>
-        /// <returns>Schedules of running services.</returns>
-        ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherConfiguration.GatherFilter filter);
-    }
-
-    public class LocationTimetable : ILocationTimetable
+    internal class LocationTimetable
     {
         private readonly IPublicSchedule _arrivals;
         private readonly IPublicSchedule _departures;
@@ -85,9 +50,9 @@ namespace Timetable
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherConfiguration.GatherFilter filter)
+        public ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay)
         {
-            return _departures.AllServices(onDate, filter);
+            return _departures.AllServices(onDate, filter, useRailDay);
         }
 
         /// <summary>
@@ -96,6 +61,7 @@ namespace Timetable
         /// <param name="at">Date and Time</param>
         /// <param name="before">Number of services before to return</param>
         /// <param name="after">Number of services after to return.  First found after or on time is always included in after</param>
+        /// <param name="config"></param>
         /// <returns>Schedules of running services.</returns>
         public ResolvedServiceStop[] FindArrivals(DateTime at, GatherConfiguration config)
         {
@@ -107,10 +73,11 @@ namespace Timetable
         /// </summary>
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
+        /// <param name="useRailDay"></param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherConfiguration.GatherFilter filter)
+        public ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay)
         {
-            return _arrivals.AllServices(onDate, filter);
+            return _arrivals.AllServices(onDate, filter, useRailDay);
         }
     }
 }

@@ -272,7 +272,7 @@ namespace Timetable.Test
         {
             var (schedule, expected) = CreateSchedule();
             
-            var found = schedule.AllServices(Aug5, GatherFilterFactory.NoFilter);
+            var found = schedule.AllServices(Aug5, GatherFilterFactory.NoFilter, false);
             Assert.Equal(expected.Length, found.Length);
         }
         
@@ -281,7 +281,7 @@ namespace Timetable.Test
         {
             var (schedule, expected) = CreateSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.None));
             
-            var services = schedule.AllServices(Aug5, GatherFilterFactory.NoFilter);
+            var services = schedule.AllServices(Aug5, GatherFilterFactory.NoFilter, false);
             Assert.Empty(services);
         }
     }

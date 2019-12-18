@@ -185,11 +185,28 @@ namespace Timetable.Web.Test.Controllers
         public async Task FullDayArrivalsReturnsServices(string clapham)
         {
             var data = Substitute.For<ILocationData>();
-            data.AllArrivals("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>())
+            data.AllArrivals("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>(), false)
                 .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
 
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Arrivals(clapham, Aug12, fullDay: true) as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+
+            var services = response.Value as Model.FoundResponse;
+            AssertRequestSetInResponse(services);
+            Assert.NotEmpty(services.Services);
+        }
+        
+        [Fact]
+        public async Task FullRailDayArrivalsReturnsServices()
+        {
+            var data = Substitute.For<ILocationData>();
+            data.AllArrivals("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>(), true)
+                .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
+
+            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.Arrivals("CLJ", Aug12, fullDay: true, useRailDay: true) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
 
@@ -204,7 +221,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ArrivalsForDayReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
             var data = Substitute.For<ILocationData>();
-            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>())
+            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), false)
                 .Returns((status, new ResolvedServiceStop[0]));
 
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -221,7 +238,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ArrivalsForDayReturnsError()
         {
             var data = Substitute.For<ILocationData>();
-            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>())
+            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), false)
                 .Throws(new Exception("Something went wrong"));
 
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
