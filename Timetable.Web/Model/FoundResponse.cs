@@ -17,16 +17,27 @@ namespace Timetable.Web.Model
         /// </summary>
         public DateTime GeneratedAt { get; set; }
     }
-
+    
     /// <summary>
     /// Found Departures/Arrivals
     /// </summary>
-    public class FoundResponse : SearchResponse
+    public class FoundServiceResponse : SearchResponse
     {
         /// <summary>
         /// Services arriving/departing
         /// </summary>
-        public FoundItem[] Services { get; set; } = new FoundItem[0];
+        public FoundServiceItem[] Services { get; set; } = new FoundServiceItem[0];
+    }
+    
+    /// <summary>
+    /// Found Departures/Arrivals
+    /// </summary>
+    public class FoundSummaryResponse : SearchResponse
+    {
+        /// <summary>
+        /// Services arriving/departing
+        /// </summary>
+        public FoundSummaryItem[] Services { get; set; } = new FoundSummaryItem[0];
     }
     
     /// <summary>

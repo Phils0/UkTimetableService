@@ -36,14 +36,14 @@ namespace Timetable.Web.Test.Controllers
             
             Assert.Equal(200, response.StatusCode);
 
-            var services = response.Value as Model.FoundResponse;
+            var services = response.Value as Model.FoundSummaryResponse;
             AssertRequestSetInResponse(services);
             Assert.NotEmpty(services.Services);
         }
 
         private static GatherFilterFactory FilterFactory => new GatherFilterFactory();
 
-        private void AssertRequestSetInResponse(FoundResponse response)
+        private void AssertRequestSetInResponse(SearchResponse response)
         {
             Assert.NotNull(response.Request);
             Assert.True(response.GeneratedAt > DateTime.Now.AddMinutes(-1));
@@ -187,7 +187,7 @@ namespace Timetable.Web.Test.Controllers
             
             Assert.Equal(200, response.StatusCode);
 
-            var services = response.Value as Model.FoundResponse;
+            var services = response.Value as Model.FoundSummaryResponse;
             AssertRequestSetInResponse(services);
             Assert.NotEmpty(services.Services);
         }
@@ -204,7 +204,7 @@ namespace Timetable.Web.Test.Controllers
             
             Assert.Equal(200, response.StatusCode);
 
-            var services = response.Value as Model.FoundResponse;
+            var services = response.Value as Model.FoundSummaryResponse;
             AssertRequestSetInResponse(services);
             Assert.NotEmpty(services.Services);
         }
@@ -249,8 +249,8 @@ namespace Timetable.Web.Test.Controllers
         {
             get
             {
-                yield return new object[] {false, typeof(FoundSummaryItem)};                
-                yield return new object[] {true, typeof(FoundServiceItem)};
+                yield return new object[] {false, typeof(FoundSummaryResponse)};                
+                yield return new object[] {true, typeof(FoundServiceResponse)};
             }
         }
         
@@ -264,9 +264,7 @@ namespace Timetable.Web.Test.Controllers
             
             var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Departures("SUR", Aug12AtTen, includeStops: includeStops) as ObjectResult;
-            var found = response.Value as Model.FoundResponse;
-
-            Assert.IsType(expected, found.Services[0]);
+            Assert.IsType(expected, response.Value);
         }
         
         [Theory]
@@ -279,9 +277,7 @@ namespace Timetable.Web.Test.Controllers
             
             var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Departures("SUR", includeStops: includeStops) as ObjectResult;
-            var found = response.Value as Model.FoundResponse;
-
-            Assert.IsType(expected, found.Services[0]);
+            Assert.IsType(expected, response.Value);
         }
     }
 }

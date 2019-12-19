@@ -66,18 +66,26 @@ namespace Timetable.Web.Controllers
 
                     if (findStatus == FindStatus.Success)
                     {
-                        FoundItem[] items;
-                        if(includeStops)
-                            items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundServiceItem[]>(services, ServiceController.InitialiseContext);
-                        else
-                            items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundSummaryItem[]>(services, ServiceController.InitialiseContext);
-                        
-                        return Ok(new Model.FoundResponse()
+                        if (includeStops)
                         {
-                            Request = request,
-                            GeneratedAt = DateTime.Now,
-                            Services = items
-                        });
+                            var items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundServiceItem[]>(services, ServiceController.InitialiseContext);
+                            return Ok(new Model.FoundServiceResponse()
+                            {
+                                Request = request,
+                                GeneratedAt = DateTime.Now,
+                                Services = items
+                            });                           
+                        }
+                        else
+                        {
+                            var items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundSummaryItem[]>(services, ServiceController.InitialiseContext);
+                            return Ok(new Model.FoundSummaryResponse()
+                            {
+                                Request = request,
+                                GeneratedAt = DateTime.Now,
+                                Services = items
+                            });
+                        }
                     }
 
                     status = findStatus;

@@ -32,7 +32,8 @@ namespace Timetable.Web.Controllers
         /// <response code="200">Ok</response>
         /// <response code="404">Not Found</response>
         /// <response code="500">Internal Server error</response>
-        [ProducesResponseType(200, Type = typeof(Model.FoundResponse))]
+        [ProducesResponseType(200, Type = typeof(Model.FoundSummaryItem))]
+        [ProducesResponseType(200, Type = typeof(Model.FoundServiceResponse))]
         [ProducesResponseType(404, Type = typeof(Model.NotFoundResponse))]
         [ProducesResponseType(500, Type = typeof(Model.NotFoundResponse))]
         [Route("arrivals/{location}")]
@@ -59,7 +60,8 @@ namespace Timetable.Web.Controllers
         /// <response code="200">Ok</response>
         /// <response code="404">Not Found</response>
         /// <response code="500">Internal Server error</response>
-        [ProducesResponseType(200, Type = typeof(Model.FoundResponse))]
+        [ProducesResponseType(200, Type = typeof(Model.FoundSummaryItem))]
+        [ProducesResponseType(200, Type = typeof(Model.FoundServiceResponse))]
         [ProducesResponseType(404, Type = typeof(Model.NotFoundResponse))]
         [ProducesResponseType(500, Type = typeof(Model.NotFoundResponse))]
         [Route("arrivals/{location}/{at}")]
