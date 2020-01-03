@@ -23,7 +23,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ServicesByTocReturnsServices()
         {
             var data = Substitute.For<ITimetable>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -39,11 +39,11 @@ namespace Timetable.Web.Test.Controllers
         public async Task ServicesByTocReturnsFullSchedulewsWhenSetFullScheduleParameter()
         {
             var data = Substitute.For<ITimetable>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.GetTocServices("VT", April1, true) as ObjectResult;;
+            var response = await controller.GetTocServices("VT", April1, includeStops: true) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
 
@@ -52,10 +52,26 @@ namespace Timetable.Web.Test.Controllers
         }
         
         [Fact]
+        public async Task RailDayServicesByTocReturnsServices()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.StartRailDay)
+                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
+
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetTocServices("VT", April1, true) as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+
+            var services = response.Value as Model.ServiceSummary[];
+            Assert.NotEmpty(services);
+        }
+
+        [Fact]
         public async Task ServicesByTocReturnsNotFoundWithReason()
         {
             var data = Substitute.For<ITimetable>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>())
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Returns((LookupStatus.ServiceNotFound, new ResolvedService[0]));
 
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());

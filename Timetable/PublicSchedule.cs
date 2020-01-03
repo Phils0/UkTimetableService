@@ -17,9 +17,6 @@ namespace Timetable
     /// <remarks>Services are ordered by time</remarks>
     internal class PublicSchedule : IPublicSchedule, IGathererScheduleData
     {
-        // Rail day assumed to start at 02:30 
-        public static Time StartRailDay = new Time(new TimeSpan(2, 30,0));
-        public static Time Midnight = new Time(new TimeSpan(0, 0,0));
         public Station Location { get; }
 
         private readonly SortedList<Time, Service[]> _services;
@@ -87,7 +84,7 @@ namespace Timetable
         /// <remarks>Reuses standard Gather functionality, setting starting index to 0 and config to get all (actually lots) </remarks>
         public ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay)
         {
-            var time = useRailDay ? StartRailDay : Midnight;
+            var time = useRailDay ? Time.StartRailDay : Time.Midnight;
             var first = FindNearestTime(time);
             
             var config = new GatherConfiguration(0, 0, true, filter);

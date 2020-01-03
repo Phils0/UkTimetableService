@@ -18,7 +18,7 @@ namespace Timetable
     {
         (LookupStatus status, ResolvedService service) GetScheduleByTimetableUid(string timetableUid, DateTime date);
         (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
-        (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date);
+        (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary);
     }
 
     public class TimetableData : ITimetable
@@ -109,13 +109,15 @@ namespace Timetable
             return (reason, schedules.ToArray());
         }
 
-        public (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date)
+        public (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary)
         {
             var services = new List<ResolvedService>();
-
+            var nextDay = date.AddDays(1);
+            
             foreach (var service in _timetableUidMap.Values)
             {
-                if (service.TryFindScheduleOn(date, out var schedule))
+                var onDate = IsNextDay(service) ? nextDay : date;
+                if (service.TryFindScheduleOn(onDate, out var schedule))
                 {
                     if(schedule.OperatedBy(toc))
                         services.Add(schedule);
@@ -125,8 +127,10 @@ namespace Timetable
             var reason = services.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
 
             return (reason, services.ToArray());
+            
+            bool IsNextDay(Service service) => service.StartsBefore(dayBoundary);
         }
-
+        
         public int AddAssociations(IEnumerable<Association> associations)
         {
             int count = 0;

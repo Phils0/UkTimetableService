@@ -180,6 +180,14 @@ namespace Timetable
         {
             return _associations != null && _associations.Any();
         }
+
+        public bool StartsBefore(Time time)
+        {
+            var schedule = HasSingleSchedule ? _schedule : _multipleSchedules.Values.First(s => !s.IsCancelled());
+            
+            var origin = schedule.Locations.First() as IDeparture;
+            return origin.Time.IsBeforeIgnoringDay(time);
+        }
         
         public override string ToString()
         {

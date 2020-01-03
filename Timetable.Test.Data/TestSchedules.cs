@@ -100,11 +100,14 @@ namespace Timetable.Test.Data
 
             if (service != null)
                 schedule.AddToService(service);
-            
-            stops = stops ?? DefaultLocations;
-            foreach (var location in stops)
+
+            if (indicator != StpIndicator.Cancelled)
             {
-                location.SetParent(schedule);
+                stops = stops ?? DefaultLocations;
+                foreach (var location in stops)
+                {
+                    location.SetParent(schedule);
+                }              
             }
 
             return schedule;

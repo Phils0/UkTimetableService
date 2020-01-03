@@ -9,6 +9,10 @@ namespace Timetable
     /// </summary>
     public struct Time : IEquatable<Time>
     {
+        // Rail day assumed to start at 02:30 
+        public static Time StartRailDay = new Time(new TimeSpan(2, 30,0));
+        public static Time Midnight = new Time(new TimeSpan(0, 0,0));
+        
         private sealed class EarlierToLaterComparer : IComparer<Time>
         {
             public int Compare(Time x, Time y)
@@ -84,7 +88,7 @@ namespace Timetable
         public TimeSpan Value { get; }
         public bool IsNextDay => Value > OneDay;
 
-        public bool IsValid => !Equals(NotValid);
+        public bool IsValid => !(Equals(NotValid)  || IsBefore(NotValid));
         
         /// <summary>
         /// Constructor
@@ -98,6 +102,11 @@ namespace Timetable
         public bool IsBefore(Time other)
         {
             return Value < other.Value;
+        }
+        
+        public bool IsBeforeIgnoringDay(Time other)
+        {
+            return EarlierLaterComparer.Compare(this, other) < 0;
         }
              
         public Time MakeAfterByAddingADay(Time start) => IsBefore(start) && IsValid ? Add(OneDay) : this;
@@ -127,7 +136,8 @@ namespace Timetable
         
         public override string ToString()
         {
-            var timeString = Value.Seconds == 0 ? $"{Value:hh\\:mm}" : $"{Value:hh\\:mm\\:ss}";
+            var negative = (Value < TimeSpan.Zero ?  "-" : "");
+            var timeString = Value.Seconds == 0 ? $"{negative}{Value:hh\\:mm}" : $"{negative}{Value:hh\\:mm\\:ss}";
 
             return IsNextDay ? $"{timeString} (+1)" : timeString;
         }

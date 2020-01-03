@@ -34,6 +34,14 @@ namespace Timetable.Test
             Assert.Equal("01:10 (+1)", t.ToString());
         }
         
+        [Fact]
+        public void ToStingNegative()
+        {
+            var t = Time.Midnight.AddMinutes(-1);
+            
+            Assert.Equal("-00:01", t.ToString());
+        }
+        
         public static TheoryData<Time, Time> TimeAddDay =>
             new TheoryData<Time, Time>()
             {
@@ -79,6 +87,8 @@ namespace Timetable.Test
                 {Time.NotValid, false },
                 {new Time(TimeSpan.Zero), false },
                 {new Time(TenThirty), true },
+                {Time.Midnight, false},
+                {Time.Midnight.AddMinutes(-1), false}
             };
         
         [Theory]

@@ -191,14 +191,50 @@ namespace Timetable.Test
         [Fact]
         public void TryFindScheduleStopOnFindsStopOnNextDay()
         {
-            var stops = TestSchedules.CreateThreeStopSchedule(TwentyThreeFiftyFive);
-            var schedule = TestSchedules.CreateScheduleWithService(stops: stops);
-            var service = schedule.Service;
+            var schedule = CreateServiceStartingAt(TwentyThreeFiftyFive);
             var find = CreateFindSpec(MidnightEleven, MondayAugust12);
             
-            Assert.True(service.TryFindScheduledStop(find, out var found));
+            Assert.True(schedule.Service.TryFindScheduledStop(find, out var found));
             Assert.Equal(schedule, found.Details);
             Assert.Equal(MondayAugust12.AddDays(-1), found.On);
+        }
+
+        private Schedule CreateServiceStartingAt(Time startsAt)
+        {
+            var stops = TestSchedules.CreateThreeStopSchedule(startsAt);
+            return TestSchedules.CreateScheduleWithService(stops: stops);
+        }
+
+        public static TheoryData<Time, Time, bool> StartsBeforeData =>
+            new TheoryData<Time, Time, bool>()
+            {
+                {Time.Midnight, Time.Midnight, false },
+                {Time.Midnight.AddMinutes(1), Time.Midnight, false },
+                {new Time(new TimeSpan(23, 59, 0)), Time.Midnight, false },
+                {Time.Midnight.AddDay().AddMinutes(1), Time.Midnight, false },
+                {Time.StartRailDay, Time.StartRailDay, false },
+                {Time.StartRailDay.AddMinutes(1), Time.StartRailDay, false },
+                {Time.StartRailDay.AddMinutes(-1), Time.StartRailDay, true },
+                {Time.StartRailDay.AddDay(), Time.StartRailDay, false },
+                {Time.StartRailDay.AddDay().AddMinutes(1), Time.StartRailDay, false },
+                {Time.StartRailDay.AddDay().AddMinutes(-1), Time.StartRailDay, true },
+            };
+        
+        [Theory]
+        [MemberData(nameof(StartsBeforeData))]
+        public void StartsBefore(Time serviceStart, Time boundary, bool expected)
+        {
+            var service = CreateServiceStartingAt(serviceStart).Service;
+            Assert.Equal(expected, service.StartsBefore(boundary));        
+        }
+
+        [Fact]
+        public void StartsBeforeSkipsCancelledServices()
+        {
+            var service = CreateServiceStartingAt(Time.StartRailDay.AddMinutes(-1)).Service;
+            TestSchedules.CreateSchedule(indicator: StpIndicator.Cancelled, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
+            
+            Assert.True(service.StartsBefore(Time.StartRailDay));   
         }
     }
 }
