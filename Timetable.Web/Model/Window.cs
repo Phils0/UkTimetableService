@@ -23,7 +23,7 @@ namespace Timetable.Web.Model
         /// <summary>
         /// Return services for whole day
         /// </summary>
-        public bool UseRailDay { get; set; } = false;
+        public string DayBoundary { get; set; } = "";
         public override string ToString()
         {
             return At.ToString("s");

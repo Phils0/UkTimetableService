@@ -8,7 +8,7 @@ namespace Timetable
     {
         void AddService(IServiceTime stop);
         ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config);
-        ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay);
+        ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary);
     }
 
     /// <summary>
@@ -79,13 +79,12 @@ namespace Timetable
         /// </summary>
         /// <param name="onDate"></param>
         /// <param name="filter"></param>
-        /// <param name="useRailDay"></param>
+        /// <param name="dayBoundary"></param>
         /// <returns>All services for day</returns>
         /// <remarks>Reuses standard Gather functionality, setting starting index to 0 and config to get all (actually lots) </remarks>
-        public ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay)
+        public ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary)
         {
-            var time = useRailDay ? Time.StartRailDay : Time.Midnight;
-            var first = FindNearestTime(time);
+            var first = FindNearestTime(dayBoundary);
             
             var config = new GatherConfiguration(0, 0, true, filter);
             var gatherer = new ScheduleGatherer(this, config, _arrivalsOrDepartures);

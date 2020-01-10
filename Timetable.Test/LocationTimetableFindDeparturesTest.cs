@@ -70,7 +70,7 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.AllDepartures(Aug1AtTen, GatherFilterFactory.NoFilter, false);
+            var schedules = clapham.Timetable.AllDepartures(Aug1AtTen, GatherFilterFactory.NoFilter, Time.Midnight);
 
             Assert.Equal(96, schedules.Length);
         }

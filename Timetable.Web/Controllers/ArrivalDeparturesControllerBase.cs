@@ -28,10 +28,10 @@ namespace Timetable.Web.Controllers
         
         protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs)
         {
-            return CreateRequest(location, at, toFrom, before, after, requestType, tocs, false, false);
+            return CreateRequest(location, at, toFrom, before, after, requestType, tocs, false, "");
         }
 
-        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs, bool fullDay,  bool useRailDay)
+        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs, bool fullDay,  string dayBoundary)
         {
             var request = new SearchRequest()
             {
@@ -41,7 +41,8 @@ namespace Timetable.Web.Controllers
                     At = at,
                     Before = before,
                     After = after,
-                    FullDay = fullDay
+                    FullDay = fullDay,
+                    DayBoundary = dayBoundary
                 },
                 ComingFromGoingTo = toFrom,
                 Type = requestType
@@ -50,9 +51,9 @@ namespace Timetable.Web.Controllers
             return request;
         }
         
-        protected SearchRequest CreateFullDayRequest(string location, DateTime at, string toFrom, string requestType, string[] tocs,  bool useRailDay)
+        protected SearchRequest CreateFullDayRequest(string location, DateTime at, string toFrom, string requestType, string[] tocs,  string dayBoundary)
         {
-            return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true, useRailDay);
+            return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true, dayBoundary);
         }
         
         protected async Task<IActionResult> Process(SearchRequest request, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find, bool includeStops)

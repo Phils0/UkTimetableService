@@ -25,7 +25,7 @@ namespace Timetable.Web.Controllers
         /// <param name="before">Number of services to return that depart before the time</param>
         /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
         /// <param name="fullDay">Return full day of departures.  fullDay=true and before\after are mutually exclusive.  If both provided fullDay will take precedence</param>
-        /// <param name="useRailDay">Only used when fullDay=true.  If true day is calculated as 02:30 to 02:30 next day.  False uses calendar day</param>
+        /// <param name="dayBoundary">Time to start a day, use 24hr clock, format HH:mm.  The rail day is generally considered to start at 02:30  Default uses calendar day i.e. boundary is midnight</param>
         /// <param name="includeStops">Whether to return a full schedule</param>
         /// <param name="toc">Only services from included TOCs included.  Can add multiple to querystring, then any service ran by any of them returned</param>
         /// <returns>Set of arrivals</returns>
@@ -39,9 +39,9 @@ namespace Timetable.Web.Controllers
         [Route("arrivals/{location}")]
         [HttpGet]
         public async Task<IActionResult> Arrivals(string location, [FromQuery] string from = "",
-            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3, [FromQuery] bool fullDay = false, [FromQuery] bool useRailDay = false, [FromQuery] bool includeStops = false, [FromQuery] string[] toc = null)
+            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3, [FromQuery] bool fullDay = false, [FromQuery] string dayBoundary = "00:00", [FromQuery] bool includeStops = false, [FromQuery] string[] toc = null)
         {
-            return await Arrivals(location, DateTime.Now, @from, before, after, fullDay, useRailDay, includeStops, toc);
+            return await Arrivals(location, DateTime.Now, @from, before, after, fullDay, dayBoundary, includeStops, toc);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Timetable.Web.Controllers
         /// <param name="before">Number of services to return that depart before the time</param>
         /// <param name="after">Number of services to return that depart after the time, includes any at the specific time</param>
         /// <param name="fullDay">Return full day of departures.  fullDay=true and before\after are mutually exclusive.  If both provided fullDay will take precedence</param>
-        /// <param name="useRailDay">Only used when fullDay=true.  If true day is calculated as 02:30 to 02:30 next day.  False uses calendar day</param>
+        /// <param name="dayBoundary">Time to start a day, use 24hr clock, format HH:mm.  The rail day is generally considered to start at 02:30  Default uses calendar day i.e. boundary is midnight</param>
         /// <param name="includeStops">Whether to return a full schedule</param>
         /// <param name="toc">Only services from included TOCs included.  Can add multiple to querystring, then any service ran by any of them returned</param>
         /// <returns>Set of arrivals</returns>
@@ -67,10 +67,10 @@ namespace Timetable.Web.Controllers
         [Route("arrivals/{location}/{at}")]
         [HttpGet]
         public async Task<IActionResult> Arrivals(string location, DateTime at, [FromQuery] string from = "",
-            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3, [FromQuery] bool fullDay = false, [FromQuery] bool useRailDay = false, [FromQuery] bool includeStops = false, [FromQuery] string[] toc = null)
+            [FromQuery] ushort before = 3, [FromQuery] ushort after = 3, [FromQuery] bool fullDay = false, [FromQuery] string dayBoundary = "00:00", [FromQuery] bool includeStops = false, [FromQuery] string[] toc = null)
         {
             if (fullDay)
-                return await FullDayArrivals(location, at.Date, from, includeStops, toc, useRailDay);
+                return await FullDayArrivals(location, at.Date, from, includeStops, toc, dayBoundary);
             
             var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS, toc);
             return await Process(request, async () =>
@@ -81,13 +81,14 @@ namespace Timetable.Web.Controllers
             }, includeStops);
         }
         
-        private async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, string from, bool includeStops, string[] tocs,  bool useRailDay)
+        private async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, string from, bool includeStops, string[] tocs,  string dayBoundary)
         {
-            var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS, tocs, useRailDay);
+            var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS, tocs, dayBoundary);
             return await Process(request, async () =>
             {
+                var boundary = Time.Parse(dayBoundary);
                 var filter = CreateFilter(request);
-                var result = _timetable.AllArrivals(request.Location, onDate, filter, useRailDay);
+                var result = _timetable.AllDepartures(request.Location, onDate, filter, boundary);
                 return await Task.FromResult(result);
             }, includeStops);
         }

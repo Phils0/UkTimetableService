@@ -49,10 +49,11 @@ namespace Timetable
         /// </summary>
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
+        /// <param name="dayBoundary"></param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay)
+        public ResolvedServiceStop[] AllDepartures(DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary)
         {
-            return _departures.AllServices(onDate, filter, useRailDay);
+            return _departures.AllServices(onDate, filter, dayBoundary);
         }
 
         /// <summary>
@@ -73,11 +74,11 @@ namespace Timetable
         /// </summary>
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
-        /// <param name="useRailDay"></param>
+        /// <param name="dayBoundary"></param>
         /// <returns>Schedules of running services.</returns>
-        public ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherConfiguration.GatherFilter filter,  bool useRailDay)
+        public ResolvedServiceStop[] AllArrivals(DateTime onDate, GatherConfiguration.GatherFilter filter,  Time dayBoundary)
         {
-            return _arrivals.AllServices(onDate, filter, useRailDay);
+            return _arrivals.AllServices(onDate, filter, dayBoundary);
         }
     }
 }
