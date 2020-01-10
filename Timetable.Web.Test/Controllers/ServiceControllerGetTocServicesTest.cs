@@ -59,7 +59,7 @@ namespace Timetable.Web.Test.Controllers
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.GetTocServices("VT", April1, true) as ObjectResult;;
+            var response = await controller.GetTocServices("VT", April1, "02:30") as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
 

@@ -141,5 +141,7 @@ namespace Timetable
 
             return IsNextDay ? $"{timeString} (+1)" : timeString;
         }
+        
+        public static Time Parse(string time) => new Time(TimeSpan.Parse(time));
     }
 }

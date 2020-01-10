@@ -123,5 +123,24 @@ namespace Timetable.Test
             
             Assert.Equal(expected, time.IsSameTime(other));
         }
+
+        public static TheoryData<string, Time> TimesToParse =>
+            new TheoryData<string, Time>()
+            {
+                {"00:00", new Time(new TimeSpan(0, 0, 0)) },
+                {"02:30", new Time(new TimeSpan(2, 30, 0)) },
+                {"12:00", new Time(new TimeSpan(12, 0, 0)) },
+                {"23:59", new Time(new TimeSpan(23, 59, 0)) },
+                {"2:30", new Time(new TimeSpan(2, 30, 0)) },
+            };
+        
+        [Theory]
+        [MemberData(nameof(TimesToParse))]
+        public void ParseTime(string time, Time expected)
+        {
+            var parsed = Time.Parse(time);
+            Assert.Equal(expected, parsed);
+        }
+        
     }
 }

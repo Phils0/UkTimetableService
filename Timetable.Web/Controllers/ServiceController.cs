@@ -139,7 +139,7 @@ namespace Timetable.Web.Controllers
         /// </summary>
         /// <param name="toc">Two letter TOC code</param>
         /// <param name="on">date</param>
-        /// <param name="useRailDay">If true day is calculated as 02:30 to 02:30 next day.  False uses calendar day</param>
+        /// <param name="dayBoundary">Time to start a day, use 24hr clock, format HH:mm.  The rail day is generally considered to start at 02:30  Default uses calendar day i.e. boundary is midnight</param>
         /// <param name="includeStops">Whether to return a full schedule</param>
         /// <returns>Set of services</returns>
         /// <response code="200">Ok</response>
@@ -150,12 +150,12 @@ namespace Timetable.Web.Controllers
         [ProducesResponseType(404, Type = typeof(Model.ServiceNotFound))]
         [Route("toc/{toc}/{on}")]
         [HttpGet]
-        public async Task<IActionResult> GetTocServices(string toc, DateTime @on, [FromQuery] bool useRailDay = false, [FromQuery] bool includeStops = false)
+        public async Task<IActionResult> GetTocServices(string toc, DateTime @on, [FromQuery] string dayBoundary = "00:00", [FromQuery] bool includeStops = false)
         {
             try
             {
-                var dayBoundary = useRailDay ? Time.StartRailDay : Time.Midnight;
-                var service = _timetable.GetSchedulesByToc(toc, @on, dayBoundary);
+                var boundary = Time.Parse(dayBoundary);
+                var service = _timetable.GetSchedulesByToc(toc, @on, boundary);
                 if (service.status == LookupStatus.Success)
                 {
                     if (includeStops)
