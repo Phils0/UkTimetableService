@@ -29,7 +29,7 @@ namespace Timetable
 
         private SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> _multipleSchedules;
         
-        private Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> _associations;
+        private AssociationDictionary _associations;
 
         public Service(string timetableUid, ILogger logger)
         {
@@ -76,13 +76,19 @@ namespace Timetable
             return schedule != null;
         }
         
+        private static readonly ResolvedAssociation[] None = new ResolvedAssociation[0];
+        
         public ResolvedService GetScheduleOn(DateTime date, bool resolveAssociations = true)
         {
             ResolvedService CreateResolvedService(Schedule schedule, bool cancelled)
             {
-                return HasAssociations() && resolveAssociations
-                    ? new ResolvedServiceWithAssociations(schedule, date, cancelled, _associations)
-                    : new ResolvedService(schedule, date, cancelled);
+                var resolvedAssociations = HasAssociations() && resolveAssociations
+                    ? _associations.Resolve(schedule.TimetableUid, date)
+                    : None;
+                
+                return resolvedAssociations.Any() ?
+                    new ResolvedServiceWithAssociations(schedule, date, cancelled, resolvedAssociations) :
+                    new ResolvedService(schedule, date, cancelled);
             }
             
             if(HasSingleSchedule)
@@ -128,7 +134,7 @@ namespace Timetable
         internal void AddAssociation(Association association, bool isMain)
         {
             if (!HasAssociations())
-                _associations = new Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>(1);
+                _associations = new AssociationDictionary(1);
 
             if (isMain)
             {
