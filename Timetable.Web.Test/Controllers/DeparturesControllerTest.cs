@@ -41,7 +41,7 @@ namespace Timetable.Web.Test.Controllers
             Assert.NotEmpty(services.Services);
         }
 
-        private static GatherFilterFactory FilterFactory => new GatherFilterFactory();
+        private static GatherFilterFactory FilterFactory => new GatherFilterFactory(Substitute.For<ILogger>());
 
         private void AssertRequestSetInResponse(SearchResponse response)
         {

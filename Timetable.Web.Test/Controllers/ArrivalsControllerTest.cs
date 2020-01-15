@@ -47,7 +47,7 @@ namespace Timetable.Web.Test.Controllers
             return TestSchedules.CreateResolvedDepartureStop(atLocation: TestStations.ClaphamJunction, when: TestSchedules.TenSixteen);
         }
 
-        private static GatherFilterFactory FilterFactory => new GatherFilterFactory();
+        private static GatherFilterFactory FilterFactory => new GatherFilterFactory(Substitute.For<ILogger>());
 
         private void AssertRequestSetInResponse(SearchResponse response)
         {

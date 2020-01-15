@@ -40,7 +40,7 @@ namespace Timetable.Web
             services
                 .AddSingleton<ILocationData>(data.Locations)
                 .AddSingleton<ITimetable>(data.Timetable)
-                .AddSingleton<IFilterFactory>(new GatherFilterFactory())
+                .AddSingleton<IFilterFactory>(new GatherFilterFactory(Log.Logger))
                 .AddSingleton<IMapper>(factory.CreateMapper()) //TODO Swap to scoped
                 .AddSingleton<ILogger>(Log.Logger)
                 .AddSingleton<Model.Configuration>(CreateConfiguration())

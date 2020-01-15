@@ -1,4 +1,6 @@
 using System.Linq;
+using NSubstitute;
+using Serilog;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -6,7 +8,7 @@ namespace Timetable.Test
 {
     public class GatherFilterTest
     {
-        private  static readonly IFilterFactory Factory = new GatherFilterFactory();
+        private  static readonly IFilterFactory Factory = new GatherFilterFactory(Substitute.For<ILogger>());
         
         [Fact]
         public void NoFilterDoesNothing()
@@ -62,6 +64,17 @@ namespace Timetable.Test
             Assert.Empty(results);
         }
         
+        [Fact]
+        public void GoesToFilterHandlesErrors()
+        {
+            var source = ComesFromSource;
+            var filter = Factory.DeparturesGoTo(TestStations.ClaphamJunction);
+
+            var results = filter(source).ToArray();
+            
+            Assert.Empty(results);
+        }
+        
         private ResolvedServiceStop[] ComesFromSource
         {
             get
@@ -105,6 +118,17 @@ namespace Timetable.Test
             Assert.Empty(results);
         }
         
+        [Fact]
+        public void ComesFromFilterHandlesErrors()
+        {
+            var source = Source;
+            var filter = Factory.ArrivalsComeFrom(TestStations.ClaphamJunction);
+
+            var results = filter(source).ToArray();
+            
+            Assert.Empty(results);
+        }
+        
         [Theory]
         [InlineData("VT", 2)]
         [InlineData("GR", 1)]
@@ -125,6 +149,22 @@ namespace Timetable.Test
             Assert.Equal(expected, results.Length);
         }
 
+        [Fact]
+        public void FilterTocsHandlesExceptions()
+        {
+            var source = ComesFromSource;
+            source[0].Details.Operator.Code = "GR";
+            source[1].Details.Operator = null;
+            source[2].Details.Operator.Code = "VT";
+            source[3].Details.Operator.Code = "SW";
+
+            var filter = Factory.ProvidedByToc("VT", Factory.NoFilter);
+
+            var results = filter(source).ToArray();
+            
+            Assert.Equal(1, results.Length);
+        }
+        
         [Fact]
         public void HandlesBeingPassedAnEmptyEnumerable()
         {
