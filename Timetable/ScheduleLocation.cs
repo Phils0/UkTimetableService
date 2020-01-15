@@ -35,11 +35,7 @@ namespace Timetable
                 return;
             }
             
-            if (Activities.Contains(Activity.PassengerStop))
-            {
-                AdvertisedStop = PublicStop.Yes;
-            }
-            else if (Activities.Contains(Activity.TrainBegins) ||
+            if (Activities.Contains(Activity.TrainBegins) ||
                      Activities.Contains(Activity.PickUpOnlyStop))
             {
                 AdvertisedStop = PublicStop.PickUpOnly;                           
@@ -52,6 +48,10 @@ namespace Timetable
             else if (Activities.Contains(Activity.RequestStop))
             {
                 AdvertisedStop = PublicStop.Request;                           
+            }
+            else if (Activities.Contains(Activity.PassengerStop))
+            {
+                AdvertisedStop = PublicStop.Yes;
             }
             else
             {

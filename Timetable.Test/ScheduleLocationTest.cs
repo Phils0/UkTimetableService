@@ -166,6 +166,35 @@ namespace Timetable.Test
             };
             scheduleLocation.UpdateAdvertisedStop();
             Assert.Equal(PublicStop.Yes, scheduleLocation.AdvertisedStop);
-        }     
+        }
+
+        public static TheoryData<String[], PublicStop> PrecedentData =>
+            new TheoryData<String[], PublicStop>()
+            {
+                {new [] {"T", "TB"}, PublicStop.PickUpOnly },
+                {new [] {"TB", "T"}, PublicStop.PickUpOnly },
+                {new [] {"T", "TF"}, PublicStop.SetDownOnly },
+                {new [] {"TF", "T"}, PublicStop.SetDownOnly },
+                {new [] {"T", "R"}, PublicStop.Request },
+                {new [] {"R", "T"}, PublicStop.Request },
+                {new [] {"T", "U"}, PublicStop.PickUpOnly },
+                {new [] {"U", "T"}, PublicStop.PickUpOnly },
+                {new [] {"T", "D"}, PublicStop.SetDownOnly },
+                {new [] {"D", "T"}, PublicStop.SetDownOnly },
+            };
+        
+        [Theory]
+        [MemberData(nameof(PrecedentData))]
+        public void PrecedenceOfActivitiesWhenSettingAdvertisedStops(string[] activities, PublicStop expected)
+        {
+            var scheduleLocation =  new ScheduleStop()
+            {
+                Location = TestLocations.Surbiton,
+                Sequence = 1,
+                Activities = new HashSet<string>(activities)
+            };
+            scheduleLocation.UpdateAdvertisedStop();
+            Assert.Equal(expected, scheduleLocation.AdvertisedStop);
+        }
     }
 }
