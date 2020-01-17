@@ -43,19 +43,23 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
                 .ForMember(d => d.Origin, o => o.MapFrom(s => s.Locations.First()))
-                .ForMember(d => d.Destination, o => o.MapFrom(s => s.Locations.Last()));
+                .ForMember(d => d.Destination, o => o.MapFrom(s => s.Locations.Last()))
+                .ForMember(d => d.Associations, o => o.Ignore());
             
-            var serviceConverter = new ResolvedServiceConverter(Log.Logger);
+            var serviceConverter = new ResolvedServiceToServiceConverter(Log.Logger);
             CreateMap<Timetable.ResolvedService, Model.Service>()
                 .ConvertUsing(serviceConverter);
             CreateMap<Timetable.ResolvedService[], Model.Service[]>()
                 .ConvertUsing(serviceConverter);
+             CreateMap<Timetable.ResolvedServiceStop, Model.FoundServiceItem>()
+                 .ConvertUsing(serviceConverter);   
+             
+            var summaryConverter = new ResolvedServiceToSummaryConverter(Log.Logger);
             CreateMap<Timetable.ResolvedService, Model.ServiceSummary>()
-                .ConvertUsing(MapServiceSummary);        
+                .ConvertUsing(summaryConverter);        
             CreateMap<Timetable.ResolvedServiceStop, Model.FoundSummaryItem>()
-                .ConvertUsing(MapFoundServiceSummary);
-            CreateMap<Timetable.ResolvedServiceStop, Model.FoundServiceItem>()
-                .ConvertUsing(serviceConverter);
+                .ConvertUsing(summaryConverter);
+
         }
 
         private static DateTime? ResolveTime(Time time, ResolutionContext context)
@@ -76,30 +80,6 @@ namespace Timetable.Web.Mapping
             return (Model.ScheduledStop) context.Mapper
                 .Map(scheduleLocation, scheduleLocation.GetType(), typeof(Model.ScheduledStop),
                     o => o.Items["On"] = context.Items["On"]);
-        }
-        
-        private Model.ServiceSummary MapServiceSummary(ResolvedService source, Model.ServiceSummary notUsed, ResolutionContext context)
-        {
-            return CreateServiceSummary(source, context);
-        }
-
-        private ServiceSummary CreateServiceSummary(ResolvedService source, ResolutionContext context)
-        {
-            var service = context.Mapper.Map<Model.ServiceSummary>(source.Details, opts => opts.Items["On"] = source.On);
-            service.Date = source.On;
-            service.IsCancelled = source.IsCancelled;
-            return service;
-        }
-        
-        private FoundSummaryItem MapFoundServiceSummary(Timetable.ResolvedServiceStop source, FoundItem notUsed, ResolutionContext context)
-        {
-            return new FoundSummaryItem()
-            {
-                Service = CreateServiceSummary(source, context),
-                At = context.Mapper.Map<Model.ScheduledStop>(source.Stop, opts => opts.Items["On"] = source.On),
-                To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop, opts => opts.Items["On"] = source.On),
-                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop, opts => opts.Items["On"] = source.On)
-            };
         }
     }
 }

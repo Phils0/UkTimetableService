@@ -6,14 +6,14 @@ using Timetable.Web.Model;
 
 namespace Timetable.Web.Mapping
 {
-    public class ResolvedServiceConverter : 
+    public class ResolvedServiceToServiceConverter : 
         ITypeConverter<Timetable.ResolvedService, Model.Service>,  
         ITypeConverter<Timetable.ResolvedService[], Model.Service[]>,
         ITypeConverter<Timetable.ResolvedServiceStop, Model.FoundServiceItem>
     {
         private readonly ILogger _logger;
 
-        internal ResolvedServiceConverter(ILogger logger)
+        internal ResolvedServiceToServiceConverter(ILogger logger)
         {
             _logger = logger;
         }

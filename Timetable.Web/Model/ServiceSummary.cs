@@ -71,5 +71,10 @@ namespace Timetable.Web.Model
         {
             return $"{TimetableUid} {Date.ToYMD()}";
         }
+        
+        /// <summary>
+        /// Associations
+        /// </summary>
+        public AssociationSummary[] Associations { get; set; }
     }
 }
