@@ -7,7 +7,7 @@ using TestSchedules = Timetable.Test.Data.TestSchedules;
 
 namespace Timetable.Web.Test.Mapping
 {
-    public class ToViewModelProfileResolvedServiceToServiceTest
+    public class ToViewModelProfileResolvedServiceToSummaryTest
     {
         private static readonly DateTime TestDate = TestTime.August1;
         
@@ -27,13 +27,13 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal("X12345", output.TimetableUid);
         }
 
-        private static Model.Service MapResolvedService(Timetable.Schedule schedule = null, bool isCancelled = false)
+        private static Model.ServiceSummary MapResolvedService(Timetable.Schedule schedule = null, bool isCancelled = false)
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
             var resolved = new ResolvedService(schedule, TestDate, isCancelled);
             
-            var service = mapper.Map<Timetable.ResolvedService, Model.Service>(resolved, opts => opts.Items["On"] = resolved.On);
+            var service = mapper.Map<Timetable.ResolvedService, Model.ServiceSummary>(resolved, opts => opts.Items["On"] = resolved.On);
             return service;
         }
 
@@ -108,10 +108,17 @@ namespace Timetable.Web.Test.Mapping
         }
         
         [Fact]
-        public void MapLocations()
+        public void MapOrigin()
         {
             var output = MapResolvedService();
-            Assert.NotEmpty(output.Stops);         
+            Assert.Equal("SUR",output.Origin.Location.ThreeLetterCode);         
+        }
+        
+        [Fact]
+        public void MapDestination()
+        {
+            var output = MapResolvedService();
+            Assert.Equal("WAT", output.Destination.Location.ThreeLetterCode);         
         }
         
         [Theory]
