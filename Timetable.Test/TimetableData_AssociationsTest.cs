@@ -98,8 +98,8 @@ namespace Timetable.Test
         public void ResolvedServiceAlsoIncludesAssociatedServices()
         {
             var timetable = CreateTimetable();
-            var main = TestSchedules.CreateScheduleInTimetable(timetable, "X12345").Service;
-            var associated = TestSchedules.CreateScheduleInTimetable(timetable, "A98765").Service;
+            var main = TestSchedules.CreateScheduleInTimetable(timetable, "X12345", retailServiceId: "VT123401").Service;
+            var associated = TestSchedules.CreateScheduleInTimetable(timetable, "A98765", retailServiceId: "VT123402").Service;
 
             var associations = new [] {
                 TestAssociations.CreateAssociationWithServices(main, associated)

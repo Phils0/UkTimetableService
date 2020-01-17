@@ -117,11 +117,12 @@ namespace Timetable.Test.Data
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            Service service = null)
+            Service service = null,
+            string retailServiceId = null)
         {
             service = service ?? new Service(timetableId, Substitute.For<ILogger>());
 
-            return CreateSchedule(timetableId, indicator, calendar, stops, service);
+            return CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
         }
 
         public static Schedule CreateScheduleInTimetable(TimetableData timetable, 

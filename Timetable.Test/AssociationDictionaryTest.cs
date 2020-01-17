@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using NSubstitute;
 using ReflectionMagic;
+using Serilog;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -20,16 +23,16 @@ namespace Timetable.Test
             var association2 = TestAssociations.CreateAssociationWithServices(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Thursday), mainService: service);
             var associations = service.AsDynamic()._associations.RealObject as AssociationDictionary;
 
-            var resolved = associations.Resolve(service.TimetableUid, MondayAugust12.AddDays(2));
+            var resolved = associations.Resolve(service.TimetableUid, MondayAugust12.AddDays(2), schedule.NrsRetailServiceId);
 
             Assert.NotEmpty(resolved);
             Assert.Equal(association1, resolved[0].Details);
             
-            resolved = associations.Resolve(service.TimetableUid,MondayAugust12.AddDays(3));
+            resolved = associations.Resolve(service.TimetableUid,MondayAugust12.AddDays(3), schedule.NrsRetailServiceId);
             Assert.NotEmpty(resolved);
             Assert.Equal(association2, resolved[0].Details);
             
-            resolved = associations.Resolve(service.TimetableUid,MondayAugust12);
+            resolved = associations.Resolve(service.TimetableUid,MondayAugust12, schedule.NrsRetailServiceId);
             Assert.Empty(resolved);
         }
         
@@ -46,7 +49,7 @@ namespace Timetable.Test
             var high = TestAssociations.CreateAssociationWithServices(indicator: highIndicator, mainService: service);
             var associations = service.AsDynamic()._associations.RealObject as AssociationDictionary;
             
-            var resolved = associations.Resolve(service.TimetableUid, MondayAugust12);
+            var resolved = associations.Resolve(service.TimetableUid, MondayAugust12, schedule.NrsRetailServiceId);
             Assert.Equal(high, resolved[0].Details);
         }
         
@@ -63,7 +66,7 @@ namespace Timetable.Test
             var cancelled = TestAssociations.CreateAssociationWithServices(indicator: StpIndicator.Cancelled, mainService: service);
             var associations = service.AsDynamic()._associations.RealObject as AssociationDictionary;
             
-            var resolved = associations.Resolve(service.TimetableUid, MondayAugust12);
+            var resolved = associations.Resolve(service.TimetableUid, MondayAugust12, schedule.NrsRetailServiceId);
             
             Assert.True( resolved[0].IsCancelled);
             Assert.Equal(low, resolved[0].Details);
@@ -80,7 +83,7 @@ namespace Timetable.Test
             var cancelled = TestAssociations.CreateAssociationWithServices(indicator: StpIndicator.Cancelled, mainService: service);
             var associations = service.AsDynamic()._associations.RealObject as AssociationDictionary;
             
-            var resolved = associations.Resolve(service.TimetableUid, MondayAugust12);
+            var resolved = associations.Resolve(service.TimetableUid, MondayAugust12, schedule.NrsRetailServiceId);
 
             Assert.True( resolved[0].IsCancelled);
             Assert.Equal(high, resolved[0].Details);
@@ -96,7 +99,7 @@ namespace Timetable.Test
             var association2 = TestAssociations.CreateAssociationWithServices(mainService: service, associatedUid:"A67890");
             var associations = service.AsDynamic()._associations.RealObject as AssociationDictionary;
             
-            var resolved =associations.Resolve(service.TimetableUid, MondayAugust12);
+            var resolved =associations.Resolve(service.TimetableUid, MondayAugust12, schedule.NrsRetailServiceId);
 
             Assert.Equal(2, resolved.Length);
             
@@ -117,7 +120,7 @@ namespace Timetable.Test
         
         [Theory]
         [MemberData(nameof(DataIndicatorScenarios))]
-        public void GetsScheduleWithAssociationsApplyingMovingDateBAsedUponDateIndicator(AssociationDateIndicator indicator, bool isMain, DateTime expected)
+        public void GetsScheduleWithAssociationsApplyingMovingDateBasedUponDateIndicator(AssociationDateIndicator indicator, bool isMain, DateTime expected)
         {
             
             var association = TestAssociations.CreateAssociationWithServices(dateIndicator: indicator);
@@ -125,7 +128,7 @@ namespace Timetable.Test
             var service = isMain ? association.Main.Service : association.Associated.Service;
             var other = isMain ? association.Associated.Service : association.Main.Service;
             
-            var resolved = Associations(other.TimetableUid).Resolve(service.TimetableUid, MondayAugust12);
+            var resolved = Associations(other.TimetableUid).Resolve(service.TimetableUid, MondayAugust12, "VT123401");
 
             Assert.NotEmpty(resolved);
             Assert.Equal(expected, resolved[0].AssociatedService.On);
@@ -134,11 +137,28 @@ namespace Timetable.Test
             {
                 var values = new SortedList<(StpIndicator indicator, ICalendar calendar), Association>();
                 values.Add((StpIndicator.Permanent, association.Calendar), association);
-                return new AssociationDictionary(1)
+                return new AssociationDictionary(1, Substitute.For<ILogger>())
                 {
                     {uid, values}
                 };
             }
+        }
+        
+        [Theory]
+        [InlineData("VT123402", true)]
+        [InlineData("VT567802", true)]    // Allow associations with different Retail Service Ids example LIV-EUS Saturdays 20:04 LNWR
+        public void ResolveAssociationsWithDifferentRetailServiceId(string associatedRetailServiceId, bool hasAssociation)
+        {
+            var schedule = TestSchedules.CreateScheduleWithService(retailServiceId: "VT123401");
+            var service = schedule.Service;
+  
+            var association = TestAssociations.CreateAssociationWithServices(indicator: StpIndicator.Permanent, mainService: service, retailServiceId: associatedRetailServiceId);
+
+            var associations = service.AsDynamic()._associations.RealObject as AssociationDictionary;
+            
+            var resolved = associations.Resolve(service.TimetableUid, MondayAugust12, schedule.NrsRetailServiceId);
+            
+            Assert.Equal(hasAssociation, resolved.Any());
         }
     }
 }

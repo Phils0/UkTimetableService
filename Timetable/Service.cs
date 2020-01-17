@@ -83,7 +83,7 @@ namespace Timetable
             ResolvedService CreateResolvedService(Schedule schedule, bool cancelled)
             {
                 var resolvedAssociations = HasAssociations() && resolveAssociations
-                    ? _associations.Resolve(schedule.TimetableUid, date)
+                    ? _associations.Resolve(schedule.TimetableUid, date, schedule.NrsRetailServiceId)
                     : None;
                 
                 return resolvedAssociations.Any() ?
@@ -134,7 +134,7 @@ namespace Timetable
         internal void AddAssociation(Association association, bool isMain)
         {
             if (!HasAssociations())
-                _associations = new AssociationDictionary(1);
+                _associations = new AssociationDictionary(1, _logger);
 
             if (isMain)
             {

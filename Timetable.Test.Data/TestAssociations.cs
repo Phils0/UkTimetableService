@@ -49,11 +49,12 @@ namespace Timetable.Test.Data
             Location location = null,
             AssociationCategory category = AssociationCategory.Join,
             AssociationDateIndicator dateIndicator = AssociationDateIndicator.Standard,
-            string associatedUid = "A98765" 
+            string associatedUid = "A98765",
+            string retailServiceId = "VT123402"
             )
         {
             mainService = mainService ?? TestSchedules.CreateScheduleWithService("X12345").Service;
-            associatedService = associatedService ?? TestSchedules.CreateScheduleWithService(associatedUid).Service;
+            associatedService = associatedService ?? TestSchedules.CreateScheduleWithService(associatedUid, retailServiceId: retailServiceId).Service;
             
             var association = CreateAssociation(mainService.TimetableUid, associatedService.TimetableUid, indicator, calendar, location, category,
                 dateIndicator);

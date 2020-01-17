@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using Serilog;
 
 namespace Timetable
 {
     public class AssociationDictionary :
         Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>
     {
-        public AssociationDictionary(int capacity) : base(capacity)
+        private readonly ILogger _logger ;
+
+        public AssociationDictionary(int capacity, ILogger logger) : base(capacity)
         {
+            _logger = logger;
         }
         
-        public ResolvedAssociation[] Resolve(string timetableUid, DateTime on)
+        public ResolvedAssociation[] Resolve(string timetableUid, DateTime on, string retailServiceId)
         {
             var resolvedAssociations = new List<ResolvedAssociation>();
             foreach (var versions in this.Values)
@@ -27,6 +31,11 @@ namespace Timetable
                             var other = association.GetOtherService(timetableUid);
                             var otherDate = ResolveDate(on, association.DateIndicator, association.IsMain(timetableUid));
                             var resolved = other.GetScheduleOn(otherDate, false);
+
+                            if (!resolved.HasRetailServiceId(retailServiceId))
+                                _logger.Warning("Resolved association {resolved} has mismatched RetailServiceIds {resolvedRsId} instead of {retailServiceId}", 
+                                    resolved, resolved.Details.RetailServiceId, retailServiceId);                                
+                            
                             resolvedAssociations.Add(new ResolvedAssociation(association, on, isCancelled, resolved));
                             break;
                         }
