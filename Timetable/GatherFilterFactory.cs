@@ -54,7 +54,7 @@ namespace Timetable
         public GatherConfiguration.GatherFilter ProvidedByToc(string tocs, GatherConfiguration.GatherFilter innerFilter)
         {
             return (s => innerFilter(s).
-                Where(SuppressExceptions(service => tocs.Contains(service.Details.Operator.Code))));
+                Where(SuppressExceptions(service => tocs.Contains(service.Operator.Code))));
         }
     }
 }

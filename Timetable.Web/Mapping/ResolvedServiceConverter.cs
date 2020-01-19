@@ -120,7 +120,7 @@ namespace Timetable.Web.Mapping
                 To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop, opts => opts.Items["On"] = source.On),
                 From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop, opts => opts.Items["On"] = source.On)
             };
-            var service = CreateService(source, context);
+            var service = Convert(source.Service, (S) null, context);
             SetService(item, service);
             
             return item;

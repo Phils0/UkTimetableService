@@ -104,7 +104,7 @@ namespace Timetable.Test
             var found = schedule.FindServices(searchAt, GathererConfig.OneService);
 
             var expected =  services[expectedIdx].Schedule;
-            Assert.Equal(expected, found[0].Details);
+            Assert.Equal(expected, found[0].Service.Details);
         }
 
         private (PublicSchedule schedule, ScheduleStop[] stops) CreateSchedule(ICalendar calendar = null)
@@ -144,7 +144,7 @@ namespace Timetable.Test
             var searchAt = Aug5.AddHours(10).AddMinutes(1);
             var found = schedule.FindServices(searchAt, GathererConfig.Create(0, 0));
             
-            Assert.Equal(services[1].Schedule, found[0].Details);
+            Assert.Equal(services[1].Schedule, found[0].Service.Details);
         }
         
         [Fact]
@@ -165,7 +165,7 @@ namespace Timetable.Test
             var searchAt = Aug5.AddHours(10).AddMinutes(1);
             var found = schedule.FindServices(searchAt, GathererConfig.OneBefore);
             
-            Assert.Equal(services[0].Schedule, found[0].Details);
+            Assert.Equal(services[0].Schedule, found[0].Service.Details);
         }
         
         [Fact]
@@ -187,7 +187,7 @@ namespace Timetable.Test
             var found = schedule.FindServices(searchAt, GathererConfig.OneBefore);
             
             Assert.Single(found);
-            Assert.Equal(services[0].Schedule, found[0].Details);
+            Assert.Equal(services[0].Schedule, found[0].Service.Details);
         }
         
         [Fact]
@@ -212,7 +212,7 @@ namespace Timetable.Test
             var searchAt = Aug5.AddMinutes(1);
             var found = schedule.FindServices(searchAt, GathererConfig.OneService);
             
-            Assert.Equal(services[1].Schedule, found[0].Details);
+            Assert.Equal(services[1].Schedule, found[0].Service.Details);
         }
         
         [Fact]
@@ -237,7 +237,7 @@ namespace Timetable.Test
             var searchAt = Aug5.AddMinutes(1);
             var found = schedule.FindServices(searchAt, GathererConfig.OneService);
             
-            Assert.Equal(Aug4, found[0].On);
+            Assert.Equal(Aug4, found[0].Service.On);
         }
         
         [Fact]

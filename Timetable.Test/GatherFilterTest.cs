@@ -137,10 +137,10 @@ namespace Timetable.Test
         public void FilterTocs(string tocFilterString, int expected)
         {
             var source = ComesFromSource;
-            source[0].Details.Operator.Code = "GR";
-            source[1].Details.Operator.Code = "VT";
-            source[2].Details.Operator.Code = "VT";
-            source[3].Details.Operator.Code = "SW";
+            source[0].Operator.Code = "GR";
+            source[1].Operator.Code = "VT";
+            source[2].Operator.Code = "VT";
+            source[3].Operator.Code = "SW";
 
             var filter = Factory.ProvidedByToc(tocFilterString, Factory.NoFilter);
 
@@ -153,10 +153,10 @@ namespace Timetable.Test
         public void FilterTocsHandlesExceptions()
         {
             var source = ComesFromSource;
-            source[0].Details.Operator.Code = "GR";
-            source[1].Details.Operator = null;
-            source[2].Details.Operator.Code = "VT";
-            source[3].Details.Operator.Code = "SW";
+            source[0].Operator.Code = "GR";
+            source[1].Service.Details.Operator = null;
+            source[2].Operator.Code = "VT";
+            source[3].Operator.Code = "SW";
 
             var filter = Factory.ProvidedByToc("VT", Factory.NoFilter);
 

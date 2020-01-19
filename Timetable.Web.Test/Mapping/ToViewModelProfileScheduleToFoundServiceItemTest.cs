@@ -50,6 +50,19 @@ namespace Timetable.Web.Test.Mapping
         }
 
         [Fact]
+        public void MapAssociation()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+            var resolved = TestSchedules.CreateServiceWithAssociation();
+            var find = new StopSpecification(TestStations.Surbiton, TestSchedules.Ten, TestDate, TimesToUse.Departures);
+            resolved.TryFindStop(find, out var stop);
+            
+            var item = mapper.Map<Timetable.ResolvedServiceStop, Model.FoundServiceItem>(stop, opts => opts.Items["On"] = stop.On);
+            
+            Assert.NotEmpty(item.Service.Associations);
+        }
+
+        [Fact]
         public void MapStop()
         {
             var output = MapResolvedStop();            

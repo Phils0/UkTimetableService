@@ -11,6 +11,22 @@ namespace Timetable.Test
         private static readonly DateTime TestDate = new DateTime(2019, 8, 12);
 
         [Fact]
+        public void OnReturnsResolvedServiceOn()
+        {
+            var service =  TestSchedules.CreateService();
+            var stop = new ResolvedServiceStop(service, service.Details.Locations[0]);
+            Assert.Equal(TestDate, stop.On);
+        }
+        
+        [Fact]
+        public void OperatorReturnsResolvedServiceOperator()
+        {
+            var service =  TestSchedules.CreateService();
+            var stop = new ResolvedServiceStop(service, service.Details.Locations[0]);
+            Assert.Equal("VT", stop.Operator.Code);
+        }
+        
+        [Fact]
         public void ToStringReturnsServiceAndStop()
         {
             var service =  TestSchedules.CreateService();

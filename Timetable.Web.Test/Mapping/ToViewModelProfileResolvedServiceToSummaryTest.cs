@@ -129,5 +129,12 @@ namespace Timetable.Web.Test.Mapping
             var output = MapResolvedService(isCancelled: isCancelled);
             Assert.Equal(isCancelled, output.IsCancelled);         
         }
+        
+        [Fact]
+        public void AsosciationsIsEmptyIfNone()
+        {
+            var output = MapResolvedService();
+            Assert.Empty(output.Associations);         
+        }
     }
 }

@@ -21,10 +21,10 @@ namespace Timetable.Test
             Assert.Equal(6, schedules.Length);
 
             var first = schedules.First();
-            Assert.Equal("X00585", first.Details.TimetableUid);
+            Assert.Equal("X00585", first.Service.TimetableUid);
             Assert.Equal(Aug1, first.On);
             var last = schedules.Last();
-            Assert.Equal("X00660", last.Details.TimetableUid);        
+            Assert.Equal("X00660", last.Service.TimetableUid);        
             Assert.Equal(Aug1, last.On);
         }
 
@@ -60,7 +60,7 @@ namespace Timetable.Test
             
             Assert.Equal(6, schedules.Length);
 
-            var last = schedules.Last().Details.Locations[1];
+            var last = schedules.Last().Service.Details.Locations[1];
             //TODO check next day       
         }
         

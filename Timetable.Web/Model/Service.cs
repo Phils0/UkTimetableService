@@ -80,12 +80,12 @@ namespace Timetable.Web.Model
         /// <summary>
         /// Service stops
         /// </summary>
-        public ScheduledStop[] Stops { get; set; }
+        public ScheduledStop[] Stops { get; set; } = new ScheduledStop[0];
         
         /// <summary>
         /// Associations
         /// </summary>
-        public Association[] Associations { get; set; }
+        public Association[] Associations { get; set; } = new Association[0];
     }
     
     /// <summary>
@@ -103,10 +103,10 @@ namespace Timetable.Web.Model
         /// </summary>
         public ScheduledStop Destination { get; set; }
 
-        
+
         /// <summary>
         /// Associations
         /// </summary>
-        public AssociationSummary[] Associations { get; set; }
+        public AssociationSummary[] Associations { get; set; } = new AssociationSummary[0];
     }
 }

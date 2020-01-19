@@ -155,7 +155,7 @@ namespace Timetable.Test
             var find = CreateFindSpec(TestSchedules.TenSixteen, MondayAugust12.AddDays(2));
             
             Assert.True(service.TryFindScheduledStop(find, out var found));
-            Assert.Equal(schedule, found.Details);
+            Assert.Equal(schedule, found.Service.Details);
         }
 
         private StopSpecification CreateFindSpec(Time time, DateTime onDate)
@@ -195,7 +195,7 @@ namespace Timetable.Test
             var find = CreateFindSpec(MidnightEleven, MondayAugust12);
             
             Assert.True(schedule.Service.TryFindScheduledStop(find, out var found));
-            Assert.Equal(schedule, found.Details);
+            Assert.Equal(schedule, found.Service.Details);
             Assert.Equal(MondayAugust12.AddDays(-1), found.On);
         }
 
