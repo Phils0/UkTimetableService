@@ -1,6 +1,6 @@
 namespace Timetable
 {
-    public interface IArrival
+    public interface IArrival : IStop
     {
         bool IsPublic { get; }
         Time Time { get; }

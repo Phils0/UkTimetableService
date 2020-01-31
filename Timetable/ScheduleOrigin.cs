@@ -14,8 +14,7 @@ namespace Timetable
         public Time Departure { get; set; }
 
         public Time WorkingDeparture { get; set; }
-
-
+        
         public override void AddDay(Time start)
         {
             Departure = Departure.MakeAfterByAddingADay(start);

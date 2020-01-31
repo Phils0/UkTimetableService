@@ -61,7 +61,7 @@ namespace Timetable.Web.Mapping
         
         private A MapAssociation(ResolvedAssociation source, ResolvedService service, ResolutionContext context)
         {
-            var atStop = Map(source.GetStop(service), context);
+            var atStop = Map(source.GetStop(service).Stop, context);
             var (associatedService, associatedStop) = MapOtherService();
 
             var association = new A()
@@ -83,7 +83,7 @@ namespace Timetable.Web.Mapping
                 try
                 {
                     var otherService = CreateService(source.AssociatedService, context);
-                    var otherStop = Map(source.GetStop(source.AssociatedService), context);
+                    var otherStop = Map(source.GetStop(source.AssociatedService).Stop, context);
                     return (otherService, otherStop);
                 }
                 finally

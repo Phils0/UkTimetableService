@@ -44,6 +44,16 @@ namespace Timetable.Test.Data
             }
         }
         
+        public static Station Weybridge
+        {
+            get
+            {
+                var s = new Station();
+                s.Add(TestLocations.Weybridge);
+                return s;
+            }
+        }
+        
         public static Station Vauxhall
         {
             get

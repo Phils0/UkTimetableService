@@ -205,5 +205,61 @@ namespace Timetable.Test
             else
                 Assert.NotNull(schedule.GetStop(location, sequence));
         }
+        
+        public static IEnumerable<object[]> Arrivals
+        {
+            get
+            {
+                var stops = TestSchedules.DefaultLocations;
+                var origin = stops[0] as ScheduleOrigin;
+                yield return new object[] {origin.Station, false};
+                var intermediate = stops[1] as ScheduleStop;
+                yield return new object[] {intermediate.Station, true};
+                var pass = stops[2] as SchedulePass;
+                yield return new object[] {pass.Station, false};
+                var destination = stops[3] as ScheduleDestination;
+                yield return new object[] {destination.Station, true};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(Arrivals))]
+        public void InArrivals(Station location, bool expectedContains)
+        {
+            var schedule = TestSchedules.CreateSchedule();
+
+            if (expectedContains)
+                 Assert.Contains<Station>(location, schedule.Arrivals.Select(a => a.Station));
+            else
+                Assert.DoesNotContain<Station>(location, schedule.Arrivals.Select(a => a.Station));
+        }
+        
+        public static IEnumerable<object[]> Departures
+        {
+            get
+            {
+                var stops = TestSchedules.DefaultLocations;
+                var origin = stops[0] as ScheduleOrigin;
+                yield return new object[] {origin.Station, true};
+                var intermediate = stops[1] as ScheduleStop;
+                yield return new object[] {intermediate.Station, true};
+                var pass = stops[2] as SchedulePass;
+                yield return new object[] {pass.Station, false};
+                var destination = stops[3] as ScheduleDestination;
+                yield return new object[] {destination.Station, false};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(Departures))]
+        public void InDepartures(Station location, bool expectedContains)
+        {
+            var schedule = TestSchedules.CreateSchedule();
+
+            if (expectedContains)
+                Assert.Contains<Station>(location, schedule.Departures.Select(d => d.Station));
+            else
+                Assert.DoesNotContain<Station>(location, schedule.Departures.Select(d => d.Station));
+        }
     }
 }

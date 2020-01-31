@@ -14,6 +14,14 @@ namespace Timetable
         No
     }
     
+    public interface IStop
+    {
+        Location Location { get; }
+        int Sequence { get; }
+
+        bool IsStop(Location at, int sequence);
+    }
+    
     public abstract class ScheduleLocation
     {
         public Location Location { get; set; }
@@ -80,7 +88,7 @@ namespace Timetable
 
         public abstract bool IsStopAt(StopSpecification spec);
 
-        public bool IsStopAt(Station at)
+        protected bool IsStopAt(Station at)
         {
             return Station.Equals(at);
         }

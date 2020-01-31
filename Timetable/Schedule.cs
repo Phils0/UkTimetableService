@@ -130,6 +130,12 @@ namespace Timetable
         }
 
         public IReadOnlyList<ScheduleLocation> Locations => _locations;
+
+        public IEnumerable<IArrival> Arrivals =>
+            Locations.Where(l => l.HasAdvertisedTime(false)).OfType<IArrival>();
+        
+        public IEnumerable<IDeparture> Departures =>
+            Locations.Where(l => l.HasAdvertisedTime(true)).OfType<IDeparture>();
         
         private List<ScheduleLocation> _locations = new List<ScheduleLocation>(8);
 
@@ -166,6 +172,9 @@ namespace Timetable
                         $"Stop {at}({sequence}) not found in {this}" :                             
                         $"Stop {at} not found in {this}");
         }
+
+        public ScheduleOrigin Origin => Locations.FirstOrDefault() as ScheduleOrigin;
+        public ScheduleDestination Destination => Locations.LastOrDefault() as ScheduleDestination;
         
         public override string ToString()
         {

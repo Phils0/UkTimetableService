@@ -168,7 +168,14 @@ namespace Timetable.Test.Data
         public static Time TenSixteen => Ten.AddMinutes(16);
         public static Time TenThirty => Ten.AddMinutes(30);
         public static Time NineForty => Ten.AddMinutes(-20);
-
+        public static Time TenTen => Ten.AddMinutes(10);
+        public static Time TenTwenty => Ten.AddMinutes(20);
+        public static Time TenTwentyOne => Ten.AddMinutes(21);
+        public static Time TenTwentyFive => Ten.AddMinutes(25);
+        public static Time TenForty => Ten.AddMinutes(40);
+        public static Time TenFortyOne => Ten.AddMinutes(41);
+        public static Time TenFiftyFive => Ten.AddMinutes(55);
+        
         public static ScheduleLocation[] DefaultLocations => CreateThreeStopSchedule(Ten);
         
         public static ScheduleLocation[] CreateThreeStopSchedule(Time start) => new[]
@@ -182,7 +189,15 @@ namespace Timetable.Test.Data
         public static ScheduleLocation[] CreateWokingClaphamSchedule(Time start) => new[]
         {
             (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Woking, start),
-            TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, start.AddMinutes(30))
+            TestScheduleLocations.CreateStop(TestStations.Weybridge, start.AddMinutes(15)),
+            TestScheduleLocations.CreateDestination(TestStations.ClaphamJunction, start.AddMinutes(30))
+        };
+        
+        public static ScheduleLocation[] CreateClaphamWokingSchedule(Time start) => new[]
+        {
+            (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.ClaphamJunction, start),
+            TestScheduleLocations.CreateStop(TestStations.Weybridge, start.AddMinutes(15)),
+            TestScheduleLocations.CreateDestination(TestStations.Woking, start.AddMinutes(30))
         };
         
         public static ResolvedServiceWithAssociations CreateServiceWithAssociation(

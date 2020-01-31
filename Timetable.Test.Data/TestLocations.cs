@@ -92,6 +92,21 @@ namespace Timetable.Test.Data
             }
         };
         
+        public static Location Weybridge => new Location()
+        {
+            Tiploc = "WEYBDGE",
+            ThreeLetterCode = "WYB",
+            Nlc = "557700",
+            Name = "WEYBRIDGE",
+            InterchangeStatus = InterchangeStatus.Normal,
+            Coordinates = new Coordinates()
+            {
+                Eastings = 15075,
+                Northings = 61636,
+                IsEstimate = false
+            }
+        };
+        
         public static Location Vauxhall => new Location()
         {
             Tiploc = "VAUXHLM",

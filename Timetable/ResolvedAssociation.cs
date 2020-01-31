@@ -9,6 +9,10 @@ namespace Timetable
         public ResolvedService AssociatedService { get; }
         public DateTime On { get; }
         public Association Details { get; }
+        public AssociationCategory Category => Details.Category;
+
+        public bool IsJoin => AssociationCategory.Join.Equals(Category);
+        public bool IsSplit => AssociationCategory.Split.Equals(Category);
 
         public ResolvedAssociation(Association association, DateTime on, bool isCancelled, ResolvedService associatedService)
         {
@@ -18,13 +22,15 @@ namespace Timetable
             AssociatedService = associatedService;
         }
         
-        public ScheduleLocation GetStop(ResolvedService service)
+        public ResolvedServiceStop GetStop(ResolvedService service)
         {
-            return IsMain(service.TimetableUid) ?
-                Details.Main.GetStop(service) :
-                Details.Associated.GetStop(service);
-        }
+            var association = IsMain(service.TimetableUid) ?
+                Details.Main :
+                Details.Associated;
 
+            return service.GetStop(association.AtLocation, association.Sequence);
+        }
+        
         public bool IsMain(string timetableUid)
         {
             return Details.IsMain(timetableUid);

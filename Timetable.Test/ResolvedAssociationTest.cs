@@ -29,7 +29,7 @@ namespace Timetable.Test
             var association = TestAssociations.CreateAssociationWithServices();
             var resolvedService = association.Main.Service.GetScheduleOn(Aug10);
             var resolved = new ResolvedAssociation(
-                TestAssociations.CreateAssociation(),
+                association,
                 DateTime.Today, 
                 false,
                 null);
@@ -37,8 +37,8 @@ namespace Timetable.Test
 
             var stop = resolved.GetStop(resolvedService);
             Assert.NotNull(stop);
-            Assert.Equal(TestLocations.CLPHMJN, stop.Location);
-            Assert.Equal("X12345", stop.Schedule.TimetableUid);        
+            Assert.Equal(TestLocations.CLPHMJN, stop.Stop.Location);
+            Assert.Equal("X12345", stop.Service.TimetableUid);        
         }
         
         [Fact]
@@ -47,7 +47,7 @@ namespace Timetable.Test
             var association = TestAssociations.CreateAssociationWithServices();
             var resolvedService = association.Associated.Service.GetScheduleOn(Aug10);
             var resolved = new ResolvedAssociation(
-                TestAssociations.CreateAssociation(),
+                association,
                 DateTime.Today, 
                 false,
                 null);
@@ -55,8 +55,44 @@ namespace Timetable.Test
 
             var stop = resolved.GetStop(resolvedService);
             Assert.NotNull(stop);
-            Assert.Equal(stop.Location, TestLocations.CLPHMJN);
-            Assert.Equal("A98765", stop.Schedule.TimetableUid);        
+            Assert.Equal(TestLocations.CLPHMJN, stop.Stop.Location);
+            Assert.Equal("A98765", stop.Service.TimetableUid);        
+        }
+
+        [Theory]
+        [InlineData(AssociationCategory.Join, true)]
+        [InlineData(AssociationCategory.Split, false)]
+        [InlineData(AssociationCategory.None, false)]
+        [InlineData(AssociationCategory.NextPrevious, false)]
+        public void IsJoin(AssociationCategory category, bool expected)
+        {
+            var association = TestAssociations.CreateAssociationWithServices(category: category);
+            var resolved = new ResolvedAssociation(
+                association,
+                DateTime.Today, 
+                false,
+                null);
+            ;
+            
+            Assert.Equal(expected, resolved.IsJoin);
+        }
+        
+        [Theory]
+        [InlineData(AssociationCategory.Join, false)]
+        [InlineData(AssociationCategory.Split, true)]
+        [InlineData(AssociationCategory.None, false)]
+        [InlineData(AssociationCategory.NextPrevious, false)]
+        public void IsSplit(AssociationCategory category, bool expected)
+        {
+            var association = TestAssociations.CreateAssociationWithServices(category: category);
+            var resolved = new ResolvedAssociation(
+                association,
+                DateTime.Today, 
+                false,
+                null);
+            ;
+            
+            Assert.Equal(expected, resolved.IsSplit);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Timetable
         public Service Service { get; private set;  }
 
         public bool IsService(string timetableId) => TimetableUid == timetableId;
-
+        
         public bool TrySetService(Service service)
         {
             if (!IsService(service.TimetableUid))
@@ -19,11 +19,6 @@ namespace Timetable
             
             Service = service;
             return true;
-        }
-
-        public ScheduleLocation GetStop(ResolvedService service)
-        {
-            return service.Details.GetStop(AtLocation, Sequence);
         }
         
         public override string ToString()

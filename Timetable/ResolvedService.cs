@@ -38,6 +38,14 @@ namespace Timetable
             stop = null;
             return false;
         }
+
+        public ResolvedServiceStop GetStop(Location at, int sequence)
+        {
+            return  new ResolvedServiceStop(this, Details.GetStop(at, sequence));
+        }
+        
+        public ResolvedServiceStop Origin => new ResolvedServiceStop(this, Details.Origin);
+        public ResolvedServiceStop Destination => new ResolvedServiceStop(this, Details.Destination);
         
         public override string ToString()
         {
