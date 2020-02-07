@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using AutoMapper;
 using NSubstitute;
 using Serilog;
-using Timetable.Web.Mapping;
+using Timetable.Web.Mapping.Cif;
 using Xunit;
 
-namespace Timetable.Web.Test.Mapping
+namespace Timetable.Web.Test.Mapping.Cif
 {
     public class TocConverterTest
     {

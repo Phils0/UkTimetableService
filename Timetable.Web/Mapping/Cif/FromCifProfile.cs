@@ -2,7 +2,7 @@ using System;
 using AutoMapper;
 using Serilog;
 
-namespace Timetable.Web.Mapping
+namespace Timetable.Web.Mapping.Cif
 {
     public class FromCifProfile : Profile
     {

@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper;
-using Serilog;
 
-namespace Timetable.Web.Mapping
+namespace Timetable.Web.Mapping.Cif
 {
     public class LocationsConverter : IValueConverter<string, Location>
     {         

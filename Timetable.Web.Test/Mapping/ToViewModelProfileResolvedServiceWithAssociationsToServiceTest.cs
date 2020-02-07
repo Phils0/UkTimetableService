@@ -7,7 +7,7 @@ namespace Timetable.Web.Test.Mapping
 {
     public class ToViewModelProfileResolvedServiceWithAssociationsToServiceTest
     {
-        private static readonly DateTime TestDate = Cif.TestTime.August1;
+        private static readonly DateTime TestDate = TestTime.August1;
         
         private static readonly MapperConfiguration ToViewProfileConfiguration = 
             ToViewModelProfileLocationTest.ToViewProfileConfiguration;

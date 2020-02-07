@@ -1,8 +1,8 @@
 using AutoMapper;
-using Timetable.Web.Mapping;
+using Timetable.Web.Mapping.Cif;
 using Xunit;
 
-namespace Timetable.Web.Test.Mapping
+namespace Timetable.Web.Test.Mapping.Cif
 {
     public class FromCifProfileLocationsTest
     {
@@ -20,7 +20,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
 
-            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Cif.TestStations.Surbiton);
+            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Test.Cif.TestStations.Surbiton);
             
             Assert.Equal("SUR", output.ThreeLetterCode);
         }
@@ -30,7 +30,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
 
-            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Cif.TestStations.Surbiton);
+            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Test.Cif.TestStations.Surbiton);
             
             Assert.Equal("SURBITN", output.Tiploc);
         }
@@ -40,7 +40,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
 
-            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Cif.TestStations.Surbiton);
+            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Test.Cif.TestStations.Surbiton);
             
             Assert.Equal("SURBITON", output.Name);
         }
@@ -50,7 +50,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
 
-            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Cif.TestStations.WaterlooWindsor);
+            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Test.Cif.TestStations.WaterlooWindsor);
 
             var expected = new Coordinates()
             {
@@ -68,7 +68,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
 
-            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Cif.TestStations.Surbiton);
+            var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Test.Cif.TestStations.Surbiton);
             
             Assert.Equal("Normal", output.InterchangeStatus.ToString());
         }

@@ -1,10 +1,10 @@
 using System;
 using AutoMapper;
-using CifParser;
 using CifParser.Archives;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Timetable.Web.Mapping;
+using Timetable.Web.Mapping.Cif;
 using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace Timetable.Web

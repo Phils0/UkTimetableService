@@ -1,15 +1,12 @@
-using System;
 using AutoMapper;
 using Timetable.Test.Data;
-using Timetable.Web.Mapping;
-using Cif = Timetable.Web.Test.Cif;
 using Xunit;
 
-namespace Timetable.Web.Test.Mapping
+namespace Timetable.Web.Test.Mapping.Cif
 {
-    public class FromCifProfileScheduleOriginTest
+    public class FromCifProfileScheduleStopTest
     {
-        private static readonly Time Ten = new Time(Cif.TestTime.Ten);
+        private static readonly Time TenFifteen = new Time(TestTime.TenFifteen);
 
         private static readonly MapperConfiguration FromCifProfileConfiguration =
             FromCifProfileLocationsTest.FromCifProfileConfiguration;
@@ -25,25 +22,34 @@ namespace Timetable.Web.Test.Mapping
         {
             var output = Map();
 
-            Assert.Equal(TestLocations.Surbiton, output.Location);
+            Assert.Equal(TestLocations.CLPHMJC, output.Location);
             Assert.Equal(1, output.Sequence);
         }
 
-        private static ScheduleOrigin Map()
+        private static ScheduleStop Map()
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
-            return mapper.Map<CifParser.Records.OriginLocation, Timetable.ScheduleOrigin>(
-                Cif.TestSchedules.CreateOriginLocation(),
+            return mapper.Map<CifParser.Records.IntermediateLocation, Timetable.ScheduleStop>(
+                Test.Cif.TestSchedules.CreateIntermediateLocation(),
                 o => o.Items.Add("Locations", TestData.Locations));
         }
 
+        [Fact]
+        public void MapArrival()
+        {
+            var output = Map();
+
+            Assert.Equal(TenFifteen.Subtract(TestTime.OneMinute), output.Arrival);
+            Assert.Equal(TenFifteen.Subtract(TestTime.ThirtySeconds), output.WorkingArrival);
+        }
+        
         [Fact]
         public void MapDeparture()
         {
             var output = Map();
 
-            Assert.Equal(Ten, output.Departure);
-            Assert.Equal(Ten.Add(Cif.TestTime.ThirtySeconds), output.WorkingDeparture);
+            Assert.Equal(TenFifteen, output.Departure);
+            Assert.Equal(TenFifteen.Add(TestTime.ThirtySeconds), output.WorkingDeparture);
         }
 
         [Fact]
@@ -51,7 +57,7 @@ namespace Timetable.Web.Test.Mapping
         {
             var output = Map();
 
-            Assert.Equal("1", output.Platform);
+            Assert.Equal("10", output.Platform);
         }
 
         [Fact]
@@ -59,15 +65,15 @@ namespace Timetable.Web.Test.Mapping
         {
             var output = Map();
 
-            Assert.Contains("TB", output.Activities);
-        }
+            Assert.Contains("T", output.Activities);
+        }    
         
         [Fact]
         public void SetAdvertisedStop()
         {
             var output = Map();
 
-            Assert.Equal(PublicStop.PickUpOnly, output.AdvertisedStop);
+            Assert.Equal(PublicStop.Yes, output.AdvertisedStop);
         } 
     }
 }

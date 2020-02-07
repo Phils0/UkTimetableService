@@ -12,6 +12,7 @@ using NSubstitute;
 using ReflectionMagic;
 using Serilog;
 using Timetable.Web.Mapping;
+using Timetable.Web.Mapping.Cif;
 using Xunit;
 
 namespace Timetable.Web.Test

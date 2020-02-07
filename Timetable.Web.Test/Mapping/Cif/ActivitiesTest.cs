@@ -1,6 +1,7 @@
+using Timetable.Web.Mapping.Cif;
 using Xunit;
 
-namespace Timetable.Web.Test.Mapping
+namespace Timetable.Web.Test.Mapping.Cif
 {
     public class ActivitiesTest
     {
@@ -19,7 +20,7 @@ namespace Timetable.Web.Test.Mapping
         [MemberData(nameof(TestActivities))]
         public void SplitActivities(string input, string[] expectedValues)
         {
-            var activities = Timetable.Web.Mapping.Activities.Split(input);
+            var activities = Activities.Split(input);
 
             foreach (var expected in expectedValues)
             {
@@ -30,7 +31,7 @@ namespace Timetable.Web.Test.Mapping
         [Fact]
         public void HandleNoActivities()
         {
-            var activities = Timetable.Web.Mapping.Activities.Split("");
+            var activities = Activities.Split("");
             Assert.Empty(activities);
         }
     }

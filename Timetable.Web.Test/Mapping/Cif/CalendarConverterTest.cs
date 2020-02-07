@@ -1,10 +1,10 @@
 using System;
 using AutoMapper;
-using Timetable.Web.Mapping;
+using Timetable.Web.Mapping.Cif;
 using Timetable.Web.Test.Cif;
 using Xunit;
 
-namespace Timetable.Web.Test.Mapping
+namespace Timetable.Web.Test.Mapping.Cif
 {
     public class CalendarConverterTest
     {

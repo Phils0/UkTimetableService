@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Timetable.Web.Mapping
+namespace Timetable.Web.Mapping.Cif
 {
     internal static class Activities
     {

@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper;
-using Timetable.Web.Test.Cif;
 using Xunit;
-using TestSchedules = Timetable.Test.Data.TestSchedules;
-using TestStations = Timetable.Test.Data.TestStations;
-using TestAssociations = Timetable.Test.Data.TestAssociations;
+using Timetable.Test.Data;
 
 namespace Timetable.Web.Test.Mapping
 {

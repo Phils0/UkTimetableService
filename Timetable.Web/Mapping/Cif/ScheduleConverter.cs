@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
@@ -6,7 +5,7 @@ using CifParser;
 using CifParser.Records;
 using Serilog;
 
-namespace Timetable.Web.Mapping
+namespace Timetable.Web.Mapping.Cif
 {
     internal class ScheduleConverter : ITypeConverter<CifParser.Schedule, Timetable.Schedule>
     {

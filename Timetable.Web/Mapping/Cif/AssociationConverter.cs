@@ -1,6 +1,6 @@
 using System;
 
-namespace Timetable.Web.Mapping
+namespace Timetable.Web.Mapping.Cif
 {
     public static class AssociationConverter
     {

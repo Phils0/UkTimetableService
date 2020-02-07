@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using AutoMapper;
 using CifParser.Records;
 
-namespace Timetable.Web.Mapping
+namespace Timetable.Web.Mapping.Cif
 {
     public class CalendarConverter : IValueConverter<ScheduleDetails, Calendar>, IValueConverter<CifParser.Records.Association, Calendar>
     {

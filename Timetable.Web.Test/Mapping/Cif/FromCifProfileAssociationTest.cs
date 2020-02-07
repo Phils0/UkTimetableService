@@ -1,16 +1,9 @@
 using System;
-using System.Collections.Generic;
 using AutoMapper;
-using CifParser;
-using CifParser.Records;
-using NSubstitute;
-using Serilog;
 using Timetable.Test.Data;
-using Timetable.Web.Mapping;
-using Cif = Timetable.Web.Test.Cif;
 using Xunit;
 
-namespace Timetable.Web.Test.Mapping
+namespace Timetable.Web.Test.Mapping.Cif
 {
     public class FromCifProfileAssociationTest
     {
@@ -39,7 +32,7 @@ namespace Timetable.Web.Test.Mapping
         
         public static Association MapAssociation(CifParser.Records.Association input = null)
         {
-            input = input ?? Cif.TestAssociations.CreateAssociation();
+            input = input ?? Test.Cif.TestAssociations.CreateAssociation();
             var mapper = FromCifProfileConfiguration.CreateMapper();
             return mapper.Map<CifParser.Records.Association, Timetable.Association>(input, o =>
             {
@@ -68,7 +61,7 @@ namespace Timetable.Web.Test.Mapping
         [InlineData(CifParser.Records.StpIndicator.C, StpIndicator.Cancelled)]
         public void MapStpIndicator(CifParser.Records.StpIndicator input, StpIndicator expected)
         {
-            var association = Cif.TestAssociations.CreateAssociation(stp: input);
+            var association = Test.Cif.TestAssociations.CreateAssociation(stp: input);
 
             var output = MapAssociation(association);
 
@@ -113,7 +106,7 @@ namespace Timetable.Web.Test.Mapping
         [InlineData(null, AssociationCategory.None)]
         public void MapCategory(string input, AssociationCategory expected)
         {
-            var association = Cif.TestAssociations.CreateAssociation();
+            var association = Test.Cif.TestAssociations.CreateAssociation();
             association.Category = input;
             var output = MapAssociation(association);
             
@@ -128,7 +121,7 @@ namespace Timetable.Web.Test.Mapping
         [InlineData(null, AssociationDateIndicator.None)]
         public void MapDateIndicator(string input, AssociationDateIndicator expected)
         {
-            var association = Cif.TestAssociations.CreateAssociation();
+            var association = Test.Cif.TestAssociations.CreateAssociation();
             association.DateIndicator = input;
             var output = MapAssociation(association);
             
@@ -142,7 +135,7 @@ namespace Timetable.Web.Test.Mapping
         [InlineData(null, false)]
         public void MapIsPublic(string input, bool expected)
         {
-            var association = Cif.TestAssociations.CreateAssociation(type: input);
+            var association = Test.Cif.TestAssociations.CreateAssociation(type: input);
             var output = MapAssociation(association);
             
             Assert.Equal(expected, output.IsPassenger);

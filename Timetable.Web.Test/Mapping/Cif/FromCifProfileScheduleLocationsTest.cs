@@ -1,16 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using CifParser;
-using NSubstitute;
-using Serilog;
-using Timetable.Test.Data;
-using Timetable.Web.Mapping;
-using Timetable.Web.Test.Cif;
 using Xunit;
 
-namespace Timetable.Web.Test.Mapping
+namespace Timetable.Web.Test.Mapping.Cif
 {
     public class FromCifProfileScheduleLocationsTest
     {
