@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using AutoMapper;
 using Timetable.Web.Test.Cif;
 using Xunit;
 using TestSchedules = Timetable.Test.Data.TestSchedules;
 using TestStations = Timetable.Test.Data.TestStations;
+using TestAssociations = Timetable.Test.Data.TestAssociations;
 
 namespace Timetable.Web.Test.Mapping
 {
@@ -57,9 +59,49 @@ namespace Timetable.Web.Test.Mapping
             var find = new StopSpecification(TestStations.Surbiton, TestSchedules.Ten, TestDate, TimesToUse.Departures);
             resolved.TryFindStop(find, out var stop);
             
-            var item = mapper.Map<Timetable.ResolvedServiceStop, Model.FoundServiceItem>(stop, opts => opts.Items["On"] = stop.On);
+            var item = mapper.Map<Timetable.ResolvedServiceStop, Model.FoundSummaryItem>(stop, opts => opts.Items["On"] = stop.On);
             
             Assert.NotEmpty(item.Service.Associations);
+            Assert.False(item.Association.IsIncluded);
+        }
+        
+        
+        public static IEnumerable<object[]> JoinToStations
+        {
+            get
+            {
+                yield return new object[] {TestStations.Weybridge, false};   
+                yield return new object[] {TestStations.ClaphamJunction, false};
+                yield return new object[] {TestStations.Waterloo, true};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(JoinToStations))]
+        public void MapIncludeAssociation(Station station, bool expected)
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var association = CreateJoinServices();
+            var woking = new StopSpecification(TestStations.Woking, TestSchedules.NineForty, TestDate, TimesToUse.Departures);
+            var found = association.Associated.Service.TryFindScheduledStop(woking, out var stop);
+            stop.GoesTo(station);
+            
+            var item = mapper.Map<Timetable.ResolvedServiceStop, Model.FoundSummaryItem>(stop, opts => opts.Items["On"] = stop.On);
+            
+            Assert.NotEmpty(item.Service.Associations);
+            Assert.Equal(expected, item.Association.IsIncluded);
+            if(expected)
+                Assert.Equal("X12345", item.Association.TimetableUid);
+        }
+        
+        private Association CreateJoinServices()
+        {
+            var main = TestSchedules.CreateScheduleWithService("X12345", retailServiceId: "VT123401").Service;
+            var associated = TestSchedules.CreateScheduleWithService("A98765", retailServiceId: "VT123402",
+                stops: TestSchedules.CreateWokingClaphamSchedule(TestSchedules.NineForty)).Service;
+            var association = TestAssociations.CreateAssociationWithServices(main, associated);
+            return association;
         }
         
         [Fact]

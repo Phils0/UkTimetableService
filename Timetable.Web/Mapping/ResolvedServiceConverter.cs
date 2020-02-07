@@ -51,8 +51,7 @@ namespace Timetable.Web.Mapping
                     _logger.Error(e, "Failed to add association : {sourceAssociation}", sourceAssociation);
                 }
             }
-
-            // thisService.Associations = ;
+            
             SetAssociations(thisService, associations.ToArray());
             return thisService;
         }
@@ -118,7 +117,8 @@ namespace Timetable.Web.Mapping
             {
                 At = context.Mapper.Map<Model.ScheduledStop>(source.Stop, opts => opts.Items["On"] = source.On),
                 To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop, opts => opts.Items["On"] = source.On),
-                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop, opts => opts.Items["On"] = source.On)
+                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop, opts => opts.Items["On"] = source.On),
+                Association = context.Mapper.Map<Model.IncludedAssociation>(source.Association)
             };
             var service = Convert(source.Service, (S) null, context);
             SetService(item, service);

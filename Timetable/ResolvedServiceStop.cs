@@ -11,6 +11,8 @@ namespace Timetable
         public ScheduleLocation FoundToStop { get; private set; } = null;
         public ScheduleLocation FoundFromStop { get; private set; } = null;
 
+        public IncludedAssociation Association { get; private set; } = IncludedAssociation.NoAssociation;
+        
         public DateTime On => Service.On;
 
         public Toc Operator => Service.Details.Operator;
@@ -40,18 +42,25 @@ namespace Timetable
         
         public bool GoesTo(Station destination)
         {
+            bool found;
+            ScheduleLocation to;
+            IncludedAssociation association = IncludedAssociation.NoAssociation;
             var departureTime = ((IDeparture) Stop).Time;
-            var (found, to) = GoesTo(destination, departureTime);  // Check our service
-
+            
+            (found, to) = GoesTo(destination, departureTime);  // Check our service
+            
             if (!found && Service is ResolvedServiceWithAssociations withAssociations)
-                (found, to) = AssociationGoesTo(withAssociations);    // Check associations
+                (found, to, association) = AssociationGoesTo(withAssociations);    // Check associations
 
             if (found)
+            {
                 FoundToStop = to;
+                Association = association;
+            }
             
             return found;
             
-            (bool success, ScheduleLocation to) AssociationGoesTo(ResolvedServiceWithAssociations service)
+            (bool success, ScheduleLocation to, IncludedAssociation association) AssociationGoesTo(ResolvedServiceWithAssociations service)
             {
                 foreach (var association in service.Associations)
                 {
@@ -69,31 +78,37 @@ namespace Timetable
                             return foundInAssociated;
                     }                 
                 }
-                return (false, null);
+                return (false, null, IncludedAssociation.NoAssociation);
             }
 
-            (bool success, ScheduleLocation to) JoinGoesTo(ResolvedAssociation association)
+            (bool success, ScheduleLocation to, IncludedAssociation association) JoinGoesTo(ResolvedAssociation association)
             {
                 if (association.IsMain(Service.TimetableUid))
-                    return (false, null);  // We're on the main, fail as join not possible
+                    return (false, null, null);  // We're on the main, fail as join not possible
                 
                 var main = association.Details.Main;
                 var joinStop = association.AssociatedService.GetStop(main.AtLocation, main.Sequence);
-                return joinStop.GoesTo(destination, departureTime);
+                var (success, to) = joinStop.GoesTo(destination, departureTime);
+                return (success, 
+                    to, 
+                    success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
             }
             
-            (bool success, ScheduleLocation to) SplitGoesTo(ResolvedAssociation association)
+            (bool success, ScheduleLocation to, IncludedAssociation association) SplitGoesTo(ResolvedAssociation association)
             {
                 if (!association.IsMain(Service.TimetableUid))
-                    return (false, null);  // We're already on the split so cannot go to the main
+                    return (false, null, null);  // We're already on the split so cannot go to the main
                 
                 var main = association.Details.Main;
                 var splitStop = Service.GetStop(main.AtLocation, main.Sequence);
                 if( splitStop.IsBefore(departureTime, true))
-                    return (false, null);  // We're past the split stop
+                    return (false, null, null);  // We're past the split stop
                 
                 var firstStop = association.AssociatedService.Origin;
-                return firstStop.GoesTo(destination, departureTime);
+                var (success, to) = firstStop.GoesTo(destination, departureTime);
+                return (success, 
+                    to, 
+                    success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
             }
         }
         

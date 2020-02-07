@@ -19,6 +19,11 @@ namespace Timetable.Web.Model
         /// Details for Going To location - Departures only
         /// </summary>
         public ScheduledStop To { get; set; }
+        
+        /// <summary>
+        /// Whether found journey includes splitting\joining 
+        /// </summary>
+        public IncludedAssociation Association { get; set; }
     }
     
     /// <summary>

@@ -40,6 +40,17 @@ namespace Timetable.Test
             }
         }
         
+        [Fact]
+        public void GoesToWithNoAssociation()
+        {
+            var service =  TestSchedules.CreateService();
+            var clapham = service.Details.Locations[1];
+            var stop = new ResolvedServiceStop(service, clapham);
+
+            Assert.True(stop.GoesTo(TestStations.Waterloo));
+            Assert.Equal(IncludedAssociation.NoAssociation, stop.Association);
+        }
+        
         [Theory]
         [InlineData(PublicStop.No, false)]
         [InlineData(PublicStop.Yes, true)]
@@ -65,10 +76,10 @@ namespace Timetable.Test
         {
             get
             {
-                yield return new object[] {TestStations.Surbiton, false};   
-                yield return new object[] {TestStations.ClaphamJunction, true};
-                yield return new object[] {TestStations.Vauxhall, false};    // Passing
-                yield return new object[] {TestStations.Waterloo, true};
+                yield return new object[] {TestStations.Surbiton, false, false};   
+                yield return new object[] {TestStations.ClaphamJunction, true, false};
+                yield return new object[] {TestStations.Vauxhall, false, false};    // Passing
+                yield return new object[] {TestStations.Waterloo, true, true};
             }
         }
         
@@ -76,7 +87,7 @@ namespace Timetable.Test
 
         [Theory]
         [MemberData(nameof(JoinToStations))]
-        public void GoesToWorksWithJoins(Station station, bool isTo)
+        public void GoesToWorksWithJoins(Station station, bool isTo, bool involvesAssociation)
         {
             var association = CreateJoinServices();
             var woking = new StopSpecification(TestStations.Woking, TestSchedules.NineForty, MondayAugust12, TimesToUse.Departures);
@@ -92,6 +103,7 @@ namespace Timetable.Test
                 Assert.False(stop.GoesTo(station));
                 Assert.Null(stop.FoundToStop);
             }
+            Assert.Equal(involvesAssociation, stop.Association.IsIncluded);
         }
 
         private Association CreateJoinServices()
@@ -131,22 +143,22 @@ namespace Timetable.Test
         {
             get
             {
-                yield return new object[] {TestStations.Surbiton, TestSchedules.Ten, TestStations.ClaphamJunction, true};
-                yield return new object[] {TestStations.Surbiton, TestSchedules.Ten, TestStations.Waterloo, true};
-                yield return new object[] {TestStations.Surbiton, TestSchedules.Ten, TestStations.Weybridge, true};
-                yield return new object[] {TestStations.Surbiton, TestSchedules.Ten, TestStations.Woking, true};
-                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenSixteen, TestStations.Waterloo, true};
-                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenSixteen, TestStations.Weybridge, true};
-                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenSixteen, TestStations.Woking, true};
-                yield return new object[] {TestStations.Vauxhall, TestSchedules.TenTwentyOne, TestStations.Waterloo, true};
-                yield return new object[] {TestStations.Vauxhall, TestSchedules.TenTwentyOne, TestStations.Weybridge, false};
-                yield return new object[] {TestStations.Vauxhall, TestSchedules.TenTwentyOne, TestStations.Woking, false};
+                yield return new object[] {TestStations.Surbiton, TestSchedules.Ten, TestStations.ClaphamJunction, true, false};
+                yield return new object[] {TestStations.Surbiton, TestSchedules.Ten, TestStations.Waterloo, true, false};
+                yield return new object[] {TestStations.Surbiton, TestSchedules.Ten, TestStations.Weybridge, true, true};
+                yield return new object[] {TestStations.Surbiton, TestSchedules.Ten, TestStations.Woking, true, true};
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenSixteen, TestStations.Waterloo, true, false};
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenSixteen, TestStations.Weybridge, true, true};
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenSixteen, TestStations.Woking, true, true};
+                yield return new object[] {TestStations.Vauxhall, TestSchedules.TenTwentyOne, TestStations.Waterloo, true, false};
+                yield return new object[] {TestStations.Vauxhall, TestSchedules.TenTwentyOne, TestStations.Weybridge, false, false};
+                yield return new object[] {TestStations.Vauxhall, TestSchedules.TenTwentyOne, TestStations.Woking, false, false};
             }
         }
         
         [Theory]
         [MemberData(nameof(MainSplitToStations))]
-        public void GoesToWorksWithSplitsFromMain(Station from, Time departs, Station to, bool isTo)
+        public void GoesToWorksWithSplitsFromMain(Station from, Time departs, Station to, bool isTo, bool involvesAssociation)
         {
             var association = CreateSplitServices();
             var at = new StopSpecification(from, departs, MondayAugust12, TimesToUse.Departures);
@@ -162,6 +174,7 @@ namespace Timetable.Test
                 Assert.False(stop.GoesTo(to));
                 Assert.Null(stop.FoundToStop);
             }
+            Assert.Equal(involvesAssociation, stop.Association.IsIncluded);
         }
         
         private Association CreateSplitServices()
@@ -179,17 +192,17 @@ namespace Timetable.Test
         {
             get
             {
-                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenTwentyFive, TestStations.Waterloo, false};
-                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenTwentyFive, TestStations.Weybridge, true};
-                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenTwentyFive, TestStations.Woking, true};
-                yield return new object[] {TestStations.Weybridge, TestSchedules.TenFortyOne, TestStations.Waterloo, false};
-                yield return new object[] {TestStations.Weybridge, TestSchedules.TenFortyOne, TestStations.Woking, true};            
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenTwentyFive, TestStations.Waterloo, false, false};
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenTwentyFive, TestStations.Weybridge, true, false};
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenTwentyFive, TestStations.Woking, true, false};
+                yield return new object[] {TestStations.Weybridge, TestSchedules.TenFortyOne, TestStations.Waterloo, false, false};
+                yield return new object[] {TestStations.Weybridge, TestSchedules.TenFortyOne, TestStations.Woking, true, false};            
             }
         }
         
         [Theory]
         [MemberData(nameof(AssociatedSplitToStations))]
-        public void GoesToWorksWithSplitsFromAssociated(Station from, Time departs, Station to, bool isTo)
+        public void GoesToWorksWithSplitsFromAssociated(Station from, Time departs, Station to, bool isTo, bool involvesAssociation)
         {
             var association = CreateSplitServices();
             var at = new StopSpecification(from, departs, MondayAugust12, TimesToUse.Departures);
@@ -205,6 +218,7 @@ namespace Timetable.Test
                 Assert.False(stop.GoesTo(to));
                 Assert.Null(stop.FoundToStop);
             }
+            Assert.Equal(involvesAssociation, stop.Association.IsIncluded);
         }
     }
 }

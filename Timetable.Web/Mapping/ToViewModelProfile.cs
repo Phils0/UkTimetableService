@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Serilog;
-using Timetable.Web.Model;
 
 namespace Timetable.Web.Mapping
 {
@@ -45,6 +44,7 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Origin, o => o.MapFrom(s => s.Locations.First()))
                 .ForMember(d => d.Destination, o => o.MapFrom(s => s.Locations.Last()))
                 .ForMember(d => d.Associations, o => o.Ignore());
+            CreateMap<Timetable.IncludedAssociation, Model.IncludedAssociation>();
             
             var serviceConverter = new ResolvedServiceToServiceConverter(Log.Logger);
             CreateMap<Timetable.ResolvedService, Model.Service>()
@@ -71,7 +71,7 @@ namespace Timetable.Web.Mapping
             return date.Add(time.Value);
         }
 
-        private ScheduledStop[] MapStops(IReadOnlyList<ScheduleLocation> source, ResolutionContext context)
+        private Model.ScheduledStop[] MapStops(IReadOnlyList<ScheduleLocation> source, ResolutionContext context)
         {
             return source.Select(s => ConvertToStop(s, context)).ToArray();
         }
