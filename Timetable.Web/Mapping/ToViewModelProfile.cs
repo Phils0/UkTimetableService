@@ -33,6 +33,8 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.PassesAt,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.PassesAt, c)));
             CreateMap<Timetable.ScheduleLocation, Model.ScheduledStop>()
                 .ConvertUsing((s, d, c) => ConvertToStop(s, c));
+            CreateMap<Timetable.ResolvedStop, Model.ScheduledStop>()
+                .ConvertUsing((s, d, c) => ConvertToStop(s, c));
             CreateMap<Timetable.Schedule, Model.Service>()
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
@@ -80,6 +82,13 @@ namespace Timetable.Web.Mapping
             return (Model.ScheduledStop) context.Mapper
                 .Map(scheduleLocation, scheduleLocation.GetType(), typeof(Model.ScheduledStop),
                     o => o.Items["On"] = context.Items["On"]);
+        }
+        
+        private Model.ScheduledStop ConvertToStop(ResolvedStop stop, ResolutionContext context)
+        {
+            return (Model.ScheduledStop) context.Mapper
+                .Map(stop.Stop, stop.Stop.GetType(), typeof(Model.ScheduledStop),
+                    o => o.Items["On"] = stop.On );
         }
     }
 }

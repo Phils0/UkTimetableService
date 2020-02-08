@@ -7,9 +7,9 @@ namespace Timetable
     public class ResolvedServiceStop
     {
         public ResolvedService Service { get; }
-        public ScheduleLocation Stop { get; }
-        public ScheduleLocation FoundToStop { get; private set; } = null;
-        public ScheduleLocation FoundFromStop { get; private set; } = null;
+        public ResolvedStop Stop { get; }
+        public ResolvedStop FoundToStop { get; private set; } = null;
+        public ResolvedStop FoundFromStop { get; private set; } = null;
 
         public IncludedAssociation Association { get; private set; } = IncludedAssociation.NoAssociation;
         
@@ -20,32 +20,38 @@ namespace Timetable
         public ResolvedServiceStop(ResolvedService service, ScheduleLocation stop)
         {
             Service = service;
-            Stop = stop;
+            Stop = new ResolvedStop(stop, service.On);
         }
 
         public override string ToString()
         {
-            return $"{Service} {Stop}";
+            return $"{Service} {Stop.Stop}";
         }
 
         public bool IsNextDay(bool useDeparture)
         {
             if (useDeparture)
             {
-                var departure = Stop as IDeparture;
+                var departure = StopDeparture;
                 return departure?.IsNextDay ?? false;
             }
             
-            var arrival = Stop as IArrival;
+            var arrival = StopArrival;
             return arrival?.IsNextDay ?? false;
         }
+
+        private IDeparture StopDeparture => ((IDeparture) Stop.Stop);
+        private IArrival StopArrival => ((IArrival) Stop.Stop);
+        
+        private ResolvedStop ResolveStop(IArrival location) => new ResolvedStop((ScheduleLocation) location, On);
+        private ResolvedStop ResolveStop(IDeparture location) => new ResolvedStop((ScheduleLocation) location, On);
         
         public bool GoesTo(Station destination)
         {
             bool found;
-            ScheduleLocation to;
+            ResolvedStop to;
             IncludedAssociation association = IncludedAssociation.NoAssociation;
-            var departureTime = ((IDeparture) Stop).Time;
+            var departureTime = StopDeparture.Time;
             
             (found, to) = GoesTo(destination, departureTime);  // Check our service
             
@@ -60,7 +66,7 @@ namespace Timetable
             
             return found;
             
-            (bool success, ScheduleLocation to, IncludedAssociation association) AssociationGoesTo(ResolvedServiceWithAssociations service)
+            (bool success, ResolvedStop to, IncludedAssociation association) AssociationGoesTo(ResolvedServiceWithAssociations service)
             {
                 foreach (var association in service.Associations)
                 {
@@ -81,20 +87,21 @@ namespace Timetable
                 return (false, null, IncludedAssociation.NoAssociation);
             }
 
-            (bool success, ScheduleLocation to, IncludedAssociation association) JoinGoesTo(ResolvedAssociation association)
+            (bool success, ResolvedStop to, IncludedAssociation association) JoinGoesTo(ResolvedAssociation association)
             {
                 if (association.IsMain(Service.TimetableUid))
                     return (false, null, null);  // We're on the main, fail as join not possible
                 
                 var main = association.Details.Main;
                 var joinStop = association.AssociatedService.GetStop(main.AtLocation, main.Sequence);
-                var (success, to) = joinStop.GoesTo(destination, departureTime);
+                var joinDeparture = joinStop.StopDeparture;
+                var (success, to) = joinStop.GoesTo(destination, joinDeparture.Time);
                 return (success, 
                     to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
             }
             
-            (bool success, ScheduleLocation to, IncludedAssociation association) SplitGoesTo(ResolvedAssociation association)
+            (bool success, ResolvedStop to, IncludedAssociation association) SplitGoesTo(ResolvedAssociation association)
             {
                 if (!association.IsMain(Service.TimetableUid))
                     return (false, null, null);  // We're already on the split so cannot go to the main
@@ -105,14 +112,15 @@ namespace Timetable
                     return (false, null, null);  // We're past the split stop
                 
                 var firstStop = association.AssociatedService.Origin;
-                var (success, to) = firstStop.GoesTo(destination, departureTime);
+                var splitDeparture = firstStop.StopDeparture;
+                var (success, to) = firstStop.GoesTo(destination, splitDeparture.Time);
                 return (success, 
                     to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
             }
         }
         
-        private (bool success, ScheduleLocation to) GoesTo(Station destination, Time departureTime)
+        private (bool success, ResolvedStop to) GoesTo(Station destination, Time departureTime)
         {
             foreach (var arrival in  Service.Details.Arrivals.Reverse())
             {
@@ -122,7 +130,7 @@ namespace Timetable
 
                 if (destination.Equals(arrival.Station))
                 {
-                    return (true, (ScheduleLocation) arrival);
+                    return (true, ResolveStop(arrival));
                 }
             }
 
@@ -131,13 +139,13 @@ namespace Timetable
 
         private bool IsBefore(Time time, bool useDepartures)
         {
-            var thisTime = useDepartures ? ((IDeparture) Stop).Time : ((IArrival) Stop).Time;
+            var thisTime = useDepartures ? StopDeparture.Time : StopArrival.Time;
             return thisTime.IsBefore(time);
         }
         
         public bool ComesFrom(Station origin)
         {
-            var arrivalTime = ((IArrival) Stop).Time;
+            var arrivalTime = StopArrival.Time;
             foreach (var departure in Service.Details.Departures)
             {
                 // If arrival at Stop before departure got to found stop so know that it does not come from location
@@ -146,7 +154,7 @@ namespace Timetable
 
                 if (origin.Equals(departure.Station))
                 {
-                    FoundFromStop = (ScheduleLocation) departure;
+                    FoundFromStop = new ResolvedStop( (ScheduleLocation) departure, Service.On);
                     return true;
                 }
             }

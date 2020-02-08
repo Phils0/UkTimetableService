@@ -1,7 +1,6 @@
 using System;
 using AutoMapper;
 using Timetable.Test.Data;
-using Timetable.Web.Test.Cif;
 using Xunit;
 
 namespace Timetable.Web.Test.Mapping

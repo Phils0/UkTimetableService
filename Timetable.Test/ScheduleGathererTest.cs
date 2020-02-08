@@ -19,7 +19,7 @@ namespace Timetable.Test
             var services = gatherer.Gather(2, TestDate);
 
             Assert.Single(services);
-            var stop = services[0].Stop as ScheduleOrigin;
+            var stop = services[0].Stop.Stop as ScheduleOrigin;
             Assert.Equal(TestStations.Surbiton, stop.Station);
             Assert.Equal(TestSchedules.TenFifteen, stop.Departure);
         }
@@ -86,7 +86,7 @@ namespace Timetable.Test
             var services = gatherer.Gather(2, TestDate);
 
             Assert.Single(services);
-            var stop = services[0].Stop as ScheduleOrigin;
+            var stop = services[0].Stop.Stop as ScheduleOrigin;
             Assert.Equal(TestStations.Surbiton, stop.Station);
             Assert.Equal(TestSchedules.Ten, stop.Departure);
         }
@@ -110,9 +110,9 @@ namespace Timetable.Test
             var gatherer = new ScheduleGatherer(schedule, GathererConfig.OneBeforeTwoAfter, TimesToUse.Departures);
             var services = gatherer.Gather(1, TestDate);
 
-            var first = services[0].Stop as ScheduleOrigin;
-            var second = services[1].Stop as ScheduleOrigin;
-            var third = services[2].Stop as ScheduleOrigin;
+            var first = services[0].Stop.Stop as ScheduleOrigin;
+            var second = services[1].Stop.Stop as ScheduleOrigin;
+            var third = services[2].Stop.Stop as ScheduleOrigin;
 
             Assert.True(first.Departure.Value < second.Departure.Value);
             Assert.True(second.Departure.Value < third.Departure.Value);

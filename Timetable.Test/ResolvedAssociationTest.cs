@@ -37,7 +37,7 @@ namespace Timetable.Test
 
             var stop = resolved.GetStop(resolvedService);
             Assert.NotNull(stop);
-            Assert.Equal(TestLocations.CLPHMJN, stop.Stop.Location);
+            Assert.Equal(TestLocations.CLPHMJN, stop.Stop.Stop.Location);
             Assert.Equal("X12345", stop.Service.TimetableUid);        
         }
         
@@ -55,7 +55,7 @@ namespace Timetable.Test
 
             var stop = resolved.GetStop(resolvedService);
             Assert.NotNull(stop);
-            Assert.Equal(TestLocations.CLPHMJN, stop.Stop.Location);
+            Assert.Equal(TestLocations.CLPHMJN, stop.Stop.Stop.Location);
             Assert.Equal("A98765", stop.Service.TimetableUid);        
         }
 

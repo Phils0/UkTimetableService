@@ -173,7 +173,7 @@ namespace Timetable.Test
         
         private static void AssertDeparture(DateTime expectedDate, TimeSpan expectedTime, ResolvedServiceStop stop)
         {
-            var origin = stop.Stop as ScheduleOrigin;
+            var origin = stop.Stop.Stop as ScheduleOrigin;
             Assert.Equal(expectedTime, origin.Departure.Value);
             Assert.Equal(expectedDate, stop.On);
         }
@@ -270,7 +270,7 @@ namespace Timetable.Test
 
         private static void AssertArrival(DateTime expectedDate, TimeSpan expectedTime, ResolvedServiceStop stop)
         {
-            var destination = stop.Stop as ScheduleDestination;
+            var destination = stop.Stop.Stop as ScheduleDestination;
             Assert.Equal(expectedTime, destination.Arrival.Value);
             Assert.Equal(expectedDate, stop.On);
         }
