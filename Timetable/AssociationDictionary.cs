@@ -33,8 +33,8 @@ namespace Timetable
                             var resolved = other.GetScheduleOn(otherDate, false);
 
                             if (!resolved.HasRetailServiceId(retailServiceId))
-                                _logger.Warning("Resolved association {resolved} has mismatched RetailServiceIds {resolvedRsId} instead of {retailServiceId}", 
-                                    resolved, resolved.Details.RetailServiceId, retailServiceId);                                
+                                _logger.Information("Resolved association {resolved} has mismatched RetailServiceIds {resolvedRsId} instead of {retailServiceId}", 
+                                    resolved, resolved.Details.NrsRetailServiceId, retailServiceId);                                
                             
                             resolvedAssociations.Add(new ResolvedAssociation(association, on, isCancelled, resolved));
                             break;

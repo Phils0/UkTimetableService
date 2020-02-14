@@ -177,15 +177,38 @@ namespace Timetable.Test
             Assert.Equal(involvesAssociation, stop.Association.IsIncluded);
         }
         
-        private Association CreateSplitServices()
+        [Fact]
+        public void GoesToWorksWithSplitsWhereMainTerminatesAtSplitPoint()
         {
-            var mainStops = TestSchedules.CreateThreeStopSchedule(TestSchedules.Ten);
-            mainStops[2] = TestScheduleLocations.CreateStop(TestStations.Vauxhall, TestSchedules.TenTwenty);    // Make Vauxhall a stop
+            //  Hack the stop so it doesn't have a departure
+            var mainStops = CreateMainStops();
+            mainStops[1] = TestScheduleLocations.CreateDestination(TestStations.ClaphamJunction, TestSchedules.TenFifteen);
+               
+            var association = CreateSplitServices(mainStops);
+            
+            var at = new StopSpecification(TestStations.Surbiton, TestSchedules.Ten, MondayAugust12, TimesToUse.Departures);
+            var found = association.Main.Service.TryFindScheduledStop(at, out var stop);
+            
+            Assert.True(stop.GoesTo(TestStations.Woking));
+            Assert.NotNull(stop.FoundToStop);
+            Assert.True(stop.Association.IsIncluded);
+        }
+        
+        private Association CreateSplitServices(ScheduleLocation[] mainStops = null)
+        {
+            mainStops ??= CreateMainStops();
             var main = TestSchedules.CreateScheduleWithService("X12345", retailServiceId: "VT123401", stops: mainStops).Service;
             var associated = TestSchedules.CreateScheduleWithService("A98765", retailServiceId: "VT123402",
                 stops: TestSchedules.CreateClaphamWokingSchedule(TestSchedules.TenTwentyFive)).Service;
             var association = TestAssociations.CreateAssociationWithServices(main, associated, category: AssociationCategory.Split);
             return association;
+        }
+
+        private ScheduleLocation[] CreateMainStops()
+        {
+            var mainStops = TestSchedules.CreateThreeStopSchedule(TestSchedules.Ten);
+            mainStops[2] = TestScheduleLocations.CreateStop(TestStations.Vauxhall, TestSchedules.TenTwenty);    // Make Vauxhall a stop
+            return mainStops;
         }
         
         public static IEnumerable<object[]> AssociatedSplitToStations

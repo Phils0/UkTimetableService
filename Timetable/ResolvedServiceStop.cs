@@ -40,6 +40,9 @@ namespace Timetable
             return arrival?.IsNextDay ?? false;
         }
 
+        private bool HasDeparture => Stop.Stop is IDeparture;
+        private bool HasArrival => Stop.Stop is IArrival;
+        
         private IDeparture StopDeparture => ((IDeparture) Stop.Stop);
         private IArrival StopArrival => ((IArrival) Stop.Stop);
         
@@ -139,7 +142,7 @@ namespace Timetable
 
         private bool IsBefore(Time time, bool useDepartures)
         {
-            var thisTime = useDepartures ? StopDeparture.Time : StopArrival.Time;
+            var thisTime = useDepartures && HasDeparture ? StopDeparture.Time : StopArrival.Time;
             return thisTime.IsBefore(time);
         }
         
