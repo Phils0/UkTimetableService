@@ -71,7 +71,7 @@ namespace Timetable
             
             (bool success, ResolvedStop to, IncludedAssociation association) AssociationGoesTo(ResolvedServiceWithAssociations service)
             {
-                foreach (var association in service.Associations)
+                foreach (var association in service.Associations.Where(a => !a.IsCancelled))
                 {
                     if (association.IsJoin)
                     {

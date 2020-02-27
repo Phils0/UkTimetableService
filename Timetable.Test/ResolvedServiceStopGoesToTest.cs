@@ -243,5 +243,18 @@ namespace Timetable.Test
             }
             Assert.Equal(involvesAssociation, stop.Association.IsIncluded);
         }
+        
+        [Fact]
+        public void DoNotUseCancelledAssociations()
+        {
+            var association = CreateJoinServices();
+            var cancelledAssociation  = TestAssociations.CreateAssociationWithServices(association.Main.Service, association.Associated.Service, StpIndicator.Cancelled);
+            
+            var woking = new StopSpecification(TestStations.Woking, TestSchedules.NineForty, MondayAugust12, TimesToUse.Departures);
+            var found = cancelledAssociation.Associated.Service.TryFindScheduledStop(woking, out var stop);
+            
+            Assert.False(stop.GoesTo(TestStations.Waterloo));
+            Assert.Null(stop.FoundToStop);
+        }
     }
 }
