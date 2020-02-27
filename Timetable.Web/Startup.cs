@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Serilog.Context;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Timetable.Web.Model;
 using ILogger = Serilog.ILogger;
@@ -61,26 +62,28 @@ namespace Timetable.Web
         private static Data LoadData(Factory factory)
         {
             var archive = factory.Archive;
-
-            try
+            using (LogContext.PushProperty("TraceId", Guid.NewGuid(), true))
             {
-                var loader = factory.CreateDataLoader();
-                var loaderTask = loader.LoadAsync(CancellationToken.None);
-
-                var loaded = Task.WaitAll(new[]
+                try
                 {
-                    loaderTask
-                }, Timeout);
+                    var loader = factory.CreateDataLoader();
+                    var loaderTask = loader.LoadAsync(CancellationToken.None);
 
-                if (!loaded)
-                    throw new InvalidDataException($"Timeout loading file: {archive.FullName}");
+                    var loaded = Task.WaitAll(new[]
+                    {
+                        loaderTask
+                    }, Timeout);
 
-                return loaderTask.Result;
-            }
-            catch (Exception e)
-            {
-                Log.Fatal(e, "Timetable not loaded: {file}", archive.FullName);
-                throw;
+                    if (!loaded)
+                        throw new InvalidDataException($"Timeout loading file: {archive.FullName}");
+
+                    return loaderTask.Result;
+                }
+                catch (Exception e)
+                {
+                    Log.Fatal(e, "Timetable not loaded: {file}", archive.FullName);
+                    throw;
+                }
             }
         }
 
