@@ -163,11 +163,13 @@ namespace Timetable.Test.Data
         }
 
         public static ICalendar EverydayAugust2019 => CreateAugust2019Calendar();
+        
+        public static Time NineForty => Ten.AddMinutes(-20);
+        public static Time NineFiftyFive => Ten.AddMinutes(-5);
         public static Time Ten => new Time(new TimeSpan(10, 0,0 ));
         public static Time TenFifteen => Ten.AddMinutes(15);
         public static Time TenSixteen => Ten.AddMinutes(16);
         public static Time TenThirty => Ten.AddMinutes(30);
-        public static Time NineForty => Ten.AddMinutes(-20);
         public static Time TenTen => Ten.AddMinutes(10);
         public static Time TenTwenty => Ten.AddMinutes(20);
         public static Time TenTwentyOne => Ten.AddMinutes(21);
@@ -181,6 +183,15 @@ namespace Timetable.Test.Data
         public static ScheduleLocation[] CreateThreeStopSchedule(Time start) => new[]
         {
             (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, start),
+            TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, start.AddMinutes(15)),
+            TestScheduleLocations.CreatePass(TestStations.Vauxhall, start.AddMinutes(20)),
+            TestScheduleLocations.CreateDestination(TestStations.Waterloo, start.AddMinutes(30))
+        };
+        
+        public static ScheduleLocation[] CreateFourStopSchedule(Time start) => new[]
+        {
+            (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, start),
+            TestScheduleLocations.CreateStop(TestStations.Wimbledon, start.AddMinutes(10)),
             TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, start.AddMinutes(15)),
             TestScheduleLocations.CreatePass(TestStations.Vauxhall, start.AddMinutes(20)),
             TestScheduleLocations.CreateDestination(TestStations.Waterloo, start.AddMinutes(30))

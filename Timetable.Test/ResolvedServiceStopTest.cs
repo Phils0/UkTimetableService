@@ -68,7 +68,6 @@ namespace Timetable.Test
             var stop = new ResolvedServiceStop(service, clapham);
 
             Assert.Equal(expected, stop.IsNextDay(useDeparture));
-
         }
         
     }

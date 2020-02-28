@@ -60,5 +60,215 @@ namespace Timetable.Test
             Assert.Equal(expected, stop.FoundFromStop != null);
         }
         
+        [Fact]
+        public void ComesFromWithNoAssociation()
+        {
+            var service =  TestSchedules.CreateService();
+            var clapham = service.Details.Locations[1];
+            var stop = new ResolvedServiceStop(service, clapham);
+
+            Assert.True(stop.ComesFrom(TestStations.Waterloo));
+            Assert.False(stop.Association.IsIncluded);
+            Assert.Equal(IncludedAssociation.NoAssociation, stop.Association);
+        }
+        
+        public static IEnumerable<object[]> SplitComesFromStations
+        {
+            get
+            {
+                yield return new object[] {TestStations.Surbiton, true, true};   
+                yield return new object[] {TestStations.ClaphamJunction, true, false};
+                yield return new object[] {TestStations.Waterloo, false, false};
+            }
+        }
+        
+        private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
+
+        [Theory]
+        [MemberData(nameof(SplitComesFromStations))]
+        public void ComesFromWorksWithSplits(Station station, bool isFrom, bool involvesAssociation)
+        {
+            var association = CreateSplitServices();
+            var woking = new StopSpecification(TestStations.Woking, TestSchedules.TenFiftyFive, MondayAugust12, TimesToUse.Arrivals);
+            var found = association.Associated.Service.TryFindScheduledStop(woking, out var stop);
+
+            if (isFrom)
+            {
+                Assert.True(stop.ComesFrom(station));
+                Assert.NotNull(stop.FoundToStop);
+            }
+            else
+            {
+                Assert.False(stop.ComesFrom(station));
+                Assert.Null(stop.FoundToStop);
+            }
+            Assert.Equal(involvesAssociation, stop.Association.IsIncluded);
+        }
+
+        private Association CreateSplitServices()
+        {
+            var mainStops = TestSchedules.CreateThreeStopSchedule(TestSchedules.Ten);
+            var main = TestSchedules.CreateScheduleWithService("X12345", retailServiceId: "VT123401", stops: mainStops).Service;
+            var associated = TestSchedules.CreateScheduleWithService("A98765", retailServiceId: "VT123402",
+                stops: TestSchedules.CreateClaphamWokingSchedule(TestSchedules.TenTwentyFive)).Service;
+            var association = TestAssociations.CreateAssociationWithServices(main, associated, category: AssociationCategory.Split);
+            return association;
+        }
+
+        [Fact]
+        public void MainComesFromAtSplitIsMainStop()
+        {
+            var association = CreateSplitServices();
+            var waterloo = new StopSpecification(TestStations.Waterloo, TestSchedules.TenThirty, MondayAugust12, TimesToUse.Departures);
+            var found = association.Main.Service.TryFindScheduledStop(waterloo, out var stop);
+            
+            Assert.True(stop.ComesFrom(TestStations.ClaphamJunction));
+            
+            Assert.Equal(TestSchedules.TenFifteen, (stop.FoundToStop.Stop as ScheduleStop).Arrival);
+        }
+        
+        [Fact]
+        public void AssociatedComesFromAtSplitIsAssociatedStop()
+        {
+            var association = CreateSplitServices();
+            var woking = new StopSpecification(TestStations.Woking, TestSchedules.TenFiftyFive, MondayAugust12, TimesToUse.Departures);
+            var found = association.Associated.Service.TryFindScheduledStop(woking, out var stop);
+            
+            Assert.True(stop.ComesFrom(TestStations.ClaphamJunction));
+            
+            Assert.Equal(TestSchedules.TenTwentyFive, (stop.FoundToStop.Stop as ScheduleDestination).Arrival);
+        }
+        
+        [Fact]
+        public void ComesFromWorksWithSplitsWhereMainTerminatesAtSplitPoint()
+        {
+            //  Hack the stop so it doesn't have a departure
+            var mainStops = CreateMainStops();
+            mainStops[1] = TestScheduleLocations.CreateDestination(TestStations.ClaphamJunction, TestSchedules.TenFifteen);
+            var association = CreateJoinServices(mainStops);
+            
+            var at = new StopSpecification(TestStations.Woking, TestSchedules.TenFiftyFive, MondayAugust12, TimesToUse.Arrivals);
+            var found = association.Main.Service.TryFindScheduledStop(at, out var stop);
+            
+            Assert.True(stop.ComesFrom(TestStations.Surbiton));
+            Assert.NotNull(stop.FoundToStop);
+            Assert.True(stop.Association.IsIncluded);
+        }
+        
+        public static IEnumerable<object[]> MainJoinFromStations
+        {
+            get
+            {
+                yield return new object[] {TestStations.Waterloo, TestSchedules.TenThirty, TestStations.ClaphamJunction, true, false};
+                yield return new object[] {TestStations.Waterloo, TestSchedules.TenThirty, TestStations.Surbiton, true, false};
+                yield return new object[] {TestStations.Waterloo, TestSchedules.TenThirty, TestStations.Weybridge, true, true};
+                yield return new object[] {TestStations.Waterloo, TestSchedules.TenThirty, TestStations.Woking, true, true};
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenFifteen, TestStations.Surbiton, true, false};
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenFifteen, TestStations.Wimbledon, true, false};
+                yield return new object[] {TestStations.Wimbledon, TestSchedules.TenTen, TestStations.Surbiton, true, false};
+                yield return new object[] {TestStations.Wimbledon, TestSchedules.TenTen, TestStations.Weybridge, false, false};
+                yield return new object[] {TestStations.Wimbledon, TestSchedules.TenTen, TestStations.Woking, false, false};
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(MainJoinFromStations))]
+        public void ComesFromWorksWithJoinsToMain(Station atStation, Time departs, Station @from, bool isFrom, bool involvesAssociation)
+        {
+            var association = CreateJoinServices();
+            var at = new StopSpecification(atStation, departs, MondayAugust12, TimesToUse.Arrivals);
+            var found = association.Main.Service.TryFindScheduledStop(at, out var stop);
+
+            if (isFrom)
+            {
+                Assert.True(stop.ComesFrom(@from));
+                Assert.NotNull(stop.FoundToStop);
+            }
+            else
+            {
+                Assert.False(stop.ComesFrom(@from));
+                Assert.Null(stop.FoundToStop);
+            }
+            Assert.Equal(involvesAssociation, stop.Association.IsIncluded);
+        }
+        
+        [Fact] 
+        public void ComesFromWorksWithJoinWhereMainTerminatesAtSplitPoint()
+        {
+            //  Hack the stop so it doesn't have a departure
+            var mainStops = CreateMainStops();
+            mainStops[1] = TestScheduleLocations.CreateDestination(TestStations.ClaphamJunction, TestSchedules.TenFifteen);
+            var association = CreateJoinServices(mainStops);
+            
+            var at = new StopSpecification(TestStations.Woking, TestSchedules.Ten, MondayAugust12, TimesToUse.Departures);
+            var found = association.Main.Service.TryFindScheduledStop(at, out var stop);
+            
+            Assert.True(stop.ComesFrom(TestStations.Surbiton));
+            Assert.NotNull(stop.FoundToStop);
+            Assert.True(stop.Association.IsIncluded);
+        }
+        
+        private Association CreateJoinServices(ScheduleLocation[] mainStops = null)
+        {
+            mainStops ??= CreateMainStops();
+            var main = TestSchedules.CreateScheduleWithService("X12345", retailServiceId: "VT123401", stops: mainStops).Service;
+            var associated = TestSchedules.CreateScheduleWithService("A98765", retailServiceId: "VT123402",
+                stops: TestSchedules.CreateWokingClaphamSchedule(TestSchedules.NineForty)).Service;
+            var association = TestAssociations.CreateAssociationWithServices(main, associated);
+            return association;
+        }
+
+        private ScheduleLocation[] CreateMainStops()
+        {
+            var mainStops = TestSchedules.CreateFourStopSchedule(TestSchedules.Ten);
+            mainStops[2] = TestScheduleLocations.CreateStop(TestStations.Vauxhall, TestSchedules.TenTwenty);    // Make Vauxhall a stop
+            return mainStops;
+        }
+        
+        public static IEnumerable<object[]> AssociatedSplitToStations
+        {
+            get
+            {
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenTen, TestStations.Waterloo, false, false};
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenTen, TestStations.Weybridge, true, false};
+                yield return new object[] {TestStations.ClaphamJunction, TestSchedules.TenTen, TestStations.Woking, true, false};
+                yield return new object[] {TestStations.Weybridge, TestSchedules.NineFiftyFive, TestStations.Waterloo, false, false};
+                yield return new object[] {TestStations.Weybridge, TestSchedules.NineFiftyFive, TestStations.Woking, true, false};            
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(AssociatedSplitToStations))]
+        public void ComesFromWorksWithJoinFromAssociated(Station atStation, Time departs, Station @from, bool isFrom, bool involvesAssociation)
+        {
+            var association = CreateJoinServices();
+            var at = new StopSpecification(atStation, departs, MondayAugust12, TimesToUse.Arrivals);
+            var found = association.Associated.Service.TryFindScheduledStop(at, out var stop);
+
+            if (isFrom)
+            {
+                Assert.True(stop.ComesFrom(@from));
+                Assert.NotNull(stop.FoundToStop);
+            }
+            else
+            {
+                Assert.False(stop.ComesFrom(@from));
+                Assert.Null(stop.FoundToStop);
+            }
+            Assert.Equal(involvesAssociation, stop.Association.IsIncluded);
+        }
+        
+        [Fact]
+        public void DoNotUseCancelledAssociations()
+        {
+            var association = CreateJoinServices();
+            var cancelledAssociation  = TestAssociations.CreateAssociationWithServices(association.Main.Service, association.Associated.Service, StpIndicator.Cancelled);
+            
+            var waterloo = new StopSpecification(TestStations.Waterloo, TestSchedules.TenThirty, MondayAugust12, TimesToUse.Departures);
+            var found = cancelledAssociation.Associated.Service.TryFindScheduledStop(waterloo, out var stop);
+            
+            Assert.False(stop.ComesFrom(TestStations.Woking));
+            Assert.Null(stop.FoundToStop);
+        }
     }
 }

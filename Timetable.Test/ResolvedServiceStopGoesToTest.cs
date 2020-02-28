@@ -48,6 +48,7 @@ namespace Timetable.Test
             var stop = new ResolvedServiceStop(service, clapham);
 
             Assert.True(stop.GoesTo(TestStations.Waterloo));
+            Assert.False(stop.Association.IsIncluded);
             Assert.Equal(IncludedAssociation.NoAssociation, stop.Association);
         }
         
@@ -106,9 +107,10 @@ namespace Timetable.Test
             Assert.Equal(involvesAssociation, stop.Association.IsIncluded);
         }
 
-        private Association CreateJoinServices()
+        private Association CreateJoinServices(ScheduleLocation[] mainStops = null)
         {
-            var main = TestSchedules.CreateScheduleWithService("X12345", retailServiceId: "VT123401").Service;
+            mainStops = mainStops ?? TestSchedules.CreateThreeStopSchedule(TestSchedules.Ten);
+            var main = TestSchedules.CreateScheduleWithService("X12345", retailServiceId: "VT123401", stops: mainStops).Service;
             var associated = TestSchedules.CreateScheduleWithService("A98765", retailServiceId: "VT123402",
                 stops: TestSchedules.CreateWokingClaphamSchedule(TestSchedules.NineForty)).Service;
             var association = TestAssociations.CreateAssociationWithServices(main, associated);
@@ -178,12 +180,36 @@ namespace Timetable.Test
         }
         
         [Fact]
+        public void GoesToWorksWithJoinsWhereMainStartsAtJoinPoint()
+        {
+            //  Hack so starts at Clapham
+            var mainStops = CreateMainStops();
+            
+            mainStops = new [] {
+                    TestScheduleLocations.CreateOrigin(TestStations.ClaphamJunction, TestSchedules.TenFifteen),
+                    mainStops[2],
+                    mainStops[3]
+                };
+            var association = CreateJoinServices(mainStops);
+            
+            
+            var at = new StopSpecification(TestStations.Woking, TestSchedules.NineForty, MondayAugust12, TimesToUse.Departures);
+            var found = association.Associated.Service.TryFindScheduledStop(at, out var stop);
+            
+            Assert.True(stop.GoesTo(TestStations.Waterloo));
+            Assert.NotNull(stop.FoundToStop);
+            Assert.True(stop.Association.IsIncluded);
+        }
+        
+        [Fact]
         public void GoesToWorksWithSplitsWhereMainTerminatesAtSplitPoint()
         {
             //  Hack the stop so it doesn't have a departure
             var mainStops = CreateMainStops();
-            mainStops[1] = TestScheduleLocations.CreateDestination(TestStations.ClaphamJunction, TestSchedules.TenFifteen);
-               
+            mainStops = new [] {
+                mainStops[0],
+                TestScheduleLocations.CreateDestination(TestStations.ClaphamJunction, TestSchedules.TenFifteen)
+            };
             var association = CreateSplitServices(mainStops);
             
             var at = new StopSpecification(TestStations.Surbiton, TestSchedules.Ten, MondayAugust12, TimesToUse.Departures);

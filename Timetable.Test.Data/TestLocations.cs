@@ -107,6 +107,21 @@ namespace Timetable.Test.Data
             }
         };
         
+        public static Location Wimbledon => new Location()
+        {
+            Tiploc = "WIMBLDN",
+            ThreeLetterCode = "WIM",
+            Nlc = "557800",
+            Name = "WIMBLEDON",
+            InterchangeStatus = InterchangeStatus.Normal,
+            Coordinates = new Coordinates()
+            {
+                Eastings = 15075,
+                Northings = 61636,
+                IsEstimate = false
+            }
+        };
+        
         public static Location Vauxhall => new Location()
         {
             Tiploc = "VAUXHLM",
