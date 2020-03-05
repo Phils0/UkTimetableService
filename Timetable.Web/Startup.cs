@@ -62,7 +62,7 @@ namespace Timetable.Web
         private static Data LoadData(Factory factory)
         {
             var archive = factory.Archive;
-            using (LogContext.PushProperty("TraceId", Guid.NewGuid(), true))
+            using (LogContext.PushProperty("TraceId", Guid.NewGuid().ToString("N"), true))
             {
                 try
                 {
