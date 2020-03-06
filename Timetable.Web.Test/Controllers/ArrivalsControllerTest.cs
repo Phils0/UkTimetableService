@@ -185,7 +185,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task FullDayArrivalsReturnsServices(string clapham)
         {
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
+            data.AllArrivals("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
                 .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
 
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
@@ -202,7 +202,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task FullRailDayArrivalsReturnsServices()
         {
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>(), Time.StartRailDay)
+            data.AllArrivals("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>(), Time.StartRailDay)
                 .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
 
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
@@ -221,7 +221,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ArrivalsForDayReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
+            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
                 .Returns((status, new ResolvedServiceStop[0]));
 
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -238,7 +238,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ArrivalsForDayReturnsError()
         {
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
+            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
                 .Throws(new Exception("Something went wrong"));
 
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());

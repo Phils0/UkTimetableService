@@ -182,16 +182,14 @@ namespace Timetable.Test
         [Fact]
         public void GoesToWorksWithJoinsWhereMainStartsAtJoinPoint()
         {
-            //  Hack so starts at Clapham
+            //  Starts at Clapham
             var mainStops = CreateMainStops();
-            
             mainStops = new [] {
                     TestScheduleLocations.CreateOrigin(TestStations.ClaphamJunction, TestSchedules.TenFifteen),
                     mainStops[2],
                     mainStops[3]
                 };
             var association = CreateJoinServices(mainStops);
-            
             
             var at = new StopSpecification(TestStations.Woking, TestSchedules.NineForty, MondayAugust12, TimesToUse.Departures);
             var found = association.Associated.Service.TryFindScheduledStop(at, out var stop);
@@ -202,9 +200,59 @@ namespace Timetable.Test
         }
         
         [Fact]
+        public void GoesToWorksWithJoinsWhereMainStopsAtJoinPoint()
+        {
+            //  Ends at Clapham
+            var mainStops = CreateMainStops();
+            mainStops = new [] {
+                mainStops[0],
+                TestScheduleLocations.CreateDestination(TestStations.ClaphamJunction, TestSchedules.TenFifteen)
+            };
+            var association = CreateJoinServices(mainStops);
+            
+            var at = new StopSpecification(TestStations.Woking, TestSchedules.NineForty, MondayAugust12, TimesToUse.Departures);
+            var found = association.Associated.Service.TryFindScheduledStop(at, out var stop);
+            
+            // Neither train goes beyond Clapham so actually whole journey on join
+            Assert.True(stop.GoesTo(TestStations.ClaphamJunction));    
+            Assert.NotNull(stop.FoundToStop);
+            Assert.False(stop.Association.IsIncluded);
+        }
+
+        [Fact]
+        public void GoesToWorksWithSplitsWhereMainStartsAtSplitPoint()
+        {
+            //  Start at Clapham
+            var mainStops = CreateMainStops();
+            mainStops = new [] {
+                TestScheduleLocations.CreateOrigin(TestStations.ClaphamJunction, TestSchedules.TenTen),
+                mainStops[2],
+                mainStops[3]
+            };
+            var association = CreateSplitServices(mainStops);
+            
+            var at = new StopSpecification(TestStations.ClaphamJunction, TestSchedules.TenTen, MondayAugust12, TimesToUse.Departures);
+            var found = association.Main.Service.TryFindScheduledStop(at, out var mainStop);
+            
+            // Both trains start at Clapham so actually whole journey on split
+            // Using main stop fails
+            Assert.True(mainStop.GoesTo(TestStations.Woking));
+            Assert.NotNull(mainStop.FoundToStop);
+            Assert.True(mainStop.Association.IsIncluded);
+            
+            at = new StopSpecification(TestStations.ClaphamJunction, TestSchedules.TenTwentyFive, MondayAugust12, TimesToUse.Departures);
+            found = association.Associated.Service.TryFindScheduledStop(at, out var associationStop);
+            
+            // Using Association works
+            Assert.True(associationStop.GoesTo(TestStations.Woking));
+            Assert.NotNull(associationStop.FoundToStop);
+            Assert.False(associationStop.Association.IsIncluded);
+        }
+        
+        [Fact]
         public void GoesToWorksWithSplitsWhereMainTerminatesAtSplitPoint()
         {
-            //  Hack the stop so it doesn't have a departure
+            //  Stop at Clapham
             var mainStops = CreateMainStops();
             mainStops = new [] {
                 mainStops[0],

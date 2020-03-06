@@ -36,6 +36,11 @@ namespace Timetable
             return Details.IsMain(timetableUid);
         }
         
+        public bool IsAssociated(string timetableUid)
+        {
+            return !IsMain(timetableUid);
+        }
+        
         public override string ToString()
         {
             return IsCancelled ? $"{Details} {On.ToYMD()} {AssociatedService} CANCELLED" : $"{Details} {On.ToYMD()} {AssociatedService}";

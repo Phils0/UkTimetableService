@@ -176,6 +176,7 @@ namespace Timetable.Test.Data
         public static Time TenTwentyFive => Ten.AddMinutes(25);
         public static Time TenForty => Ten.AddMinutes(40);
         public static Time TenFortyOne => Ten.AddMinutes(41);
+        public static Time TenFortyFive => Ten.AddMinutes(45);
         public static Time TenFiftyFive => Ten.AddMinutes(55);
         
         public static ScheduleLocation[] DefaultLocations => CreateThreeStopSchedule(Ten);

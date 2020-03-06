@@ -88,7 +88,7 @@ namespace Timetable.Web.Controllers
             {
                 var boundary = Time.Parse(dayBoundary);
                 var filter = CreateFilter(request);
-                var result = _timetable.AllDepartures(request.Location, onDate, filter, boundary);
+                var result = _timetable.AllArrivals(request.Location, onDate, filter, boundary);
                 return await Task.FromResult(result);
             }, includeStops);
         }
