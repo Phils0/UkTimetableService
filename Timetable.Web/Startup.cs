@@ -62,7 +62,8 @@ namespace Timetable.Web
         private static Data LoadData(Factory factory)
         {
             var archive = factory.Archive;
-            using (LogContext.PushProperty("TraceId", Guid.NewGuid().ToString("N"), true))
+            var activity = new System.Diagnostics.Activity("LoadData").Start();
+            using (LogContext.PushProperty("TraceId", activity.TraceId.ToHexString(), true))
             {
                 try
                 {
@@ -83,6 +84,11 @@ namespace Timetable.Web
                 {
                     Log.Fatal(e, "Timetable not loaded: {file}", archive.FullName);
                     throw;
+                }
+                finally
+                {
+                    activity.Stop();
+                    Log.Information("Data loaded in: {duration}ms", activity.Duration.TotalMilliseconds);
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace Timetable.Web
         {
             try
             {
+                System.Diagnostics.Activity.DefaultIdFormat = ActivityIdFormat.W3C;
                 var host = CreateWebHostBuilder(args).Build();
                 Log.Information("Built web host");                  
                 host.Run();
