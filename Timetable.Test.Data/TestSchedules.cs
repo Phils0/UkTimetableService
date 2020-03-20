@@ -29,7 +29,7 @@ namespace Timetable.Test.Data
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
             var resolved = new ResolvedService(schedule, on, isCancelled);
 
-            var origin = schedule.Locations.First() as ScheduleOrigin; 
+            var origin = schedule.Locations.First() as ScheduleStop; 
             atLocation = atLocation ?? origin.Station;
             when = when.Equals(default(Time)) ? origin.Departure : when;
             var find = new StopSpecification(atLocation, when, on, TimesToUse.Arrivals);
@@ -53,7 +53,7 @@ namespace Timetable.Test.Data
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
             var resolved = new ResolvedService(schedule, on, isCancelled);
 
-            var origin = schedule.Locations.First() as ScheduleOrigin; 
+            var origin = schedule.Locations.First() as ScheduleStop; 
             atLocation = atLocation ?? origin.Station;
             when = when.Equals(default(Time)) ? origin.Departure : when;
             var find = new StopSpecification(atLocation, when, on, TimesToUse.Departures);

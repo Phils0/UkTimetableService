@@ -26,10 +26,10 @@ namespace Timetable.Web.Test.Mapping.Cif
             Assert.Equal(1, output.Sequence);
         }
 
-        private static ScheduleOrigin Map()
+        private static ScheduleStop Map()
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
-            return mapper.Map<CifParser.Records.OriginLocation, Timetable.ScheduleOrigin>(
+            return mapper.Map<CifParser.Records.OriginLocation, Timetable.ScheduleStop>(
                 Test.Cif.TestSchedules.CreateOriginLocation(),
                 o => o.Items.Add("Locations", TestData.Locations));
         }
@@ -41,6 +41,15 @@ namespace Timetable.Web.Test.Mapping.Cif
 
             Assert.Equal(Ten, output.Departure);
             Assert.Equal(Ten.Add(TestTime.ThirtySeconds), output.WorkingDeparture);
+        }
+        
+        [Fact]
+        public void MapArrivals()
+        {
+            var output = Map();
+
+            Assert.Equal(Time.NotValid, output.Arrival);
+            Assert.Equal(Time.NotValid, output.WorkingArrival);
         }
 
         [Fact]

@@ -46,7 +46,9 @@ namespace Timetable.Web.Mapping.Cif
             CreateMap<TimeSpan, Time>()
                 .ConvertUsing(t => new Time(t));
             // Schedule location records
-            CreateMap<CifParser.Records.OriginLocation, ScheduleOrigin>()
+            CreateMap<CifParser.Records.OriginLocation, ScheduleStop>()
+                .ForMember(d => d.Arrival, o => o.MapFrom(s => Time.NotValid))
+                .ForMember(d => d.WorkingArrival, o => o.MapFrom(s => Time.NotValid))
                 .ForMember(d => d.Departure, o => o.MapFrom(s => s.PublicDeparture))
                 .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
                 .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)))
@@ -71,8 +73,10 @@ namespace Timetable.Web.Mapping.Cif
                 .ForMember(d => d.Schedule, o => o.Ignore())
                 .ForMember(d => d.Id, o => o.Ignore())
                 .AfterMap((s, d) => d.UpdateAdvertisedStop());
-            CreateMap<CifParser.Records.TerminalLocation, ScheduleDestination>()
+            CreateMap<CifParser.Records.TerminalLocation, ScheduleStop>()
                 .ForMember(d => d.Arrival, o => o.MapFrom(s => s.PublicArrival))
+                .ForMember(d => d.Departure, o => o.MapFrom(s => Time.NotValid))
+                .ForMember(d => d.WorkingDeparture, o => o.MapFrom(s => Time.NotValid))
                 .ForMember(d => d.Location, o => o.ConvertUsing(locationConverter, s => s.Location))
                 .ForMember(d => d.Activities, o => o.MapFrom(s => Activities.Split(s.Activities)))
                 .ForMember(d => d.AdvertisedStop, o => o.Ignore())

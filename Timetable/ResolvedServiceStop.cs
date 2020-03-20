@@ -40,8 +40,8 @@ namespace Timetable
             return arrival?.IsNextDay ?? false;
         }
 
-        private bool HasDeparture => Stop.Stop is IDeparture;
-        private bool HasArrival => Stop.Stop is IArrival;
+        private bool HasDeparture => (Stop.Stop as IDeparture)?.IsPublic ?? false;
+        private bool HasArrival => (Stop.Stop as IArrival)?.IsPublic ?? false;
         
         private IDeparture StopDeparture => ((IDeparture) Stop.Stop);
         private IArrival StopArrival => ((IArrival) Stop.Stop);

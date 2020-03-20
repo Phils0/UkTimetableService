@@ -96,14 +96,14 @@ namespace Timetable.Web.Mapping.Cif
 
                 ScheduleLocation MapOrigin(OriginLocation ol)
                 {
-                    var origin = context.Mapper.Map<OriginLocation, ScheduleOrigin>(ol, null, context);
+                    var origin = context.Mapper.Map<OriginLocation, ScheduleStop>(ol, null, context);
                     start = origin.Departure.IsBefore(origin.WorkingDeparture) ? origin.Departure : origin.WorkingDeparture;
                     return origin;
                 }
 
                 ScheduleLocation MapDestination(TerminalLocation tl)
                 {
-                    return context.Mapper.Map<TerminalLocation, ScheduleDestination>(tl, null, context);
+                    return context.Mapper.Map<TerminalLocation, ScheduleStop>(tl, null, context);
                 }
                 
                 void EnsureTimesGoToTheFuture(ScheduleLocation scheduleLocation)

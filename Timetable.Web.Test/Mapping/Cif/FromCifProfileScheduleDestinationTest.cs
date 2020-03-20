@@ -26,10 +26,10 @@ namespace Timetable.Web.Test.Mapping.Cif
             Assert.Equal(1, output.Sequence);
         }
 
-        private static ScheduleDestination Map()
+        private static ScheduleStop Map()
         {
             var mapper = FromCifProfileConfiguration.CreateMapper();
-            return mapper.Map<CifParser.Records.TerminalLocation, Timetable.ScheduleDestination>(
+            return mapper.Map<CifParser.Records.TerminalLocation, Timetable.ScheduleStop>(
                 Test.Cif.TestSchedules.CreateTerminalLocation(),
                 o => o.Items.Add("Locations", TestData.Locations));
         }

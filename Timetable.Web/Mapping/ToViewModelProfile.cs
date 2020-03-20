@@ -15,17 +15,9 @@ namespace Timetable.Web.Mapping
             CreateMap<Timetable.Station, Model.Station>();
 
             CreateMap<Timetable.Location, Model.LocationId>();
-            CreateMap<Timetable.ScheduleOrigin, Model.ScheduledStop>()               
-                .ForMember(d => d.Arrival, o => o.Ignore())
-                .ForMember(d => d.Departure,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.Departure, c)))
-                .ForMember(d => d.PassesAt, o => o.Ignore());
             CreateMap<Timetable.ScheduleStop, Model.ScheduledStop>()
                 .ForMember(d => d.Arrival,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.Arrival, c)))
                 .ForMember(d => d.Departure,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.Departure, c)))
-                .ForMember(d => d.PassesAt, o => o.Ignore());
-            CreateMap<Timetable.ScheduleDestination, Model.ScheduledStop>()
-                .ForMember(d => d.Arrival,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.Arrival, c)))
-                .ForMember(d => d.Departure, o => o.Ignore())
                 .ForMember(d => d.PassesAt, o => o.Ignore());
             CreateMap<Timetable.SchedulePass, Model.ScheduledStop>()
                 .ForMember(d => d.Arrival, o => o.Ignore())

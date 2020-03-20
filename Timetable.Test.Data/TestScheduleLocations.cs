@@ -9,22 +9,17 @@ namespace Timetable.Test.Data
         public static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
         public static readonly TimeSpan ThirtySeconds = new TimeSpan(0, 0, 30);     
 
-        public static ScheduleOrigin CreateOrigin(Station location, Time departure)
+        public static ScheduleStop CreateOrigin(Station location, Time departure)
         {
             return CreateOrigin(location.Locations.First(), departure);
         }
         
-        public static ScheduleOrigin CreateOrigin(Location location, Time departure)
+        public static ScheduleStop CreateOrigin(Location location, Time departure)
         {
-            var origin = new ScheduleOrigin()
-            {
-                Location = location,
-                Sequence = 1,
-                Departure = departure,
-                WorkingDeparture = departure.Add(ThirtySeconds),
-                Platform = "1",
-                Activities = CreateActivities("TB")
-            };
+            var origin = CreatePickupOnlyStop(location, departure);
+            origin.Platform = "1";
+            origin.Activities = CreateActivities("TB");
+            origin.WorkingArrival = Time.NotValid;
             origin.UpdateAdvertisedStop();
             return origin;
         }
@@ -124,22 +119,17 @@ namespace Timetable.Test.Data
             return schedulePass;
         }
         
-        public static ScheduleDestination CreateDestination(Station location, Time arrival)
+        public static ScheduleStop CreateDestination(Station location, Time arrival)
         {
             return CreateDestination(location.Locations.First(), arrival);
         }
         
-        public static ScheduleDestination CreateDestination(Location location, Time arrival)
+        public static ScheduleStop CreateDestination(Location location, Time arrival)
         {
-            var destination = new ScheduleDestination()
-            {
-                Location = location,
-                Sequence = 1,
-                Arrival = arrival,
-                WorkingArrival = arrival.Subtract(ThirtySeconds),
-                Platform = "2",
-                Activities = CreateActivities("TF")
-            };
+            var destination = CreateSetdownOnlyStop(location, arrival);
+            destination.Platform = "2";
+            destination.Activities = CreateActivities("TF");
+            destination.WorkingDeparture = Time.NotValid;
             destination.UpdateAdvertisedStop();
             return destination;
         }

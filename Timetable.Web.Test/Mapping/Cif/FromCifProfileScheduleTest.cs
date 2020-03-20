@@ -246,7 +246,7 @@ namespace Timetable.Web.Test.Mapping.Cif
             
             var output = MapSchedule(schedule);
 
-            var origin = output.Locations[0] as ScheduleOrigin;
+            var origin = output.Locations[0] as ScheduleStop;
             Assert.False(origin.Departure.IsNextDay);
 
             var stop = output.Locations[1] as ScheduleStop;
@@ -258,7 +258,7 @@ namespace Timetable.Web.Test.Mapping.Cif
             var stop2 = output.Locations[3] as ScheduleStop;
             Assert.True(stop2.Arrival.IsNextDay);
 
-            var destination = output.Locations[4] as ScheduleDestination;
+            var destination = output.Locations[4] as ScheduleStop;
             Assert.True(destination.Arrival.IsNextDay);
         }
     }

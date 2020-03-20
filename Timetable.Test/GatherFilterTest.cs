@@ -72,7 +72,7 @@ namespace Timetable.Test
 
             var results = filter(source).ToArray();
             
-            Assert.Empty(results);
+            Assert.NotEmpty(results);
         }
         
         private ResolvedServiceStop[] ComesFromSource

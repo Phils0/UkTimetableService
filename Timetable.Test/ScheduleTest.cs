@@ -129,12 +129,12 @@ namespace Timetable.Test
             get
             {
                 var stops = TestSchedules.DefaultLocations;
-                var origin = stops[0] as ScheduleOrigin;
+                var origin = stops[0] as ScheduleStop;
                 yield return new object[] {origin.Station, origin.Departure, TimesToUse.Departures};
                 var intermediate = stops[1] as ScheduleStop;
                 yield return new object[] {intermediate.Station, intermediate.Arrival, TimesToUse.Arrivals};
                 yield return new object[] {intermediate.Station, intermediate.Departure, TimesToUse.Departures};
-                var destination = stops[3] as ScheduleDestination;
+                var destination = stops[3] as ScheduleStop;
                 yield return new object[] {destination.Station, destination.Arrival, TimesToUse.Arrivals};
             }
         }
@@ -211,13 +211,13 @@ namespace Timetable.Test
             get
             {
                 var stops = TestSchedules.DefaultLocations;
-                var origin = stops[0] as ScheduleOrigin;
+                var origin = stops[0] as ScheduleStop;
                 yield return new object[] {origin.Station, false};
                 var intermediate = stops[1] as ScheduleStop;
                 yield return new object[] {intermediate.Station, true};
                 var pass = stops[2] as SchedulePass;
                 yield return new object[] {pass.Station, false};
-                var destination = stops[3] as ScheduleDestination;
+                var destination = stops[3] as ScheduleStop;
                 yield return new object[] {destination.Station, true};
             }
         }
@@ -239,13 +239,13 @@ namespace Timetable.Test
             get
             {
                 var stops = TestSchedules.DefaultLocations;
-                var origin = stops[0] as ScheduleOrigin;
+                var origin = stops[0] as ScheduleStop;
                 yield return new object[] {origin.Station, true};
                 var intermediate = stops[1] as ScheduleStop;
                 yield return new object[] {intermediate.Station, true};
                 var pass = stops[2] as SchedulePass;
                 yield return new object[] {pass.Station, false};
-                var destination = stops[3] as ScheduleDestination;
+                var destination = stops[3] as ScheduleStop;
                 yield return new object[] {destination.Station, false};
             }
         }

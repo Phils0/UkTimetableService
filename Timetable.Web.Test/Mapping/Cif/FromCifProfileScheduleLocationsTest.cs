@@ -32,7 +32,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         {
             var output = MapSchedule();
             var location = output.Locations.First();
-            Assert.IsType<ScheduleOrigin>(location);
+            Assert.IsType<ScheduleStop>(location);
         }
         
         [Fact]
@@ -40,7 +40,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         {
             var output = MapSchedule();
             var location = output.Locations.Last();
-            Assert.IsType<ScheduleDestination>(location);
+            Assert.IsType<ScheduleStop>(location);
         }
         
         [Fact]

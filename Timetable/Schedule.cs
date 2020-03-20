@@ -173,8 +173,8 @@ namespace Timetable
                         $"Stop {at} not found in {this}");
         }
 
-        public ScheduleOrigin Origin => Locations.FirstOrDefault() as ScheduleOrigin;
-        public ScheduleDestination Destination => Locations.LastOrDefault() as ScheduleDestination;
+        public ScheduleStop Origin => Locations.FirstOrDefault() as ScheduleStop;
+        public ScheduleStop Destination => Locations.LastOrDefault() as ScheduleStop;
         
         public override string ToString()
         {

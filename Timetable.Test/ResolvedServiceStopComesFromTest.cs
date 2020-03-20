@@ -141,7 +141,7 @@ namespace Timetable.Test
             
             Assert.True(stop.ComesFrom(TestStations.ClaphamJunction));
             
-            Assert.Equal(TestSchedules.TenTwentyFive, (stop.FoundFromStop.Stop as ScheduleOrigin).Departure);
+            Assert.Equal(TestSchedules.TenTwentyFive, (stop.FoundFromStop.Stop as ScheduleStop).Departure);
         }
         
         [Fact]

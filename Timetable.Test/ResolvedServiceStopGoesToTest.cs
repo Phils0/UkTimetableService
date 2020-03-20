@@ -138,7 +138,7 @@ namespace Timetable.Test
             
             Assert.True(stop.GoesTo(TestStations.ClaphamJunction));
             
-            Assert.Equal(TestSchedules.TenTen, (stop.FoundToStop.Stop as ScheduleDestination).Arrival);
+            Assert.Equal(TestSchedules.TenTen, (stop.FoundToStop.Stop as ScheduleStop).Arrival);
         }
         
         public static IEnumerable<object[]> MainSplitToStations
