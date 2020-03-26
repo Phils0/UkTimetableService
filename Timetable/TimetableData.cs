@@ -116,11 +116,18 @@ namespace Timetable
             
             foreach (var service in _timetableUidMap.Values)
             {
-                var onDate = IsNextDay(service) ? nextDay : date;
-                if (service.TryFindScheduleOn(onDate, out var schedule))
+                try
                 {
-                    if(schedule.OperatedBy(toc))
-                        services.Add(schedule);
+                    var onDate = IsNextDay(service) ? nextDay : date;
+                    if (service.TryFindScheduleOn(onDate, out var schedule))
+                    {
+                        if(schedule.OperatedBy(toc))
+                            services.Add(schedule);
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.Error(e, "Error processing {service}", service);
                 }
             }
 
