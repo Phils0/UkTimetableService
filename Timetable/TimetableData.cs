@@ -63,13 +63,11 @@ namespace Timetable
         {
             if (!_timetableUidMap.TryGetValue(timetableUid, out var service))
                 return (LookupStatus.ServiceNotFound, null);
-
-            var schedule = service.GetScheduleOn(date);
             
-            if(schedule == null)
-                return (LookupStatus.NoScheduleOnDate, null);
+            if(service.TryFindScheduleOn(date, out var schedule))
+                return (LookupStatus.Success, schedule);
             
-            return (LookupStatus.Success, schedule);
+            return (LookupStatus.NoScheduleOnDate, null);
         }
         
         private Regex RetailServiceIdRegex = new Regex(@"^(\w\w\d{4})\d{0,2}");
@@ -97,11 +95,7 @@ namespace Timetable
             
             foreach (var service in services)
             {
-                var schedule = service.GetScheduleOn(date);
-                if(schedule == null)
-                    continue;
-                
-                if(schedule.HasRetailServiceId(retailServiceId))
+                if(service.TryFindScheduleOn(date, out var schedule) && schedule.HasRetailServiceId(retailServiceId))
                     schedules.Add(schedule);
             }
 

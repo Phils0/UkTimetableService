@@ -70,15 +70,15 @@ namespace Timetable
         private bool HasNoState => _schedule == null && _multipleSchedules == null;
         private bool HasSingleSchedule => _schedule != null;
         
-        public bool TryFindScheduleOn(DateTime date, out ResolvedService schedule)
+        public bool TryFindScheduleOn(DateTime date, out ResolvedService schedule, bool resolveAssociations = true)
         {
-            schedule = GetScheduleOn(date);
+            schedule = GetScheduleOn(date, resolveAssociations);
             return schedule != null;
         }
         
         private static readonly ResolvedAssociation[] None = new ResolvedAssociation[0];
         
-        public ResolvedService GetScheduleOn(DateTime date, bool resolveAssociations = true)
+        private ResolvedService GetScheduleOn(DateTime date, bool resolveAssociations)
         {
             ResolvedService CreateResolvedService(Schedule schedule, bool cancelled)
             {

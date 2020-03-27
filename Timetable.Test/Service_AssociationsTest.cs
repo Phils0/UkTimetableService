@@ -138,7 +138,7 @@ namespace Timetable.Test
             var schedule = TestSchedules.CreateScheduleWithService();
             var service = schedule.Service;
             
-            var found = service.GetScheduleOn(MondayAugust12);
+            service.TryFindScheduleOn(MondayAugust12, out var found);
             Assert.IsType<ResolvedService>(found);
         }
         
@@ -150,7 +150,7 @@ namespace Timetable.Test
             
             var high = TestAssociations.CreateAssociationWithServices(indicator: StpIndicator.Override, mainService: service);
 
-            var found = service.GetScheduleOn(MondayAugust12) as ResolvedServiceWithAssociations;
+            service.TryFindScheduleOn(MondayAugust12, out var found);
             Assert.IsType<ResolvedServiceWithAssociations>(found);
         }
     }

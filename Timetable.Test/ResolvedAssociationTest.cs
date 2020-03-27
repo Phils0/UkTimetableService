@@ -27,13 +27,12 @@ namespace Timetable.Test
         public void GetStopOnMain()
         {
             var association = TestAssociations.CreateAssociationWithServices();
-            var resolvedService = association.Main.Service.GetScheduleOn(Aug10);
+            association.Main.Service.TryFindScheduleOn(Aug10, out var resolvedService);
             var resolved = new ResolvedAssociation(
                 association,
                 DateTime.Today, 
                 false,
                 null);
-            ;
 
             var stop = resolved.GetStop(resolvedService);
             Assert.NotNull(stop);
@@ -45,7 +44,7 @@ namespace Timetable.Test
         public void GetStopOnAssociated()
         {
             var association = TestAssociations.CreateAssociationWithServices();
-            var resolvedService = association.Associated.Service.GetScheduleOn(Aug10);
+            association.Associated.Service.TryFindScheduleOn(Aug10, out var resolvedService);
             var resolved = new ResolvedAssociation(
                 association,
                 DateTime.Today, 
