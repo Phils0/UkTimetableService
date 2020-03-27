@@ -66,10 +66,10 @@ namespace Timetable.Test
             
             var schedule2 = TestSchedules.CreateSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Thursday), service: service);
             
-            service.TryFindScheduleOn(MondayAugust12.AddDays(2), out var found);
+            service.TryResolveOn(MondayAugust12.AddDays(2), out var found);
             Assert.Equal(schedule, found.Details);
             
-            service.TryFindScheduleOn(MondayAugust12.AddDays(3), out found);
+            service.TryResolveOn(MondayAugust12.AddDays(3), out found);
             Assert.Equal(schedule2, found.Details);
         }
         
@@ -80,7 +80,7 @@ namespace Timetable.Test
             var service = schedule.Service;
             var schedule2 = TestSchedules.CreateSchedule(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Thursday), service: service);
             
-            service.TryFindScheduleOn(MondayAugust12, out var found);
+            service.TryResolveOn(MondayAugust12, out var found);
             Assert.Null(found);
         }
         
@@ -95,7 +95,7 @@ namespace Timetable.Test
             var high = TestSchedules.CreateSchedule(indicator: highIndicator, calendar: TestSchedules.EverydayAugust2019, service: service);
             TestSchedules.CreateSchedule(indicator: lowIndicator, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
 
-            service.TryFindScheduleOn(MondayAugust12, out var found);
+            service.TryResolveOn(MondayAugust12, out var found);
             Assert.Equal(high, found.Details);
         }
         
@@ -109,7 +109,7 @@ namespace Timetable.Test
             var service = baseSchedule.Service;
             TestSchedules.CreateSchedule(indicator: StpIndicator.Cancelled, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
 
-            service.TryFindScheduleOn(MondayAugust12, out var found);
+            service.TryResolveOn(MondayAugust12, out var found);
             Assert.True(found.IsCancelled);
             Assert.Equal(baseSchedule,found.Details);
         }
@@ -122,7 +122,7 @@ namespace Timetable.Test
             TestSchedules.CreateSchedule(indicator: StpIndicator.Cancelled, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
             var overrideSchedule = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), service: service);
 
-            service.TryFindScheduleOn(MondayAugust12, out var found);
+            service.TryResolveOn(MondayAugust12, out var found);
             Assert.True(found.IsCancelled);
             Assert.Equal(overrideSchedule,found.Details);
         }
@@ -133,7 +133,7 @@ namespace Timetable.Test
             var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
             var service = schedule.Service;
             
-            Assert.True(service.TryFindScheduleOn(MondayAugust12.AddDays(2), out var found));
+            Assert.True(service.TryResolveOn(MondayAugust12.AddDays(2), out var found));
             Assert.Equal(schedule, found.Details);
         }
         
@@ -143,7 +143,7 @@ namespace Timetable.Test
             var schedule = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Wednesday));
             var service = schedule.Service;
 
-            Assert.False(service.TryFindScheduleOn(MondayAugust12, out var found));
+            Assert.False(service.TryResolveOn(MondayAugust12, out var found));
             Assert.Null(found);
         }
         

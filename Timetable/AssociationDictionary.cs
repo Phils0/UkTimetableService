@@ -30,7 +30,7 @@ namespace Timetable
                         {
                             var other = association.GetOtherService(timetableUid);
                             var otherDate = ResolveDate(on, association.DateIndicator, association.IsMain(timetableUid));
-                            if (other.TryFindScheduleOn(otherDate, out var resolved, false))
+                            if (other.TryResolveOn(otherDate, out var resolved, false))
                             {
                                 if (!resolved.HasRetailServiceId(retailServiceId))
                                     _logger.Information("Resolved association {resolved} has mismatched RetailServiceIds {resolvedRsId} instead of {retailServiceId}", 

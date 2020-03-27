@@ -64,7 +64,7 @@ namespace Timetable
             if (!_timetableUidMap.TryGetValue(timetableUid, out var service))
                 return (LookupStatus.ServiceNotFound, null);
             
-            if(service.TryFindScheduleOn(date, out var schedule))
+            if(service.TryResolveOn(date, out var schedule))
                 return (LookupStatus.Success, schedule);
             
             return (LookupStatus.NoScheduleOnDate, null);
@@ -95,7 +95,7 @@ namespace Timetable
             
             foreach (var service in services)
             {
-                if(service.TryFindScheduleOn(date, out var schedule) && schedule.HasRetailServiceId(retailServiceId))
+                if(service.TryResolveOn(date, out var schedule) && schedule.HasRetailServiceId(retailServiceId))
                     schedules.Add(schedule);
             }
 
@@ -114,7 +114,7 @@ namespace Timetable
                 try
                 {
                     var onDate = IsNextDay(service) ? nextDay : date;
-                    if (service.TryFindScheduleOn(onDate, out var schedule) && schedule.OperatedBy(toc))
+                    if (service.TryResolveOn(onDate, out var schedule) && schedule.OperatedBy(toc))
                         services.Add(schedule);
                 }
                 catch (Exception e)

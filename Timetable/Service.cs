@@ -70,7 +70,7 @@ namespace Timetable
         private bool HasNoState => _schedule == null && _multipleSchedules == null;
         private bool HasSingleSchedule => _schedule != null;
         
-        public bool TryFindScheduleOn(DateTime date, out ResolvedService schedule, bool resolveAssociations = true)
+        public bool TryResolveOn(DateTime date, out ResolvedService schedule, bool resolveAssociations = true)
         {
             schedule = GetScheduleOn(date, resolveAssociations);
             return schedule != null;
@@ -124,7 +124,7 @@ namespace Timetable
 
         private bool TryFindStopOn(StopSpecification find, out ResolvedServiceStop stop)
         {
-            if (TryFindScheduleOn(find.OnDate, out var schedule))
+            if (TryResolveOn(find.OnDate, out var schedule))
                 return schedule.TryFindStop(find, out stop);
 
             stop = null;

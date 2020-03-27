@@ -27,7 +27,7 @@ namespace Timetable.Test
         public void GetStopOnMain()
         {
             var association = TestAssociations.CreateAssociationWithServices();
-            association.Main.Service.TryFindScheduleOn(Aug10, out var resolvedService);
+            association.Main.Service.TryResolveOn(Aug10, out var resolvedService);
             var resolved = new ResolvedAssociation(
                 association,
                 DateTime.Today, 
@@ -44,7 +44,7 @@ namespace Timetable.Test
         public void GetStopOnAssociated()
         {
             var association = TestAssociations.CreateAssociationWithServices();
-            association.Associated.Service.TryFindScheduleOn(Aug10, out var resolvedService);
+            association.Associated.Service.TryResolveOn(Aug10, out var resolvedService);
             var resolved = new ResolvedAssociation(
                 association,
                 DateTime.Today, 
