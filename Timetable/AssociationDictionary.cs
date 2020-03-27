@@ -31,7 +31,9 @@ namespace Timetable
                             var other = association.GetOtherService(timetableUid);
                             var otherDate = ResolveDate(on, association.DateIndicator, association.IsMain(timetableUid));
                             var resolved = other.GetScheduleOn(otherDate, false);
-
+                            if (resolved == null)
+                                break;
+                            
                             if (!resolved.HasRetailServiceId(retailServiceId))
                                 _logger.Information("Resolved association {resolved} has mismatched RetailServiceIds {resolvedRsId} instead of {retailServiceId}", 
                                     resolved, resolved.Details.NrsRetailServiceId, retailServiceId);                                

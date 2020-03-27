@@ -160,5 +160,22 @@ namespace Timetable.Test
             
             Assert.Equal(hasAssociation, resolved.Any());
         }
+        
+        [Fact]
+        public void HandleBadAssociationWhereOtherServiceDoesNotResolve()
+        {
+            var main = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            var other = TestSchedules.CreateScheduleWithService("Z98765", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            
+            var association = TestAssociations.CreateAssociationWithServices(
+                mainService: main.Service,
+                associatedService: other.Service,    
+                dateIndicator: AssociationDateIndicator.NextDay);    // Next day means other schedule will not resolve
+
+            var associations = main.Service.AsDynamic()._associations.RealObject as AssociationDictionary;
+
+            var resolved = associations.Resolve(main.TimetableUid, MondayAugust12, main.RetailServiceId);
+            Assert.Empty(resolved);
+        }
     }
 }
