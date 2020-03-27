@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NSubstitute;
+using ReflectionMagic;
 using Serilog;
 using Timetable.Test.Data;
 using Xunit;
@@ -276,6 +278,25 @@ namespace Timetable.Test
             Assert.True(service.IsCancelled);
             Assert.Equal(MondayAugust12, service.On);
             Assert.Equal(schedule, service.Details);
+        }
+        
+        [Fact]
+        public void GetsTocSchedulesHandlesIndividualServiceError()
+        {
+            var timetable = CreateTimetable();           
+
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "CORRUPT", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            var schedule3 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "X98765", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+
+            var data = timetable.AsDynamic()._timetableUidMap.RealObject as Dictionary<string, Service>;
+            data["CORRUPT"] = null;    // Force an error
+            
+            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight);
+            var schedules = found.services.Select(s => s.Details).ToArray();
+            Assert.Contains<Schedule>(schedule, schedules);
+            Assert.Contains<Schedule>(schedule3, schedules);
+            Assert.All(found.services, s => { Assert.Equal(MondayAugust12, s.On);});
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Serilog;
 using Timetable.Test.Data;
 using Timetable.Web.Controllers;
@@ -72,6 +73,23 @@ namespace Timetable.Web.Test.Controllers
             var service = GetService(response);;
             Assert.Equal("X12345", service.TimetableUid);
             Assert.True(service.IsCancelled);
+        }
+        
+        [Fact]
+        public async Task ServiceByTimetableUidReturnsError()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Throws(new Exception("Test"));
+
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetServiceByTimetableId("X12345", April1) as ObjectResult;
+            
+            Assert.Equal(500, response.StatusCode);
+            var notFound = response.Value as ServiceNotFound;
+            Assert.Equal("X12345", notFound.Id);
+            Assert.Equal(April1, notFound.Date);
+            Assert.Equal("Error looking for Service X12345 on 2019-04-01", notFound.Reason);
         }
     }
 }

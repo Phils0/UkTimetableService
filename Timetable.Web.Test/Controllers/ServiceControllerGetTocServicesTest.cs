@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Serilog;
 using Timetable.Test.Data;
 using Timetable.Web.Controllers;
@@ -82,6 +83,23 @@ namespace Timetable.Web.Test.Controllers
             Assert.Equal("VT", notFound.Id);
             Assert.Equal(April1, notFound.Date);
             Assert.Equal("VT not found in timetable", notFound.Reason);
+        }
+        
+        [Fact]
+        public async Task ServicesByTocReturnsError()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
+                .Throws(new Exception("Test"));
+
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetTocServices("VT", April1) as ObjectResult;;
+            
+            Assert.Equal(500, response.StatusCode);
+            var notFound = response.Value as ServiceNotFound;
+            Assert.Equal("VT", notFound.Id);
+            Assert.Equal(April1, notFound.Date);
+            Assert.Equal("Error looking for Toc VT on 2019-04-01", notFound.Reason);
         }
     }
 }

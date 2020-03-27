@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Serilog;
 using Timetable.Test.Data;
 using Timetable.Web.Controllers;
@@ -86,7 +87,24 @@ namespace Timetable.Web.Test.Controllers
             var notFound = response.Value as ServiceNotFound;
             Assert.Equal("", notFound.Id);
             Assert.Equal(April1, notFound.Date);
-            Assert.Equal("Retail Service Id  is invalid", notFound.Reason);
+            Assert.Equal("Service  is invalid", notFound.Reason);
+        }
+        
+        [Fact]
+        public async Task ServiceByRetailServiceIdReturnsErrorWithReason()
+        {
+            var data = Substitute.For<ITimetable>();
+            data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
+                .Throws(new Exception("Test"));
+
+            var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.GetServiceByRetailServiceId("", April1) as ObjectResult;;
+            
+            Assert.Equal(500, response.StatusCode);
+            var notFound = response.Value as ServiceNotFound;
+            Assert.Equal("", notFound.Id);
+            Assert.Equal(April1, notFound.Date);
+            Assert.Equal("Error looking for Service  on 2019-04-01", notFound.Reason);
         }
     }
 }

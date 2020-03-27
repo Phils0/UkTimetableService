@@ -11,7 +11,8 @@ namespace Timetable
         Success,
         ServiceNotFound,
         NoScheduleOnDate,
-        InvalidRetailServiceId
+        InvalidRetailServiceId,
+        Error
     }
     
     public interface ITimetable
@@ -119,11 +120,8 @@ namespace Timetable
                 try
                 {
                     var onDate = IsNextDay(service) ? nextDay : date;
-                    if (service.TryFindScheduleOn(onDate, out var schedule))
-                    {
-                        if(schedule.OperatedBy(toc))
-                            services.Add(schedule);
-                    }
+                    if (service.TryFindScheduleOn(onDate, out var schedule) && schedule.OperatedBy(toc))
+                        services.Add(schedule);
                 }
                 catch (Exception e)
                 {
@@ -132,7 +130,6 @@ namespace Timetable
             }
 
             var reason = services.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
-
             return (reason, services.ToArray());
             
             bool IsNextDay(Service service) => service.StartsBefore(dayBoundary);

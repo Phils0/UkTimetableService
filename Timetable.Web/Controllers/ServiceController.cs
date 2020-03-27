@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Serilog;
@@ -58,7 +59,7 @@ namespace Timetable.Web.Controllers
             catch (Exception e)
             {
                 _logger.Error(e, "Error when processing : {serviceId} on {on}", serviceId, on.ToYMD());
-                throw;
+                return CreateNoServiceResponse(LookupStatus.Error, serviceId, @on);
             }
         }
 
@@ -67,38 +68,37 @@ namespace Timetable.Web.Controllers
             opts.Items["Dummy"] = "";
         }
 
-        private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string serviceId, DateTime date)
+        private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string id, DateTime date, string searchType = "Service")
         {
             var reason = "";
             switch (serviceStatus)
             {
                 case LookupStatus.ServiceNotFound:
-                    reason = $"{serviceId} not found in timetable";
-                    break;
+                    reason = $"{id} not found in timetable";
+                    return NotFound(CreateServiceNotFound());
                 case LookupStatus.NoScheduleOnDate:
-                    reason = $"{serviceId} does not run on {date.ToYMD()}";
-                    break;
+                    reason = $"{id} does not run on {date.ToYMD()}";
+                    return NotFound(CreateServiceNotFound());
                 case LookupStatus.InvalidRetailServiceId:
-                    reason = $"Retail Service Id {serviceId} is invalid";
-                    return BadRequest(new ServiceNotFound()
-                    {
-                        Id = serviceId,
-                        Date = date,
-                        Reason = reason
-                    });
+                    reason = $"{searchType} {id} is invalid";
+                    return BadRequest(CreateServiceNotFound());
+                case LookupStatus.Error:
+                    reason = $"Error looking for {searchType} {id} on {date.ToYMD()}";
+                    return StatusCode(StatusCodes.Status500InternalServerError, CreateServiceNotFound());
                 default:
-                    reason = $"Unknown reason why could not find {serviceId} on {date.ToYMD()}";
-                    _logger.Error(reason);
-                    break;
+                    reason = $"Unknown reason why could not find {searchType} {id} on {date.ToYMD()}";
+                    return StatusCode(StatusCodes.Status500InternalServerError, CreateServiceNotFound());
             }
 
-            //Return 404
-            return NotFound(new ServiceNotFound()
+            ServiceNotFound CreateServiceNotFound()
             {
-                Id = serviceId,
-                Date = date,
-                Reason = reason
-            });
+                return new ServiceNotFound()
+                {
+                    Id = id,
+                    Date = date,
+                    Reason = reason
+                };
+            }
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace Timetable.Web.Controllers
             catch (Exception e)
             {
                 _logger.Error(e, "Error when processing : {serviceId} on {on}", serviceId, on.ToYMD());
-                throw;
+                return CreateNoServiceResponse(LookupStatus.Error, serviceId, @on);
             }
         }
 
@@ -170,12 +170,12 @@ namespace Timetable.Web.Controllers
                     }
                 }
 
-                return await Task.FromResult(CreateNoServiceResponse(service.status, toc, @on));
+                return await Task.FromResult(CreateNoServiceResponse(service.status, toc, @on, "Toc"));
             }
             catch (Exception e)
             {
                 _logger.Error(e, "Error when processing : {toc} on {on}", toc, on.ToYMD());
-                throw;
+                return CreateNoServiceResponse(LookupStatus.Error, toc, @on, "Toc");
             }
         }
     }
