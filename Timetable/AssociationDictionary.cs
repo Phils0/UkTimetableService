@@ -38,6 +38,11 @@ namespace Timetable
                             
                                 resolvedAssociations.Add(new ResolvedAssociation(association, on, isCancelled, resolved));
                             }
+                            else
+                            {
+                                _logger.Warning("Association {association} has unresolved service {other} on {otherDate}", 
+                                    association, other, otherDate.ToYMD());
+                            }
                             break;
                         }
                     }
