@@ -15,6 +15,8 @@ namespace Timetable
     
     internal class ScheduleGatherer
     {
+        private const int DayLimit = 3;
+        
         private readonly IGathererScheduleData _schedule;
         private readonly GatherConfiguration _config;
         private readonly TimesToUse _arrivalsOrDestinations;
@@ -40,8 +42,12 @@ namespace Timetable
         {
             if (_config.All)
                 return SelectAllServices(startIdx, onDate).ToArray();
+
+            // Check of need to go back a day
+            int beforeStartIdx = startIdx == 0 ? LastIdx : startIdx - 1;
+            DateTime beforeDate = startIdx == 0 ? onDate.AddDays(-1) : onDate;
             
-            var beforeServices = SelectServicesBefore(startIdx - 1,  _config.ServicesBefore, onDate).Reverse();
+            var beforeServices = SelectServicesBefore(beforeStartIdx,  _config.ServicesBefore, beforeDate).Reverse();
             var afterServices = SelectServicesAfter(startIdx, _config.ServicesAfter,  onDate);
             return beforeServices.Concat(afterServices).ToArray();
         }
@@ -61,19 +67,35 @@ namespace Timetable
             {
                 int found = 0;
                 int idx = startIdx;
-                while (found < quantity && idx >= 0)
+                DateTime resolveDate = onDate;
+                bool keepSearching = true;
+                int dayGuard = 0;
+                
+                while (keepSearching && (dayGuard < DayLimit))
                 {
-                    var pair = _schedule.ValuesAt(idx);
-                    foreach (var stop in ResolveServices(pair.services, pair.time, onDate))
+                    while (keepSearching && idx >= 0)
                     {
-                        found++;
-                        yield return stop;
+                        var pair = _schedule.ValuesAt(idx);
+                        foreach (var stop in ResolveServices(pair.services, pair.time, resolveDate))
+                        {
+                            found++;
+                            keepSearching = (found < quantity);
+                            yield return stop;
+                        }
+                        idx--;
                     }
 
-                    idx--;
+                    if (keepSearching)
+                    {
+                        resolveDate = resolveDate.AddDays(-1);
+                        idx = LastIdx;
+                        dayGuard++;
+                    }
                 }
             }
         }
+
+        private int LastIdx => _schedule.Count - 1;
 
         private IEnumerable<ResolvedServiceStop> ResolveServices(Service[] services, Time atTime, DateTime onDate)
         {
@@ -91,32 +113,45 @@ namespace Timetable
             }
         }
         
-        private IEnumerable<ResolvedServiceStop> SelectServicesAfter(int startIdx, int quantity, DateTime date)
+        private IEnumerable<ResolvedServiceStop> SelectServicesAfter(int startIdx, int quantity, DateTime onDate)
         {
-            int stopIterating = _schedule.Count;
             return DoNotIterate() ? 
                 Enumerable.Empty<ResolvedServiceStop>() :
                 IterateForwardsThroughServices();
 
             bool DoNotIterate()
             {
-                return quantity == 0 || startIdx >= stopIterating;
+                return quantity == 0 || startIdx >= _schedule.Count;
             }
 
             IEnumerable<ResolvedServiceStop> IterateForwardsThroughServices()
             {
                 int found = 0;
                 int idx = startIdx;
-                while (found < quantity && idx < stopIterating)
+                DateTime resolveDate = onDate;
+                bool keepSearching = true;
+                int dayGuard = 0;
+                
+                while (keepSearching && (dayGuard < DayLimit))
                 {
-                    var pair = _schedule.ValuesAt(idx);
-                    foreach (var stop in ResolveServices(pair.services, pair.time, date))
+                    while (keepSearching && idx < _schedule.Count)
                     {
-                        found++;
-                        yield return stop;
+                        var pair = _schedule.ValuesAt(idx);
+                        foreach (var stop in ResolveServices(pair.services, pair.time, resolveDate))
+                        {
+                            found++;
+                            keepSearching = (found < quantity);
+                            yield return stop;
+                        }
+                        idx++;
                     }
 
-                    idx++;
+                    if (keepSearching)
+                    {
+                        resolveDate = resolveDate.AddDays(1);
+                        idx = 0;
+                        dayGuard++;
+                    }
                 }
             }
         }

@@ -29,6 +29,18 @@ namespace Timetable.Test
         }
 
         [Fact]
+        public void ReturnAllFoundDeparturesWhenRequestTooManyAfter()
+        {
+            var locations = TestData.CreateTimetabledLocations();
+            var clapham = locations.Locations["CLJ"];
+
+            var aug31AtTen = new DateTime(2019, 8, 31, 10, 0, 0);
+            var schedules = clapham.Timetable.FindDepartures(aug31AtTen, GathererConfig.Create(1, 100));
+            
+            Assert.Equal(57, schedules.Length);     
+        }
+        
+        [Fact]
         public void ReturnAllFoundDeparturesWhenRequestTooManyBefore()
         {
             var locations = TestData.CreateTimetabledLocations();
@@ -36,21 +48,25 @@ namespace Timetable.Test
             
             var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, GathererConfig.Create(100, 1));
             
-            Assert.Equal(41, schedules.Length);    //TODO Handle wrapping day      
+            Assert.Equal(41, schedules.Length);     
         }
         
-        [Fact]
-        public void ReturnAllFoundDeparturesWhenRequestTooManyAfter()
+        [Fact()]
+        public void FindDeparturesPreviousDay()
         {
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindDepartures(Aug1AtTen, GathererConfig.Create(1, 100));
+            var schedules = clapham.Timetable.FindDepartures(new DateTime(2019, 8, 2, 0, 30 ,0), GathererConfig.Create(5, 1));
             
-            Assert.Equal(57, schedules.Length);    //TODO Handle wrapping day     
+            Assert.Equal(6, schedules.Length);
+
+            var first = schedules.First().Service;
+            Assert.Equal(Aug1, first.On);  
         }
+
         
-        [Fact(Skip="Not implemented yet")]
+        [Fact()]
         public void FindDeparturesNextDay()
         {
             var locations = TestData.CreateTimetabledLocations();
@@ -60,8 +76,8 @@ namespace Timetable.Test
             
             Assert.Equal(6, schedules.Length);
 
-            var last = schedules.Last().Service.Details.Locations[1];
-            //TODO check next day       
+            var last = schedules.Last().Service;
+            Assert.Equal(Aug1.AddDays(1), last.On);  
         }
         
         [Fact]

@@ -69,8 +69,6 @@ namespace Timetable
             if (config.HasRequestedBeforeOnly && EqualsTime(first.index, time))
                 first.index += 1; 
             
-            //TODO if need to change day do we go forward or backward
-            
             return GatherServices(first.index, onDate, config);
         }
 

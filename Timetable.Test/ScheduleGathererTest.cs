@@ -119,25 +119,49 @@ namespace Timetable.Test
         }
         
         [Fact]
-        public void GatherAsManyAsCanFindGoingBackward()
+        public void HandleGoingBackwardsWhenStartIdxIsZero()
         {
             var schedule = CreateMockSchedule();
 
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(2, 0), TimesToUse.Departures);
-            var services = gatherer.Gather(1, TestDate);
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(1, 0), TimesToUse.Departures);
+            var services = gatherer.Gather(0, TestDate);
 
-            Assert.Equal(1, services.Length);    //TODO Loop to next day
+            Assert.Single(services); 
+            Assert.Equal(TestDate.AddDays(-1), services.First().On);
         }
         
         [Fact]
-        public void GatherAsManyAsCanFindGoingForward()
+        public void LimitToGoingBackward2Days()
         {
-            var schedule = CreateMockSchedule();
+            var responses = new []
+            {
+                (idx: 0, services: CreateTimeEntry(TestSchedules.Ten.AddMinutes(-60))), 
+                (idx: 1, services: CreateTimeEntry(TestSchedules.Ten)),
+            };
+            var schedule = CreateMockSchedule(responses);
 
-            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(0, 2), TimesToUse.Departures);
-            var services = gatherer.Gather(3, TestDate);
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(10, 0), TimesToUse.Departures);
+            var services = gatherer.Gather(1, TestDate);
 
-            Assert.Equal(1, services.Length);    //TODO Loop to next day
+            Assert.Equal(5, services.Length); 
+            Assert.Equal(TestDate.AddDays(-2), services.First().On);
+        }
+        
+        [Fact]
+        public void LimitToGoingForward2Days()
+        {
+            var responses = new []
+            {
+                (idx: 0, services: CreateTimeEntry(TestSchedules.Ten.AddMinutes(-60))), 
+                (idx: 1, services: CreateTimeEntry(TestSchedules.Ten)),
+            };
+            var schedule = CreateMockSchedule(responses);
+
+            var gatherer = new ScheduleGatherer(schedule, GathererConfig.Create(0, 10), TimesToUse.Departures);
+            var services = gatherer.Gather(1, TestDate);
+
+            Assert.Equal(5, services.Length);    
+            Assert.Equal(TestDate.AddDays(2), services.Last().On);
         }
         
         [Fact]

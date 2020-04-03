@@ -45,23 +45,38 @@ namespace Timetable.Test
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindArrivals(Aug1AtTen, GathererConfig.Create(1, 100));
+            var aug31AtTen = new DateTime(2019, 8, 31, 10, 0, 0);
+            var schedules = clapham.Timetable.FindArrivals(aug31AtTen, GathererConfig.Create(1, 100));
 
             Assert.Equal(57, schedules.Length);     //TODO Handle wrapping day    
         }
         
-        [Fact(Skip="Not implemented yet")]
+        [Fact]
+        public void FindArrivalsPreviousDay()
+        {
+            var locations = TestData.CreateTimetabledLocations();
+            var clapham = locations.Locations["CLJ"];
+            
+            var schedules = clapham.Timetable.FindArrivals(new DateTime(2019, 8, 2, 0, 30 ,0), GathererConfig.Create(5, 1));
+            
+            Assert.Equal(6, schedules.Length);
+
+            var first = schedules.First().Service;
+            Assert.Equal(Aug1, first.On);    
+        }
+        
+        [Fact]
         public void FindArrivalsNextDay()
         {
             var locations = TestData.CreateTimetabledLocations();
             var clapham = locations.Locations["CLJ"];
             
-            var schedules = clapham.Timetable.FindArrivals(new DateTime(2019, 8, 2, 0, 30 ,0), GathererConfig.Create(3, 3));
+            var schedules = clapham.Timetable.FindArrivals(new DateTime(2019, 8, 1, 23, 30 ,0), GathererConfig.Create(1, 5));
             
             Assert.Equal(6, schedules.Length);
 
-            var last = schedules.Last().Service.Details.Locations[1];
-            //TODO check next day       
+            var last = schedules.Last().Service;
+            Assert.Equal(Aug1.AddDays(1), last.On);    
         }
         
         [Fact]
