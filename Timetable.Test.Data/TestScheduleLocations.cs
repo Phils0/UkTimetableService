@@ -20,18 +20,12 @@ namespace Timetable.Test.Data
             origin.Platform = "1";
             origin.Activities = CreateActivities("TB");
             origin.WorkingArrival = Time.NotValid;
-            origin.UpdateAdvertisedStop();
             return origin;
         }
 
-        private static ISet<string> CreateActivities(string activity)
+        private static Activities CreateActivities(string activity)
         {
-            return CreateActivities(new[] {activity});
-        }
-        
-        private static ISet<string> CreateActivities(string[] activities)
-        {
-            return new HashSet<string>(activities);
+            return new Activities(activity);
         }
         
         public static ScheduleStop CreateStop(Station location, Time arrival, string activity = "T", int sequence = 1)
@@ -52,7 +46,6 @@ namespace Timetable.Test.Data
                 Platform = "10",
                 Activities = CreateActivities(activity)
             };
-            stop.UpdateAdvertisedStop();
             return stop;
         }
         
@@ -74,7 +67,6 @@ namespace Timetable.Test.Data
                 Platform = "10",
                 Activities = CreateActivities("U")
             };
-            stop.UpdateAdvertisedStop();
             return stop;
         }
         
@@ -96,7 +88,6 @@ namespace Timetable.Test.Data
                 Platform = "10",
                 Activities = CreateActivities("D")
             };
-            stop.UpdateAdvertisedStop();
             return stop;
         }
         
@@ -113,9 +104,8 @@ namespace Timetable.Test.Data
                 Sequence = 1,
                 PassesAt = pass,
                 Platform = "",
-                Activities = new HashSet<string>()
+                Activities = CreateActivities("")
             };
-            schedulePass.UpdateAdvertisedStop();
             return schedulePass;
         }
         
@@ -130,7 +120,6 @@ namespace Timetable.Test.Data
             destination.Platform = "2";
             destination.Activities = CreateActivities("TF");
             destination.WorkingDeparture = Time.NotValid;
-            destination.UpdateAdvertisedStop();
             return destination;
         }
     }

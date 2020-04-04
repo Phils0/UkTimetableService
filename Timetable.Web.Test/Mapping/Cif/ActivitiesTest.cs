@@ -5,34 +5,39 @@ namespace Timetable.Web.Test.Mapping.Cif
 {
     public class ActivitiesTest
     {
-        public static TheoryData<string, string[]> TestActivities =>
-            new TheoryData<string, string[]>()
+        public static TheoryData<string> TestActivities =>
+            new TheoryData<string>()
             {
-                {"TB", new [] {"TB"}},
-                {"T", new [] {"T"}},
-                {"-U", new [] {"-U"}},
-                {"TFN", new [] {"TF", "N"}},
-                {"TFRM", new [] {"TF", "RM"}},
-                {"T -DK X", new [] {"T", "-D", "K", "X"}},
+                "TB",
+                "T",
+                "-U",
+                "TFN",
+                "TFRM",
+                "T -DK X",
+                ""
             };
         
         [Theory]
         [MemberData(nameof(TestActivities))]
-        public void SplitActivities(string input, string[] expectedValues)
+        public void SplitActivities(string input)
         {
-            var activities = Activities.Split(input);
+            var converter = new ActivitiesConverter();
+            var activities = converter.Convert(input, null);
 
-            foreach (var expected in expectedValues)
-            {
-                Assert.Contains(expected, activities);
-            }
+            Assert.Equal(input, activities.Value);
         }
 
         [Fact]
-        public void HandleNoActivities()
+        public void ReturnsSameValueForSameSetOfActivities()
         {
-            var activities = Activities.Split("");
-            Assert.Empty(activities);
+            var converter = new ActivitiesConverter();
+            var activities = converter.Convert("TB", null);
+            
+            var same = converter.Convert("TB", null);
+            Assert.Same(activities, same);
+            
+            var different = converter.Convert("TB-D", null);
+            Assert.NotSame(activities, different);
         }
     }
 }

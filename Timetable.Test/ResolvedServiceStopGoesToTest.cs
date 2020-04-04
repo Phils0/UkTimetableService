@@ -53,20 +53,20 @@ namespace Timetable.Test
         }
         
         [Theory]
-        [InlineData(PublicStop.No, false)]
-        [InlineData(PublicStop.Yes, true)]
-        [InlineData(PublicStop.Request, true)]
-        [InlineData(PublicStop.PickUpOnly, false)]
-        [InlineData(PublicStop.SetDownOnly, true)]
-        public void GoesToIsFalseIfNotPublicArrival(PublicStop advertised, bool expected)
+        [InlineData(Activities.StopNotAdvertised, false)]
+        [InlineData(Activities.PassengerStop, true)]
+        [InlineData(Activities.RequestStop, true)]
+        [InlineData(Activities.PickUpOnlyStop, false)]
+        [InlineData(Activities.SetDownOnlyStop, true)]
+        [InlineData(Activities.TrainBegins, false)]
+        [InlineData(Activities.TrainFinishes, true)]
+        public void GoesToOnlyIfHasPublicArrival(string activity, bool expected)
         {
             var service =  TestSchedules.CreateService();
             var surbiton = service.Details.Locations[0];
             var clapham = service.Details.Locations[1] as ScheduleStop;
-            
-            var updateable = clapham.AsDynamic();
-            updateable.AdvertisedStop = advertised;
-            
+            clapham.Activities = new Activities(activity);
+          
             var stop = new ResolvedServiceStop(service, surbiton);
             
             Assert.Equal(expected, stop.GoesTo(clapham.Station));

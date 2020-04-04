@@ -65,7 +65,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         {
             var output = Map();
 
-            Assert.Contains("TB", output.Activities);
+            Assert.Contains("TB", output.Activities.Value);
         }
         
         [Fact]

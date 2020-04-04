@@ -44,7 +44,7 @@ namespace Timetable.Web.Test.Mapping
             var expected = TestDate.Add(TestTime.Ten);
             Assert.Equal(expected, output.Departure);
             Assert.Equal("1", output.Platform);
-            Assert.Equal("TB",  output.Activities[0]);
+            Assert.Equal("TB",  output.Activities);
             Assert.Null(output.PassesAt);
             Assert.Null(output.Arrival);
         }
@@ -72,7 +72,7 @@ namespace Timetable.Web.Test.Mapping
             var expected = TestDate.Add(TestTime.Ten);
             Assert.Equal(expected, output.Arrival);
             Assert.Equal("2", output.Platform);
-            Assert.Equal("TF",  output.Activities[0]);
+            Assert.Equal("TF",  output.Activities);
             Assert.Null(output.PassesAt);
             Assert.Null(output.Departure);
         }
@@ -94,7 +94,7 @@ namespace Timetable.Web.Test.Mapping
             var expectedDeparture = expected.AddMinutes(1);
             Assert.Equal(expectedDeparture, output.Departure);
             Assert.Equal("10", output.Platform);
-            Assert.Equal("T",  output.Activities[0]);
+            Assert.Equal("T",  output.Activities);
             Assert.Null(output.PassesAt);
         }
         

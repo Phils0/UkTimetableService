@@ -11,8 +11,7 @@ namespace Timetable.Test
         private static readonly TimeSpan TenThirty = new TimeSpan(10, 30, 0);
         private static readonly TimeSpan OneMinute = new TimeSpan(0, 1, 0);
         private static readonly TimeSpan OneDay = new TimeSpan(24, 0, 0);
-
-
+        
         public static TheoryData<Time, int> TimeComparisonTests =>
             new TheoryData<Time, int>()
             {
@@ -46,8 +45,6 @@ namespace Timetable.Test
             Assert.Equal(expected, comparer.Compare(x, y));
             Assert.Equal(expected * -1, comparer.Compare(y, x));
         }
-        
-
         
         [Theory]
         [ClassData(typeof(SameTimeTestData))]
@@ -88,5 +85,4 @@ namespace Timetable.Test
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
-
 }

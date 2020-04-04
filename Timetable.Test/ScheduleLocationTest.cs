@@ -133,67 +133,10 @@ namespace Timetable.Test
         
         [Theory]
         [InlineData("T", PublicStop.Yes)]
-        [InlineData("D", PublicStop.SetDownOnly)]
-        [InlineData("U", PublicStop.PickUpOnly)]
-        [InlineData("R", PublicStop.Request)]
-        public void SchedulePassSetsStopTypeBasedUponAttributes(string activity, PublicStop expected)
+        [InlineData("T N", PublicStop.No)]
+        public void ScheduleStopSetsStopTypeBasedUponActivities(string activity, PublicStop expected)
         {
             var scheduleLocation = TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, activity);            
-            Assert.Equal(expected, scheduleLocation.AdvertisedStop);
-        }
-
-        [Fact]
-        public void AttributesIncludesNThenNotAnAdvertisedStop()
-        {
-            var scheduleLocation = TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, "T"); 
-            scheduleLocation.Activities = new HashSet<string>(new [] {"T", "N"});
-            scheduleLocation.UpdateAdvertisedStop();
-            Assert.Equal(PublicStop.No, scheduleLocation.AdvertisedStop);
-        }
-
-        [Fact]
-        public void SchedulePassSetsStopTypeWhenMultipleAttributes()
-        {
-            var scheduleLocation =  new ScheduleStop()
-            {
-                Location = TestLocations.Surbiton,
-                Sequence = 1,
-                Activities = new HashSet<string>(new []
-                {
-                    "-U",
-                    "T"
-                })
-            };
-            scheduleLocation.UpdateAdvertisedStop();
-            Assert.Equal(PublicStop.Yes, scheduleLocation.AdvertisedStop);
-        }
-
-        public static TheoryData<String[], PublicStop> PrecedentData =>
-            new TheoryData<String[], PublicStop>()
-            {
-                {new [] {"T", "TB"}, PublicStop.PickUpOnly },
-                {new [] {"TB", "T"}, PublicStop.PickUpOnly },
-                {new [] {"T", "TF"}, PublicStop.SetDownOnly },
-                {new [] {"TF", "T"}, PublicStop.SetDownOnly },
-                {new [] {"T", "R"}, PublicStop.Request },
-                {new [] {"R", "T"}, PublicStop.Request },
-                {new [] {"T", "U"}, PublicStop.PickUpOnly },
-                {new [] {"U", "T"}, PublicStop.PickUpOnly },
-                {new [] {"T", "D"}, PublicStop.SetDownOnly },
-                {new [] {"D", "T"}, PublicStop.SetDownOnly },
-            };
-        
-        [Theory]
-        [MemberData(nameof(PrecedentData))]
-        public void PrecedenceOfActivitiesWhenSettingAdvertisedStops(string[] activities, PublicStop expected)
-        {
-            var scheduleLocation =  new ScheduleStop()
-            {
-                Location = TestLocations.Surbiton,
-                Sequence = 1,
-                Activities = new HashSet<string>(activities)
-            };
-            scheduleLocation.UpdateAdvertisedStop();
             Assert.Equal(expected, scheduleLocation.AdvertisedStop);
         }
     }

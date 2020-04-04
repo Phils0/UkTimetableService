@@ -31,7 +31,5 @@ namespace Timetable.Test
 
             Assert.Equal(expected, rounded);
         }
-
-
     }
 }

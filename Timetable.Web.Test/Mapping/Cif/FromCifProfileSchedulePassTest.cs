@@ -55,7 +55,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         {
             var output = Map();
 
-            Assert.Empty(output.Activities);
+            Assert.Empty(output.Activities.Value);
         }    
         
         [Fact]

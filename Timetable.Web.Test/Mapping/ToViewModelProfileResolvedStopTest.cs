@@ -47,7 +47,7 @@ namespace Timetable.Web.Test.Mapping
             var expectedDeparture = expected.AddMinutes(1);
             Assert.Equal(expectedDeparture, output.Departure);
             Assert.Equal("10", output.Platform);
-            Assert.Equal("T",  output.Activities[0]);
+            Assert.Equal("T",  output.Activities);
             Assert.Null(output.PassesAt);
         }
     }

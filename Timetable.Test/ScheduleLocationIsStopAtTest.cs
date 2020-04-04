@@ -34,28 +34,30 @@ namespace Timetable.Test
             Assert.Equal(expected, stop.IsStopAt(spec));
         }
 
-        public static TheoryData<PublicStop, bool, bool> AdvertisedStop =>
-            new TheoryData<PublicStop, bool, bool>()
+        public static TheoryData<string, bool, bool> AdvertisedStop =>
+            new TheoryData<string, bool, bool>()
             {
-                {PublicStop.No, true, false},
-                {PublicStop.No, false, false},
-                {PublicStop.Yes, true, true},
-                {PublicStop.Yes, false, true},          
-                {PublicStop.PickUpOnly, true, false},
-                {PublicStop.PickUpOnly, false, true},
-                {PublicStop.SetDownOnly, true, true},
-                {PublicStop.SetDownOnly, false, false},                  
-                {PublicStop.Request, true, true},
-                {PublicStop.Request, false, true}
+                {Activities.StopNotAdvertised, true, false},
+                {Activities.StopNotAdvertised, false, false},
+                {Activities.PassengerStop, true, true},
+                {Activities.PassengerStop, false, true},          
+                {Activities.PickUpOnlyStop, true, false},
+                {Activities.PickUpOnlyStop, false, true},
+                {Activities.SetDownOnlyStop, true, true},
+                {Activities.SetDownOnlyStop, false, false},                  
+                {Activities.RequestStop, true, true},
+                {Activities.RequestStop, false, true},
+                {Activities.TrainBegins, true, false},
+                {Activities.TrainBegins, false, true},
+                {Activities.TrainFinishes, true, true},
+                {Activities.TrainFinishes, false, false},  
             };
         
         [Theory]
         [MemberData(nameof(AdvertisedStop))]
-        public void OnlyIncludeStopsWhereAdvertisedStopIsRight(PublicStop advertised, bool useArrivals, bool expected)
+        public void OnlyIncludeStopsWhereAdvertisedStopIsRight(string activity, bool useArrivals, bool expected)
         {
-            var stop = TestScheduleLocations.CreateStop(ClaphamJunction, TestSchedules.Ten);
-            var updateable = stop.AsDynamic();
-            updateable.AdvertisedStop = advertised;
+            var stop = TestScheduleLocations.CreateStop(ClaphamJunction, TestSchedules.Ten, activity);
 
             var arrivalsDepartures = useArrivals ? TimesToUse.Arrivals : TimesToUse.Departures;
             var findAt = useArrivals ? TestSchedules.Ten : TestSchedules.Ten.AddMinutes(1);

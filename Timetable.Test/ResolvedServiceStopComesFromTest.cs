@@ -41,18 +41,19 @@ namespace Timetable.Test
         }
         
         [Theory]
-        [InlineData(PublicStop.No, false)]
-        [InlineData(PublicStop.Yes, true)]
-        [InlineData(PublicStop.Request, true)]
-        [InlineData(PublicStop.PickUpOnly, true)]
-        [InlineData(PublicStop.SetDownOnly, false)]
-        public void ComesFromIsFalseIfNotPublicDeparture(PublicStop advertised, bool expected)
+        [InlineData(Activities.StopNotAdvertised, false)]
+        [InlineData(Activities.PassengerStop, true)]
+        [InlineData(Activities.RequestStop, true)]
+        [InlineData(Activities.PickUpOnlyStop, true)]
+        [InlineData(Activities.SetDownOnlyStop, false)]
+        [InlineData(Activities.TrainBegins, true)]
+        [InlineData(Activities.TrainFinishes, false)]
+        public void ComesFromIsFalseIfNotPublicDeparture(string activity, bool expected)
         {
             var service =  TestSchedules.CreateService();
             var waterloo = service.Details.Locations[3];
             var clapham = service.Details.Locations[1] as ScheduleStop;
-            var updateable = clapham.AsDynamic();
-            updateable.AdvertisedStop = advertised;
+            clapham.Activities = new Activities(activity);
             
             var stop = new ResolvedServiceStop(service, waterloo);
             

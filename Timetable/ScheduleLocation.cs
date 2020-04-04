@@ -30,44 +30,9 @@ namespace Timetable
 
         public string Platform { get; set; }
 
-        public ISet<string> Activities { get; set; }
-
-        public void UpdateAdvertisedStop()
-        {
-            if (Activities == null)
-                return;
-            
-            if (Activities.Contains(Activity.StopNotAdvertised))
-            {
-                AdvertisedStop = PublicStop.No;
-                return;
-            }
-            
-            if (Activities.Contains(Activity.TrainBegins) ||
-                     Activities.Contains(Activity.PickUpOnlyStop))
-            {
-                AdvertisedStop = PublicStop.PickUpOnly;                           
-            }
-            else if (Activities.Contains(Activity.TrainFinishes) ||
-                     Activities.Contains(Activity.SetDownOnlyStop))
-            {
-                AdvertisedStop = PublicStop.SetDownOnly;                           
-            }
-            else if (Activities.Contains(Activity.RequestStop))
-            {
-                AdvertisedStop = PublicStop.Request;                           
-            }
-            else if (Activities.Contains(Activity.PassengerStop))
-            {
-                AdvertisedStop = PublicStop.Yes;
-            }
-            else
-            {
-                AdvertisedStop = PublicStop.No;
-            }
-        }
-
-        public PublicStop AdvertisedStop { get; private set; } = PublicStop.NotSet;
+        public Activities Activities { get; set; }
+        
+        public PublicStop AdvertisedStop => Activities.AdvertisedStop;
         
         public Schedule Schedule { get; private set; }
 
