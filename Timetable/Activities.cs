@@ -96,5 +96,10 @@ namespace Timetable
         {
             return chars[i+1] == ' ';
         }
+
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 }
