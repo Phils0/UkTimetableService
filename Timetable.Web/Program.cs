@@ -47,6 +47,5 @@ namespace Timetable.Web
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-
     }
 }

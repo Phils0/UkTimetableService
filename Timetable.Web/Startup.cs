@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -32,6 +33,8 @@ namespace Timetable.Web
 
         public IConfiguration Configuration { get; }
 
+        public bool HasLoadedData { get; private set; } = false;
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -47,7 +50,10 @@ namespace Timetable.Web
                 .AddSingleton<Model.Configuration>(CreateConfiguration())
                 .AddSwaggerGen(ConfigureSwagger)
                 .AddControllers();
-            services.AddHealthChecks();
+            services.AddHealthChecks().
+                AddCheck("Data", 
+                    () => HasLoadedData ? HealthCheckResult.Healthy() : HealthCheckResult.Unhealthy("Data not loaded"), 
+                    tags: new[] { "data" });
 
             Configuration CreateConfiguration()
             {
@@ -59,7 +65,7 @@ namespace Timetable.Web
             }
         }
 
-        private static Data LoadData(Factory factory)
+        private Data LoadData(Factory factory)
         {
             var archive = factory.Archive;
             var activity = new System.Diagnostics.Activity("LoadData").Start();
@@ -69,15 +75,11 @@ namespace Timetable.Web
                 {
                     var loader = factory.CreateDataLoader();
                     var loaderTask = loader.LoadAsync(CancellationToken.None);
+                    HasLoadedData = loaderTask.Wait(Timeout);
 
-                    var loaded = Task.WaitAll(new[]
-                    {
-                        loaderTask
-                    }, Timeout);
-
-                    if (!loaded)
+                    if (!HasLoadedData)
                         throw new InvalidDataException($"Timeout loading file: {archive.FullName}");
-
+                    
                     return loaderTask.Result;
                 }
                 catch (Exception e)
