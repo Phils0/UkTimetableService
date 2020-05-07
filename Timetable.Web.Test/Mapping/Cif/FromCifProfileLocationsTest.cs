@@ -6,7 +6,7 @@ namespace Timetable.Web.Test.Mapping.Cif
 {
     public class FromCifProfileLocationsTest
     {
-        public static readonly MapperConfiguration FromCifProfileConfiguration = new MapperConfiguration(
+        public static MapperConfiguration FromCifProfileConfiguration => new MapperConfiguration(
             cfg => cfg.AddProfile<FromCifProfile>());
         
         [Fact]
