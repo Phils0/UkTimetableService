@@ -7,9 +7,8 @@ trigger:
 - master
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  GitVersion.SemVer: ''
 
 jobs:
 - job: WindowsBuildAndTest
@@ -17,30 +16,32 @@ jobs:
   pool:
     vmImage: 'windows-latest'  
   steps:
-    - task: gittools.gitversion.gitversion-task.GitVersion@5
-      displayName: GitVersion
+    - task: UseGitVersion@5
+      displayName: gitversion
       inputs:
-        configFilePath: 'GitVersion.yml'  
+        runtime: 'core'
+        configFilePath: 'GitVersion.yml'
     - task: DotNetCoreCLI@2
-      displayName: 'Build'
+      displayName: Build
       inputs:
-        command: 'build'
-        configuration: '$(buildConfiguration)'  
-        versionEnvVar: '$(GitVersion.AssemblySemVer)'
+        command: build
+        configuration: $(buildConfiguration)  
+        versioningScheme: byEnvVar
+        versionEnvVar: $(GitVersion.SemVer)
     - task: DotNetCoreCLI@2
       displayName: 'Domain Unit Test'
       inputs:
-        command: 'test'
-        projects: 'Timetable.Test/Timetable.Test.csproj'
-        configuration: '$(buildConfiguration)'  
+        command: test
+        projects: '**/Timetable.Test/Timetable.Test.csproj'
+        configuration: $(buildConfiguration)  
         nobuild: true
     - task: DotNetCoreCLI@2
-        displayName: 'Webservice Unit Test'
-        inputs:
-          command: 'test'
-          projects: 'Timetable.Test/Timetable.Web.Test.csproj'
-          configuration: '$(buildConfiguration)'  
-          nobuild: true
+      displayName: 'Webservice Unit Test'
+      inputs:
+        command: test
+        projects: '**/Timetable.Web.Test/Timetable.Web.Test.csproj'
+        configuration: $(buildConfiguration)  
+        nobuild: true
 - job: LinuxBuildAndTest
   displayName: 'Linux build and test'
   pool:
