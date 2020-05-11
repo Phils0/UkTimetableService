@@ -20,6 +20,7 @@ jobs:
       displayName: gitversion
       inputs:
         runtime: 'core'
+        versionSpec: '5.x'
         configFilePath: 'GitVersion.yml'
     - task: DotNetCoreCLI@2
       displayName: Build
