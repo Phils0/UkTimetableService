@@ -25,7 +25,7 @@ namespace Timetable.Web.IntegrationTest
             var responseString = await response.Content.ReadAsStringAsync();
             var serviceConfig = JsonConvert.DeserializeObject<Model.Configuration>(responseString);
             
-            var fullTimetableRegex = new Regex(@"RJTTF\d{3}\.zip");
+            var fullTimetableRegex = new Regex(@"RJTTF\d{3}\.ZIP", RegexOptions.IgnoreCase);
             Assert.Matches(fullTimetableRegex, serviceConfig.Data);
         }
     }
