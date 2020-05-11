@@ -33,9 +33,9 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'  
   - task: VSTest@2
-    testAssemblyVer2: '**\\*!(integration)test*.dll'
     displayName: Unit Test
     inputs:
+      testAssemblyVer2: '**\\*!(integration)test*.dll'
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'
 - job: LinuxBuildAndTest
