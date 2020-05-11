@@ -17,27 +17,30 @@ jobs:
   pool:
     vmImage: 'windows-latest'  
   steps:
-  - task: NuGetToolInstaller@1
-  - task: NuGetCommand@2
-    inputs:
-      restoreSolution: '$(solution)'
-  - task: gittools.gitversion.gitversion-task.GitVersion@5
-    displayName: GitVersion
-    inputs:
-      configFilePath: 'GitVersion.yml'  
-  - task: VSBuild@1
-    displayName: Build
-    inputs:
-      solution: '$(solution)'
-      msbuildArgs: '/p:Version=$(GitVersion.AssemblySemVer) /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-      platform: '$(buildPlatform)'
-      configuration: '$(buildConfiguration)'  
-  - task: VSTest@2
-    displayName: Unit Test
-    inputs:
-      testAssemblyVer2: '**\\Timetable.Test.dll\n**\\Timetable.Web.Test.dll'
-      platform: '$(buildPlatform)'
-      configuration: '$(buildConfiguration)'
+    - task: gittools.gitversion.gitversion-task.GitVersion@5
+      displayName: GitVersion
+      inputs:
+        configFilePath: 'GitVersion.yml'  
+    - task: DotNetCoreCLI@2
+      displayName: 'Build'
+      inputs:
+        command: 'build'
+        configuration: '$(buildConfiguration)'  
+        versionEnvVar: '$(GitVersion.AssemblySemVer)'
+    - task: DotNetCoreCLI@2
+      displayName: 'Domain Unit Test'
+      inputs:
+        command: 'test'
+        projects: 'Timetable.Test/Timetable.Test.csproj'
+        configuration: '$(buildConfiguration)'  
+        nobuild: true
+    - task: DotNetCoreCLI@2
+        displayName: 'Webservice Unit Test'
+        inputs:
+          command: 'test'
+          projects: 'Timetable.Test/Timetable.Web.Test.csproj'
+          configuration: '$(buildConfiguration)'  
+          nobuild: true
 - job: LinuxBuildAndTest
   displayName: 'Linux build and test'
   pool:
@@ -49,9 +52,9 @@ jobs:
         packageType: sdk
         version: 3.1.x
         installationPath: $(Agent.ToolsDirectory)/dotnet
-    - script: dotnet build
-      displayName: Build
-    - script: dotnet test ./Timetable.Test/Timetable.Test.csproj
-      displayName: Domain Unit Test
-    - script: dotnet test ./Timetable.Web.Test/Timetable.Web.Test.csproj
-      displayName: Webservice Unit Test
+    - script: dotnet build -c Release
+      displayName: 'Build'
+    - script: dotnet test  -c Release ./Timetable.Test/Timetable.Test.csproj
+      displayName: 'Domain Unit Test'
+    - script: dotnet test  -c Release ./Timetable.Web.Test/Timetable.Web.Test.csproj
+      displayName: 'Webservice Unit Test'
