@@ -30,17 +30,12 @@ jobs:
         versioningScheme: byEnvVar
         versionEnvVar: $(GitVersion.SemVer)
     - task: DotNetCoreCLI@2
-      displayName: 'Domain Unit Test'
+      displayName: 'Unit Test'
       inputs:
         command: test
-        projects: '**/Timetable.Test/Timetable.Test.csproj'
-        configuration: $(buildConfiguration)  
-        nobuild: true
-    - task: DotNetCoreCLI@2
-      displayName: 'Webservice Unit Test'
-      inputs:
-        command: test
-        projects: '**/Timetable.Web.Test/Timetable.Web.Test.csproj'
+        projects: |
+          **/Timetable.Test/Timetable.Test.csproj
+          **/Timetable.Web.Test/Timetable.Web.Test.csproj
         configuration: $(buildConfiguration)  
         nobuild: true
 - job: LinuxBuildAndTest
@@ -60,16 +55,11 @@ jobs:
         command: build
         configuration: $(buildConfiguration)  
     - task: DotNetCoreCLI@2
-      displayName: 'Domain Unit Test'
+      displayName: 'Unit Test'
       inputs:
         command: test
-        projects: '**/Timetable.Test/Timetable.Test.csproj'
-        configuration: $(buildConfiguration)  
-        nobuild: true
-    - task: DotNetCoreCLI@2
-      displayName: 'Webservice Unit Test'
-      inputs:
-        command: test
-        projects: '**/Timetable.Web.Test/Timetable.Web.Test.csproj'
+        projects: |
+          **/Timetable.Test/Timetable.Test.csproj
+          **/Timetable.Web.Test/Timetable.Web.Test.csproj
         configuration: $(buildConfiguration)  
         nobuild: true
