@@ -33,6 +33,7 @@ jobs:
       platform: '$(buildPlatform)'
       configuration: '$(buildConfiguration)'  
   - task: VSTest@2
+    testAssemblyVer2: '**\\*!(integration)test*.dll'
     displayName: Unit Test
     inputs:
       platform: '$(buildPlatform)'
@@ -50,5 +51,7 @@ jobs:
         installationPath: $(Agent.ToolsDirectory)/dotnet
     - script: dotnet build
       displayName: Build
-    - script: dotnet test
-      displayName: Unit Test
+    - script: dotnet test ./Timetable.Test/Timetable.Test.csproj
+      displayName: Domain Unit Test
+    - script: dotnet test ./Timetable.Web.Test/Timetable.Web.Test.csproj
+      displayName: Webservice Unit Test
