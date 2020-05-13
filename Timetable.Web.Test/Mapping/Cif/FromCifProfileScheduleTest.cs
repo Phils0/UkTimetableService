@@ -11,13 +11,13 @@ namespace Timetable.Web.Test.Mapping.Cif
 {
     public class FromCifProfileScheduleTest
     {
-        private static readonly MapperConfiguration FromCifProfileConfiguration =
+        private readonly MapperConfiguration _fromCifProfileConfiguration =
             FromCifProfileLocationsTest.FromCifProfileConfiguration;
 
         [Fact]
         public void ValidMapping()
         {
-            FromCifProfileConfiguration.AssertConfigurationIsValid();
+            _fromCifProfileConfiguration.AssertConfigurationIsValid();
         }
 
         [Fact]
@@ -33,10 +33,10 @@ namespace Timetable.Web.Test.Mapping.Cif
         
         private static TimetableData CreateTimetable() => new TimetableData(Substitute.For<ILogger>());
         
-        public static Schedule MapSchedule(CifParser.Schedule input = null)
+        public Schedule MapSchedule(CifParser.Schedule input = null, IMapper mapper = null)
         {
             input = input ?? Test.Cif.TestSchedules.Test;
-            var mapper = FromCifProfileConfiguration.CreateMapper();
+            mapper = mapper ?? _fromCifProfileConfiguration.CreateMapper();
             return mapper.Map<CifParser.Schedule, Timetable.Schedule>(input, o =>
             {
                 o.Items.Add("Tocs", CreateLookup());
@@ -110,7 +110,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         [Fact]
         public void MapReusesExistingCalendar()
         {
-            var mapper = FromCifProfileConfiguration.CreateMapper();
+            var mapper = _fromCifProfileConfiguration.CreateMapper();
 
             var output1 = MapSchedule();
             var output2 = MapSchedule();
@@ -146,7 +146,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         public void MapReusesExistingToc()
         {
             var lookup = CreateLookup();
-            var mapper = FromCifProfileConfiguration.CreateMapper();
+            var mapper = _fromCifProfileConfiguration.CreateMapper();
             
             var output1 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(Test.Cif.TestSchedules.Test, o =>
                 {

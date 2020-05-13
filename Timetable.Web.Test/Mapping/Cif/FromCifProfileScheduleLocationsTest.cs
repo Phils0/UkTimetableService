@@ -6,13 +6,13 @@ namespace Timetable.Web.Test.Mapping.Cif
 {
     public class FromCifProfileScheduleLocationsTest
     {
-        private static readonly MapperConfiguration FromCifProfileConfiguration =
+        private readonly MapperConfiguration _fromCifProfileConfiguration =
             FromCifProfileLocationsTest.FromCifProfileConfiguration;
 
         [Fact]
         public void ValidMapping()
         {
-            FromCifProfileConfiguration.AssertConfigurationIsValid();
+            _fromCifProfileConfiguration.AssertConfigurationIsValid();
         }
 
         [Fact]
@@ -22,9 +22,10 @@ namespace Timetable.Web.Test.Mapping.Cif
             Assert.NotEmpty(output.Locations);
         }
 
-        private static Schedule MapSchedule()
+        private Schedule MapSchedule()
         {
-            return FromCifProfileScheduleTest.MapSchedule();
+            var helper = new FromCifProfileScheduleTest();
+            return helper.MapSchedule();
         }
         
         [Fact]
