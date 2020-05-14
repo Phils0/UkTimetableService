@@ -11,16 +11,6 @@ namespace Timetable
 {
     public class Service
     {
-        private sealed class StpDescendingComparer : IComparer<(StpIndicator indicator, ICalendar calendar)>
-        {
-            public int Compare((StpIndicator indicator, ICalendar calendar) x,
-                (StpIndicator indicator, ICalendar calendar) y)
-            {
-                var compare = y.indicator.CompareTo(x.indicator);
-                return compare != 0 ? compare : x.calendar.CompareTo(y.calendar);
-            }
-        }
-        
         private readonly ILogger _logger;
         
         public string TimetableUid { get; }
@@ -136,50 +126,8 @@ namespace Timetable
             if (!HasAssociations())
                 _associations = new AssociationDictionary(1, _logger);
 
-            if (isMain)
-            {
-                Add(association.Associated.TimetableUid);
-                association.SetService(this, true);
-            }
-            else
-            {
-                Add(association.Main.TimetableUid);
-                association.SetService(this, false);
-            }
-
-            void Add(string uid)
-            {
-                if (!_associations.TryGetValue(uid, out var values))
-                {
-                    values = new SortedList<(StpIndicator indicator, ICalendar calendar), Association>(new StpDescendingComparer());
-                    _associations.Add(uid, values);
-                }
-
-                try
-                {
-                    values.Add((association.StpIndicator, association.Calendar), association);
-                }
-                catch (ArgumentException e)
-                {
-                    if(values.TryGetValue((association.StpIndicator, association.Calendar), out var duplicate))
-                    {
-                        // Can have 2 associations that are different but for the same services, see tests
-                        _logger.Warning("Removing Duplicate Associations {association} {duplicate}", association, duplicate);
-                        RemoveAssociation();
-                    }
-                    else
-                        throw;
-                    
-                    void RemoveAssociation()
-                    {
-                        values.Remove((association.StpIndicator, association.Calendar));
-                        if (!values.Any())
-                            _associations.Remove(uid);
-                    }                    
-                }
-
-
-            }
+            if(_associations.Add(association, isMain, this))
+                association.SetService(this, isMain);
         }
         
         public bool HasAssociations()
@@ -193,6 +141,23 @@ namespace Timetable
             
             var origin = schedule.Locations.First() as IDeparture;
             return origin.Time.IsBeforeIgnoringDay(time);
+        }
+
+        internal bool TryGetSchedule((StpIndicator indicator, ICalendar calendar) key, out Schedule schedule)
+        {
+            schedule = null;
+            if (HasNoState)
+                return false;
+
+            if (HasSingleSchedule)
+            {
+                // Assume its good
+                schedule = _schedule;
+                return true;
+            }
+
+            // Simple match, may sometimes not find a match when should
+            return _multipleSchedules.TryGetValue(key, out schedule);
         }
         
         public override string ToString()

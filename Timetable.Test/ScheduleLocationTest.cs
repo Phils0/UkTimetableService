@@ -139,5 +139,35 @@ namespace Timetable.Test
             var scheduleLocation = TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, activity);            
             Assert.Equal(expected, scheduleLocation.AdvertisedStop);
         }
+        
+        [Theory]
+        [InlineData("T-U", AssociationCategory.Join, true)]
+        [InlineData("T", AssociationCategory.Join, false)]
+        [InlineData("TB", AssociationCategory.Join, false)]
+        [InlineData("TF", AssociationCategory.Join, false)]
+        [InlineData("T-D", AssociationCategory.Split, true)]
+        [InlineData("T", AssociationCategory.Split, false)]
+        [InlineData("TB", AssociationCategory.Split, false)]
+        [InlineData("TF", AssociationCategory.Split, false)]
+        public void IsMainConsistent(string activity, AssociationCategory category, bool expected)
+        {
+            var scheduleLocation = TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, activity);            
+            Assert.Equal(expected, scheduleLocation.IsMainConsistent(category));
+        }
+        
+        [Theory]
+        [InlineData("T-U", AssociationCategory.Join, false)]
+        [InlineData("T", AssociationCategory.Join, false)]
+        [InlineData("TB", AssociationCategory.Join, false)]
+        [InlineData("TF", AssociationCategory.Join, true)]
+        [InlineData("T-D", AssociationCategory.Split, false)]
+        [InlineData("T", AssociationCategory.Split, false)]
+        [InlineData("TB", AssociationCategory.Split, true)]
+        [InlineData("TF", AssociationCategory.Split, false)]
+        public void IsAssociatedConsistent(string activity, AssociationCategory category, bool expected)
+        {
+            var scheduleLocation = TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, activity);            
+            Assert.Equal(expected, scheduleLocation.IsAssociatedConsistent(category));
+        }
     }
 }

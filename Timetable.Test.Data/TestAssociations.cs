@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using NSubstitute;
+using Serilog;
 
 namespace Timetable.Test.Data
 {
@@ -28,10 +30,11 @@ namespace Timetable.Test.Data
                 Sequence = 1,
             };
             
-            var association = new Association()
+            var association = new Association(Substitute.For<ILogger>())
             {
                 Main = main,
                 Associated = associated,
+                AtLocation = location,
                 StpIndicator = indicator,
                 Category = category,
                 DateIndicator = dateIndicator,

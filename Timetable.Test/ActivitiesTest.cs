@@ -76,5 +76,63 @@ namespace Timetable.Test
             var activities = new Activities(activitiesString);
             Assert.Equal(expected, activities.AdvertisedStop);
         }
+        
+        [Theory]
+        [InlineData("T", false)]
+        [InlineData("T -U", true)]
+        [InlineData("-UT", true)]
+        [InlineData("T -D", false)]
+        [InlineData("-DT", false)]
+        [InlineData("D", false)]
+        [InlineData("U", false)]
+        [InlineData("D -D", false)]
+        [InlineData("-UU", true)]
+        public void IsTrainJoin(string activity, bool expected)
+        {
+            var activities = new Activities(activity);            
+            Assert.Equal(expected, activities.IsTrainJoin);
+        }
+        
+        [Theory]
+        [InlineData("T", false)]
+        [InlineData("T -U", false)]
+        [InlineData("-UT", false)]
+        [InlineData("T -D", true)]
+        [InlineData("-DT", true)]
+        [InlineData("D", false)]
+        [InlineData("U", false)]
+        [InlineData("D -D", true)]
+        [InlineData("-UU", false)]
+        public void IsTrainSplit(string activity, bool expected)
+        {
+            var activities = new Activities(activity);            
+            Assert.Equal(expected, activities.IsTrainSplit);
+        }
+        
+        [Theory]
+        [InlineData("T", false)]
+        [InlineData("T -U", false)]
+        [InlineData("TB", true)]
+        [InlineData("TB-D", true)]
+        [InlineData("TF", false)]
+        [InlineData("TF-U", false)]
+        public void IsOrigin(string activity, bool expected)
+        {
+            var activities = new Activities(activity);            
+            Assert.Equal(expected, activities.IsOrigin);
+        }
+        
+        [Theory]
+        [InlineData("T", false)]
+        [InlineData("T -U", false)]
+        [InlineData("TB", false)]
+        [InlineData("TB-D", false)]
+        [InlineData("TF", true)]
+        [InlineData("TF-U", true)]
+        public void IsDestination(string activity, bool expected)
+        {
+            var activities = new Activities(activity);            
+            Assert.Equal(expected, activities.IsDestination);
+        }
     }
 }

@@ -177,5 +177,117 @@ namespace Timetable.Test
             var resolved = associations.Resolve(main.TimetableUid, MondayAugust12, main.RetailServiceId);
             Assert.Empty(resolved);
         }
+        
+        [Fact]
+        public void AddSameAssociationTwiceResultsInNeitherBeingAdded()
+        {
+            var service = TestSchedules.CreateScheduleWithService("A12345").Service;
+            var association1 = TestAssociations.CreateAssociation(mainUid: "A12345", associatedUid: "A67890");
+            var association2 = TestAssociations.CreateAssociation(mainUid: "A12345", associatedUid: "A67890");
+           
+            service.AddAssociation(association1, true);
+            service.AddAssociation(association2, true);
+            
+            Assert.False(service.HasAssociations());
+            var associations = service.GetAssociations();
+            Assert.Empty(associations);
+        }
+        
+        [Theory]
+        [InlineData("T-U", AssociationCategory.Join, true)]
+        [InlineData("T", AssociationCategory.Join, false)]
+        [InlineData("TB", AssociationCategory.Join, false)]
+        [InlineData("TF", AssociationCategory.Join, false)]
+        [InlineData("T-D", AssociationCategory.Split, true)]
+        [InlineData("T", AssociationCategory.Split, false)]
+        [InlineData("TB", AssociationCategory.Split, false)]
+        [InlineData("TF", AssociationCategory.Split, false)]
+        public void AddSameAssociationWithDifferentLocationsResolveToCorrectForMain(string activities, AssociationCategory joinSplit, bool expectedHasAssociation)
+        {
+            Test(TestLocations.CLPHMJN, TestLocations.WaterlooMain);
+            Test(TestLocations.WaterlooMain, TestLocations.CLPHMJN);
+
+            void Test(Location location1, Location location2)
+            {
+                var stops = CreateStopsSettingClaphamActivities(activities);
+                var service = TestSchedules.CreateScheduleWithService("A12345", stops: stops).Service;
+                var association1 = TestAssociations.CreateAssociation(mainUid: "A12345", associatedUid: "A67890",
+                    category: joinSplit, location: location1);
+                var association2 = TestAssociations.CreateAssociation(mainUid: "A12345", associatedUid: "A67890",
+                    category: joinSplit, location: location2);
+
+                service.AddAssociation(association1, true);
+                service.AddAssociation(association2, true);
+
+                Assert.Equal(expectedHasAssociation, service.HasAssociations());
+                if (expectedHasAssociation)
+                {
+                    var associations = service.GetAssociations()["A67890"];
+                    Assert.Single(associations);
+                    Assert.Equal(TestLocations.CLPHMJN, associations.Single().Value.AtLocation);
+                }
+            }
+        }
+
+        public static ScheduleLocation[] CreateStopsSettingClaphamActivities(string activities)
+        {
+            var stops = TestSchedules.CreateFourStopSchedule(TestSchedules.Ten);
+            stops[2].Activities = new Activities(activities);
+            return stops;
+        }
+        
+        [Theory]
+        [InlineData("T-U", AssociationCategory.Join, false)]
+        [InlineData("T", AssociationCategory.Join, false)]
+        [InlineData("TB", AssociationCategory.Join, false)]
+        [InlineData("TF", AssociationCategory.Join, true)]
+        [InlineData("T-D", AssociationCategory.Split, false)]
+        [InlineData("T", AssociationCategory.Split, false)]
+        [InlineData("TB", AssociationCategory.Split, true)]
+        [InlineData("TF", AssociationCategory.Split, false)]
+        public void AddSameAssociationWithDifferentLocationsResolveToCorrectForAssociated(string activities, AssociationCategory joinSplit, bool expectedHasAssociation)
+        {
+            Test(TestLocations.CLPHMJN, TestLocations.Woking);
+            Test(TestLocations.Woking, TestLocations.CLPHMJN);
+
+            void Test(Location location1, Location location2)
+            {
+                var stops = CreateAssociateStopsSettingClaphamActivities(joinSplit, activities);
+                var service = TestSchedules.CreateScheduleWithService("A12345", stops: stops).Service;
+                var association1 = TestAssociations.CreateAssociation(mainUid: "A67890",associatedUid:"A12345",  
+                    category: joinSplit, location: location1);
+                var association2 = TestAssociations.CreateAssociation(mainUid: "A67890",associatedUid:"A12345",
+                    category: joinSplit, location: location2);
+
+                service.AddAssociation(association1, false);
+                service.AddAssociation(association2, false);
+
+                Assert.Equal(expectedHasAssociation, service.HasAssociations());
+                if (expectedHasAssociation)
+                {
+                    var associations = service.GetAssociations()["A67890"];
+                    Assert.Single(associations);
+                    Assert.Equal(TestLocations.CLPHMJN, associations.Single().Value.AtLocation);
+                }
+            }
+        }
+        
+        public static ScheduleLocation[] CreateAssociateStopsSettingClaphamActivities(AssociationCategory joinSplit,string activities)
+        {
+            ScheduleLocation[] stops;
+            
+            if (joinSplit.IsJoin())
+            {
+                stops = TestSchedules.CreateWokingClaphamSchedule(TestSchedules.NineForty);
+                stops[2].Activities = new Activities(activities);              
+            }
+            else
+            {
+                stops = TestSchedules.CreateClaphamWokingSchedule(TestSchedules.TenTwentyFive);
+                stops[0].Activities = new Activities(activities);                   
+            }
+            
+            return stops;
+        }
     }
 }

@@ -81,6 +81,14 @@ namespace Timetable
             return Location.Equals(at) && Sequence == sequence;
         }
 
+        internal bool IsMainConsistent(AssociationCategory category) => category.IsJoin()
+            ? Activities.IsTrainJoin
+            : category.IsSplit() && Activities.IsTrainSplit; 
+        
+        internal bool IsAssociatedConsistent(AssociationCategory category) => category.IsJoin()
+            ? Activities.IsDestination
+            : category.IsSplit() && Activities.IsOrigin; 
+        
         public override string ToString()
         {
             return Sequence > 1 ? 

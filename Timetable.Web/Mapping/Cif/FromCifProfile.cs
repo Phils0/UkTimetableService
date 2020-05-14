@@ -34,6 +34,7 @@ namespace Timetable.Web.Mapping.Cif
 
             var locationConverter = new LocationsConverter();
             CreateMap<CifParser.Records.Association, Association>()
+                .ConstructUsing(a => new Association(Log.Logger))
                 .ForMember(d => d.Main, o => o.MapFrom(s => AssociationConverter.ConvertMain(s)))
                 .ForMember(d => d.Associated, o => o.MapFrom(s => AssociationConverter.ConvertAssociated(s)))
                 .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))

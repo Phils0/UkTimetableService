@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 
 namespace Timetable
 {
@@ -10,6 +11,12 @@ namespace Timetable
         Join,          // JJ
         Split,         // VV
         NextPrevious   // NP
+    }
+
+    public static class AssociationCategoryExtensions
+    {
+        public static bool IsJoin(this AssociationCategory category) => category == AssociationCategory.Join;
+        public static bool IsSplit(this AssociationCategory category) => category == AssociationCategory.Split;
     }
     
     public enum AssociationDateIndicator
@@ -25,6 +32,7 @@ namespace Timetable
     /// </summary>
     public class Association
     {
+        private readonly ILogger _logger;
         public AssociationService Main { get; set;  }
         
         public AssociationService Associated { get; set;  }
@@ -52,6 +60,11 @@ namespace Timetable
         
         public bool IsPassenger { get; set; }
 
+        public Association(ILogger logger)
+        {
+            _logger = logger;
+        }
+        
         public void SetService(Service service, bool isMain)
         {
             var associationService = isMain ? Main : Associated;
@@ -77,6 +90,21 @@ namespace Timetable
             return IsMain(timetableUid) ? 
                 Associated.Service :
                 Main.Service;
+        }
+        
+        internal bool HasConsistentLocation(Schedule service, bool isMain)
+        {
+            try
+            {
+                var stop = service.GetStop(Main.AtLocation, Main.Sequence);
+                return isMain ? stop.IsMainConsistent(Category) : stop.IsAssociatedConsistent(Category);
+            }
+            catch (Exception e)
+            {
+                _logger.Warning(e, 
+                    "Error when matching association location {location} {service} {association}:{main}", Main.AtLocation, service, this, isMain);
+                return false;
+            }
         }
         
         public override string ToString()

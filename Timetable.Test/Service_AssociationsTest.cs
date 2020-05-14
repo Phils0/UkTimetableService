@@ -99,10 +99,21 @@ namespace Timetable.Test
             Assert.Empty(associations);
         }
         
-        [Fact]
+        [Fact(Skip="Not currently implemented")]
         public void DoNotHaveOverlappingAssociationsWithTheSameStpIndicator()
         {
-            //TODO
+            var everydayIn2019 =
+                TestSchedules.CreateEverydayCalendar(new DateTime(2019, 1, 1), new DateTime(2019, 12, 31));
+            var service = TestSchedules.CreateScheduleWithService("A12345").Service;
+            var association = TestAssociations.CreateAssociation(mainUid: "A12345", associatedUid: "A67890");
+            var overlapping = TestAssociations.CreateAssociation(mainUid: "A12345", associatedUid: "A67890", calendar: everydayIn2019);
+           
+            service.AddAssociation(association, true);
+            service.AddAssociation(overlapping, true);
+            
+            Assert.False(service.HasAssociations());
+            var associations = service.GetAssociations();
+            Assert.Empty(associations);
         }
         
         [Fact]

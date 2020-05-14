@@ -18,6 +18,15 @@ namespace Timetable
         public string Value { get; }
         
         public PublicStop AdvertisedStop { get; private set; } = PublicStop.NotSet;
+        
+        public bool IsTrainJoin => Value.Contains(AttachVehicles);
+
+        public bool IsTrainSplit => Value.Contains(DetachVehicles);
+        
+        public bool IsOrigin => Value.Contains(TrainBegins);
+ 
+        public bool IsDestination => Value.Contains(TrainFinishes);
+
         public Activities(string activities)
         {
             Value = activities;

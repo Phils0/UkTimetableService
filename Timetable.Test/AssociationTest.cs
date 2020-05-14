@@ -63,5 +63,52 @@ namespace Timetable.Test
             
             var ex = Assert.Throws<ArgumentException>(() => association.SetService(schedule.Service, isMain));
         }
+        
+        [Theory]
+        [InlineData("T-U", AssociationCategory.Join, true)]
+        [InlineData("T", AssociationCategory.Join, false)]
+        [InlineData("TB", AssociationCategory.Join, false)]
+        [InlineData("TF", AssociationCategory.Join, false)]
+        [InlineData("T-D", AssociationCategory.Split, true)]
+        [InlineData("T", AssociationCategory.Split, false)]
+        [InlineData("TB", AssociationCategory.Split, false)]
+        [InlineData("TF", AssociationCategory.Split, false)]
+        public void HasConsistentLocationOnMain(string activities, AssociationCategory joinSplit, bool expected)
+        {
+            var stops = AssociationDictionaryTest.CreateStopsSettingClaphamActivities(activities);
+            var schedule = TestSchedules.CreateScheduleWithService(stops: stops);
+            var association = TestAssociations.CreateAssociation(category: joinSplit);
+            
+            Assert.Equal(expected, association.HasConsistentLocation(schedule, true));
+        }
+        
+        [Theory]
+        [InlineData("T-U", AssociationCategory.Join, false)]
+        [InlineData("T", AssociationCategory.Join, false)]
+        [InlineData("TB", AssociationCategory.Join, false)]
+        [InlineData("TF", AssociationCategory.Join, true)]
+        [InlineData("T-D", AssociationCategory.Split, false)]
+        [InlineData("T", AssociationCategory.Split, false)]
+        [InlineData("TB", AssociationCategory.Split, true)]
+        [InlineData("TF", AssociationCategory.Split, false)]
+        public void HasConsistentLocationOnAssociated(string activities, AssociationCategory joinSplit, bool expected)
+        {
+            var stops = AssociationDictionaryTest.CreateAssociateStopsSettingClaphamActivities(joinSplit, activities);
+            var schedule = TestSchedules.CreateScheduleWithService(stops: stops);
+            var association = TestAssociations.CreateAssociation(category: joinSplit);
+            
+            Assert.Equal(expected, association.HasConsistentLocation(schedule, false));
+        }
+        
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void NotConsistentLocationWhenCannotFindTheStop(bool isMain)
+        {
+            var association = TestAssociations.CreateAssociation(location: TestLocations.Weybridge);
+            var schedule = TestSchedules.CreateScheduleWithService();
+            
+            Assert.False(association.HasConsistentLocation(schedule, isMain));
+        }
     }
 }

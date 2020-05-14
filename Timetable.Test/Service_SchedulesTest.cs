@@ -236,5 +236,78 @@ namespace Timetable.Test
             
             Assert.True(service.StartsBefore(Time.StartRailDay));   
         }
+
+        [Fact]
+        public void TryGetScheduleNoSchedules()
+        {
+            var service = new Service("X12345", Substitute.For<ILogger>());
+            
+            Assert.False(service.TryGetSchedule((StpIndicator.Permanent, TestSchedules.EverydayAugust2019), out var schedule));
+            Assert.Null(schedule);
+        }
+        
+        [Fact]
+        public void TryGetScheduleSingleSchedule()
+        {
+            var baseSchedule = TestSchedules.CreateScheduleWithService();
+            var service = baseSchedule.Service;
+            
+            Assert.True(service.TryGetSchedule((StpIndicator.Permanent, TestSchedules.EverydayAugust2019), out var schedule));
+            Assert.Equal(baseSchedule, schedule);
+        }
+        
+        public static TheoryData<StpIndicator, bool, bool> StpTests =>
+            new TheoryData<StpIndicator, bool, bool>()
+            {
+                {StpIndicator.Permanent, true, true },
+                {StpIndicator.Override, true, false },
+                {StpIndicator.New, false, false },
+            };
+        
+        [Theory]
+        [MemberData(nameof(StpTests))]
+        public void TryGetScheduleMultipleSchedulesDifferentStp(StpIndicator indicator, bool expectedFound, bool isPermanent)
+        {
+            var service = new Service("X12345", Substitute.For<ILogger>());
+            var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
+            var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.EverydayAugust2019);
+            
+            service.Add(permanent);
+            service.Add(overlay);
+            
+            Assert.Equal(expectedFound, service.TryGetSchedule((indicator, TestSchedules.EverydayAugust2019), out var schedule));
+            if (expectedFound)
+            {
+                var expected = isPermanent ? permanent : overlay;
+                Assert.Equal(expected, schedule);
+            }
+        }
+        
+        public static TheoryData<ICalendar, bool, bool> CalendarTests =>
+            new TheoryData<ICalendar, bool, bool>()
+            {
+                {TestSchedules.EverydayAugust2019, true, true },
+                {TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), true, false },
+                {TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday), false, false },
+            };
+        
+        [Theory]
+        [MemberData(nameof(CalendarTests))]
+        public void TryGetScheduleMultipleSchedulesDifferentCalendar(ICalendar calendar, bool expectedFound, bool isFirst)
+        {
+            var service = new Service("X12345", Substitute.For<ILogger>());
+            var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
+            var permanent2 = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            
+            service.Add(permanent);
+            service.Add(permanent2);
+            
+            Assert.Equal(expectedFound,service.TryGetSchedule((StpIndicator.Permanent, calendar), out var schedule));
+            if (expectedFound)
+            {
+                var expected = isFirst ? permanent : permanent2;
+                Assert.Equal(expected, schedule);
+            }
+        }
     }
 }
