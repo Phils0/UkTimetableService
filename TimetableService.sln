@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timetable.Test.Data", "Time
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timetable.Web.IntegrationTest", "Timetable.Web.IntegrationTest\Timetable.Web.IntegrationTest.csproj", "{8B5822BB-5795-4A83-979C-E267B76ED6E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timetable.Web.Plugin", "Timetable.Web.Plugin\Timetable.Web.Plugin.csproj", "{73620FD3-51C4-419D-8F8C-42E290BF9C41}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,5 +53,9 @@ Global
 		{8B5822BB-5795-4A83-979C-E267B76ED6E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B5822BB-5795-4A83-979C-E267B76ED6E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B5822BB-5795-4A83-979C-E267B76ED6E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73620FD3-51C4-419D-8F8C-42E290BF9C41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73620FD3-51C4-419D-8F8C-42E290BF9C41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73620FD3-51C4-419D-8F8C-42E290BF9C41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73620FD3-51C4-419D-8F8C-42E290BF9C41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -13,12 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Context;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Timetable.Web.Model;
-using ILogger = Serilog.ILogger;
 
 namespace Timetable.Web
 {
@@ -29,40 +23,35 @@ namespace Timetable.Web
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            Logger = Log.Logger;
+            Plugins = Plugins.FindPlugins(AppContext.BaseDirectory, Logger);
         }
 
+        public Plugins Plugins { get; }
         public IConfiguration Configuration { get; }
-
+        public ILogger Logger { get;  }
         public bool HasLoadedData { get; private set; } = false;
         
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var factory = new Factory(Factory.MapperConfiguration, Configuration, Log.Logger);
+            var factory = new Factory(Factory.MapperConfiguration, Configuration, Logger);
             var data = LoadData(factory);
 
             services
                 .AddSingleton<ILocationData>(data.Locations)
                 .AddSingleton<ITimetable>(data.Timetable)
-                .AddSingleton<IFilterFactory>(new GatherFilterFactory(Log.Logger))
+                .AddSingleton<IFilterFactory>(new GatherFilterFactory(Logger))
                 .AddSingleton<IMapper>(factory.CreateMapper()) //TODO Swap to scoped
                 .AddSingleton<ILogger>(Log.Logger)
-                .AddSingleton<Model.Configuration>(CreateConfiguration())
-                .AddSwaggerGen(ConfigureSwagger)
+                .AddSingleton<Model.Configuration>(ServiceConfigurationFactory.Create(data.Archive))
                 .AddControllers();
             services.AddHealthChecks().
                 AddCheck("Data", 
                     () => HasLoadedData ? HealthCheckResult.Healthy() : HealthCheckResult.Unhealthy("Data not loaded"), 
                     tags: new[] { "data" });
-
-            Configuration CreateConfiguration()
-            {
-                return new Model.Configuration()
-                {
-                    Version = GetType().Assembly.GetName().Version.ToString(),
-                    Data = data.Archive
-                };
-            }
+            
+            Plugins.ConfigureServices(services);
         }
 
         private Data LoadData(Factory factory)
@@ -94,30 +83,7 @@ namespace Timetable.Web
                 }
             }
         }
-
-        private void ConfigureSwagger(SwaggerGenOptions options)
-        {
-            options.SwaggerDoc("v1", new OpenApiInfo()
-            {
-                Version = "v1",
-                Title = "Timetable Service",
-                Description = "A simple UK rail timetable service.  Look up services and departures and arrivals",
-                Contact = new OpenApiContact()
-                {
-                    Name = "Phil Sharp",
-                },
-                License = new OpenApiLicense()
-                {
-                    Name = "MIT",
-                    Url = new Uri(@"https://github.com/Phils0/UkTimetableService/blob/master/LICENSE") 
-                }           
-            });
-
-            var controllerAssembly = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var controllerPath = Path.Combine(AppContext.BaseDirectory, controllerAssembly);
-            options.IncludeXmlComments(controllerPath);
-        }
-
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -132,9 +98,8 @@ namespace Timetable.Web
                 app.UseHsts();
             }
             
-            app.UseSwagger();
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Timetable Service V1"); });
-            
+            Plugins.Configure(app, env);
+
             app.UseStatusCodePages();
             app.UseHttpsRedirection();
 
