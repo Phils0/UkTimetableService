@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using AutoMapper;
+using Timetable.Test.Data;
 using Xunit;
 using TestSchedules = Timetable.Test.Data.TestSchedules;
 
@@ -56,6 +58,57 @@ namespace Timetable.Web.Test.Mapping
             var output = MapResolvedService(isCancelled);
             var association = output.Associations[0];
             Assert.Equal(isCancelled, association.IsCancelled);
+        }
+        
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MapAssociationWhereMainServiceDoesNotHaveLocation(bool isCancelled)
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var newStops = TestSchedules.DefaultLocations
+                .Where(l => !l.Station.Equals(TestStations.ClaphamJunction))
+                .ToArray();
+            
+            var mainService = TestSchedules.CreateService(stops: newStops);
+            var resolved = TestSchedules.CreateServiceWithAssociation(mainService, isCancelled);
+            
+            var output = 
+                mapper.Map<Timetable.ResolvedService, Model.Service>(resolved, opts => opts.Items["On"] = resolved.On);
+            
+            Assert.True(output.Associations[0].IsBroken);
+            Assert.Null(output.Associations[0].Stop);
+            Assert.Equal(isCancelled, output.Associations[0].IsCancelled);
+        }
+        
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MapAssociationWhereAssociatedServiceDoesNotHaveLocation(bool isCancelled)
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+            var resolved = TestSchedules.CreateServiceWithAssociation(@on: TestDate, isCancelled, "X12345", "A98765", false);
+
+            var association = resolved.Associations[0];
+
+            var newStops = TestSchedules.CreateWokingClaphamSchedule(TestSchedules.NineForty)
+                    .Where(l => !l.Station.Equals(TestStations.ClaphamJunction))
+                    .ToArray();
+            var newService = TestSchedules.CreateScheduleWithService("A98765", stops: newStops);
+            var newAssociation = new ResolvedAssociation(
+                    association.Details, 
+                    association.On, 
+                    association.IsCancelled, 
+                    new ResolvedService(newService, association.On, false));
+            resolved = new ResolvedServiceWithAssociations(resolved, new [] { newAssociation });
+            
+            var output = 
+                    mapper.Map<Timetable.ResolvedService, Model.Service>(resolved, opts => opts.Items["On"] = resolved.On);
+            
+            Assert.True(output.Associations[0].IsBroken);
+            Assert.Null(output.Associations[0].AssociatedServiceStop);
+            Assert.Equal(isCancelled, output.Associations[0].IsCancelled);
         }
         
         [Fact]

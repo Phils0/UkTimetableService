@@ -220,11 +220,20 @@ namespace Timetable.Test.Data
             bool isNextDay = false)
         {
             var resolved = CreateService(mainUid, on: on);
+            return CreateServiceWithAssociation(resolved, associationIsCancelled, associatedUid, isNextDay);
+        }
+
+        public static ResolvedServiceWithAssociations CreateServiceWithAssociation(
+            ResolvedService resolved,
+            bool associationIsCancelled = false,
+            string associatedUid = "A98765", 
+            bool isNextDay = false)
+        {
             var association = CreateAssociation(resolved, associatedUid, associationIsCancelled, isNextDay);
             var resolvedWithAssociations = new ResolvedServiceWithAssociations(resolved, new [] { association });
             return resolvedWithAssociations;
         }
-
+        
         public static ResolvedAssociation CreateAssociation(ResolvedService main, string associatedUid, bool associationIsCancelled = false, bool isNextDay = false)
         {
             var associated = CreateScheduleWithService(associatedUid, stops: CreateWokingClaphamSchedule(NineForty));

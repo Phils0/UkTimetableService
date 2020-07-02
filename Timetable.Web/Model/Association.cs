@@ -9,6 +9,11 @@ namespace Timetable.Web.Model
         /// the one being joined to / split from
         /// </summary>
         public bool IsMain { get; set; }
+        
+        /// <summary>
+        /// Association is broken
+        /// </summary>
+        public bool IsBroken { get; set; }
 
         /// <summary>
         /// Association is cancelled

@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using AutoMapper;
 using Serilog;
+using Serilog.Events;
 
 namespace Timetable.Web.Mapping
 {
-        public abstract class ResolvedServiceConverter<S, FS, A> : 
-            ITypeConverter<Timetable.ResolvedService, S>,  
-            ITypeConverter<Timetable.ResolvedService[], S[]>,
-            ITypeConverter<Timetable.ResolvedServiceStop, FS>
+    public abstract class ResolvedServiceConverter<S, FS, A> :
+        ITypeConverter<Timetable.ResolvedService, S>,
+        ITypeConverter<Timetable.ResolvedService[], S[]>,
+        ITypeConverter<Timetable.ResolvedServiceStop, FS>
         where S : Model.ServiceBase, new()
         where FS : Model.FoundItem, new()
         where A : Model.AssociationBase, new()
@@ -19,14 +20,14 @@ namespace Timetable.Web.Mapping
         {
             _logger = logger;
         }
-        
+
         public S Convert(ResolvedService source, S destination, ResolutionContext context)
         {
             if (source is Timetable.ResolvedServiceWithAssociations withAssociations)
                 return MapServiceWithAssociations(withAssociations, context);
-            return  CreateService(source, context);
+            return CreateService(source, context);
         }
-        
+
         private S CreateService(ResolvedService source, ResolutionContext context)
         {
             var service = context.Mapper.Map<S>(source.Details, opts => opts.Items["On"] = source.On);
@@ -35,7 +36,8 @@ namespace Timetable.Web.Mapping
             return service;
         }
 
-        private S MapServiceWithAssociations(Timetable.ResolvedServiceWithAssociations source, ResolutionContext context)
+        private S MapServiceWithAssociations(Timetable.ResolvedServiceWithAssociations source,
+            ResolutionContext context)
         {
             var thisService = CreateService(source, context);
             var associations = new List<A>();
@@ -51,21 +53,22 @@ namespace Timetable.Web.Mapping
                     _logger.Error(e, "Failed to add association : {sourceAssociation}", sourceAssociation);
                 }
             }
-            
+
             SetAssociations(thisService, associations.ToArray());
             return thisService;
         }
 
         protected abstract void SetAssociations(S service, A[] associations);
-        
+
         private A MapAssociation(ResolvedAssociation source, ResolvedService service, ResolutionContext context)
         {
-            var atStop = Map(source.GetStop(service).Stop.Stop, context);
+            var atStop = FindAndMapStop(source, service, context);
             var (associatedService, associatedStop) = MapOtherService();
 
             var association = new A()
             {
-                Stop =  atStop,
+                Stop = atStop,
+                IsBroken = (atStop == null  || associatedStop == null),
                 IsCancelled = source.IsCancelled,
                 IsMain = source.IsMain(service.TimetableUid),
                 Date = source.On,
@@ -82,7 +85,7 @@ namespace Timetable.Web.Mapping
                 try
                 {
                     var otherService = CreateService(source.AssociatedService, context);
-                    var otherStop = Map(source.GetStop(source.AssociatedService).Stop.Stop, context);
+                    var otherStop = FindAndMapStop(source, source.AssociatedService, context);
                     return (otherService, otherStop);
                 }
                 finally
@@ -94,10 +97,20 @@ namespace Timetable.Web.Mapping
         }
 
         protected abstract void SetAssociatedService(A association, S service);
-        
-        private Model.ScheduledStop Map(Timetable.ScheduleLocation stop, ResolutionContext context)
+
+        private Model.ScheduledStop FindAndMapStop(ResolvedAssociation source, Timetable.ResolvedService service, ResolutionContext context)
         {
-            return context.Mapper.Map<Timetable.ScheduleLocation,Model.ScheduledStop>(stop);
+            try
+            {
+                var stop = source.GetStop(service).Stop.Stop;
+                return context.Mapper.Map<Timetable.ScheduleLocation, Model.ScheduledStop>(stop);
+            }
+            catch (Exception e)
+            {
+                var level = source.IsCancelled ? LogEventLevel.Information : LogEventLevel.Warning;
+                _logger.Write(level, e, "Did not find association stop in service {source} : {service}", source, service);
+                return null;
+            }
         }
 
         public S[] Convert(ResolvedService[] source, S[] destination, ResolutionContext context)
@@ -107,7 +120,7 @@ namespace Timetable.Web.Mapping
             {
                 services.Add(Convert(sourceService, null, context));
             }
-            
+
             return services.ToArray();
         }
 
@@ -117,12 +130,13 @@ namespace Timetable.Web.Mapping
             {
                 At = context.Mapper.Map<Model.ScheduledStop>(source.Stop, opts => opts.Items["On"] = source.On),
                 To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop, opts => opts.Items["On"] = source.On),
-                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop, opts => opts.Items["On"] = source.On),
+                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop,
+                    opts => opts.Items["On"] = source.On),
                 Association = context.Mapper.Map<Model.IncludedAssociation>(source.Association)
             };
             var service = Convert(source.Service, (S) null, context);
             SetService(item, service);
-            
+
             return item;
         }
 
