@@ -3,6 +3,18 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <LangVersion>default</LangVersion>
+        <IsPackable>true</IsPackable>
+        <Authors>Phil Sharp</Authors>
+        <Description>Interface to implement to add additional middleware services to the timetable service</Description>
+        <PackageProjectUrl>https://github.com/Phils0/UkTimetableService/</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/Phils0/UkTimetableService/</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>ukrail plugin</PackageTags>
+        <PackageVersion>0.0.0</PackageVersion>
+        <Title>UK Rail Timetable Service Plugin Interface</Title>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
     
     <ItemGroup>
