@@ -1,6 +1,6 @@
 using System;
+using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -24,7 +24,7 @@ namespace Timetable.Web.IntegrationTest
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             var locations = JsonConvert.DeserializeObject<Model.Station[]>(responseString);
-            Assert.NotEmpty(locations);
+            locations.Should().NotBeEmpty("{url} should return values", url);
         }
     }
 }

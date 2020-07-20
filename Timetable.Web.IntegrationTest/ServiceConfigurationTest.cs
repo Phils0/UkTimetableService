@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using Xunit;
@@ -21,7 +22,7 @@ namespace Timetable.Web.IntegrationTest
                 $"/api/ServiceConfiguration/";
             var response = await client.GetAsync(url);
             
-            response.EnsureSuccessStatusCode();
+            response.IsSuccessStatusCode.Should().BeTrue("{url} should be successful: {status}", url, response.StatusCode);
             var responseString = await response.Content.ReadAsStringAsync();
             var serviceConfig = JsonConvert.DeserializeObject<Model.Configuration>(responseString);
             

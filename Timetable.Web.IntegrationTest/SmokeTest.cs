@@ -1,6 +1,6 @@
 using System;
+using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -21,7 +21,7 @@ namespace Timetable.Web.IntegrationTest
         [InlineData("EUS", "MAN", "VT")]
         [InlineData("LDS", "KGX", "GR")]
         [InlineData("PAD", "BRI", "GW")]
-        [InlineData("GLC", "EUS", "CS")]
+        [InlineData("EDB", "EUS", "CS")]
         public async void MakeDeparturesRequest(string origin, string destination, string toc)
         {
             var client = Host.GetTestClient();
@@ -29,10 +29,10 @@ namespace Timetable.Web.IntegrationTest
                 $"/api/Timetable/departures/{origin}/{TestDate}?to={destination}&fullDay=true&includeStops=false&toc={toc}";
             var response = await client.GetAsync(url);
             
-            response.EnsureSuccessStatusCode();
+            response.IsSuccessStatusCode.Should().BeTrue("{0} should be successful: {1}", url, response.StatusCode);
             var responseString = await response.Content.ReadAsStringAsync();
             var departures = JsonConvert.DeserializeObject<Model.FoundSummaryResponse>(responseString);
-            Assert.NotEmpty(departures.Services);
+            departures.Services.Should().NotBeEmpty("{0} should return values", url);
         }
         
         [Theory]
@@ -46,13 +46,13 @@ namespace Timetable.Web.IntegrationTest
         {
             var client = Host.GetTestClient();
             var url =
-                $"/api/Timetable/toc/{toc}/{TestDate}?includeStops=false&toc=";
+                $"/api/Timetable/toc/{toc}/{TestDate}?includeStops=false";
             var response = await client.GetAsync(url);
             
-            response.EnsureSuccessStatusCode();
+            response.IsSuccessStatusCode.Should().BeTrue("{0} should be successful: {1}", url, response.StatusCode);
             var responseString = await response.Content.ReadAsStringAsync();
             var services = JsonConvert.DeserializeObject<Model.ServiceSummary[]>(responseString);
-            Assert.NotEmpty(services);
+            services.Should().NotBeEmpty("{0} should return values", url);
         }
         
         [Theory]
@@ -64,10 +64,10 @@ namespace Timetable.Web.IntegrationTest
                 $"/api/Timetable/retailService/{rsid}/{TestDate}";
             var response = await client.GetAsync(url);
             
-            response.EnsureSuccessStatusCode();
+            response.IsSuccessStatusCode.Should().BeTrue("{0} should be successful: {1}", url, response.StatusCode);
             var responseString = await response.Content.ReadAsStringAsync();
             var services = JsonConvert.DeserializeObject<Model.Service[]>(responseString);
-            Assert.NotEmpty(services);
+            services.Should().NotBeEmpty("{0} should return values", url);
         }
     }
 }
