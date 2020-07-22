@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using CifParser.Archives;
 using NSubstitute;
 using ReflectionMagic;
 using Serilog;
@@ -19,24 +20,26 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadStations()
         {
-            var config = new LoaderConfig(ConfigurationHelper.GetConfiguration());
-            
-            var factory = new Factory(_mapperConfig, config, Substitute.For<ILogger>());
-            var loader = factory.CreateDataLoader();
-
+            var loader = Create();
             var locations = await loader.LoadStationMasterListAsync(CancellationToken.None);
             
             Assert.NotEmpty(locations);
         }
-        
+
+        private static IDataLoader Create()
+        {
+            var config = new Configuration(ConfigurationHelper.GetConfiguration());
+            
+            return new DataLoader(
+                new Archive(config.TimetableArchiveFile, Substitute.For<ILogger>()), 
+                _mapperConfig.CreateMapper(), 
+                Substitute.For<ILogger>());
+        }
+
         [Fact]
         public async Task LoadCif()
         {
-            var config = new LoaderConfig(ConfigurationHelper.GetConfiguration());
-            
-            var factory = new Factory(_mapperConfig, config, Substitute.For<ILogger>());
-            var loader = factory.CreateDataLoader();
-
+            var loader = Create();
             var data = await loader.LoadAsync(CancellationToken.None);
             var locationData = data.Locations;
             

@@ -15,7 +15,7 @@ namespace Timetable.Web.Controllers
     [ApiController]
     public class ServiceConfigurationController : ControllerBase
     {
-        private readonly Configuration _configuration;
+        private readonly Model.Configuration _configuration;
 
         public ServiceConfigurationController(Model.Configuration configuration)
         {

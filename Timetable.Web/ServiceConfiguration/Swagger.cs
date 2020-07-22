@@ -1,29 +1,34 @@
 using System;
-using System.Composition;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Timetable.Web.Plugin;
 
-namespace Timetable.Web
+namespace Timetable.Web.ServiceConfiguration
 {
-    [Export(typeof(IPlugin))]
-    public class SwaggerPlugin : IPlugin
+    internal class Swagger : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, ILogger logger)
+        public ILogger Logger { get; set; }
+
+        public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSwaggerGen(ConfigureSwagger);
+            services.AddSwaggerGen(options =>
+                {
+                    options.SwaggerDoc("v1", ApiInfo);
+
+                    var controllerAssembly = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var controllerPath = Path.Combine(AppContext.BaseDirectory, controllerAssembly);
+                    options.IncludeXmlComments(controllerPath);
+                });
         }
 
-        private void ConfigureSwagger(SwaggerGenOptions options)
-        {
-            options.SwaggerDoc("v1", new OpenApiInfo()
+        private OpenApiInfo ApiInfo => new OpenApiInfo()
             {
                 Version = "v1",
                 Title = "Timetable Service",
@@ -37,17 +42,17 @@ namespace Timetable.Web
                     Name = "MIT",
                     Url = new Uri(@"https://github.com/Phils0/UkTimetableService/blob/master/LICENSE") 
                 }           
-            });
+            };
 
-            var controllerAssembly = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var controllerPath = Path.Combine(AppContext.BaseDirectory, controllerAssembly);
-            options.IncludeXmlComments(controllerPath);
-        }
-        
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Timetable Service V1"); });
+        }
+        
+        public void ConfigureEndpoints(IEndpointRouteBuilder endpoints)
+        {
+            // Do nothing
         }
     }
 }

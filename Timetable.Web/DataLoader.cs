@@ -10,7 +10,7 @@ using CifParser.Records;
 using Serilog;
 
 namespace Timetable.Web
-{
+{ 
     public class DataLoader : IDataLoader
     {
         private const int LogAfter = 100000;

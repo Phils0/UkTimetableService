@@ -162,7 +162,7 @@ namespace Timetable.Test
 
             var results = filter(source).ToArray();
             
-            Assert.Equal(1, results.Length);
+            Assert.Single(results);
         }
         
         [Fact]

@@ -4,12 +4,18 @@ using NSubstitute;
 
 namespace Timetable.Web.Test
 {
-    public static class ConfigurationHelper
+    internal static class ConfigurationHelper
     {
-        public static IConfigurationRoot GetConfiguration()
+        internal static Configuration GetConfiguration(bool enablePrometheus, bool enableCustomPlugins = false)
+        {
+            return new Configuration(GetConfiguration(enableCustomPlugins.ToString(), enablePrometheus.ToString()));
+        }
+        internal static IConfigurationRoot GetConfiguration(string enableCustomPlugins = "false", string enablePrometheus = "true")
         {
             var appSettings = Substitute.For<IConfigurationRoot>();
             appSettings["TimetableArchive"].Returns("ttis144.zip");
+            appSettings["EnableCustomPlugins"].Returns(enableCustomPlugins);
+            appSettings["EnablePrometheusMonitoring"].Returns(enablePrometheus);
             
             return appSettings;
         }
