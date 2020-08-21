@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
@@ -8,11 +8,11 @@ using Xunit.Abstractions;
 
 namespace Timetable.Web.IntegrationTest
 {
-    public class WebServiceFixture
+    public class WebServiceFixture : IDisposable 
     {
         public static TimeSpan Timeout = new TimeSpan(0, 1, 0);
         
-        public IHost Host { get; }
+        public IHost Host { get; private set; }
 
         public WebServiceFixture(IMessageSink logging)
         {
@@ -51,6 +51,19 @@ namespace Timetable.Web.IntegrationTest
                 var responseTask = client.GetAsync(@"/health");
                 var got = responseTask.Wait(Timeout);
                 return got && responseTask.Result.IsSuccessStatusCode;
+        }
+
+        public void Dispose()
+        {
+            if (Host != null)
+            {
+                var task = Host.StopAsync(CancellationToken.None);
+                var shutdown = task.Wait(Timeout);
+                if(!shutdown)
+                    throw new Exception("Failed to shutdown web host");
+
+                Host = null;
+            }
         }
     }
 }
