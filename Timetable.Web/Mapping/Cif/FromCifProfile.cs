@@ -25,7 +25,9 @@ namespace Timetable.Web.Mapping.Cif
                 .ForMember(d => d.Service, o => o.Ignore())
                 .ForMember(d => d.RetailServiceId, o => o.Ignore())
                 .ForMember(d => d.Operator, o => o.Ignore())
-                .ForMember(d => d.Locations, o => o.Ignore());
+                .ForMember(d => d.Locations, o => o.Ignore())
+                .ForMember(d => d.Arrivals, o => o.Ignore())
+                .ForMember(d => d.Departures, o => o.Ignore());
             CreateMap<CifParser.Records.ScheduleExtraData, Timetable.Schedule>()
                 .DisableCtorValidation()
                 .ForMember(d => d.RetailServiceId, o => o.MapFrom(s => s.RetailServiceId))

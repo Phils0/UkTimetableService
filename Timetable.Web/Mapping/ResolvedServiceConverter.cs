@@ -30,7 +30,8 @@ namespace Timetable.Web.Mapping
 
         private S CreateService(ResolvedService source, ResolutionContext context)
         {
-            var service = context.Mapper.Map<S>(source.Details, opts => opts.Items["On"] = source.On);
+            context.Items["On"] = source.On;
+            var service = context.Mapper.Map<S>(source.Details);
             service.Date = source.On;
             service.IsCancelled = source.IsCancelled;
             return service;
@@ -80,7 +81,7 @@ namespace Timetable.Web.Mapping
 
             (S, Model.ScheduledStop) MapOtherService()
             {
-                // Remember original service date as can change
+                // Association maybe on different day.
                 var originalDate = context.Items["On"];
                 try
                 {
@@ -126,12 +127,13 @@ namespace Timetable.Web.Mapping
 
         public FS Convert(ResolvedServiceStop source, FS destination, ResolutionContext context)
         {
+            // var original = context.Items["On"];
+            // context.Items["On"] = source.On;
             var item = new FS()
             {
-                At = context.Mapper.Map<Model.ScheduledStop>(source.Stop, opts => opts.Items["On"] = source.On),
-                To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop, opts => opts.Items["On"] = source.On),
-                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop,
-                    opts => opts.Items["On"] = source.On),
+                At = context.Mapper.Map<Model.ScheduledStop>(source.Stop),
+                To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop),
+                From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop),
                 Association = context.Mapper.Map<Model.IncludedAssociation>(source.Association)
             };
             var service = Convert(source.Service, (S) null, context);

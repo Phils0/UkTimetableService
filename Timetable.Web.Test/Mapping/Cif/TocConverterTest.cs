@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using NSubstitute;
 using Serilog;
-using Timetable.Web.Mapping.Cif;
+using Timetable.Web.Test.Cif;
 using Xunit;
 
 namespace Timetable.Web.Test.Mapping.Cif
@@ -16,51 +16,55 @@ namespace Timetable.Web.Test.Mapping.Cif
             Name = "Virgin Trains"
         };
         
+        private readonly MapperConfiguration _fromCifProfileConfiguration =
+            FromCifProfileLocationsTest.FromCifProfileConfiguration;
 
-        [Fact]
-        public void ConvertUsesExistingToc()
+        private Schedule MapSchedule(CifParser.Records.ScheduleExtraData input)
+        {
+            var mapper = _fromCifProfileConfiguration.CreateMapper();
+            return mapper.Map<CifParser.Records.ScheduleExtraData, Timetable.Schedule>(input, new Schedule(), o =>
+            {
+                o.Items.Add("Tocs", CreateTocLookup());
+            });
+        }
+        private static TocLookup CreateTocLookup()
         {
             var lookup = new TocLookup(Substitute.For<ILogger>(),
                 new Dictionary<string, Toc>()
                 {
                     {"VT", VT}
                 });
-            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), Substitute.For<IRuntimeMapper>());
-            context.Items.Add("Tocs", lookup);
+            return lookup;
+        }
+        
+        [Fact]
+        public void ConvertUsesExistingToc()
+        {
+            var schedule = TestSchedules.CreateScheduleExtraDetails(toc: "VT");
             
-            var converter = new TocConverter();
+            var output = MapSchedule(schedule);
 
-            var output = converter.Convert("VT", context);
-
-            Assert.Same(VT, output);
+            Assert.Same(VT, output.Operator);
         }
         
         [Fact]
         public void ConvertCreatesNewToc()
         {
-            var lookup = new TocLookup(Substitute.For<ILogger>(),
-                new Dictionary<string, Toc>()
-                {
-                    {"VT", new Toc() {Code = "VT"}}
-                });
-            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), Substitute.For<IRuntimeMapper>());
-            context.Items.Add("Tocs", lookup);
-
-            var converter = new TocConverter();
-            var output = converter.Convert("SW", context);
-
-            Assert.NotSame(VT, output);
-            Assert.Equal("SW", output.Code);
+            var schedule = TestSchedules.CreateScheduleExtraDetails(toc: "SW");
+            
+            var output = MapSchedule(schedule);
+            
+            Assert.Equal("SW", output.Operator.Code);
         }
         
         [Fact]
         public void ThrowsExceptionIfDoNotPassTocs()
         {
-            var context = new ResolutionContext(new MappingOperationOptions<string, Toc>(null), Substitute.For<IRuntimeMapper>());
-            
-            var converter = new TocConverter();
+            var schedule = TestSchedules.CreateScheduleExtraDetails();
+            var mapper = _fromCifProfileConfiguration.CreateMapper();
 
-            Assert.Throws<ArgumentException>(() => converter.Convert("VT", context)) ;
+            var  ex = Assert.Throws<AutoMapperMappingException>(() => mapper.Map<CifParser.Records.ScheduleExtraData, Timetable.Schedule>(schedule, new Schedule()));
+            Assert.IsType<ArgumentException>(ex.InnerException);
         }
     }
 }

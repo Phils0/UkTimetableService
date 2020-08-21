@@ -44,7 +44,7 @@ namespace Timetable.Web.Mapping.Cif
                 }
                 else
                 {
-                    context.Mapper.Map(extra, schedule, context);
+                    context.Mapper.Map(extra, schedule);
                     return true;
                 }
             }
@@ -90,20 +90,20 @@ namespace Timetable.Web.Mapping.Cif
                 ScheduleLocation MapLocation(IntermediateLocation il)
                 {
                     return il.WorkingPass == null
-                        ? (ScheduleLocation) context.Mapper.Map<IntermediateLocation, ScheduleStop>(il, null, context)
-                        : context.Mapper.Map<IntermediateLocation, SchedulePass>(il, null, context);
+                        ? (ScheduleLocation) context.Mapper.Map<IntermediateLocation, ScheduleStop>(il, null)
+                        : context.Mapper.Map<IntermediateLocation, SchedulePass>(il, null);
                 }
 
                 ScheduleLocation MapOrigin(OriginLocation ol)
                 {
-                    var origin = context.Mapper.Map<OriginLocation, ScheduleStop>(ol, null, context);
+                    var origin = context.Mapper.Map<OriginLocation, ScheduleStop>(ol, null);
                     start = origin.Departure.IsBefore(origin.WorkingDeparture) ? origin.Departure : origin.WorkingDeparture;
                     return origin;
                 }
 
                 ScheduleLocation MapDestination(TerminalLocation tl)
                 {
-                    return context.Mapper.Map<TerminalLocation, ScheduleStop>(tl, null, context);
+                    return context.Mapper.Map<TerminalLocation, ScheduleStop>(tl, null);
                 }
                 
                 void EnsureTimesGoToTheFuture(ScheduleLocation scheduleLocation)

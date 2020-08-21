@@ -8,19 +8,13 @@ namespace Timetable.Web.Test.Mapping.Cif
 {
     public class CalendarConverterTest
     {
-        private static readonly MapperConfiguration FromCifProfileConfiguration =
-            FromCifProfileLocationsTest.FromCifProfileConfiguration;
-     
         [Fact]
         public void ConverterReusesExistingCalendar()
         {
-            var mapper = FromCifProfileConfiguration.CreateMapper();
-            var context = new ResolutionContext(null, (IRuntimeMapper) mapper);
-           
             var converter = new CalendarConverter();
 
-            var output1 = converter.Convert(TestSchedules.CreateScheduleDetails(), context);
-            var output2 = converter.Convert(TestSchedules.CreateScheduleDetails(), context);
+            var output1 = converter.Convert(TestSchedules.CreateScheduleDetails(), null);
+            var output2 = converter.Convert(TestSchedules.CreateScheduleDetails(), null);
 
             Assert.Same(output1, output2);
         }
@@ -28,12 +22,9 @@ namespace Timetable.Web.Test.Mapping.Cif
         [Fact]
         public void ConverterCreatesWorkingCalendar()
         {
-            var mapper = FromCifProfileConfiguration.CreateMapper();
-            var context = new ResolutionContext(null, (IRuntimeMapper) mapper);
-           
             var converter = new CalendarConverter();
 
-            var output = converter.Convert(TestSchedules.CreateScheduleDetails(), context);
+            var output = converter.Convert(TestSchedules.CreateScheduleDetails(), null);
 
             Assert.True(output.IsActiveOn(new DateTime(2019, 8, 1)));
             Assert.False(output.IsActiveOn(new DateTime(2019, 8, 3)));

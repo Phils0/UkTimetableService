@@ -49,7 +49,7 @@ namespace Timetable.Web.Test.Cif
             };
         }
 
-        internal static ScheduleExtraData CreateScheduleExtraDetails(
+        public static ScheduleExtraData CreateScheduleExtraDetails(
             string retailServiceId = SW1234,
             string toc = "SW")
         {

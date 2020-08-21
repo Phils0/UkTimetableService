@@ -66,7 +66,7 @@ namespace Timetable.Web.Mapping
             var date = (DateTime) context.Items["On"];
             return date.Add(time.Value);
         }
-
+        
         private Model.ScheduledStop[] MapStops(IReadOnlyList<ScheduleLocation> source, ResolutionContext context)
         {
             return source.Select(s => ConvertToStop(s, context)).ToArray();
@@ -74,15 +74,14 @@ namespace Timetable.Web.Mapping
         private Model.ScheduledStop ConvertToStop(ScheduleLocation scheduleLocation, ResolutionContext context)
         {
             return (Model.ScheduledStop) context.Mapper
-                .Map(scheduleLocation, scheduleLocation.GetType(), typeof(Model.ScheduledStop),
-                    o => o.Items["On"] = context.Items["On"]);
+                .Map(scheduleLocation, scheduleLocation.GetType(), typeof(Model.ScheduledStop));
         }
         
         private Model.ScheduledStop ConvertToStop(ResolvedStop stop, ResolutionContext context)
         {
+            context.Items["On"] = stop.On;
             return (Model.ScheduledStop) context.Mapper
-                .Map(stop.Stop, stop.Stop.GetType(), typeof(Model.ScheduledStop),
-                    o => o.Items["On"] = stop.On );
+                .Map(stop.Stop, stop.Stop.GetType(), typeof(Model.ScheduledStop));
         }
     }
 }
