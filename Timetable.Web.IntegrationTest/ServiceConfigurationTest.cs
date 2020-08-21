@@ -18,8 +18,7 @@ namespace Timetable.Web.IntegrationTest
         public async void MakeServiceConfigurationRequest()
         {
             var client = Host.GetTestClient();
-            var url =
-                $"/api/ServiceConfiguration/";
+            var url = $"/api/ServiceConfiguration/";
             var response = await client.GetAsync(url);
             
             response.IsSuccessStatusCode.Should().BeTrue("{url} should be successful: {status}", url, response.StatusCode);

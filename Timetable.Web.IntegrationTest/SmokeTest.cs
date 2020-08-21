@@ -45,8 +45,7 @@ namespace Timetable.Web.IntegrationTest
         public async void MakeTocRequest(string toc)
         {
             var client = Host.GetTestClient();
-            var url =
-                $"/api/Timetable/toc/{toc}/{TestDate}?includeStops=false";
+            var url = $"/api/Timetable/toc/{toc}/{TestDate}?includeStops=false";
             var response = await client.GetAsync(url);
             
             response.IsSuccessStatusCode.Should().BeTrue("{0} should be successful: {1}", url, response.StatusCode);
@@ -60,8 +59,7 @@ namespace Timetable.Web.IntegrationTest
         public async void MakeRetailServiceIdRequest(string rsid)
         {
             var client = Host.GetTestClient();
-            var url =
-                $"/api/Timetable/retailService/{rsid}/{TestDate}";
+            var url = $"/api/Timetable/retailService/{rsid}/{TestDate}";
             var response = await client.GetAsync(url);
             
             response.IsSuccessStatusCode.Should().BeTrue("{0} should be successful: {1}", url, response.StatusCode);

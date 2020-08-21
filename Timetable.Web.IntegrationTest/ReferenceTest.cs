@@ -17,8 +17,7 @@ namespace Timetable.Web.IntegrationTest
         public async void MakeLocationRequest()
         {
             var client = Host.GetTestClient();
-            var url =
-                $"/api/reference/location/";
+            var url = $"/api/reference/location/";
             var response = await client.GetAsync(url);
             
             response.EnsureSuccessStatusCode();
