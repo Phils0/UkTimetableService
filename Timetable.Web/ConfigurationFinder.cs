@@ -16,10 +16,15 @@ namespace Timetable.Web
     internal static class ConfigurationFinder
     {
         internal static readonly string PluginDir = Path.Combine(AppContext.BaseDirectory, "plugins");
-        
-        internal static ServiceConfigurations Find(Configuration config, ILogger logger = null)
+
+        internal static ServiceConfigurations Find(IConfiguration config)
         {
-            logger = logger ?? Log.Logger;
+            var logger = CreateLogger(config);    // logger used during startup
+            return Find(new Configuration(config), logger);
+        }
+        
+        internal static ServiceConfigurations Find(Configuration config, ILogger logger)
+        {
             logger.Information("Loading configuration", PluginDir);
             
             var configurations = new ServiceConfigurations( logger);
@@ -66,6 +71,17 @@ namespace Timetable.Web
                     logger.Warning(e, "Error loading plugins from {path}", PluginDir);
                 }
             }
+        }
+        
+        internal static ILogger CreateLogger(IConfiguration configuration)
+        {
+            var logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .Enrich.FromLogContext()
+                .CreateLogger();
+
+            logger.Information("Configured logging");
+            return logger;
         }
     }
 }

@@ -12,13 +12,6 @@ namespace Timetable.Web.Test.ServiceConfiguration
 {
     public class SingletonsTest
     {
-        [Fact]
-        public void AddLoggerToDIContainer()
-        {
-            var descriptors = ConfigureServices();
-            descriptors.Should().Contain(d => d.ServiceType.Equals(typeof(ILogger)));
-        }
-
         private static List<ServiceDescriptor> ConfigureServices()
         {
             var descriptors = new List<ServiceDescriptor>();

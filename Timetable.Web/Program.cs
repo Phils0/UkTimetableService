@@ -38,14 +38,14 @@ namespace Timetable.Web
 
         public static IHostBuilder CreateWebHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                })
                 .UseSerilog((context, config) =>
                 {
                     config.ReadFrom.Configuration(context.Configuration);
                     config.Enrich.FromLogContext();
-                })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
                 });
     }
 }

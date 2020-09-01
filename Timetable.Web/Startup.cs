@@ -1,18 +1,10 @@
 ﻿using System;
-using System.IO;
-using System.Net;
-using System.Threading;
-using AutoMapper;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Timetable.Web.Plugin;
 using Timetable.Web.ServiceConfiguration;
 
 namespace Timetable.Web
@@ -21,12 +13,10 @@ namespace Timetable.Web
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = new Configuration(configuration);
-            Plugins = ConfigurationFinder.Find(Configuration);
+            Plugins = ConfigurationFinder.Find(configuration);
         }
-
+        
         internal ServiceConfigurations Plugins { get; }
-        internal Configuration Configuration { get; }
         
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -44,6 +34,7 @@ namespace Timetable.Web
                 app.UseHsts();
             }
             
+            app.UseSerilogRequestLogging();
             Plugins.Configure(app, env);
             app.UseHttpsRedirection();
 

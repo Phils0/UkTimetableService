@@ -15,7 +15,6 @@ namespace Timetable.Web.ServiceConfiguration
         
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ILogger>(Logger);
             services.AddSingleton<IFilterFactory>(new GatherFilterFactory(Logger));
             
             var mapperConfiguration = new MapperConfiguration(
