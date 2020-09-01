@@ -13,15 +13,15 @@ namespace Timetable.Web
     {
         public Startup(IConfiguration configuration)
         {
-            Plugins = ConfigurationFinder.Find(configuration);
+            Configurations = ConfigurationFinder.Find(configuration);
         }
         
-        internal ServiceConfigurations Plugins { get; }
+        internal ServiceConfigurations Configurations { get; }
         
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Plugins.ConfigureServices(services);
+            Configurations.ConfigureServices(services);
             services.AddControllers();
         }
         
@@ -35,13 +35,12 @@ namespace Timetable.Web
             }
             
             app.UseSerilogRequestLogging();
-            Plugins.Configure(app, env);
+            Configurations.Configure(app, env);
             app.UseHttpsRedirection();
-
             app.UseRouting();
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
-                Plugins.ConfigureEndpoints(endpoints);
+                Configurations.ConfigureEndpoints(endpoints);
             });
         }
     }

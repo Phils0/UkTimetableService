@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.IO;
-using AutoMapper;
-using CifParser.Archives;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Timetable.Web.Mapping.Cif;
 using Timetable.Web.Plugin;
 using Timetable.Web.ServiceConfiguration;
 
@@ -19,8 +15,9 @@ namespace Timetable.Web
 
         internal static ServiceConfigurations Find(IConfiguration config)
         {
-            var logger = CreateLogger(config);    // logger used during startup
-            return Find(new Configuration(config), logger);
+            var logConfig = new LoggerConfiguration();
+            Logging.Configure(config, logConfig);
+            return Find(new Configuration(config), logConfig.CreateLogger());
         }
         
         internal static ServiceConfigurations Find(Configuration config, ILogger logger)
@@ -71,17 +68,6 @@ namespace Timetable.Web
                     logger.Warning(e, "Error loading plugins from {path}", PluginDir);
                 }
             }
-        }
-        
-        internal static ILogger CreateLogger(IConfiguration configuration)
-        {
-            var logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .Enrich.FromLogContext()
-                .CreateLogger();
-
-            logger.Information("Configured logging");
-            return logger;
         }
     }
 }
