@@ -7,7 +7,7 @@ namespace Timetable.Test.Data
 {
     public static class TestSchedules
     {
-        private static Toc VirginTrains => new Toc() {Code = "VT", Name = "Virgin Trains"};
+        public static Toc VirginTrains => new Toc() {Code = "VT", Name = "Virgin Trains"};
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
         
         public static ResolvedAssociation[] NoAssociations => new ResolvedAssociation[0];
@@ -83,13 +83,15 @@ namespace Timetable.Test.Data
             Service service = null,
             string retailServiceId = null)
         {
+            retailServiceId = retailServiceId ?? $"VT{timetableId.Substring(1, 4)}00";
+
             var schedule = new Schedule()
             {
                 TimetableUid = timetableId,
                 StpIndicator = indicator,
-                RetailServiceId = retailServiceId ?? $"VT{timetableId.Substring(1, 4)}00",
+                RetailServiceId = retailServiceId,
                 TrainIdentity = $"9Z{timetableId.Substring(1, 2)}",
-                Operator = VirginTrains,
+                Operator = new Toc() { Code = retailServiceId.Substring(0, 2)},
                 Status = ServiceStatus.PermanentPassenger,
                 Category = ServiceCategory.ExpressPassenger,
                 ReservationIndicator = ReservationIndicator.Supported,

@@ -23,6 +23,11 @@ namespace Timetable.Web.Model
         /// </summary>
         public ISet<Location> Locations { get; set; }
         
+        /// <summary>
+        /// The tocs that have services that stop here.
+        /// </summary>
+        public ISet<string> TocServices { get; set; }
+        
         public override string ToString()
         {
             return  String.IsNullOrEmpty(ThreeLetterCode) ? "Not Set" : $"{ThreeLetterCode}";

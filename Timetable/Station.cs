@@ -32,6 +32,11 @@ namespace Timetable
         public ISet<Location> Locations { get; } = new HashSet<Location>();
         
         /// <summary>
+        /// The tocs that have services that stop here
+        /// </summary>
+        public ISet<Toc> TocServices { get; } = new HashSet<Toc>();
+        
+        /// <summary>
         /// Timetable for Station
         /// </summary>
         internal LocationTimetable Timetable { get; }
@@ -86,6 +91,8 @@ namespace Timetable
         public void Add(ScheduleLocation stop)
         {
             Timetable.AddService(stop);
+            if(stop.IsAdvertised())
+                TocServices.Add(stop.Schedule.Operator);
         }
         
         public override string ToString()

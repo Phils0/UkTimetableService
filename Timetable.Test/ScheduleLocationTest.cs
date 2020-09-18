@@ -169,5 +169,25 @@ namespace Timetable.Test
             var scheduleLocation = TestScheduleLocations.CreateStop(TestStations.Surbiton, Test, activity);            
             Assert.Equal(expected, scheduleLocation.IsAssociatedConsistent(category));
         }
+        
+        public static TheoryData<string, bool> AdvertisedStop =>
+            new TheoryData<string, bool>()
+            {
+                {Activities.StopNotAdvertised,false},
+                {Activities.PassengerStop, true},
+                {Activities.PickUpOnlyStop, true},
+                {Activities.SetDownOnlyStop, true},
+                {Activities.RequestStop, true},
+                {Activities.TrainBegins, true},
+                {Activities.TrainFinishes, true},  
+            };
+
+        [Theory]
+        [MemberData(nameof(AdvertisedStop))]
+        public void IsAdvertisedStop(string activity, bool expected)
+        {
+            var stop = TestScheduleLocations.CreateStop(TestStations.Surbiton, TestSchedules.Ten, activity);
+            Assert.Equal(expected, stop.IsAdvertised());
+        }
     }
 }

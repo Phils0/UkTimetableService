@@ -1,4 +1,5 @@
 using System.Linq;
+using NSubstitute;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.TestCorrelator;
@@ -150,6 +151,69 @@ namespace Timetable.Test
         {
             var test = TestStations.Waterloo;
             Assert.Equal(expected, test.Equals(other));
+        }
+
+        [Fact]
+        public void AddScheduleLocationSetsToc()
+        {
+            var test = TestStations.Waterloo;
+            var stop = CreateStop("X12345");
+            
+            test.Add(stop);
+            
+            Assert.NotEmpty(test.TocServices);
+            Assert.Equal(TestSchedules.VirginTrains, test.TocServices.First());
+        }
+        
+        private static ScheduleStop CreateStop(string timetableUid)
+        {
+            var service = new Service(timetableUid, Substitute.For<ILogger>());
+            var schedule = TestSchedules.CreateSchedule(timetableId: timetableUid, service: service);
+            var stop = schedule.Destination;
+            return stop;
+        }
+
+        [Fact]
+        public void DoesNotAddTocIfDoesNotStop()
+        {
+            var test = TestStations.Waterloo;
+            var service = new Service( "X12345", Substitute.For<ILogger>());
+            var schedule = TestSchedules.CreateSchedule(timetableId: "X12345", service: service, stops: TestSchedules.CreateThreeStopSchedule(TestSchedules.Ten));
+            var stop = schedule.Locations[2];    // Pass
+            
+            test.Add(stop);
+            
+            Assert.Empty(test.TocServices);
+        }
+        
+        [Fact]
+        public void AddScheduleLocationAddsTocIfNotAlreadyAdded()
+        {
+            var test = TestStations.Waterloo;
+            var stop = CreateStop("X12345");
+
+            test.Add(stop);
+            
+            var service = new Service("X98765", Substitute.For<ILogger>());
+            var schedule = TestSchedules.CreateSchedule("X98765", retailServiceId: "SW123400");
+            var stop2 = schedule.Destination;
+            test.Add(stop2);
+            
+            Assert.Equal(2, test.TocServices.Count);
+        }
+        
+        [Fact]
+        public void AddScheduleLocationDoesNotAddsTocAgain()
+        {
+            var test = TestStations.Waterloo;
+            var stop = CreateStop("X12345");
+
+            test.Add(stop);
+            
+            var stop2 = CreateStop("X98765");
+            test.Add(stop2);
+            
+            Assert.Single(test.TocServices);
         }
     }
 }

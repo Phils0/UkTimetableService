@@ -58,7 +58,7 @@ namespace Timetable
             return Station.Equals(at);
         }
         
-        public bool HasAdvertisedTime(bool useDepartures)
+        internal bool HasAdvertisedTime(bool useDepartures)
         {
             switch (AdvertisedStop)
             {
@@ -75,6 +75,9 @@ namespace Timetable
                     return false;
             }
         }
+        
+        internal bool IsAdvertised()
+            => HasAdvertisedTime(true) || HasAdvertisedTime(false);
         
         public bool IsStop(Location at, int sequence)
         {

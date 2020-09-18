@@ -12,6 +12,8 @@ namespace Timetable.Web.Mapping
         {
             CreateMap<Timetable.Coordinates, Model.Coordinates>();
             CreateMap<Timetable.Location, Model.Location>();
+            CreateMap<Timetable.Toc, string>()
+                .ConvertUsing((s, d, c) => s.Code );
             CreateMap<Timetable.Station, Model.Station>();
 
             CreateMap<Timetable.Location, Model.LocationId>();
