@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Timetable.Web.Model;
+using Serilog;
 
 namespace Timetable.Web.Controllers
 {
@@ -16,10 +13,12 @@ namespace Timetable.Web.Controllers
     public class ServiceConfigurationController : ControllerBase
     {
         private readonly Model.Configuration _configuration;
+        private readonly ILogger _logger;
 
-        public ServiceConfigurationController(Model.Configuration configuration)
+        public ServiceConfigurationController(Model.Configuration configuration, ILogger logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         /// <summary>
@@ -27,12 +26,23 @@ namespace Timetable.Web.Controllers
         /// </summary>
         /// <returns>App and data versions</returns>
         /// <response code="200">Ok</response>
+        /// <response code="500">Internal Server Error</response>
         [ProducesResponseType(200, Type = typeof(Model.Configuration))]
+        [ProducesResponseType(500)]
         [Route("api/[controller]")]
         [HttpGet]
         public async Task<IActionResult> LocationAsync()
         {
-            return await Task.FromResult(Ok(_configuration));
+            try
+            {
+                return await Task.FromResult(Ok(_configuration));
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error getting service configuration");
+                return await Task.FromResult(StatusCode(500));;
+            }
+            
         }
     }
 }
