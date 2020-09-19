@@ -26,14 +26,14 @@ namespace Timetable.Web.Controllers
 
         protected abstract GatherConfiguration.GatherFilter CreateFilter(Station station);
         
-        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs)
+        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, TocFilter tocs)
         {
             return CreateRequest(location, at, toFrom, before, after, requestType, tocs, false, "");
         }
 
-        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, string[] tocs, bool fullDay,  string dayBoundary)
+        protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, TocFilter tocs, bool fullDay,  string dayBoundary)
         {
-            var request = new SearchRequest()
+            return new SearchRequest()
             {
                 Location = location,
                 At = new Window()
@@ -44,14 +44,13 @@ namespace Timetable.Web.Controllers
                     FullDay = fullDay,
                     DayBoundary = dayBoundary
                 },
+                TocFilter = tocs.Tocs,
                 ComingFromGoingTo = toFrom,
                 Type = requestType
             };
-            request.SetTocs(tocs);
-            return request;
         }
         
-        protected SearchRequest CreateFullDayRequest(string location, DateTime at, string toFrom, string requestType, string[] tocs,  string dayBoundary)
+        protected SearchRequest CreateFullDayRequest(string location, DateTime at, string toFrom, string requestType, TocFilter tocs,  string dayBoundary)
         {
             return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true, dayBoundary);
         }
@@ -101,13 +100,13 @@ namespace Timetable.Web.Controllers
             }
         }
         
-        protected GatherConfiguration CreateGatherConfig(SearchRequest request)
+        protected GatherConfiguration CreateGatherConfig(SearchRequest request, TocFilter tocFilter)
         {
-            var filter = CreateFilter(request);
+            var filter = CreateFilter(request, tocFilter);
             return new GatherConfiguration(request.At.Before, request.At.After, false, filter);
         }
         
-        protected GatherConfiguration.GatherFilter CreateFilter(SearchRequest request)
+        protected GatherConfiguration.GatherFilter CreateFilter(SearchRequest request, TocFilter tocFilter)
         {
             GatherConfiguration.GatherFilter filter = _filters.NoFilter;
             if (!string.IsNullOrEmpty(request.ComingFromGoingTo))
@@ -118,9 +117,7 @@ namespace Timetable.Web.Controllers
                     _logger.Warning("Not adding filter.  Did not find location {toFrom}", request.ComingFromGoingTo);                
             }
             
-            if (!string.IsNullOrEmpty(request.TocFilter))
-                filter = _filters.ProvidedByToc(request.TocFilter, filter);
-            
+            filter = _filters.ProvidedByToc(tocFilter, filter);
             return filter;
         }
         

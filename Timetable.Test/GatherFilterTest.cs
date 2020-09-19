@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NSubstitute;
 using Serilog;
@@ -129,20 +130,26 @@ namespace Timetable.Test
             Assert.Empty(results);
         }
         
+        public static TheoryData<TocFilter, int> FilterTocData =>
+            new TheoryData<TocFilter, int>()
+            {
+                {new TocFilter(new [] {"VT"}), 2},
+                {new TocFilter(new [] {"GR"}), 1},
+                {new TocFilter(new [] {"VT", "GR"}), 3},
+                {new TocFilter(new [] {"GW"}), 0},
+            };
+        
         [Theory]
-        [InlineData("VT", 2)]
-        [InlineData("GR", 1)]
-        [InlineData("GR|VT", 3)]
-        [InlineData("GW", 0)]
-        public void FilterTocs(string tocFilterString, int expected)
+        [MemberData(nameof(FilterTocData))]
+        public void FilterTocs(TocFilter tocFilter, int expected)
         {
             var source = ComesFromSource;
-            source[0].Operator.Code = "GR";
-            source[1].Operator.Code = "VT";
-            source[2].Operator.Code = "VT";
-            source[3].Operator.Code = "SW";
+            source[0].Service.Details.Operator = new Toc("GR");
+            source[1].Service.Details.Operator = new Toc("VT");
+            source[2].Service.Details.Operator = new Toc("VT");
+            source[3].Service.Details.Operator = new Toc("SW");
 
-            var filter = Factory.ProvidedByToc(tocFilterString, Factory.NoFilter);
+            var filter = Factory.ProvidedByToc(tocFilter, Factory.NoFilter);
 
             var results = filter(source).ToArray();
             
@@ -153,27 +160,50 @@ namespace Timetable.Test
         public void FilterTocsHandlesExceptions()
         {
             var source = ComesFromSource;
-            source[0].Operator.Code = "GR";
+            source[0].Service.Details.Operator = new Toc("GR");
             source[1].Service.Details.Operator = null;
-            source[2].Operator.Code = "VT";
-            source[3].Operator.Code = "SW";
+            source[2].Service.Details.Operator = new Toc("VT");
+            source[3].Service.Details.Operator = new Toc("SW");
 
-            var filter = Factory.ProvidedByToc("VT", Factory.NoFilter);
+            var filter = Factory.ProvidedByToc(TocFilter, Factory.NoFilter);
 
             var results = filter(source).ToArray();
             
             Assert.Single(results);
         }
         
+        private TocFilter TocFilter => new TocFilter(new [] {"VT"});
+        
         [Fact]
         public void HandlesBeingPassedAnEmptyEnumerable()
         {
             var source = Enumerable.Empty<ResolvedServiceStop>();
     
-            var filter = Factory.ProvidedByToc("VT", Factory.NoFilter);
+            var filter = Factory.ProvidedByToc(TocFilter, Factory.NoFilter);
 
             var results = filter(source);
             Assert.Empty(results);
+        }
+        
+        public static IEnumerable<object[]> Tocs
+        {
+            get
+            {
+                yield return new object[] {new TocFilter(new [] {"VT"}), true};
+                yield return new object[] {new TocFilter(null), false};
+            }
+        }
+
+        [MemberData(nameof(Tocs))]
+        [Theory]
+        public void SetTocGatherFilter(TocFilter filter, bool addedFilter)
+        {
+            var noFilter = Factory.NoFilter;
+            var gatherFilter = Factory.ProvidedByToc(filter , noFilter);
+            if(addedFilter)
+                Assert.NotSame(noFilter, gatherFilter);
+            else
+                Assert.Same(noFilter, gatherFilter);
         }
     }
 }

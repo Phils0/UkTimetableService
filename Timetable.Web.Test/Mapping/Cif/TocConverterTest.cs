@@ -10,9 +10,8 @@ namespace Timetable.Web.Test.Mapping.Cif
 {
     public class TocConverterTest
     {
-        private static readonly Toc VT = new Toc()
+        private static readonly Toc VT = new Toc("VT")
         {
-            Code = "VT",
             Name = "Virgin Trains"
         };
         

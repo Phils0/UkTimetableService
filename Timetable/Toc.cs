@@ -7,16 +7,20 @@ namespace Timetable
 {
     public class Toc : IEquatable<string>, IEquatable<Toc>
     {
-        public static readonly Toc Unknown = new Toc()
+        public static readonly Toc Unknown = new Toc("??")
         {
-            Code = "??",
             Name = "Unknown"
         };
 
-        public string Code { get; set; }
+        public string Code { get; }
 
         public string Name { get; set; } = "";
 
+        public Toc(string code)
+        {
+            Code = code;
+        }
+        
         public bool Equals(string other)
         {
             return Code.Equals(other);
@@ -63,10 +67,7 @@ namespace Timetable
             if (!_values.TryGetValue(key, out var value))
             {
                 _logger.Information("{key} Toc not found. Creating.", key);
-                var newValue = new Toc()
-                {
-                    Code = key
-                };
+                var newValue = new Toc(key);
                 value = _values.GetOrAdd(key, newValue);
             }
 

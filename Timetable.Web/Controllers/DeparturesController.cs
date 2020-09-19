@@ -72,25 +72,26 @@ namespace Timetable.Web.Controllers
         public async Task<IActionResult> Departures(string location, DateTime at, [FromQuery] string to = "", 
             [FromQuery] ushort before = 1, [FromQuery] ushort after = 5, [FromQuery] bool fullDay = false, [FromQuery] string dayBoundary = "00:00", [FromQuery] bool includeStops = false, [FromQuery] string[] toc = null)
         {
+            var tocFilter = new TocFilter(toc);
             if (fullDay)
-                return await FullDayDepartures(location, at.Date, to, includeStops, toc, dayBoundary);
+                return await FullDayDepartures(location, at.Date, to, includeStops, tocFilter, dayBoundary);
             
-            var request = CreateRequest(location, at, to, before, after, SearchRequest.DEPARTURES, toc);
+            var request = CreateRequest(location, at, to, before, after, SearchRequest.DEPARTURES, tocFilter);
             return await Process(request, async () =>
             {
-                var config = CreateGatherConfig(request);
+                var config = CreateGatherConfig(request, tocFilter);
                 var result = _timetable.FindDepartures(request.Location, at, config);
                 return await Task.FromResult(result);
             }, includeStops);
         }
         
-        private async Task<IActionResult> FullDayDepartures(string location, DateTime onDate, string to, bool includeStops, string[] tocs, string dayBoundary)
+        private async Task<IActionResult> FullDayDepartures(string location, DateTime onDate, string to, bool includeStops, TocFilter tocFilter, string dayBoundary)
         {
-            var request = CreateFullDayRequest(location, onDate, to, SearchRequest.DEPARTURES, tocs, dayBoundary);
+            var request = CreateFullDayRequest(location, onDate, to, SearchRequest.DEPARTURES, tocFilter, dayBoundary);
             return await Process(request, async () =>
             {
                 var boundary = Time.Parse(dayBoundary);
-                var filter = CreateFilter(request);
+                var filter = CreateFilter(request, tocFilter);
                 var result = _timetable.AllDepartures(request.Location, onDate, filter, boundary);
                 return await Task.FromResult(result);
             }, includeStops);

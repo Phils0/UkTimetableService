@@ -54,7 +54,7 @@ namespace Timetable.Web.Test.Mapping
 
             var station = TestStations.Waterloo;
             station.TocServices.Add(TestSchedules.VirginTrains);
-            station.TocServices.Add(new Toc() {Code = "SW"});
+            station.TocServices.Add(new Toc("SW"));
 
             var output = mapper.Map<Timetable.Station,  Model.Station>(station);
             

@@ -10,7 +10,7 @@ namespace Timetable.Test
         [Fact]
         public void ReturnsExistingToc()
         {
-            var vt = new Toc() {Code = "VT"};
+            var vt = new Toc("VT");
             
             var lookup = new TocLookup(Substitute.For<ILogger>(),
                 new Dictionary<string, Toc>()

@@ -34,27 +34,5 @@ namespace Timetable.Web.Test
             request.ComingFromGoingTo = input;
             Assert.Equal(expected, request.ComingFromGoingTo);
         }
-        
-        public static IEnumerable<object[]> Tocs
-        {
-            get
-            {
-                yield return new object[] {new [] {"VT"}, "VT"};
-                yield return new object[] {new [] {"vt"}, "VT"};
-                yield return new object[] {new [] {"VT", "GR"}, "VT|GR"};
-                yield return new object[] {new [] {"VT", "GR", "GW"}, "VT|GR|GW"};
-                yield return new object[] {new string[0], ""};
-                yield return new object[] {null, ""};
-            }
-        }
-
-        [Theory]
-        [MemberData(nameof(Tocs))]
-        public void SetTocs(string[] tocs, string expectedFilter)
-        {
-            var request = new SearchRequest();
-            request.SetTocs(tocs);
-            Assert.Equal(expectedFilter, request.TocFilter);
-        }
     }
 }

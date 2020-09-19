@@ -69,25 +69,26 @@ namespace Timetable.Web.Controllers
         public async Task<IActionResult> Arrivals(string location, DateTime at, [FromQuery] string from = "",
             [FromQuery] ushort before = 3, [FromQuery] ushort after = 3, [FromQuery] bool fullDay = false, [FromQuery] string dayBoundary = "00:00", [FromQuery] bool includeStops = false, [FromQuery] string[] toc = null)
         {
+            var tocFilter = new TocFilter(toc);
             if (fullDay)
-                return await FullDayArrivals(location, at.Date, from, includeStops, toc, dayBoundary);
+                return await FullDayArrivals(location, at.Date, from, includeStops, tocFilter, dayBoundary);
             
-            var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS, toc);
+            var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS, tocFilter);
             return await Process(request, async () =>
             {
-                var config = CreateGatherConfig(request);
+                var config = CreateGatherConfig(request, tocFilter);
                 var result =  _timetable.FindArrivals(request.Location, at, config);
                 return await Task.FromResult(result);
             }, includeStops);
         }
         
-        private async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, string from, bool includeStops, string[] tocs,  string dayBoundary)
+        private async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, string from, bool includeStops, TocFilter tocFilter,  string dayBoundary)
         {
-            var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS, tocs, dayBoundary);
+            var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS, tocFilter, dayBoundary);
             return await Process(request, async () =>
             {
                 var boundary = Time.Parse(dayBoundary);
-                var filter = CreateFilter(request);
+                var filter = CreateFilter(request, tocFilter);
                 var result = _timetable.AllArrivals(request.Location, onDate, filter, boundary);
                 return await Task.FromResult(result);
             }, includeStops);

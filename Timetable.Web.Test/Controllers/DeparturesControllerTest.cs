@@ -116,22 +116,8 @@ namespace Timetable.Web.Test.Controllers
                 filterFactory.DidNotReceive().DeparturesGoTo(Arg.Any<Station>());
         }
         
-        public static IEnumerable<object[]> Tocs
-        {
-            get
-            {
-                yield return new object[] {new [] {"VT"}, "VT", true};
-                yield return new object[] {new [] {"vt"}, "VT", true};
-                yield return new object[] {new [] {"VT", "GR"}, "VT|GR", true};
-                yield return new object[] {new [] {"VT", "GR", "GW"}, "VT|GR|GW", true};
-                yield return new object[] {new string[0], "", false};
-                yield return new object[] {null, "", false};
-            }
-        }
-        
-        [Theory]
-        [MemberData(nameof(Tocs))]
-        public async Task SetsTocFilter(string[] tocs, string expectedTocFilter, bool expectedToHaveFilter)
+        [Fact]
+        public async Task SetsTocFilter()
         {
             var data = Substitute.For<ILocationData>();
             data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
@@ -140,20 +126,16 @@ namespace Timetable.Web.Test.Controllers
             var filter = Substitute.For<GatherConfiguration.GatherFilter>();
             var filterFactory = Substitute.For<IFilterFactory>();
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
-            filterFactory.ProvidedByToc(expectedTocFilter, GatherFilterFactory.NoFilter).Returns(filter);
+            filterFactory.ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter).Returns(filter);
             
             var controller = new DeparturesController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.Departures("SUR", Aug12AtTen, toc: tocs) as ObjectResult;
-
-            if (expectedToHaveFilter)
-                filterFactory.Received().ProvidedByToc(expectedTocFilter, GatherFilterFactory.NoFilter);
-            else
-                filterFactory.DidNotReceive().ProvidedByToc(Arg.Any<string>(), Arg.Any<GatherConfiguration.GatherFilter>());
+            var response = await controller.Departures("SUR", Aug12AtTen, toc: new [] {"VT"}) as ObjectResult;
+            
+            filterFactory.Received().ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter);
         }
         
-        [Theory]
-        [MemberData(nameof(Tocs))]
-        public async Task DeparturesNowSetsTocFilter(string[] tocs, string expectedTocFilter, bool expectedToHaveFilter)
+        [Fact]
+        public async Task DeparturesNowSetsTocFilter()
         {
             var data = Substitute.For<ILocationData>();
             data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
@@ -162,15 +144,12 @@ namespace Timetable.Web.Test.Controllers
             var filter = Substitute.For<GatherConfiguration.GatherFilter>();
             var filterFactory = Substitute.For<IFilterFactory>();
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
-            filterFactory.ProvidedByToc(expectedTocFilter, GatherFilterFactory.NoFilter).Returns(filter);
+            filterFactory.ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter).Returns(filter);
             
             var controller = new DeparturesController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.Departures("SUR", toc: tocs) as ObjectResult;
-
-            if (expectedToHaveFilter)
-                filterFactory.Received().ProvidedByToc(expectedTocFilter, GatherFilterFactory.NoFilter);
-            else
-                filterFactory.DidNotReceive().ProvidedByToc(Arg.Any<string>(), Arg.Any<GatherConfiguration.GatherFilter>());
+            var response = await controller.Departures("SUR", toc: new [] {"VT"}) as ObjectResult;
+            
+            filterFactory.Received().ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter);
         }
         
         [Theory]

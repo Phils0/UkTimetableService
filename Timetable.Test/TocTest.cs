@@ -5,9 +5,8 @@ namespace Timetable.Test
 {
     public class TocTest
     {
-        private Toc VT => new Toc()
+        private Toc VT => new Toc("VT")
                             {
-                                Code = "VT",
                                 Name = "Virgin Trains"
                             };
         

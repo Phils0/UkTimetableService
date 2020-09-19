@@ -42,11 +42,6 @@ namespace Timetable.Web.Model
         /// Only services from these TOCs returned
         /// </summary>
         public string TocFilter { get; set; } = "";
-
-        public void SetTocs(string[] tocs)
-        {
-            TocFilter = tocs == null ? "" : String.Join('|', tocs).ToUpper();
-        }
         
         public override string ToString()
         {

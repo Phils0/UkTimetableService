@@ -9,7 +9,7 @@ namespace Timetable
         GatherConfiguration.GatherFilter NoFilter { get; }
         GatherConfiguration.GatherFilter DeparturesGoTo(Station destination);
         GatherConfiguration.GatherFilter ArrivalsComeFrom(Station origin);
-        GatherConfiguration.GatherFilter ProvidedByToc(string tocs, GatherConfiguration.GatherFilter innerFilter);
+        GatherConfiguration.GatherFilter ProvidedByToc(TocFilter filter, GatherConfiguration.GatherFilter innerFilter);
     }
 
     public class GatherFilterFactory : IFilterFactory
@@ -51,10 +51,11 @@ namespace Timetable
             return (s => s.Where(SuppressExceptions(service => service.ComesFrom(origin))));
         }
         
-        public GatherConfiguration.GatherFilter ProvidedByToc(string tocs, GatherConfiguration.GatherFilter innerFilter)
+        public GatherConfiguration.GatherFilter ProvidedByToc(TocFilter filter, GatherConfiguration.GatherFilter innerFilter)
         {
-            return (s => innerFilter(s).
-                Where(SuppressExceptions(service => tocs.Contains(service.Operator.Code))));
+            return filter.NoFilter ? 
+                innerFilter :
+                (s => innerFilter(s).Where(SuppressExceptions(service => filter.IsValid(service.Operator))));
         }
     }
 }
