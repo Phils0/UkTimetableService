@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +30,7 @@ namespace Timetable.Web.Controllers
         /// <summary>
         /// Returns UK rail locations that you can use in this API
         /// </summary>
-        /// <param name="toc">Only services from included TOCs included.  Can add multiple to querystring, then any service ran by any of them returned</param>
+        /// <param name="toc">Only locations with services from included TOCs included.  Can add multiple to querystring, then any location with any service ran by any of them is returned</param>
         /// <returns>Set of locations</returns>
         /// <response code="200">Ok</response>
         /// <response code="404">Not Found</response>
