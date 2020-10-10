@@ -34,7 +34,17 @@ namespace Timetable.Web.Test.Mapping
 
             var output = mapper.Map<Timetable.Station,  Model.Station>(TestStations.Surbiton);
             
-            Assert.Equal("5571", output.Nlc);
+            Assert.Equal("557100", output.Nlc);
+        }
+        
+        [Fact]
+        public void StationMapName()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var output = mapper.Map<Timetable.Station,  Model.Station>(TestStations.Surbiton);
+            
+            Assert.Equal("Surbiton", output.Name);
         }
         
         [Fact]

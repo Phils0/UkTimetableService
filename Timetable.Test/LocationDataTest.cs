@@ -45,7 +45,7 @@ namespace Timetable.Test
             Assert.Equal("123456", surbiton.Nlc);
             
             var surbitonStation = data.Locations["SUR"];
-            Assert.Equal("1234", surbitonStation.Nlc);
+            Assert.Null(surbitonStation.Nlc);
         }
         
         [Fact]
@@ -84,7 +84,7 @@ namespace Timetable.Test
         public void FindStation(string threeLetterCode, bool found)
         {
             var data = TestData.Locations;
-            var find = data.TryGetLocation(threeLetterCode, out Station location);
+            var find = data.TryGetStation(threeLetterCode, out Station location);
             
             Assert.Equal(found, find);
             if(found)

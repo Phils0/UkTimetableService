@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -22,9 +23,19 @@ namespace Timetable.Web.Test
         public async Task LoadStations()
         {
             var loader = Create();
-            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None);
+            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
             
-            Assert.NotEmpty(locations);
+            Assert.NotEmpty(locations.Locations);
+        }
+        
+        [Fact]
+        public async Task StationsHaveNames()
+        {
+            var loader = Create();
+            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
+            locations = await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, CancellationToken.None) as LocationData;
+            
+            Assert.NotEmpty(locations.Locations.Values.Where(l => !string.IsNullOrEmpty(l.Name)));
         }
 
         private static IDataLoader Create()

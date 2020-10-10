@@ -21,14 +21,14 @@ namespace Timetable
         /// <param name="locations"></param>
         /// <param name="token"></param>
         /// <returns>Returns list of tocs loaded from the knowledgebase toc data</returns>
-        Task<IEnumerable<Location>> UpdateLocationsWithKnowledgebaseStationsAsync(IEnumerable<Location> locations, CancellationToken token);
+        Task<ILocationData> UpdateLocationsWithKnowledgebaseStationsAsync(ILocationData locations, CancellationToken token);
         
         /// <summary>
         /// Load Station Master List
         /// </summary>
         /// <param name="token"></param>
         /// <returns>Returns list of locations loaded from the master station list</returns>
-        Task<IEnumerable<Location>> LoadStationMasterListAsync(CancellationToken token);
+        Task<ILocationData> LoadStationMasterListAsync(CancellationToken token);
         
         /// <summary>
         /// Load CIf file data

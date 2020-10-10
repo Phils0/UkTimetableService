@@ -9,6 +9,7 @@ using CifParser;
 using CifParser.Archives;
 using CifParser.Records;
 using NreKnowledgebase;
+using NreKnowledgebase.SchemaV4;
 using Serilog;
 using Timetable.Web.Mapping.Knowledgebase;
 
@@ -34,30 +35,70 @@ namespace Timetable.Web
         public async Task<TocLookup> LoadKnowledgebaseTocsAsync(CancellationToken token)
         {
             var lookup = new TocLookup(_logger, new Dictionary<string, Toc>());
-            
+
+            TrainOperatingCompanyList tocs = null;
             try
             {
-                var tocs = await _knowledgebase.GetTocs(token);
-                foreach (var toc in tocs.TrainOperatingCompany)
-                {
-                    var t = TocMapper.Map(toc);
-                    lookup.Add(toc.AtocCode, t);
-                }
+                tocs = await _knowledgebase.GetTocs(token);
             }
             catch (Exception e)
             {
                 _logger.Warning(e,"Error loading Knowledgebase Tocs.");
             }
+
+            if (tocs == null)
+                return lookup;
+            
+            foreach (var toc in tocs.TrainOperatingCompany)
+            {
+                try
+                {
+                    var t = TocMapper.Map(toc);
+                    lookup.Add(toc.AtocCode, t);
+                }
+                catch (Exception e)
+                {
+                    _logger.Warning(e,"Error loading Knowledgebase Toc: {toc}.", toc.AtocCode);
+                }
+            }
             
             return lookup;
         }
 
-        public Task<IEnumerable<Location>> UpdateLocationsWithKnowledgebaseStationsAsync(IEnumerable<Location> locations, CancellationToken token)
+        public async Task<ILocationData> UpdateLocationsWithKnowledgebaseStationsAsync(ILocationData locations, CancellationToken token)
         {
-            throw new System.NotImplementedException();
+            StationList stations = null;
+            try
+            {
+                stations = await _knowledgebase.GetStations(token);
+            }
+            catch (Exception e)
+            {
+                _logger.Warning(e,"Error loading Knowledgebase Stations.");
+            }
+
+            if (stations == null)
+                return locations;
+            
+            foreach (var station in stations.Station)
+            {
+                try
+                {
+                    if (locations.TryGetStation(station.CrsCode, out var target))
+                    {
+                        StationMapper.Update(target, station);
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.Warning(e,"Error updating station: {station} with knowledgebase.", station.CrsCode);
+                }
+            }
+            
+            return locations;
         }
         
-        public async Task<IEnumerable<Location>> LoadStationMasterListAsync(CancellationToken token)
+        public async Task<ILocationData> LoadStationMasterListAsync(CancellationToken token)
         {
             if (!_archive.IsRdgZip)
                 throw new InvalidDataException($"Not an RDG archive. {_archive.FullName}");
@@ -69,7 +110,7 @@ namespace Timetable.Web
                 var stationRecords = parser.ReadFile(RdgZipExtractor.StationExtension).OfType<CifParser.RdgRecords.Station>();
                 var locations = _mapper.Map<IEnumerable<CifParser.RdgRecords.Station>, IEnumerable<Timetable.Location>>(stationRecords);
                 _logger.Information("Loaded Master Station List");
-                return locations;
+                return new LocationData(locations.ToArray(), _logger);
             }, token).ConfigureAwait(false);
         }
 
@@ -77,11 +118,11 @@ namespace Timetable.Web
         {
             var tocs = await LoadKnowledgebaseTocsAsync(token);
             var masterLocations = await LoadStationMasterListAsync(token).ConfigureAwait(false);
-            var data = new LocationData(masterLocations.ToArray(), _logger);
-            return await LoadCif(data, tocs, token);
+            masterLocations = await UpdateLocationsWithKnowledgebaseStationsAsync(masterLocations, token).ConfigureAwait(false);
+            return await LoadCif(masterLocations, tocs, token);
         }
 
-        private async Task<Data> LoadCif(LocationData locations, TocLookup tocs, CancellationToken token)
+        private async Task<Data> LoadCif(ILocationData locations, TocLookup tocs, CancellationToken token)
         {
             return await Task.Run(() =>
             {
@@ -94,7 +135,7 @@ namespace Timetable.Web
             }, token).ConfigureAwait(false);
         }
 
-        private Data Add(IEnumerable<IRecord> records, LocationData locations, TocLookup tocLookup, string archiveFile)
+        private Data Add(IEnumerable<IRecord> records, ILocationData locations, TocLookup tocLookup, string archiveFile)
         {
             var timetable = new TimetableData(_logger);
             var associations = new List<Association>(6000);

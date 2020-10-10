@@ -76,25 +76,47 @@ namespace Timetable.Test
         }
 
         [Fact]
-        public void NlcIsMainNlc()
+        public void NlcIsNullByDefault()
         {
             var waterloo = TestLocations.WaterlooMain;
             var station = new Station();
             station.Add(waterloo);
 
-            Assert.Equal("5598", station.Nlc);
+            Assert.Null(station.Nlc);
         }
-
+        
         [Fact]
-        public void NlcIsNullIfNoMain()
+        public void NlcIsManuallySet()
         {
-            var waterloo = TestLocations.WaterlooWindsor;
+            var station = new Station();
+            station.Nlc = "123456";
+            var waterloo = TestLocations.WaterlooMain;
+            station.Add(waterloo);
+
+            Assert.Equal("123456", station.Nlc);
+        }
+        
+        [Fact]
+        public void NameIsNullByDefault()
+        {
+            var waterloo = TestLocations.WaterlooMain;
             var station = new Station();
             station.Add(waterloo);
 
-            Assert.Null(station.Nlc);
+            Assert.Null(station.Name);
         }
+        
+        [Fact]
+        public void NameIsManuallySet()
+        {
+            var station = new Station();
+            station.Name = "MyName";
+            var waterloo = TestLocations.WaterlooMain;
+            station.Add(waterloo);
 
+            Assert.Equal("MyName", station.Name);
+        }
+        
         [Fact]
         public void ToStringWhenNoMainReturnsNotSet()
         {

@@ -105,7 +105,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task SetsFromFilter(string location, bool hasFilter)
         {
             var data = Substitute.For<ILocationData>();
-            data.TryGetLocation("SUR", out Arg.Any<Station>()).Returns(true);
+            data.TryGetStation("SUR", out Arg.Any<Station>()).Returns(true);
             data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
                 .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
 

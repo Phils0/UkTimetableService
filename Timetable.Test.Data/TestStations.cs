@@ -8,6 +8,8 @@ namespace Timetable.Test.Data
             {
                 var s = new Station();
                 s.Add(TestLocations.Surbiton);
+                s.Name = "Surbiton";
+                s.Nlc = "557100";
                 return s;
             }
         }

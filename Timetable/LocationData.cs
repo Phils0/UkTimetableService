@@ -39,7 +39,7 @@ namespace Timetable
         /// <param name="threeLetterCode">Three letter code for Location to find</param>
         /// <param name="location">Found station</param>
         /// <returns></returns>
-        bool TryGetLocation(string threeLetterCode, out Station location);
+        bool TryGetStation(string threeLetterCode, out Station location);
 
         /// <summary>
         /// Try find location
@@ -151,7 +151,7 @@ namespace Timetable
             }
         }
 
-        public bool TryGetLocation(string threeLetterCode, out Station location)
+        public bool TryGetStation(string threeLetterCode, out Station location)
         {
             location = Station.NotSet;
             return !string.IsNullOrEmpty(threeLetterCode) && Locations.TryGetValue(threeLetterCode, out location);
@@ -181,7 +181,7 @@ namespace Timetable
         {
             var status = FindStatus.LocationNotFound;
 
-            if (!string.IsNullOrEmpty(location) && TryGetLocation(location, out Station station))
+            if (!string.IsNullOrEmpty(location) && TryGetStation(location, out var station))
             {
                 var departures = findFunc(station);
                 

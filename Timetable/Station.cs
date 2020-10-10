@@ -17,9 +17,14 @@ namespace Timetable
         public string ThreeLetterCode => Main.ThreeLetterCode;
 
         /// <summary>
-        /// National Location Code - 4 character code
+        /// National Location Code
         /// </summary>
-        public string Nlc => Main.Nlc?.Substring(0, 4);
+        public string Nlc { get; set; }
+
+        /// <summary>
+        /// Name
+        /// </summary>
+        public string Name { get; set; }
         
         /// <summary>
         /// Main Location

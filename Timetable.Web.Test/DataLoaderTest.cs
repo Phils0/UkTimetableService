@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,11 +8,10 @@ using AutoMapper;
 using CifParser;
 using CifParser.Archives;
 using NreKnowledgebase;
-using NreKnowledgebase.SchemaV4;
 using NSubstitute;
 using ReflectionMagic;
 using Serilog;
-using Timetable.Web.Mapping;
+using Timetable.Test.Data;
 using Timetable.Web.Mapping.Cif;
 using Timetable.Web.Test.Knowledgebase;
 using Xunit;
@@ -29,9 +27,10 @@ namespace Timetable.Web.Test
         public async Task LoadStations()
         {
             var loader = CreateLoader(MockRdgArchive);
-            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None);
+            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
             
-            Assert.Equal(3, locations.Count());
+            Assert.Equal(3, locations.LocationsByTiploc.Count());
+            Assert.Equal(2, locations.Locations.Count());
         }
 
         private IArchive MockRdgArchive
@@ -245,12 +244,22 @@ namespace Timetable.Web.Test
                 var knowledgebase = Substitute.For<IKnowledgebaseAsync>();
                 knowledgebase.GetTocs(Arg.Any<CancellationToken>())
                     .Returns(Task.FromResult(TestTocs.Tocs));
+                knowledgebase.GetStations(Arg.Any<CancellationToken>())
+                    .Returns(Task.FromResult(Timetable.Web.Test.Knowledgebase.TestStations.Stations));
                 return knowledgebase;
             }            
         }
 
+        [Fact]
+        public async Task UpdateStationNames()
+        {
+            var loader = CreateLoader(knowledgebase: MockKnowledgebase);
 
-        
+            var locations = TestData.Locations;
+            locations =  await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, CancellationToken.None);
 
+            locations.TryGetStation("WAT", out Station waterloo);
+            Assert.Equal("Waterloo", waterloo.Name);
+        }
     }
 }

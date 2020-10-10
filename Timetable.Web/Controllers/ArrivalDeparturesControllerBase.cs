@@ -111,7 +111,7 @@ namespace Timetable.Web.Controllers
             GatherConfiguration.GatherFilter filter = _filters.NoFilter;
             if (!string.IsNullOrEmpty(request.ComingFromGoingTo))
             {
-                if (_timetable.TryGetLocation(request.ComingFromGoingTo, out Station station))
+                if (_timetable.TryGetStation(request.ComingFromGoingTo, out var station))
                     filter = CreateFilter(station);
                 else
                     _logger.Warning("Not adding filter.  Did not find location {toFrom}", request.ComingFromGoingTo);                

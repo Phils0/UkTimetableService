@@ -99,7 +99,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task SetsToFilter(string location, bool hasFilter)
         {
             var data = Substitute.For<ILocationData>();
-            data.TryGetLocation("WAT", out Arg.Any<Station>()).Returns(true);
+            data.TryGetStation("WAT", out Arg.Any<Station>()).Returns(true);
             data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
                 .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
 
