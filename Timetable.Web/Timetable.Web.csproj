@@ -21,10 +21,11 @@
         <PackageReference Include="AutoMapper" Version="10.0.0" />
         <PackageReference Include="CifParser" Version="0.2.6" />
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="3.1.6" />
+        <PackageReference Include="NreKnowledgebaseClient" Version="0.1.8" />
         <PackageReference Include="prometheus-net" Version="3.6.0" />
         <PackageReference Include="prometheus-net.AspNetCore" Version="3.6.0" />
         <PackageReference Include="prometheus-net.AspNetCore.HealthChecks" Version="3.6.0" />
-        <PackageReference Include="Serilog" Version="2.9.0" />
+        <PackageReference Include="Serilog" Version="2.10.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
         <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
@@ -37,6 +38,18 @@
     <ItemGroup>
       <ProjectReference Include="..\Timetable.Web.Plugin\Timetable.Web.Plugin.csproj" />
       <ProjectReference Include="..\Timetable\Timetable.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Data\RJTTF769.ZIP">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\stations.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\tocs.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

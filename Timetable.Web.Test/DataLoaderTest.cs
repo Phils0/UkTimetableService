@@ -8,11 +8,14 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CifParser;
 using CifParser.Archives;
+using NreKnowledgebase;
+using NreKnowledgebase.SchemaV4;
 using NSubstitute;
 using ReflectionMagic;
 using Serilog;
 using Timetable.Web.Mapping;
 using Timetable.Web.Mapping.Cif;
+using Timetable.Web.Test.Knowledgebase;
 using Xunit;
 
 namespace Timetable.Web.Test
@@ -25,13 +28,13 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadStations()
         {
-            var loader = CreateLoader(RdgArchive);
+            var loader = CreateLoader(MockRdgArchive);
             var locations = await loader.LoadStationMasterListAsync(CancellationToken.None);
             
             Assert.Equal(3, locations.Count());
         }
 
-        private IArchive RdgArchive
+        private IArchive MockRdgArchive
         {
             get
             {
@@ -41,10 +44,20 @@ namespace Timetable.Web.Test
             }
         }
 
-        private DataLoader CreateLoader(IArchive archive = null, ICifParser cifParser = null)
+        private DataLoader CreateLoader(IArchive archive = null, ICifParser cifParser = null, IKnowledgebaseAsync knowledgebase = null)
         {
-            archive = archive ?? RdgArchive;
-            
+            archive = CreateMockArchive(archive, cifParser);
+            knowledgebase = knowledgebase ?? Substitute.For<IKnowledgebaseAsync>();
+            var logger = Substitute.For<ILogger>();
+
+            var loader = new DataLoader(archive, knowledgebase, _mapperConfig.CreateMapper(), logger);
+            return loader;
+        }
+
+        private IArchive CreateMockArchive(IArchive archive, ICifParser cifParser)
+        {
+            archive = archive ?? MockRdgArchive;
+
             var stationParser = Substitute.For<IArchiveParser>();
             stationParser.ReadFile(RdgZipExtractor.StationExtension)
                 .Returns(new[]
@@ -53,17 +66,13 @@ namespace Timetable.Web.Test
                     Cif.TestStations.WaterlooMain,
                     Cif.TestStations.WaterlooWindsor
                 });
-
             archive.CreateParser().Returns(stationParser);
-            
+
             cifParser = cifParser ?? Substitute.For<ICifParser>();
             archive.CreateCifParser().Returns(cifParser);
 
             archive.FullName.Returns(@"TestData.zip");
-            var logger = Substitute.For<ILogger>();
-
-            var loader = new DataLoader(archive, _mapperConfig.CreateMapper(), logger);
-            return loader;
+            return archive;
         }
 
         [Fact]
@@ -219,5 +228,29 @@ namespace Timetable.Web.Test
             
             Assert.Equal("TestData.zip", data.Archive);
         }
+        
+        [Fact]
+        public async Task LoadTocs()
+        {
+            var loader = CreateLoader(knowledgebase: MockKnowledgebase);
+            var tocs = await loader.LoadKnowledgebaseTocsAsync(CancellationToken.None);
+            
+            Assert.NotEmpty(tocs);
+        }
+
+        private IKnowledgebaseAsync MockKnowledgebase
+        {
+            get
+            {
+                var knowledgebase = Substitute.For<IKnowledgebaseAsync>();
+                knowledgebase.GetTocs(Arg.Any<CancellationToken>())
+                    .Returns(Task.FromResult(TestTocs.Tocs));
+                return knowledgebase;
+            }            
+        }
+
+
+        
+
     }
 }

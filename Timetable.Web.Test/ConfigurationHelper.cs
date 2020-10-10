@@ -14,6 +14,8 @@ namespace Timetable.Web.Test
         {
             var appSettings = Substitute.For<IConfigurationRoot>();
             appSettings["TimetableArchive"].Returns("ttis144.zip");
+            appSettings["StationKnowledgebase"].Returns("teststations.xml");
+            appSettings["TocKnowledgebase"].Returns("testtocs.xml");
             appSettings["EnableCustomPlugins"].Returns(enableCustomPlugins);
             appSettings["EnablePrometheusMonitoring"].Returns(enablePrometheus);
             

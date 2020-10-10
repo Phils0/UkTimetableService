@@ -1,0 +1,926 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TrainOperatingCompanyList xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:add="http://www.govtalk.gov.uk/people/AddressAndPersonalDetails" xmlns:com="http://nationalrail.co.uk/xml/common" xsi:schemaLocation="http://internal.nationalrail.co.uk/xml/XsdSchemas/External/Version4.0/nre-toc-v4-0.xsd" xmlns="http://nationalrail.co.uk/xml/toc">
+  <TrainOperatingCompany xsi:schemaLocation="http://internal.nationalrail.co.uk/xml/XsdSchemas/External/Version4.0/nre-toc-v4-0.xsd">
+    <ChangeHistory>
+      <com:ChangedBy>Rob Morgan</com:ChangedBy>
+      <com:LastChangedDate>2020-02-03T14:31:06.000Z</com:LastChangedDate>
+    </ChangeHistory>
+    <AtocCode>VT</AtocCode>
+    <AtocMember>true</AtocMember>
+    <StationOperator>true</StationOperator>
+    <Name>Avanti West Coast</Name>
+    <LegalName>Avanti West Coast</LegalName>
+    <ManagingDirector>Phil Whittingham</ManagingDirector>
+    <Logo>https://www.nationalrail.co.uk/static/images/structure/Avanti_small.jpg</Logo>
+    <NetworkMap>https://www.nationalrail.co.uk/</NetworkMap>
+    <OperatingPeriod>
+      <StartDate>2019-12-08</StartDate>
+    </OperatingPeriod>
+    <HeadOfficeContactDetails>
+      <com:PrimaryTelephoneNumber>
+        <com:TelNationalNumber>0</com:TelNationalNumber>
+      </com:PrimaryTelephoneNumber>
+      <com:PostalAddress>
+        <add:Line>Avanti West Coast</add:Line>
+        <add:Line>North Wing Offices</add:Line>
+        <add:Line>Euston Station London</add:Line>
+        <add:PostCode>NW1 2HS</add:PostCode>
+      </com:PostalAddress>
+      <com:EmailAddress>Customer.Resolutions@avantiwestcoast.co.uk</com:EmailAddress>
+      <com:Url>https://www.nationalrail.co.uk/</com:Url>
+    </HeadOfficeContactDetails>
+    <CompanyWebsite>https://www.avantiwestcoast.co.uk</CompanyWebsite>
+    <SupportAndInformation>
+      <CustomerService>
+        <com:Annotation>
+          <com:Note><![CDATA[-]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><strong>Opening hours of the Customer Resolutions Centre</strong></p>
+<p>Monday to Friday - 08:30 - 18:00</p>
+<p>Saturday - 09:00 - 16:00</p>
+<p>(Closed 25 and 26 December)</p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03455280253</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>Customer Resolutions - Avanti West </add:Line>
+            <add:Line>1st Floor Victoria Square House</add:Line>
+            <add:Line>Birmingham</add:Line>
+            <add:Line>West Midlands</add:Line>
+            <add:PostCode>B2 4DN</add:PostCode>
+          </com:PostalAddress>
+          <com:EmailAddress>info@avantiwestcoast.co.uk</com:EmailAddress>
+          <com:Url>https://www.avantiwestcoast.co.uk/help/contact-us</com:Url>
+        </com:ContactDetails>
+      </CustomerService>
+      <LostProperty>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03455280253</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://avantiwestcoast.co.uk/help/lost-property</com:Url>
+        </com:ContactDetails>
+        <com:Available>true</com:Available>
+      </LostProperty>
+      <AssistedTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>08000158123</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PrimaryMinicomNumber>
+            <com:TelNationalNumber>08000158124</com:TelNationalNumber>
+          </com:PrimaryMinicomNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </AssistedTravel>
+      <CyclePolicyUrl>https://www.avantiwestcoast.co.uk/onboard/travel-advice/bikes</CyclePolicyUrl>
+    </SupportAndInformation>
+    <TicketingAndFares>
+      <TeleSales>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><strong>Opening hours</strong></p>
+        <p>Monday to Sunday - 08:00 - 22:00</p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>08719774222</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </TeleSales>
+      <GroupTravel>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><strong>Phone</strong>: 0345 528 0253 &gt; Option 5 &gt; Option 1 <br />
+<br />
+<strong>Opening</strong> <strong>Hours</strong>: Monday to Friday 08:30 - 18:00 <br />
+<br />
+<strong>Email</strong>: <a href="mailto:Group.reservations@avantiwestcoast.co.uk">Group.reservations@avantiwestcoast.co.uk</a><br />
+</p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03455280253</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </GroupTravel>
+      <BusinessTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>-</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </BusinessTravel>
+      <SeatReservations>
+        <com:Available>true</com:Available>
+      </SeatReservations>
+      <PenaltyFaresUrl>https://www.nationalrail.co.uk/</PenaltyFaresUrl>
+    </TicketingAndFares>
+  </TrainOperatingCompany>
+  <TrainOperatingCompany xsi:schemaLocation="http://internal.nationalrail.co.uk/xml/XsdSchemas/External/Version4.0/nre-toc-v4-0.xsd">
+    <ChangeHistory>
+      <com:ChangedBy>Rob Morgan</com:ChangedBy>
+      <com:LastChangedDate>2019-04-23T16:14:10.000+01:00</com:LastChangedDate>
+    </ChangeHistory>
+    <AtocCode>CC</AtocCode>
+    <AtocMember>true</AtocMember>
+    <StationOperator>true</StationOperator>
+    <Name>c2c</Name>
+    <LegalName>Trenitalia Ltd</LegalName>
+    <ManagingDirector>Julian Drury</ManagingDirector>
+    <Logo>https://www.nationalrail.co.uk/static/images/structure/TOC%20Logo/C2C.jpg</Logo>
+    <NetworkMap>https://www.c2c-online.co.uk/our-network/our-routes-and-stations/</NetworkMap>
+    <OperatingPeriod>
+      <StartDate>2005-05-18</StartDate>
+      <EndDate>2029-11-10</EndDate>
+    </OperatingPeriod>
+    <HeadOfficeContactDetails>
+      <com:PrimaryTelephoneNumber>
+        <com:TelNationalNumber>03457444422</com:TelNationalNumber>
+      </com:PrimaryTelephoneNumber>
+      <com:PostalAddress>
+        <add:Line>2nd Floor,</add:Line>
+        <add:Line>Cutlers Court,</add:Line>
+        <add:Line>115 Houndsditch - London</add:Line>
+        <add:PostCode>EC3A 7BR</add:PostCode>
+      </com:PostalAddress>
+      <com:EmailAddress>contact@c2crail.co.uk</com:EmailAddress>
+      <com:Url>https://www.nationalrail.co.uk/</com:Url>
+    </HeadOfficeContactDetails>
+    <CompanyWebsite>http://www.c2c-online.co.uk</CompanyWebsite>
+    <SupportAndInformation>
+      <CustomerService>
+        <com:Annotation>
+          <com:Note><![CDATA[03457 44 44 22]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><strong>Opening hours</strong></p>
+        <p>Monday to Friday - 08:00 - 20:00</p>
+        <p>Saturday, Sunday and Bank Holidays: 09:00 - 16:00 </p>
+        <p>Closed: Christmas Day and Boxing Day</p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457444422</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:FaxNumber>
+            <com:TelNationalNumber>01603 214 517</com:TelNationalNumber>
+          </com:FaxNumber>
+          <com:PostalAddress>
+            <add:Line>c2c</add:Line>
+            <add:Line>FREEPOST ADM3968</add:Line>
+            <add:Line>Southend</add:Line>
+            <add:PostCode>SS1 1ZS</add:PostCode>
+          </com:PostalAddress>
+          <com:EmailAddress>contact@c2crail.co.uk</com:EmailAddress>
+          <com:Url>http://www.c2c-online.co.uk</com:Url>
+        </com:ContactDetails>
+      </CustomerService>
+      <LostProperty>
+        <com:Annotation>
+          <com:Note><![CDATA[<p>Passengers who have lost property on c2c stations or trains should contact the c2c Lost Property line or complete the web-form.</p>
+        <p>Passengers will be contacted if their item has been found. </p>]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457444422</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:EmailAddress>lostproperty@c2crail.co.uk</com:EmailAddress>
+          <com:Url>https://www.c2c-online.co.uk/help-feedback/lost-property/</com:Url>
+        </com:ContactDetails>
+        <com:Available>true</com:Available>
+      </LostProperty>
+      <AssistedTravel>
+        <com:Annotation>
+          <com:Note><![CDATA[<p>Passengers requiring assisted travel bookings can contact us, where we will provide as much assistance as possible in order to help you make arrangements for your journey. </p>]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457444422</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PrimaryMinicomNumber>
+            <com:TelNationalNumber>03457444422</com:TelNationalNumber>
+          </com:PrimaryMinicomNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </AssistedTravel>
+      <CyclePolicyUrl>https://www.c2c-online.co.uk/help_centre/onboard/can-i-take-my-bike-with-me-on-board-your-trains/</CyclePolicyUrl>
+    </SupportAndInformation>
+    <TicketingAndFares>
+      <TeleSales>
+        <com:Annotation>
+          <com:Note><![CDATA[<p>We would be happy to help you with after sales support should you have any problems buying tickets from our website. </p>]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 17.0156px;"><strong>Opening Hours </strong></span>
+        <div><span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 17.0156px;">Monday to Friday 08.00 - 20.00<br />
+        </span>
+        </div>
+        <div><span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 17.0156px;">Saturday, Sunday and Bank Holidays: 09:00 - 16:00</span></div>
+        <div><span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 17.0156px;"><br />
+        </span></div>
+        <div><span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 17.0156px;"><strong>Closed</strong></span></div>
+        <div><span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif;"><span style="font-size: 12px; line-height: 17.0156002044678px;">Christmas Day and Boxing Day</span></span></div>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457444422</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>c2c</add:Line>
+            <add:Line>FREEPOST ADM3968</add:Line>
+            <add:Line>Southend</add:Line>
+            <add:PostCode>SS1 1ZS</add:PostCode>
+          </com:PostalAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </TeleSales>
+      <GroupTravel>
+        <com:Annotation>
+          <com:Note><![CDATA[<p>We would be delighted to help you make arrangements for your Group Travel needs.</p>
+        <p>Please do get in touch, we may be able to offer you a special price, or charter your very own train.</p>
+        <p></p>]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457444422</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>c2c</add:Line>
+            <add:Line>FREEPOST ADM3968</add:Line>
+            <add:Line>Southend</add:Line>
+            <add:PostCode>SS1 1ZS</add:PostCode>
+          </com:PostalAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </GroupTravel>
+      <BusinessTravel>
+        <com:Annotation>
+          <com:Note><![CDATA[<p>We would be happy to discuss with you any Corporate Travel requirements as well as Higher Education colleges who may be interested in our <a href="http://www.c2c-online.co.uk/tickets-and-fares/c2c-smartcard/smart-student/">Student Smartcard</a> scheme. </p>]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457444422</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>c2c</add:Line>
+            <add:Line>FREEPOST ADM3968</add:Line>
+            <add:Line>Southend</add:Line>
+            <add:PostCode>SS1 1ZS</add:PostCode>
+          </com:PostalAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </BusinessTravel>
+      <SeatReservations>
+        <com:Available>false</com:Available>
+      </SeatReservations>
+      <PenaltyFaresUrl>https://www.c2c-online.co.uk/help_centre/tickets/how-do-penalty-fares-work/</PenaltyFaresUrl>
+      <BuyingTickets>
+        <com:Note><![CDATA[Tickets are not available for purchase on board trains]]></com:Note>
+      </BuyingTickets>
+    </TicketingAndFares>
+  </TrainOperatingCompany>
+  <TrainOperatingCompany xsi:schemaLocation="http://internal.nationalrail.co.uk/xml/XsdSchemas/External/Version4.0/nre-toc-v4-0.xsd">
+    <ChangeHistory>
+      <com:ChangedBy>Rob Morgan</com:ChangedBy>
+      <com:LastChangedDate>2017-12-10T19:21:55.000Z</com:LastChangedDate>
+    </ChangeHistory>
+    <AtocCode>CS</AtocCode>
+    <AtocMember>true</AtocMember>
+    <StationOperator>true</StationOperator>
+    <Name>Caledonian Sleeper</Name>
+    <LegalName>Serco Caledonian Sleeper</LegalName>
+    <ManagingDirector>Ryan Flaherty</ManagingDirector>
+    <Logo>https://www.nationalrail.co.uk/static/images/structure/TOC%20Logo/Sleeper2.jpg</Logo>
+    <NetworkMap>https://www.sleeper.scot/templates/caledonian/media/route-maps/csroutes.pdf</NetworkMap>
+    <OperatingPeriod>
+      <StartDate>2015-04-01</StartDate>
+    </OperatingPeriod>
+    <HeadOfficeContactDetails>
+      <com:PrimaryTelephoneNumber>
+        <com:TelNationalNumber>03300600500</com:TelNationalNumber>
+      </com:PrimaryTelephoneNumber>
+      <com:PostalAddress>
+        <add:Line>1 Union Street</add:Line>
+        <add:Line>Inverness</add:Line>
+        <add:PostCode>IV1 1PP</add:PostCode>
+      </com:PostalAddress>
+      <com:EmailAddress>enquiry@sleeper.scot</com:EmailAddress>
+      <com:Url>https://www.nationalrail.co.uk/</com:Url>
+    </HeadOfficeContactDetails>
+    <CompanyWebsite>https://www.sleeper.scot/</CompanyWebsite>
+    <SupportAndInformation>
+      <CustomerService>
+        <com:Annotation>
+          <com:Note><![CDATA[<p>Guest Service Centre</p>
+        <p>1 Union St</p>
+        <p>Inverness</p>
+        <p>IV1 1PP</p>]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><strong>Opening Hours</strong></p>
+        <p>Monday to Friday: Between 08:30 and 20:30</p>
+        <p>Saturday: Between 08:30 and 15:30</p>
+        <p>Sunday: Between 15:30 and 20:30</p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03300600500</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>Guest Service Centre</add:Line>
+            <add:Line>1 Union Street</add:Line>
+            <add:Line>Inverness</add:Line>
+            <add:PostCode>IV1 1PP</add:PostCode>
+          </com:PostalAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </CustomerService>
+      <LostProperty>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03300600500</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:EmailAddress>lost.property@sleeper.scot</com:EmailAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+        <com:Available>true</com:Available>
+      </LostProperty>
+      <AssistedTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03300600500</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PrimaryMinicomNumber>
+            <com:TelNationalNumber>01463231951</com:TelNationalNumber>
+          </com:PrimaryMinicomNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </AssistedTravel>
+      <CyclePolicyUrl>https://www.sleeper.scot/on-board/cycles-and-pets</CyclePolicyUrl>
+    </SupportAndInformation>
+    <TicketingAndFares>
+      <TeleSales>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><strong>Opening Hours</strong></p>
+        <p>Monday to Friday: Between 08:30 and 20:30</p>
+        <p>Saturday: Between 08:30 and 15:30</p>
+        <p>Sunday: Between 15:30 and 20:30</p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03300600500</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>Guest Service Centre</add:Line>
+            <add:Line>1 Union Street</add:Line>
+            <add:Line>Inverness</add:Line>
+            <add:PostCode>IV1 1PP</add:PostCode>
+          </com:PostalAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </TeleSales>
+      <GroupTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03300600500</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>Guest Services Centre</add:Line>
+            <add:Line>1 Union St</add:Line>
+            <add:Line>Inverness</add:Line>
+            <add:PostCode>IV1 1PP</add:PostCode>
+          </com:PostalAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </GroupTravel>
+      <BusinessTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03300600500</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </BusinessTravel>
+      <SeatReservations>
+        <com:Annotation>
+          <com:Note><![CDATA[<p>Seat and cabin reservations are required for travelling on Caledonian Sleeper</p>]]></com:Note>
+        </com:Annotation>
+        <com:Available>true</com:Available>
+      </SeatReservations>
+      <PenaltyFaresUrl>https://www.sleeper.scot/</PenaltyFaresUrl>
+    </TicketingAndFares>
+  </TrainOperatingCompany>
+  <TrainOperatingCompany xsi:schemaLocation="http://internal.nationalrail.co.uk/xml/XsdSchemas/External/Version4.0/nre-toc-v4-0.xsd">
+    <ChangeHistory>
+      <com:ChangedBy>Rob Morgan</com:ChangedBy>
+      <com:LastChangedDate>2017-11-27T12:03:55.000Z</com:LastChangedDate>
+    </ChangeHistory>
+    <AtocCode>CH</AtocCode>
+    <AtocMember>true</AtocMember>
+    <StationOperator>true</StationOperator>
+    <Name>Chiltern Railways</Name>
+    <LegalName>Chiltern Railways</LegalName>
+    <ManagingDirector>Dave Penney</ManagingDirector>
+    <Logo>https://www.nationalrail.co.uk/static/images/structure/TOC%20Logo/ChilternRailways.jpg</Logo>
+    <NetworkMap>https://www.chilternrailways.co.uk/themes/chiltern_atomic/assets/images/route_map.png</NetworkMap>
+    <OperatingPeriod>
+      <StartDate>2005-05-18</StartDate>
+    </OperatingPeriod>
+    <HeadOfficeContactDetails>
+      <com:PrimaryTelephoneNumber>
+        <com:TelNationalNumber>03456005165</com:TelNationalNumber>
+      </com:PrimaryTelephoneNumber>
+      <com:PostalAddress>
+        <add:Line>Chiltern Railways</add:Line>
+        <add:Line>1 Admiral Way, Doxford Internationa</add:Line>
+        <add:Line>Sunderland</add:Line>
+        <add:Line>Tyne and Wear</add:Line>
+        <add:PostCode>SR3 3XP</add:PostCode>
+      </com:PostalAddress>
+      <com:EmailAddress>customer.service@chilternrailways.co.uk</com:EmailAddress>
+      <com:Url>https://www.nationalrail.co.uk/</com:Url>
+    </HeadOfficeContactDetails>
+    <CompanyWebsite>http://www.chilternrailways.co.uk</CompanyWebsite>
+    <SupportAndInformation>
+      <CustomerService>
+        <com:Annotation>
+          <com:Note><![CDATA[-]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p style="color: #2b2b2b;">We welcome your feedback, suggestions and ideas to help us to make changes to improve your services.</p>
+        <p style="color: #2b2b2b;"><strong>Opening hours</strong></p>
+        <p style="color: #2b2b2b;">Monday to Friday - 08:30 - 17:30</p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03456005165</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:FaxNumber>
+            <com:TelNationalNumber>01926 729 914</com:TelNationalNumber>
+          </com:FaxNumber>
+          <com:PostalAddress>
+            <add:Line>Chiltern Railways</add:Line>
+            <add:Line>Banbury ICC, Merton Street</add:Line>
+            <add:Line>Banbury</add:Line>
+            <add:PostCode>OX16 4RN</add:PostCode>
+          </com:PostalAddress>
+          <com:Url>http://www.chilternrailways.co.uk</com:Url>
+        </com:ContactDetails>
+      </CustomerService>
+      <LostProperty>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03456005165</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.chilternrailways.co.uk/lost-property-online-form</com:Url>
+        </com:ContactDetails>
+        <com:Available>true</com:Available>
+      </LostProperty>
+      <AssistedTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03456005165</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PrimaryMinicomNumber>
+            <com:TelNationalNumber>08457 078051</com:TelNationalNumber>
+          </com:PrimaryMinicomNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </AssistedTravel>
+      <CyclePolicyUrl>http://www.chilternrailways.co.uk/travelling-your-bike-0</CyclePolicyUrl>
+    </SupportAndInformation>
+    <TicketingAndFares>
+      <TeleSales>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><strong>Opening hours</strong></p>
+        <p>Monday to Sunday - 07:00 - 20:00 </p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03456005165</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </TeleSales>
+      <GroupTravel>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 17.015625px;">Advance booking is essential. Tickets can be collected from the office (Bicester North station) or posted to you - please allow 3 working days.</span></p>
+        <p><span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 17.015625px;"><strong>Opening hours</strong></span></p>
+        <p><span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 17.015625px;">Monday to Friday - 09:30 - 16:00</span></p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>01494 420117</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>Chiltern Railways</add:Line>
+            <add:Line>Group Travel Service</add:Line>
+            <add:Line>Bicester North Station</add:Line>
+            <add:PostCode>OX26 6EF</add:PostCode>
+          </com:PostalAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </GroupTravel>
+      <BusinessTravel>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p style="line-height: 1.4em; margin: 0px; padding: 0px 0px 1em; color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px;">Business travel account services</p>
+<ul class="content-list" style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px;">
+    <li style="list-style: none; padding: 0.2em 0px 0.2em 1.2em; margin: 0px 0px 0px 1em; background-image: url(&quot;http://206.150.181.245/alfresco/scripts/tiny_mce/themes/advanced/skins/default/img/bullet-content-list.gif&quot;); background-position: 0px 0.6em; background-repeat: no-repeat;">With one phone call, fax or email, you can book all your tickets, reserve seats and get journey planning advice for the entire National Rail network.</li>
+    <li style="list-style: none; padding: 0.2em 0px 0.2em 1.2em; margin: 0px 0px 0px 1em; background-image: url(&quot;http://206.150.181.245/alfresco/scripts/tiny_mce/themes/advanced/skins/default/img/bullet-content-list.gif&quot;); background-position: 0px 0.6em; background-repeat: no-repeat;">Complete itemised journey itinerary with onward connection information and any restrictions that apply.</li>
+    <li style="list-style: none; padding: 0.2em 0px 0.2em 1.2em; margin: 0px 0px 0px 1em; background-image: url(&quot;http://206.150.181.245/alfresco/scripts/tiny_mce/themes/advanced/skins/default/img/bullet-content-list.gif&quot;); background-position: 0px 0.6em; background-repeat: no-repeat;">Advice on Standard and 1st Class travel.</li>
+    <li style="list-style: none; padding: 0.2em 0px 0.2em 1.2em; margin: 0px 0px 0px 1em; background-image: url(&quot;http://206.150.181.245/alfresco/scripts/tiny_mce/themes/advanced/skins/default/img/bullet-content-list.gif&quot;); background-position: 0px 0.6em; background-repeat: no-repeat;">Immediate confirmation.</li>
+    <li style="list-style: none; padding: 0.2em 0px 0.2em 1.2em; margin: 0px 0px 0px 1em; background-image: url(&quot;http://206.150.181.245/alfresco/scripts/tiny_mce/themes/advanced/skins/default/img/bullet-content-list.gif&quot;); background-position: 0px 0.6em; background-repeat: no-repeat;">Seat, sleeper and dining car reservations where available.</li>
+    <li style="list-style: none; padding: 0.2em 0px 0.2em 1.2em; margin: 0px 0px 0px 1em; background-image: url(&quot;http://206.150.181.245/alfresco/scripts/tiny_mce/themes/advanced/skins/default/img/bullet-content-list.gif&quot;); background-position: 0px 0.6em; background-repeat: no-repeat;">London Underground Travelcards.</li>
+    <li style="list-style: none; padding: 0.2em 0px 0.2em 1.2em; margin: 0px 0px 0px 1em; background-image: url(&quot;http://206.150.181.245/alfresco/scripts/tiny_mce/themes/advanced/skins/default/img/bullet-content-list.gif&quot;); background-position: 0px 0.6em; background-repeat: no-repeat;">Order season tickets for your employees by phone or fax.</li>
+    <li style="list-style: none; padding: 0.2em 0px 0.2em 1.2em; margin: 0px 0px 0px 1em; background-image: url(&quot;http://206.150.181.245/alfresco/scripts/tiny_mce/themes/advanced/skins/default/img/bullet-content-list.gif&quot;); background-position: 0px 0.6em; background-repeat: no-repeat;">Tickets sent to you by First Class post, or collect them from our Business Travel Centre at Bicester North Station.</li>
+</ul>
+<ul class="content-list" style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px;">
+    <li style="list-style: none; padding: 0.2em 0px 0.2em 1.2em; margin: 0px 0px 0px 1em; background-image: url(&quot;http://206.150.181.245/alfresco/scripts/tiny_mce/themes/advanced/skins/default/img/bullet-content-list.gif&quot;); background-position: 0px 0.6em; background-repeat: no-repeat;">All for free, not a penny extra.</li>
+</ul>
+<p><span style="color: #2b2b2b; font-family: arial, helvetica, sans-serif; font-size: 12px; line-height: 1.4em;"><strong>Opening hours</strong></span></p>
+<p>Monday to Friday - 09:30 - 16:30 </p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>01494 420177</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>Chiltern Railways</add:Line>
+            <add:Line>Business Travel Service</add:Line>
+            <add:Line>Bicester North Station</add:Line>
+            <add:PostCode>OX26 6EF</add:PostCode>
+          </com:PostalAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </BusinessTravel>
+      <SeatReservations>
+        <com:Available>false</com:Available>
+      </SeatReservations>
+      <PenaltyFaresUrl>https://www.nationalrail.co.uk/</PenaltyFaresUrl>
+      <BuyingTickets>
+        <com:Note><![CDATA[Tickets are not available for purchase on board trains.]]></com:Note>
+      </BuyingTickets>
+    </TicketingAndFares>
+  </TrainOperatingCompany>
+  <TrainOperatingCompany xsi:schemaLocation="http://internal.nationalrail.co.uk/xml/XsdSchemas/External/Version4.0/nre-toc-v4-0.xsd">
+    <ChangeHistory>
+      <com:ChangedBy>David Knight</com:ChangedBy>
+      <com:LastChangedDate>2019-06-06T12:31:00.000+01:00</com:LastChangedDate>
+    </ChangeHistory>
+    <AtocCode>XC</AtocCode>
+    <AtocMember>true</AtocMember>
+    <StationOperator>true</StationOperator>
+    <Name>CrossCountry</Name>
+    <LegalName>XC Trains Limited</LegalName>
+    <ManagingDirector>Tom Joyner</ManagingDirector>
+    <Logo>https://www.nationalrail.co.uk/static/images/structure/TOC%20Logo/CROSSCOUNTRY.jpg</Logo>
+    <NetworkMap>https://www.crosscountrytrains.co.uk/media/1298/crosscountry-route-map.pdf</NetworkMap>
+    <OperatingPeriod>
+      <StartDate>2007-11-11</StartDate>
+    </OperatingPeriod>
+    <HeadOfficeContactDetails>
+      <com:PrimaryTelephoneNumber>
+        <com:TelNationalNumber>03447369123</com:TelNationalNumber>
+      </com:PrimaryTelephoneNumber>
+      <com:PostalAddress>
+        <add:Line>CrossCountry Trains Limited</add:Line>
+        <add:Line>FREEPOST RRXU-HUEC-GLLY, Cannon Hou</add:Line>
+        <add:Line>18 The Priory Queensway, Birmingham</add:Line>
+        <add:PostCode>B4 6BS</add:PostCode>
+      </com:PostalAddress>
+      <com:EmailAddress>customer.relations@crosscountrytrains.co.uk</com:EmailAddress>
+      <com:Url>https://www.nationalrail.co.uk/</com:Url>
+    </HeadOfficeContactDetails>
+    <CompanyWebsite>http://www.crosscountrytrains.co.uk</CompanyWebsite>
+    <SupportAndInformation>
+      <CustomerService>
+        <com:Annotation>
+          <com:Note><![CDATA[-]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><strong>Opening hours</strong></p>
+        <p>Monday to Friday - 08:30 - 20:00</p>
+        <p>Saturday - 0900 - 16:00 </p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03447369123</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:FaxNumber>
+            <com:TelNationalNumber>0121 200 6005</com:TelNationalNumber>
+          </com:FaxNumber>
+          <com:PostalAddress>
+            <add:Line>Customer Relations - CrossCountry</add:Line>
+            <add:Line>Cannon House - 18 The Priory Queens</add:Line>
+            <add:Line>Birmingham</add:Line>
+            <add:PostCode>B4 6BS</add:PostCode>
+          </com:PostalAddress>
+          <com:EmailAddress>customer.relations@crosscountrytrains.co.uk</com:EmailAddress>
+          <com:Url>http://www.crosscountrytrains.co.uk</com:Url>
+        </com:ContactDetails>
+      </CustomerService>
+      <LostProperty>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03447369123</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:EmailAddress>lost.property@crosscountrytrains.co.uk</com:EmailAddress>
+          <com:Url>http://www.crosscountrytrains.co.uk/customer-service/lost-property</com:Url>
+        </com:ContactDetails>
+        <com:Available>true</com:Available>
+      </LostProperty>
+      <AssistedTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03448110125</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PrimaryMinicomNumber>
+            <com:TelNationalNumber>03448110126</com:TelNationalNumber>
+          </com:PrimaryMinicomNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </AssistedTravel>
+      <CyclePolicyUrl>https://www.crosscountrytrains.co.uk/on-board-with-crosscountry/bikes-cyclists</CyclePolicyUrl>
+    </SupportAndInformation>
+    <TicketingAndFares>
+      <TeleSales>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p style="padding-bottom: 1em; line-height: 1.4em; margin: 0px; padding-left: 0px; padding-right: 0px; font-family: arial, helvetica, sans-serif; color: #2b2b2b; font-size: 12px; padding-top: 0px;">3 - 4 days delivery for tickets</p>
+        <p style="padding-bottom: 1em; line-height: 1.4em; margin: 0px; padding-left: 0px; padding-right: 0px; font-family: arial, helvetica, sans-serif; color: #2b2b2b; font-size: 12px; padding-top: 0px;">Next day delivery £6</p>
+        <p><span style="line-height: 1.4em; font-family: arial, helvetica, sans-serif; color: #2b2b2b; font-size: 12px;">Customers can also collect tickets from machines at the station, or print them at home.</span></p>
+        <p><strong>Opening hours</strong></p>
+        <p>Monday to Sunday - 08:00 - 20:00 </p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>08448110124</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </TeleSales>
+      <GroupTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03712442388</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </GroupTravel>
+      <BusinessTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>-</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </BusinessTravel>
+      <SeatReservations>
+        <com:Available>true</com:Available>
+      </SeatReservations>
+      <PenaltyFaresUrl>https://www.nationalrail.co.uk/</PenaltyFaresUrl>
+    </TicketingAndFares>
+  </TrainOperatingCompany>
+  <TrainOperatingCompany xsi:schemaLocation="http://internal.nationalrail.co.uk/xml/XsdSchemas/External/Version4.0/nre-toc-v4-0.xsd">
+    <ChangeHistory>
+      <com:ChangedBy>Katie Scorer</com:ChangedBy>
+      <com:LastChangedDate>2019-08-18T06:27:35.000+01:00</com:LastChangedDate>
+    </ChangeHistory>
+    <AtocCode>EM</AtocCode>
+    <AtocMember>true</AtocMember>
+    <StationOperator>true</StationOperator>
+    <Name>East Midlands Railway</Name>
+    <LegalName>Abellio</LegalName>
+    <ManagingDirector>Will Rogers</ManagingDirector>
+    <Logo>https://www.nationalrail.co.uk/static/images/structure/TOC_Logo.jpg</Logo>
+    <NetworkMap>https://www.eastmidlandstrains.co.uk/Global/Documents/EMT%20Route%20Map.pdf</NetworkMap>
+    <OperatingPeriod>
+      <StartDate>2007-09-01</StartDate>
+    </OperatingPeriod>
+    <HeadOfficeContactDetails>
+      <com:PrimaryTelephoneNumber>
+        <com:TelNationalNumber>03457125678</com:TelNationalNumber>
+      </com:PrimaryTelephoneNumber>
+      <com:PostalAddress>
+        <add:Line>Prospect House - 1 Prospect Place</add:Line>
+        <add:Line>Millennium Way, Pride Park</add:Line>
+        <add:Line>Derby</add:Line>
+        <add:Line>Derbyshire</add:Line>
+        <add:PostCode>DE24 8HG</add:PostCode>
+      </com:PostalAddress>
+      <com:EmailAddress>contact@eastmidlandsrailway.co.uk</com:EmailAddress>
+      <com:Url>https://www.nationalrail.co.uk/</com:Url>
+    </HeadOfficeContactDetails>
+    <CompanyWebsite>http://www.eastmidlandsrailway.co.uk</CompanyWebsite>
+    <SupportAndInformation>
+      <CustomerService>
+        <com:Annotation>
+          <com:Note><![CDATA[.]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p><strong>Opening hours</strong></p>
+        <p>Monday to Sunday 24 hours a day<br></p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457125678</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:FaxNumber>
+            <com:TelNationalNumber>08456 010 988</com:TelNationalNumber>
+          </com:FaxNumber>
+          <com:PostalAddress>
+            <add:Line>Customer Service Centre</add:Line>
+            <add:Line>East Midlands Railway</add:Line>
+            <add:Line>Hudson Way, Pride Park</add:Line>
+            <add:Line>Derbyshire</add:Line>
+            <add:PostCode>DE24 8HS</add:PostCode>
+          </com:PostalAddress>
+          <com:EmailAddress>contact@eastmidlandsrailway.co.uk</com:EmailAddress>
+          <com:Url>http://www.eastmidlandstrains.co.uk</com:Url>
+        </com:ContactDetails>
+      </CustomerService>
+      <LostProperty>
+        <com:Annotation>
+          <com:Note><![CDATA[<p>&nbsp;03457 125 678 (Option 5)</p>]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457125678</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.eastmidlandsrailway.co.uk/help-manage/manage/report-lost-found</com:Url>
+        </com:ContactDetails>
+        <com:Available>true</com:Available>
+      </LostProperty>
+      <AssistedTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457125678</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PrimaryMinicomNumber>
+            <com:TelNationalNumber>08457 078 051</com:TelNationalNumber>
+          </com:PrimaryMinicomNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </AssistedTravel>
+      <CyclePolicyUrl>https://www.eastmidlandsrailway.co.uk/trains-stations/on-board-the-train/bikes-on-trains</CyclePolicyUrl>
+    </SupportAndInformation>
+    <TicketingAndFares>
+      <TeleSales>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p style="line-height: 1.4em; margin: 0px; padding: 0px 0px 1em; color: #2b2b2b; font-family: arial,helvetica,sans-serif; font-size: 12px;">Tickets will be delivered within 5 working days.</p>
+<p style="line-height: 1.4em; margin: 0px; padding: 0px 0px 1em; color: #2b2b2b; font-family: arial,helvetica,sans-serif; font-size: 12px;">Next day delivery available at £6 (tickets should be ordered before 2pm)</p>
+<p style="line-height: 1.4em; margin: 0px; padding: 0px 0px 1em; color: #2b2b2b; font-family: arial,helvetica,sans-serif; font-size: 12px;">Tickets may be collected from station or ticket office if facilities are available</p>
+<p style="line-height: 1.4em; margin: 0px; padding: 0px 0px 1em; color: #2b2b2b; font-family: arial,helvetica,sans-serif; font-size: 12px;"><strong>Opening hours</strong></p>
+<p style="line-height: 1.4em; margin: 0px; padding: 0px 0px 1em; color: #2b2b2b; font-family: arial,helvetica,sans-serif; font-size: 12px;">Monday to Sunday - 08:00 to 22:00</p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457125678</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </TeleSales>
+      <GroupTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03457125678</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </GroupTravel>
+      <BusinessTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>-</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </BusinessTravel>
+      <SeatReservations>
+        <com:Annotation>
+          <com:Note><![CDATA[<p><span style="line-height: 17.015625px;">On East Midlands Mainline services and limited East Midlands Connect services.</span> </p>]]></com:Note>
+        </com:Annotation>
+        <com:Available>true</com:Available>
+      </SeatReservations>
+      <PenaltyFaresUrl>https://www.nationalrail.co.uk/</PenaltyFaresUrl>
+      <BuyingTickets>
+        <com:Note><![CDATA[Where the opportunity to purchase a ticket exists at the station before boarding the train then the passenger must purchase a ticket for their entire journey. Where there is no ticket office or ticket machine then the passenger may purchase a ticket on the train. All but Advance tickets are available to purchase on board the train.]]></com:Note>
+      </BuyingTickets>
+    </TicketingAndFares>
+  </TrainOperatingCompany>
+  <TrainOperatingCompany xsi:schemaLocation="http://internal.nationalrail.co.uk/xml/XsdSchemas/External/Version4.0/nre-toc-v4-0.xsd">
+    <ChangeHistory>
+      <com:ChangedBy>Rob Morgan</com:ChangedBy>
+      <com:LastChangedDate>2019-11-27T10:27:02.000Z</com:LastChangedDate>
+    </ChangeHistory>
+    <AtocCode>ES</AtocCode>
+    <AtocMember>true</AtocMember>
+    <StationOperator>true</StationOperator>
+    <Name>Eurostar</Name>
+    <LegalName>Eurostar International Ltd</LegalName>
+    <ManagingDirector>Nicolas Petrovic</ManagingDirector>
+    <Logo>https://www.nationalrail.co.uk/static/images/structure/eurostar_sm.png</Logo>
+    <NetworkMap>https://www.nationalrail.co.uk/</NetworkMap>
+    <OperatingPeriod>
+      <StartDate>2005-05-18</StartDate>
+    </OperatingPeriod>
+    <HeadOfficeContactDetails>
+      <com:PrimaryTelephoneNumber>
+        <com:TelNationalNumber>01777777879</com:TelNationalNumber>
+      </com:PrimaryTelephoneNumber>
+      <com:PostalAddress>
+        <add:Line>Times House</add:Line>
+        <add:Line>Bravingtons Walk</add:Line>
+        <add:Line>London</add:Line>
+        <add:PostCode>N1 9AW</add:PostCode>
+      </com:PostalAddress>
+      <com:EmailAddress>traveller.care@eurostar.com</com:EmailAddress>
+      <com:Url>https://www.nationalrail.co.uk/</com:Url>
+    </HeadOfficeContactDetails>
+    <CompanyWebsite>http://www.eurostar.com/</CompanyWebsite>
+    <SupportAndInformation>
+      <CustomerService>
+        <com:Annotation>
+          <com:Note><![CDATA[-]]></com:Note>
+        </com:Annotation>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[Web related support available by calling 03448 224 777 (Monday-Friday 08:00-22:00 and Saturday-Sunday 09:00-17:00).]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03432186186</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PostalAddress>
+            <add:Line>Eurostar Customer Services.</add:Line>
+            <add:Line>Times House, Bravingtons Walk</add:Line>
+            <add:Line>London</add:Line>
+            <add:PostCode>N1 9AW</add:PostCode>
+          </com:PostalAddress>
+          <com:EmailAddress>contactus@eurostar.co.uk</com:EmailAddress>
+          <com:Url>http://www.eurostar.com</com:Url>
+        </com:ContactDetails>
+      </CustomerService>
+      <LostProperty>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03448224411</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:EmailAddress>lost.property@eurostar.co.uk</com:EmailAddress>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+        <com:Available>true</com:Available>
+      </LostProperty>
+      <AssistedTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03448118444</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:PrimaryMinicomNumber>
+            <com:TelNationalNumber>08456050600</com:TelNationalNumber>
+          </com:PrimaryMinicomNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </AssistedTravel>
+      <CyclePolicyUrl>http://www.eurostar.com/uk-en/travel-info/travel-planning/luggage/bikes</CyclePolicyUrl>
+    </SupportAndInformation>
+    <TicketingAndFares>
+      <TeleSales>
+        <com:ContactDetails>
+          <com:Annotation>
+            <com:Note><![CDATA[<p>Opening hours:</p>
+<p>Monday - Friday: 08:00-22:00</p>
+<p>Saturday - Sunday: 09:00-17:00 </p>]]></com:Note>
+          </com:Annotation>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03448224777</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </TeleSales>
+      <GroupTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>03448224800</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </GroupTravel>
+      <BusinessTravel>
+        <com:ContactDetails>
+          <com:PrimaryTelephoneNumber>
+            <com:TelNationalNumber>-</com:TelNationalNumber>
+          </com:PrimaryTelephoneNumber>
+          <com:Url>https://www.nationalrail.co.uk/</com:Url>
+        </com:ContactDetails>
+      </BusinessTravel>
+      <SeatReservations>
+        <com:Available>true</com:Available>
+      </SeatReservations>
+      <PenaltyFaresUrl>https://www.nationalrail.co.uk/</PenaltyFaresUrl>
+    </TicketingAndFares>
+  </TrainOperatingCompany>
+</TrainOperatingCompanyList>

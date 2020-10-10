@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using CifParser.Archives;
+using NreKnowledgebase;
 using NSubstitute;
 using ReflectionMagic;
 using Serilog;
@@ -29,11 +30,7 @@ namespace Timetable.Web.Test
         private static IDataLoader Create()
         {
             var config = new Configuration(ConfigurationHelper.GetConfiguration());
-            
-            return new DataLoader(
-                new Archive(config.TimetableArchiveFile, Substitute.For<ILogger>()), 
-                _mapperConfig.CreateMapper(), 
-                Substitute.For<ILogger>());
+            return Factory.CreateLoader(config, Substitute.For<ILogger>());
         }
 
         [Fact]
@@ -51,6 +48,15 @@ namespace Timetable.Web.Test
             
             var retailServiceIdMap = data.Timetable.AsDynamic()._retailServiceIdMap.RealObject as Dictionary<string, IList<Service>>;
             Assert.NotEmpty(retailServiceIdMap);
+        }
+        
+        [Fact]
+        public async Task LoadTocs()
+        {
+            var loader = Create();
+            var tocs = await loader.LoadKnowledgebaseTocsAsync(CancellationToken.None);
+            
+            Assert.NotEmpty(tocs);
         }
     }
 }

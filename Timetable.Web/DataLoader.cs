@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +8,9 @@ using AutoMapper;
 using CifParser;
 using CifParser.Archives;
 using CifParser.Records;
+using NreKnowledgebase;
 using Serilog;
+using Timetable.Web.Mapping.Knowledgebase;
 
 namespace Timetable.Web
 { 
@@ -17,15 +20,43 @@ namespace Timetable.Web
         
         private IMapper _mapper;
         private readonly IArchive _archive;
+        private readonly IKnowledgebaseAsync _knowledgebase;
         private readonly ILogger _logger;
 
-        public DataLoader(IArchive archive, IMapper mapper, ILogger logger)
+        public DataLoader(IArchive archive, IKnowledgebaseAsync knowledgebase, IMapper mapper, ILogger logger)
         {
             _mapper = mapper;
             _archive = archive;
+            _knowledgebase = knowledgebase;
             _logger = logger;
         }
 
+        public async Task<TocLookup> LoadKnowledgebaseTocsAsync(CancellationToken token)
+        {
+            var lookup = new TocLookup(_logger, new Dictionary<string, Toc>());
+            
+            try
+            {
+                var tocs = await _knowledgebase.GetTocs(token);
+                foreach (var toc in tocs.TrainOperatingCompany)
+                {
+                    var t = TocMapper.Map(toc);
+                    lookup.Add(toc.AtocCode, t);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.Warning(e,"Error loading Knowledgebase Tocs.");
+            }
+            
+            return lookup;
+        }
+
+        public Task<IEnumerable<Location>> UpdateLocationsWithKnowledgebaseStationsAsync(IEnumerable<Location> locations, CancellationToken token)
+        {
+            throw new System.NotImplementedException();
+        }
+        
         public async Task<IEnumerable<Location>> LoadStationMasterListAsync(CancellationToken token)
         {
             if (!_archive.IsRdgZip)
@@ -44,27 +75,27 @@ namespace Timetable.Web
 
         public async Task<Data> LoadAsync(CancellationToken token)
         {
+            var tocs = await LoadKnowledgebaseTocsAsync(token);
             var masterLocations = await LoadStationMasterListAsync(token).ConfigureAwait(false);
             var data = new LocationData(masterLocations.ToArray(), _logger);
-            return await LoadCif(data, token);
+            return await LoadCif(data, tocs, token);
         }
 
-        private async Task<Data> LoadCif(LocationData locations, CancellationToken token)
+        private async Task<Data> LoadCif(LocationData locations, TocLookup tocs, CancellationToken token)
         {
             return await Task.Run(() =>
             {
                 _logger.Information("Loading Cif timetable in {file}", _archive.FullName);
                 var parser = _archive.CreateCifParser();
                 var records = parser.Read();
-                var data = Add(records, locations, _archive.FullName); 
+                var data = Add(records, locations, tocs, _archive.FullName); 
                 _logger.Information("Loaded timetable");
                 return data;
             }, token).ConfigureAwait(false);
         }
 
-        private Data Add(IEnumerable<IRecord> records, LocationData locations, string archiveFile)
+        private Data Add(IEnumerable<IRecord> records, LocationData locations, TocLookup tocLookup, string archiveFile)
         {
-            var tocLookup = new TocLookup(_logger, new Dictionary<string, Toc>());
             var timetable = new TimetableData(_logger);
             var associations = new List<Association>(6000);
             

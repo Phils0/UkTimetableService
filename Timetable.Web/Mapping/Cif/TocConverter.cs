@@ -10,7 +10,7 @@ namespace Timetable.Web.Mapping.Cif
             try
             {
                 var lookup = context.Items["Tocs"] as TocLookup;
-                return lookup.Find(source);
+                return lookup.FindOrAdd(source);
             }
             catch (InvalidOperationException ex)
             {
