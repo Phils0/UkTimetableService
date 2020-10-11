@@ -7,6 +7,7 @@ using Serilog;
 using Timetable.Test.Data;
 using Timetable.Web.Controllers;
 using Timetable.Web.Mapping;
+using Timetable.Web.Model;
 using Xunit;
 
 namespace Timetable.Web.Test.Controllers
@@ -83,5 +84,19 @@ namespace Timetable.Web.Test.Controllers
             var stations = response.Value as Model.Station[];
             Assert.Equal(expected, stations.Length);
         }
+        
+        [Fact]
+        public async Task Returns400WhenInvalidToc()
+        {
+            var data = Substitute.For<ILocationData>();
+            data.Locations.Returns(TestLocations());
+
+            var controller = new ReferenceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.LocationAsync(new []{"SWR", "VT"}) as ObjectResult;
+            
+            Assert.Equal(400, response.StatusCode);
+            var error = response.Value as ReferenceError;
+            Assert.Equal("Invalid tocs provided in request SWR|VT", error.Reason);
+        }        
     }
 }

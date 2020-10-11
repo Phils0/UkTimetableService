@@ -264,5 +264,25 @@ namespace Timetable.Web.Test.Controllers
             var response = await controller.Arrivals("CLJ", includeStops: includeStops) as ObjectResult;
             Assert.IsType(expected, response.Value);
         }
+        
+        [Fact]
+        public async Task ArrivalsReturns400WithInvalidTocs()
+        {
+            var data = Substitute.For<ILocationData>();
+            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
+                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
+
+            var filter = Substitute.For<GatherConfiguration.GatherFilter>();
+            var filterFactory = Substitute.For<IFilterFactory>();
+            filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
+            filterFactory.ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter).Returns(filter);
+            
+            var controller = new ArrivalsController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.Arrivals("CLJ",  toc: new [] {"VT", "SWR"}) as ObjectResult;
+            
+            Assert.Equal(400, response.StatusCode);
+            var error = response.Value as BadRequestResponse;
+            Assert.Equal("Invalid tocs provided in request VT|SWR", error.Reason);
+        }
     }
 }

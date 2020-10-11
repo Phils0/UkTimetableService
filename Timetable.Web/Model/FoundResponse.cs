@@ -50,4 +50,15 @@ namespace Timetable.Web.Model
         /// </summary>
         public string Reason { get; set; }
     }
+    
+    /// <summary>
+    /// Bad request response
+    /// </summary>
+    public class BadRequestResponse : SearchResponse
+    {
+        /// <summary>
+        /// Reason not found
+        /// </summary>
+        public string Reason { get; set; }
+    }
 }

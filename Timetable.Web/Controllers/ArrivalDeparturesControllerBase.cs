@@ -55,10 +55,22 @@ namespace Timetable.Web.Controllers
             return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true, dayBoundary);
         }
         
-        protected async Task<IActionResult> Process(SearchRequest request, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find, bool includeStops)
+        protected async Task<IActionResult> Process(SearchRequest request, TocFilter tocFilter, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find, bool includeStops)
         {
             using (LogContext.PushProperty("Request", request, true))
             {
+                if (tocFilter.HasInvalidTocs)
+                {
+                    _logger.Information("Invalid tocs provided in request {t}", tocFilter.Tocs); 
+                    return await Task.FromResult(
+                        BadRequest(new BadRequestResponse()
+                        {
+                            Request = request,
+                            GeneratedAt = DateTime.Now,
+                            Reason = $"Invalid tocs provided in request {tocFilter.Tocs}"                        
+                        }));   
+                }
+                
                 FindStatus status;
                 try
                 {

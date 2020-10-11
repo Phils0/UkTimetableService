@@ -74,7 +74,7 @@ namespace Timetable.Web.Controllers
                 return await FullDayArrivals(location, at.Date, from, includeStops, tocFilter, dayBoundary);
             
             var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS, tocFilter);
-            return await Process(request, async () =>
+            return await Process(request, tocFilter, async () =>
             {
                 var config = CreateGatherConfig(request, tocFilter);
                 var result =  _timetable.FindArrivals(request.Location, at, config);
@@ -85,7 +85,7 @@ namespace Timetable.Web.Controllers
         private async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, string from, bool includeStops, TocFilter tocFilter,  string dayBoundary)
         {
             var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS, tocFilter, dayBoundary);
-            return await Process(request, async () =>
+            return await Process(request, tocFilter, async () =>
             {
                 var boundary = Time.Parse(dayBoundary);
                 var filter = CreateFilter(request, tocFilter);
