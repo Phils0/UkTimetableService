@@ -15,7 +15,8 @@ namespace Timetable.Web.Mapping
             CreateMap<Timetable.Toc, string>()
                 .ConvertUsing((s, d, c) => s.Code );
             CreateMap<Timetable.Station, Model.Station>();
-
+            CreateMap<Timetable.Toc, Model.Toc>();
+            
             CreateMap<Timetable.Location, Model.LocationId>();
             CreateMap<Timetable.ScheduleStop, Model.ScheduledStop>()
                 .ForMember(d => d.Arrival,o => o.MapFrom((s, d, dm, c) => ResolveTime(s.Arrival, c)))

@@ -34,7 +34,7 @@ namespace Timetable.Web
 
         public async Task<TocLookup> LoadKnowledgebaseTocsAsync(CancellationToken token)
         {
-            var lookup = new TocLookup(_logger, new Dictionary<string, Toc>());
+            var lookup = new TocLookup(_logger);
 
             TrainOperatingCompanyList tocs = null;
             try
@@ -193,7 +193,8 @@ namespace Timetable.Web
             {
                 Archive = archiveFile,
                 Locations = locations,
-                Timetable = timetable
+                Timetable = timetable,
+                Tocs = tocLookup
             };
         }
     }

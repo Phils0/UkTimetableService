@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using AutoMapper;
@@ -37,6 +38,7 @@ namespace Timetable.Web.ServiceConfiguration
             services
                 .AddSingleton<ILocationData>(data.Locations)
                 .AddSingleton<ITimetable>(data.Timetable)
+                .AddSingleton<ITocLookup>(data.Tocs)
                 .AddSingleton<Model.Configuration>(Factory.CreateConfigurationResponse(data.Archive));
         }
 

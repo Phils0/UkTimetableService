@@ -53,6 +53,7 @@ namespace Timetable.Web.Test
             
             Assert.NotEmpty(locationData.Locations);
             Assert.NotEmpty(locationData.LocationsByTiploc);
+            Assert.NotEmpty(data.Tocs);
 
             var services = data.Timetable.AsDynamic()._timetableUidMap.RealObject as Dictionary<string, Service>;
             Assert.NotEmpty(services);

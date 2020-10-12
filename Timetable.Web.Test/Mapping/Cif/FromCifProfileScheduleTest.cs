@@ -27,9 +27,7 @@ namespace Timetable.Web.Test.Mapping.Cif
             Assert.Equal("X12345", output.TimetableUid);
         }
 
-        private static TocLookup CreateLookup() => new TocLookup(
-            Substitute.For<ILogger>(),
-            new Dictionary<string, Toc>());
+        private static TocLookup CreateLookup() => new TocLookup(Substitute.For<ILogger>());
         
         private static TimetableData CreateTimetable() => new TimetableData(Substitute.For<ILogger>());
         
@@ -139,7 +137,7 @@ namespace Timetable.Web.Test.Mapping.Cif
             var output = MapSchedule();
             var toc = output.Operator;
             Assert.Equal("SW", toc.Code);
-            Assert.Equal("", toc.Name);
+            Assert.Null(toc.Name);
         }
 
         [Fact]

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,21 @@ namespace Timetable.Web.Test.Controllers
     {
         private static readonly MapperConfiguration _config = new MapperConfiguration(
             cfg => cfg.AddProfile<ToViewModelProfile>());
+
+
+        private readonly TocLookup _tocs;
+
+        public ReferenceControllerTest()
+        {
+            _tocs = new TocLookup(Substitute.For<ILogger>(),
+                new Dictionary<string, Toc>()
+                {
+                    {"VT", new Toc("VT")
+                        {
+                            Name = "Avanti"
+                        }}
+                });
+        }
         
         [Fact]
         public async Task ReturnsLocations()
@@ -23,7 +39,7 @@ namespace Timetable.Web.Test.Controllers
             var data = Substitute.For<ILocationData>();
             data.Locations.Returns(TestLocations());
 
-            var controller = new ReferenceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.LocationAsync() as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -78,7 +94,7 @@ namespace Timetable.Web.Test.Controllers
             var data = Substitute.For<ILocationData>();
             data.Locations.Returns(TestLocations());
 
-            var controller = new ReferenceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.LocationAsync(tocs) as ObjectResult;
             
             var stations = response.Value as Model.Station[];
@@ -91,12 +107,25 @@ namespace Timetable.Web.Test.Controllers
             var data = Substitute.For<ILocationData>();
             data.Locations.Returns(TestLocations());
 
-            var controller = new ReferenceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.LocationAsync(new []{"SWR", "VT"}) as ObjectResult;
             
             Assert.Equal(400, response.StatusCode);
             var error = response.Value as ReferenceError;
             Assert.Equal("Invalid tocs provided in request SWR|VT", error.Reason);
-        }        
+        }    
+        
+        [Fact]
+        public async Task ReturnsTocs()
+        {
+            var data = Substitute.For<ILocationData>();
+            data.Locations.Returns(TestLocations());
+
+            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.TocsAsync() as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+            Assert.NotEmpty(response.Value as Model.Toc[]);
+        }
     }
 }

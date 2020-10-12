@@ -4,16 +4,13 @@ namespace Timetable
 {
     public class Toc : IEquatable<string>, IEquatable<Toc>
     {
-        public static readonly Toc Unknown = new Toc("??")
-        {
-            Name = "Unknown"
-        };
+        public static readonly Toc Unknown = new Toc("??", "Unknown");
 
         public string Code { get; }
 
         public string Name { get; set; }
 
-        public Toc(string code, string name = "")
+        public Toc(string code, string name = null)
         {
             Code = code;
             Name = name;

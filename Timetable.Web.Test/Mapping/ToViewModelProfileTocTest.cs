@@ -26,5 +26,36 @@ namespace Timetable.Web.Test.Mapping
             
             Assert.Equal("VT", output);
         }
+        
+        [Fact]
+        public void TocToToc_Code()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var output = mapper.Map<Timetable.Toc, Model.Toc>(TestSchedules.VirginTrains);
+            
+            Assert.Equal("VT", output.Code);
+        }
+        
+        [Fact]
+        public void TocToToc_Name()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var output = mapper.Map<Timetable.Toc, Model.Toc>(TestSchedules.VirginTrains);
+            
+            Assert.Equal("Virgin Trains", output.Name);
+        }
+        
+        [Fact]
+        public void TocToToc_NoName()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var source = new Timetable.Toc("SW");
+            var output = mapper.Map<Timetable.Toc, Model.Toc>(source);
+            
+            Assert.Null(output.Name);
+        }
     }
 }

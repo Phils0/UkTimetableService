@@ -25,5 +25,18 @@ namespace Timetable.Web.IntegrationTest
             var locations = JsonConvert.DeserializeObject<Model.Station[]>(responseString);
             locations.Should().NotBeEmpty("{url} should return values", url);
         }
+        
+        [Fact]
+        public async void MakeTocRequest()
+        {
+            var client = Host.GetTestClient();
+            var url = $"/api/reference/toc/";
+            var response = await client.GetAsync(url);
+            
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var locations = JsonConvert.DeserializeObject<Model.Toc[]>(responseString);
+            locations.Should().NotBeEmpty("{url} should return values", url);
+        }
     }
 }

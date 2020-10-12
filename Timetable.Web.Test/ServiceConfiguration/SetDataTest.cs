@@ -52,6 +52,7 @@ namespace Timetable.Web.Test.ServiceConfiguration
             var data = new Data();
             data.Locations = new LocationData(new List<Location>(), logger);
             data.Timetable = new TimetableData(logger);
+            data.Tocs = new TocLookup(logger);
             return data;
         }
         

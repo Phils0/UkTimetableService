@@ -18,12 +18,14 @@ namespace Timetable.Web.Controllers
     public class ReferenceController : ControllerBase
     {
         private readonly ILocationData _data;
+        private readonly ITocLookup _tocs;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public ReferenceController(ILocationData data, IMapper mapper, ILogger logger)
+        public ReferenceController(ILocationData data, ITocLookup tocs, IMapper mapper, ILogger logger)
         {
             _data = data;
+            _tocs = tocs;
             _mapper = mapper;
             _logger = logger;
         }
@@ -67,6 +69,39 @@ namespace Timetable.Web.Controllers
             catch (Exception e)
             {
                 _logger.Error(e, "Error getting locations");
+                return await Task.FromResult(StatusCode(500, new ReferenceError("Server error")));
+            }
+
+        }
+        
+        
+                /// <summary>
+        /// Returns UK tos that you can use in this API
+        /// </summary>
+        /// <returns>Set of locations</returns>
+        /// <response code="200">Ok</response>
+        /// <response code="400">Bad Request</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Model.Station[])), 
+         ProducesResponseType(400),
+         ProducesResponseType(404), 
+         ProducesResponseType(500), 
+         Route("toc"), HttpGet]
+        public async Task<IActionResult> TocsAsync()
+        {
+            try
+            {
+                var model = _mapper.Map<IEnumerable<Timetable.Toc>, Model.Toc[]>(_tocs);
+                if (model.Any())
+                    return await Task.FromResult(Ok(model));
+
+                return await Task.FromResult(
+                    NotFound(new ReferenceError("No tocs found.")));
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error getting tocs");
                 return await Task.FromResult(StatusCode(500, new ReferenceError("Server error")));
             }
 

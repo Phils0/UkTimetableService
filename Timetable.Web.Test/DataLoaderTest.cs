@@ -236,6 +236,15 @@ namespace Timetable.Web.Test
             
             Assert.NotEmpty(tocs);
         }
+        
+        [Fact]
+        public async Task LoadTimetableSetsTocs()
+        {
+            var loader = CreateLoader();
+            var data = await loader.LoadAsync(CancellationToken.None);
+            
+            Assert.NotNull(data.Tocs);
+        }
 
         private IKnowledgebaseAsync MockKnowledgebase
         {

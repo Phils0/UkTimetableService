@@ -6,15 +6,21 @@ using Serilog;
 
 namespace Timetable
 {
-    public class TocLookup : IEnumerable<Toc>, ILookup<string, Toc>
+    public interface ITocLookup : IEnumerable<Toc>, ILookup<string, Toc>
+    {
+    }
+    
+    public class TocLookup : ITocLookup
     {
         private readonly ConcurrentDictionary<string, Toc> _values;
         private readonly ILogger _logger;
         
-        public TocLookup(ILogger logger, Dictionary<string, Toc> data)
+        public TocLookup(ILogger logger, Dictionary<string, Toc> data = null)
         {
             _logger = logger;
-            _values = new ConcurrentDictionary<string, Toc>(data);
+            _values = data == null ?
+                new ConcurrentDictionary<string, Toc>() : 
+                new ConcurrentDictionary<string, Toc>(data);
         }
 
         public Toc FindOrAdd(string key)
