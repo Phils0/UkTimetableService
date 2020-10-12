@@ -40,9 +40,9 @@ namespace Timetable.Web.Controllers
         /// <response code="404">Not Found</response>
         /// <response code="500">Internal Server error</response>
         [ProducesResponseType(200, Type = typeof(Model.Station[])), 
-         ProducesResponseType(400),
-         ProducesResponseType(404), 
-         ProducesResponseType(500), 
+         ProducesResponseType(400, Type = typeof(Model.ReferenceError)),
+         ProducesResponseType(404, Type = typeof(Model.ReferenceError)), 
+         ProducesResponseType(500, Type = typeof(Model.ReferenceError)), 
          Route("location"), HttpGet]
         public async Task<IActionResult> LocationAsync([FromQuery] string[] toc = null)
         {
@@ -84,9 +84,9 @@ namespace Timetable.Web.Controllers
         /// <response code="404">Not Found</response>
         /// <response code="500">Internal Server error</response>
         [ProducesResponseType(200, Type = typeof(Model.Station[])), 
-         ProducesResponseType(400),
-         ProducesResponseType(404), 
-         ProducesResponseType(500), 
+         ProducesResponseType(400, Type = typeof(Model.ReferenceError)),
+         ProducesResponseType(404, Type = typeof(Model.ReferenceError)), 
+         ProducesResponseType(500, Type = typeof(Model.ReferenceError)), 
          Route("toc"), HttpGet]
         public async Task<IActionResult> TocsAsync()
         {
