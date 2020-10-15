@@ -88,5 +88,27 @@ namespace Timetable.Web.Test.Mapping
             
             Assert.Equal(2, output.Length);
         }
+        
+        [Fact]
+        public void StationMapCordinates()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var surbiton = TestStations.Surbiton;
+            var output = mapper.Map<Timetable.Station,  Model.Station>(surbiton);
+            
+            Assert.Equal(new decimal(-0.303959858), output.Coordinates.Longitude);
+            Assert.Equal(new decimal(51.39246129), output.Coordinates.Latitude);
+        }
+        
+        [Fact]
+        public void StationMapNoCordinates()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var output = mapper.Map<Timetable.Station,  Model.Station>(TestStations.Waterloo);
+            
+            Assert.Null(output.Coordinates);
+        }
     }
 }

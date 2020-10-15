@@ -9,7 +9,7 @@ namespace Timetable.Test.Data
             Nlc = "557100",
             Name = "SURBITON",
             InterchangeStatus = InterchangeStatus.Normal,
-            Coordinates = new Coordinates()
+            Coordinates = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15181,
                 Northings = 61673,
@@ -24,7 +24,7 @@ namespace Timetable.Test.Data
             Nlc = "559801",
             Name = "LONDON WATERLOO",
             InterchangeStatus = InterchangeStatus.Main,
-            Coordinates = new Coordinates()
+            Coordinates = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15312,
                 Northings = 61798,
@@ -39,7 +39,7 @@ namespace Timetable.Test.Data
             Nlc = "559803",
             Name = "LONDON WATERLOO",
             InterchangeStatus = InterchangeStatus.SubsidiaryLocation,
-            Coordinates = new Coordinates()
+            Coordinates = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15312,
                 Northings = 61798,
@@ -54,7 +54,7 @@ namespace Timetable.Test.Data
             Nlc = "559500",
             Name = "CLAPHAM JUNCTION",
             InterchangeStatus = InterchangeStatus.SubsidiaryLocation,
-            Coordinates = new Coordinates()
+            Coordinates = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15272,
                 Northings = 61755,
@@ -69,7 +69,7 @@ namespace Timetable.Test.Data
             Nlc = "559569",
             Name = "CLAPHAM JUNCTION",
             InterchangeStatus = InterchangeStatus.Normal,
-            Coordinates = new Coordinates()
+            Coordinates = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15272,
                 Northings = 61755,
@@ -84,7 +84,7 @@ namespace Timetable.Test.Data
             Nlc = "568500",
             Name = "WOKING",
             InterchangeStatus = InterchangeStatus.Normal,
-            Coordinates = new Coordinates()
+            Coordinates = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15006,
                 Northings = 61587,
@@ -99,7 +99,7 @@ namespace Timetable.Test.Data
             Nlc = "557700",
             Name = "WEYBRIDGE",
             InterchangeStatus = InterchangeStatus.Normal,
-            Coordinates = new Coordinates()
+            Coordinates = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15075,
                 Northings = 61636,
@@ -114,7 +114,7 @@ namespace Timetable.Test.Data
             Nlc = "557800",
             Name = "WIMBLEDON",
             InterchangeStatus = InterchangeStatus.Normal,
-            Coordinates = new Coordinates()
+            Coordinates = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15075,
                 Northings = 61636,
@@ -129,7 +129,7 @@ namespace Timetable.Test.Data
             Nlc = "559700",
             Name = "VAUXHALL",
             InterchangeStatus = InterchangeStatus.Normal,
-            Coordinates = new Coordinates()
+            Coordinates = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15304,
                 Northings = 61780,

@@ -77,7 +77,7 @@ namespace Timetable
         /// <summary>
         /// Coordinates
         /// </summary>
-        public Coordinates Coordinates { get; set; }
+        public OrdnanceSurveyCoordinates Coordinates { get; set; }
 
         /// <summary>
         /// Interchange Status

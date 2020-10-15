@@ -29,6 +29,11 @@ namespace Timetable.Web.Model
         public string Name { get; set; }
         
         /// <summary>
+        /// Coordinates
+        /// </summary>
+        public Coordinates Coordinates { get; set; }
+        
+        /// <summary>
         /// Tiploc locations included
         /// </summary>
         public ISet<Location> Locations { get; set; }

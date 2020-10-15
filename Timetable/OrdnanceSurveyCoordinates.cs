@@ -3,28 +3,28 @@ using System;
 namespace Timetable
 {
     /// <summary>
-    /// Location coordinates (loingitude, latitude
+    /// Location OrdnanceSurvey coordinates (Eastings, Northings)
     /// </summary>
-    public class Coordinates : IEquatable<Coordinates>
+    public class OrdnanceSurveyCoordinates : IEquatable<OrdnanceSurveyCoordinates>
     {
         /// <summary>
-        /// Longitude
+        /// OS Easting value
         /// </summary>
-        public decimal Longitude { get; set; }
+        public int Eastings { get; set; }
         /// <summary>
-        /// Latitude
+        /// ES Nothings value
         /// </summary>
-        public decimal Latitude { get; set; }
+        public int Northings { get; set; }
         /// <summary>
         /// Estimated location
         /// </summary>
         public bool IsEstimate { get; set; }
         
-        public bool Equals(Coordinates other)
+        public bool Equals(OrdnanceSurveyCoordinates other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Longitude == other.Longitude && Latitude == other.Latitude;
+            return Eastings == other.Eastings && Northings == other.Northings;
         }
 
         public override bool Equals(object obj)
@@ -32,20 +32,20 @@ namespace Timetable
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Coordinates) obj);
+            return Equals((OrdnanceSurveyCoordinates) obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (Longitude.GetHashCode() * 397) ^ Latitude.GetHashCode();
+                return (Eastings * 397) ^ Northings;
             }
         }
         
         public override string ToString()
         {
-            return IsEstimate ? $"{Longitude},{Latitude} (E)" :  $"{Longitude},{Latitude}";
+            return IsEstimate ? $"{Eastings},{Northings} (E)" :  $"{Eastings},{Northings}";
         }
     }
 }

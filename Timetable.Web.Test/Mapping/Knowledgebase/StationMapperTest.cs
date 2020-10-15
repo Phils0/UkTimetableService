@@ -25,5 +25,13 @@ namespace Timetable.Web.Test.Mapping.Knowledgebase
             Assert.Equal("Waterloo", station.Name);
         }
         
+        [Fact]
+        public void MapCoordinates()
+        {
+            var station = TestStations.Waterloo;
+            StationMapper.Update(station, _waterloo);
+            Assert.Equal(new decimal(-0.113897), station.Coordinates.Longitude);
+            Assert.Equal(new decimal(51.503507), station.Coordinates.Latitude);
+        }
     }
 }

@@ -8,6 +8,11 @@ namespace Timetable.Web.Mapping.Knowledgebase
         {
             station.Name = kbStation.Name;
             station.Nlc = kbStation.AlternativeIdentifiers?.NationalLocationCode;
+            station.Coordinates = new Coordinates()
+            {
+                Longitude = kbStation.Longitude,
+                Latitude = kbStation.Latitude
+            };
         }
     }
 }

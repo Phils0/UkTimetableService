@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace Timetable.Test.Data
 {
     public static class TestStations
@@ -10,6 +12,12 @@ namespace Timetable.Test.Data
                 s.Add(TestLocations.Surbiton);
                 s.Name = "Surbiton";
                 s.Nlc = "557100";
+                s.Coordinates = new Coordinates()
+                {
+                    Longitude = new decimal(-0.303959858),
+                    Latitude = new decimal(51.39246129)
+                };
+                    
                 return s;
             }
         }

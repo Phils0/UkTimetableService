@@ -19,7 +19,9 @@ namespace Timetable.Web.Test.Knowledgebase
                         AlternativeIdentifiers = new AlternativeIdentifiersStructure()
                         {
                             NationalLocationCode = "559800"
-                        }
+                        },
+                        Longitude = new decimal(-0.113897),
+                        Latitude = new decimal(51.503507)
                     },
                     new StationStructure()
                     {

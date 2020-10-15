@@ -10,10 +10,11 @@ namespace Timetable.Web.Mapping
     {
         public ToViewModelProfile()
         {
-            CreateMap<Timetable.Coordinates, Model.Coordinates>();
+            CreateMap<Timetable.OrdnanceSurveyCoordinates, Model.OrdnanceSurveyCoordinates>();
             CreateMap<Timetable.Location, Model.Location>();
             CreateMap<Timetable.Toc, string>()
                 .ConvertUsing((s, d, c) => s.Code );
+            CreateMap<Timetable.Coordinates, Model.Coordinates>();
             CreateMap<Timetable.Station, Model.Station>();
             CreateMap<Timetable.Toc, Model.Toc>();
             

@@ -52,7 +52,7 @@ namespace Timetable.Web.Test.Mapping.Cif
 
             var output = mapper.Map<CifParser.RdgRecords.Station, Timetable.Location>(Test.Cif.TestStations.WaterlooWindsor);
 
-            var expected = new Coordinates()
+            var expected = new OrdnanceSurveyCoordinates()
             {
                 Eastings = 15312,
                 Northings = 61798,

@@ -64,13 +64,14 @@ namespace Timetable.Web.Test.Mapping
 
             var output = mapper.Map<Timetable.Location,  Model.Location>(TestLocations.Surbiton);
 
-            var expected = new  Model.Coordinates()
+            var expected = new  Model.OrdnanceSurveyCoordinates()
             {
                 Eastings = 15181,
                 Northings = 61673,
                 IsEstimate = false
             };
-            Assert.Equal(expected, output.Coordinates);
+            Assert.Equal(15181, output.Coordinates.Eastings);
+            Assert.Equal(61673, output.Coordinates.Northings);
         }
         
         [Fact]

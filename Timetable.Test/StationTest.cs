@@ -153,7 +153,7 @@ namespace Timetable.Test
                     Nlc = "559803",
                     Name = "LONDON WATERLOO",
                     InterchangeStatus = InterchangeStatus.Main,
-                    Coordinates = new Coordinates()
+                    Coordinates = new OrdnanceSurveyCoordinates()
                     {
                         Eastings = 15312,
                         Northings = 61798,

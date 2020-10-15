@@ -1,18 +1,18 @@
 namespace Timetable.Web.Model
 {
     /// <summary>
-    /// Longitude/Latitude coordinates
+    /// Ordnance Survey coordinates
     /// </summary>
-    public class Coordinates
+    public class OrdnanceSurveyCoordinates
     {
         /// <summary>
-        /// Longitude value
+        /// OS Easting value
         /// </summary>
-        public decimal Longitude { get; set; }
+        public int Eastings { get; set; }
         /// <summary>
-        /// Latitude value
+        /// ES Nothings value
         /// </summary>
-        public decimal Latitude { get; set; }
+        public int Northings { get; set; }
         /// <summary>
         /// Estimated location
         /// </summary>
@@ -20,7 +20,7 @@ namespace Timetable.Web.Model
 
         public override string ToString()
         {
-            return IsEstimate ? $"{Longitude},{Latitude} (E)" :  $"{Longitude},{Latitude}";
+            return IsEstimate ? $"{Eastings},{Northings} (E)" :  $"{Eastings},{Northings}";
         }
     }
 }

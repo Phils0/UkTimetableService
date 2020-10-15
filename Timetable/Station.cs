@@ -27,6 +27,11 @@ namespace Timetable
         public string Name { get; set; }
         
         /// <summary>
+        /// Coordinates
+        /// </summary>
+        public Coordinates Coordinates { get; set; }
+        
+        /// <summary>
         /// Main Location
         /// </summary>
         public Location Main { get; private set; } = Location.NotSet;
