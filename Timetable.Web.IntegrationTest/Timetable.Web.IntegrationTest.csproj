@@ -31,8 +31,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Data\RJTTF711.ZIP">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <None Update="Data\RJTTF798.ZIP">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 </Project>

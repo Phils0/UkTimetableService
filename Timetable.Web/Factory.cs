@@ -28,12 +28,13 @@ namespace Timetable.Web
         
         internal static IKnowledgebaseAsync CreateKnowledgebase(Configuration config, ILogger logger)
         {
+            var muteErrors = new DowngradeErrorLogger(logger);
             var source = new FileSource(new Dictionary<KnowedgebaseSubjects, string>()
             {
                 {KnowedgebaseSubjects.Stations, config.StationsKnowledgebaseFile},
                 {KnowedgebaseSubjects.Tocs, config.TocsKnowledgebaseFile}
-            }, logger);
-            return new Knowledgebase(source, logger);
+            }, muteErrors);
+            return new Knowledgebase(source, muteErrors);
         }
         
         internal static IDataLoader CreateLoader(IArchive archive, IKnowledgebaseAsync knowledgebase, ILogger logger)
