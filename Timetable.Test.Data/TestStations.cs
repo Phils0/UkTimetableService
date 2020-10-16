@@ -4,6 +4,8 @@ namespace Timetable.Test.Data
 {
     public static class TestStations
     {
+        private readonly static Toc SWR = new Toc("SW", "South Western Railway"); 
+
         public static Station Surbiton
         {
             get
@@ -17,7 +19,7 @@ namespace Timetable.Test.Data
                     Longitude = new decimal(-0.303959858),
                     Latitude = new decimal(51.39246129)
                 };
-                s.StationOperator = new Toc("SW", "South Western Railway");
+                s.StationOperator = SWR;
                 return s;
             }
         }
@@ -29,6 +31,7 @@ namespace Timetable.Test.Data
                 var s = new Station();
                 s.Add(TestLocations.WaterlooMain);
                 s.Add(TestLocations.WaterlooWindsor);
+                s.StationOperator = new Toc("NR", "Network Rail");
                 return s;
             }
         }
@@ -60,6 +63,7 @@ namespace Timetable.Test.Data
             {
                 var s = new Station();
                 s.Add(TestLocations.Weybridge);
+                s.StationOperator = SWR;
                 return s;
             }
         }

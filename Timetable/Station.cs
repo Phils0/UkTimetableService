@@ -44,7 +44,7 @@ namespace Timetable
         /// <summary>
         /// The toc that runs the station
         /// </summary>
-        public Toc StationOperator { get; set; }
+        public Toc StationOperator { get; set; } = Toc.Unknown;
         
         /// <summary>
         /// The tocs that have services that stop here

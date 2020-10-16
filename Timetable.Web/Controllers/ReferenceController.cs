@@ -33,6 +33,7 @@ namespace Timetable.Web.Controllers
         /// <summary>
         /// Returns UK rail locations that you can use in this API
         /// </summary>
+        /// <param name="stationOperator">Filter based upon station operator toc</param>
         /// <param name="toc">Only locations with services from included TOCs included.  Can add multiple to querystring, then any location with any service ran by any of them is returned</param>
         /// <returns>Set of locations</returns>
         /// <response code="200">Ok</response>
@@ -44,7 +45,7 @@ namespace Timetable.Web.Controllers
          ProducesResponseType(404, Type = typeof(Model.ReferenceError)), 
          ProducesResponseType(500, Type = typeof(Model.ReferenceError)), 
          Route("location"), HttpGet]
-        public async Task<IActionResult> LocationAsync([FromQuery] string[] toc = null)
+        public async Task<IActionResult> LocationAsync([FromQuery] string stationOperator = "", [FromQuery] string[] toc = null)
         {
             try
             {
@@ -55,16 +56,20 @@ namespace Timetable.Web.Controllers
                     return await Task.FromResult(
                         BadRequest(new ReferenceError($"Invalid tocs provided in request {tocFilter.Tocs}")));                   
                 }
-
-                var locations = tocFilter.NoFilter
-                    ? _data.Locations.Values
-                    : _data.Locations.Values.Where(s => s.TocServices.Any(t => tocFilter.IsValid(t)));
+    
+                var locations = _data.Locations.Values;
+                locations = string.IsNullOrEmpty(stationOperator)
+                    ? locations
+                    : locations.Where(s => s.StationOperator.Equals(stationOperator));
+                locations = tocFilter.NoFilter
+                    ? locations
+                    : locations.Where(s => s.TocServices.Any(t => tocFilter.IsValid(t)));
                 var model = _mapper.Map<IEnumerable<Timetable.Station>, Model.Station[]>(locations);
                 if (model.Any())
                     return await Task.FromResult(Ok(model));
 
                 return await Task.FromResult(
-                    NotFound(new ReferenceError($"No stations found.  Toc filter {tocFilter.Tocs}")));
+                    NotFound(new ReferenceError($"No stations found. Station Operator: {stationOperator} Toc filter: {tocFilter.Tocs}")));
             }
             catch (Exception e)
             {

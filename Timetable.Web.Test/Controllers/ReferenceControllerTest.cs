@@ -72,7 +72,7 @@ namespace Timetable.Web.Test.Controllers
         }
         
         
-        public static TheoryData<string[], int> FilterData =>
+        public static TheoryData<string[], int> TocFilterData =>
             new TheoryData<string[], int>()
             {
                 {new []{"SW"},  2},
@@ -88,14 +88,14 @@ namespace Timetable.Web.Test.Controllers
             };
         
         [Theory]
-        [MemberData(nameof(FilterData))]
+        [MemberData(nameof(TocFilterData))]
         public async Task ReturnsFilteredLocations(string[] tocs, int expected)
         {
             var data = Substitute.For<ILocationData>();
             data.Locations.Returns(TestLocations());
 
             var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.LocationAsync(tocs) as ObjectResult;
+            var response = await controller.LocationAsync(toc: tocs) as ObjectResult;
             
             var stations = response.Value as Model.Station[];
             Assert.Equal(expected, stations.Length);
@@ -108,12 +108,45 @@ namespace Timetable.Web.Test.Controllers
             data.Locations.Returns(TestLocations());
 
             var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.LocationAsync(new []{"SWR", "VT"}) as ObjectResult;
+            var response = await controller.LocationAsync(toc: new []{"SWR", "VT"}) as ObjectResult;
             
             Assert.Equal(400, response.StatusCode);
             var error = response.Value as ReferenceError;
             Assert.Equal("Invalid tocs provided in request SWR|VT", error.Reason);
         }    
+        
+        public static TheoryData<string, int> ServiceOperatorData =>
+            new TheoryData<string, int>()
+            {
+                {"SW",  2},
+                {"NR",  1},
+                {"",  3},
+                {null,  3},
+            };
+        
+        [Theory]
+        [MemberData(nameof(ServiceOperatorData))]
+        public async Task ReturnsServiceOperatorFilteredLocations(string serviceOperator, int expected)
+        {
+            var data = Substitute.For<ILocationData>();
+            data.Locations.Returns(TestLocations());
+
+            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.LocationAsync(serviceOperator) as ObjectResult;
+            
+            var stations = response.Value as Model.Station[];
+            Assert.Equal(expected, stations.Length);
+        }
+        
+        public async Task ReturnsNotFoundWhenTocRunsNoServices()
+        {
+            var data = Substitute.For<ILocationData>();
+            data.Locations.Returns(TestLocations());
+
+            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.LocationAsync("XC") as ObjectResult;
+            Assert.IsType<NotFoundResponse>(response);
+        }
         
         [Fact]
         public async Task ReturnsTocs()
