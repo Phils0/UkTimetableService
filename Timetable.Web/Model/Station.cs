@@ -39,6 +39,11 @@ namespace Timetable.Web.Model
         public ISet<Location> Locations { get; set; }
         
         /// <summary>
+        /// The toc that runs the station
+        /// </summary>
+        public string StationOperator { get; set; }
+        
+        /// <summary>
         /// The tocs that have services that stop here.
         /// </summary>
         public ISet<string> TocServices { get; set; }

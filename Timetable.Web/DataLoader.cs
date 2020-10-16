@@ -65,8 +65,10 @@ namespace Timetable.Web
             return lookup;
         }
 
-        public async Task<ILocationData> UpdateLocationsWithKnowledgebaseStationsAsync(ILocationData locations, CancellationToken token)
+        public async Task<ILocationData> UpdateLocationsWithKnowledgebaseStationsAsync(ILocationData locations, TocLookup lookup, CancellationToken token)
         {
+            var mapper = new StationMapper(lookup);
+            
             StationList stations = null;
             try
             {
@@ -86,7 +88,7 @@ namespace Timetable.Web
                 {
                     if (locations.TryGetStation(station.CrsCode, out var target))
                     {
-                        StationMapper.Update(target, station);
+                        mapper.Update(target, station);
                     }
                 }
                 catch (Exception e)
@@ -118,7 +120,7 @@ namespace Timetable.Web
         {
             var tocs = await LoadKnowledgebaseTocsAsync(token);
             var masterLocations = await LoadStationMasterListAsync(token).ConfigureAwait(false);
-            masterLocations = await UpdateLocationsWithKnowledgebaseStationsAsync(masterLocations, token).ConfigureAwait(false);
+            masterLocations = await UpdateLocationsWithKnowledgebaseStationsAsync(masterLocations, tocs, token).ConfigureAwait(false);
             return await LoadCif(masterLocations, tocs, token);
         }
 

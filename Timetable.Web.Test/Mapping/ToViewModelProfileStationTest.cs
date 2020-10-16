@@ -110,5 +110,15 @@ namespace Timetable.Web.Test.Mapping
             
             Assert.Null(output.Coordinates);
         }
+        
+        [Fact]
+        public void StationMapStationOperator()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var output = mapper.Map<Timetable.Station,  Model.Station>(TestStations.Surbiton);
+            
+            Assert.Equal("SW", output.StationOperator);
+        }
     }
 }

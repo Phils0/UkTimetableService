@@ -262,10 +262,11 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task UpdateStationNames()
         {
+            var tocs = new TocLookup(Substitute.For<ILogger>());
             var loader = CreateLoader(knowledgebase: MockKnowledgebase);
 
             var locations = TestData.Locations;
-            locations =  await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, CancellationToken.None);
+            locations =  await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, tocs, CancellationToken.None);
 
             locations.TryGetStation("WAT", out Station waterloo);
             Assert.Equal("Waterloo", waterloo.Name);

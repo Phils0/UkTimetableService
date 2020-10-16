@@ -2,9 +2,17 @@
 
 namespace Timetable.Web.Mapping.Knowledgebase
 {
-    public static class StationMapper
+    internal class StationMapper
     {
-        public static void Update(Station station, StationStructure kbStation)
+        private readonly TocLookup _tocLookup;
+
+        internal StationMapper(TocLookup lookup)
+        {
+            _tocLookup = lookup;
+        }
+        
+        
+        internal void Update(Station station, StationStructure kbStation)
         {
             station.Name = kbStation.Name;
             station.Nlc = kbStation.AlternativeIdentifiers?.NationalLocationCode;
@@ -13,6 +21,10 @@ namespace Timetable.Web.Mapping.Knowledgebase
                 Longitude = kbStation.Longitude,
                 Latitude = kbStation.Latitude
             };
+            var stationOperator = string.IsNullOrEmpty(kbStation.StationOperator) ?
+                Toc.Unknown : 
+                _tocLookup.FindOrAdd(kbStation.StationOperator);
+            station.StationOperator = stationOperator;
         }
     }
 }

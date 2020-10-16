@@ -21,7 +21,7 @@ namespace Timetable
         /// <param name="locations"></param>
         /// <param name="token"></param>
         /// <returns>Returns list of tocs loaded from the knowledgebase toc data</returns>
-        Task<ILocationData> UpdateLocationsWithKnowledgebaseStationsAsync(ILocationData locations, CancellationToken token);
+        Task<ILocationData> UpdateLocationsWithKnowledgebaseStationsAsync(ILocationData locations, TocLookup lookup, CancellationToken token);
         
         /// <summary>
         /// Load Station Master List

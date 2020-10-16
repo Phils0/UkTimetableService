@@ -21,7 +21,8 @@ namespace Timetable.Web.Test.Knowledgebase
                             NationalLocationCode = "559800"
                         },
                         Longitude = new decimal(-0.113897),
-                        Latitude = new decimal(51.503507)
+                        Latitude = new decimal(51.503507),
+                        StationOperator = "NR"
                     },
                     new StationStructure()
                     {
@@ -39,7 +40,8 @@ namespace Timetable.Web.Test.Knowledgebase
                         AlternativeIdentifiers = new AlternativeIdentifiersStructure()
                         {
                             NationalLocationCode = "557100"
-                        }
+                        },
+                        StationOperator = "SW"
                     }
                 };
                 return tocs;

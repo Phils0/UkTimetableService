@@ -42,6 +42,11 @@ namespace Timetable
         public ISet<Location> Locations { get; } = new HashSet<Location>();
         
         /// <summary>
+        /// The toc that runs the station
+        /// </summary>
+        public Toc StationOperator { get; set; }
+        
+        /// <summary>
         /// The tocs that have services that stop here
         /// </summary>
         public ISet<Toc> TocServices { get; } = new HashSet<Toc>();

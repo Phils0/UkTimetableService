@@ -17,7 +17,7 @@ namespace Timetable.Test.Data
                     Longitude = new decimal(-0.303959858),
                     Latitude = new decimal(51.39246129)
                 };
-                    
+                s.StationOperator = new Toc("SW", "South Western Railway");
                 return s;
             }
         }

@@ -31,9 +31,10 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task StationsHaveNames()
         {
+            var tocs = new TocLookup(Substitute.For<ILogger>());
             var loader = Create();
             var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
-            locations = await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, CancellationToken.None) as LocationData;
+            locations = await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, tocs, CancellationToken.None) as LocationData;
             
             Assert.NotEmpty(locations.Locations.Values.Where(l => !string.IsNullOrEmpty(l.Name)));
         }
