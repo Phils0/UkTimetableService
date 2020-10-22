@@ -166,7 +166,7 @@ namespace Timetable.Web
             {
                 switch (record)
                 {
-                    case TiplocInsertAmend tiploc:
+                    case CifParser.Records.TiplocInsertAmend tiploc:
                         locations.UpdateLocationNlc(tiploc.Code, tiploc.Nalco);
                         break;
                     case CifParser.Schedule schedule:
@@ -175,7 +175,11 @@ namespace Timetable.Web
                     case CifParser.Records.Association association:
                         var a = MapAssociation(association);
                         associations.Add(a);
-                        break;                    
+                        break;  
+                    case CifParser.Records.Header header:
+                    case CifParser.Records.Trailer trailer:
+                        _logger.Information("Ignored record {recordType}: {record}", record.GetType(), record);
+                        break;
                     default:
                         _logger.Warning("Unhandled record {recordType}: {record}", record.GetType(), record);
                         break;
