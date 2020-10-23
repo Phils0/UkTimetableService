@@ -11,6 +11,7 @@ using NreKnowledgebase;
 using NSubstitute;
 using ReflectionMagic;
 using Serilog;
+using Timetable.DataLoader;
 using Timetable.Test.Data;
 using Timetable.Web.Mapping.Cif;
 using Timetable.Web.Test.Knowledgebase;
@@ -43,14 +44,11 @@ namespace Timetable.Web.Test
             }
         }
 
-        private DataLoader CreateLoader(IArchive archive = null, ICifParser cifParser = null, IKnowledgebaseAsync knowledgebase = null)
+        private IDataLoader CreateLoader(IArchive archive = null, ICifParser cifParser = null, IKnowledgebaseAsync knowledgebase = null)
         {
             archive = CreateMockArchive(archive, cifParser);
             knowledgebase = knowledgebase ?? Substitute.For<IKnowledgebaseAsync>();
-            var logger = Substitute.For<ILogger>();
-
-            var loader = new DataLoader(archive, knowledgebase, _mapperConfig.CreateMapper(), logger);
-            return loader;
+            return Factory.CreateLoader(archive, knowledgebase, Substitute.For<ILogger>());
         }
 
         private IArchive CreateMockArchive(IArchive archive, ICifParser cifParser)
@@ -227,16 +225,7 @@ namespace Timetable.Web.Test
             
             Assert.Equal("TestData.zip", data.Archive);
         }
-        
-        [Fact]
-        public async Task LoadTocs()
-        {
-            var loader = CreateLoader(knowledgebase: MockKnowledgebase);
-            var tocs = await loader.LoadKnowledgebaseTocsAsync(CancellationToken.None);
-            
-            Assert.NotEmpty(tocs);
-        }
-        
+                
         [Fact]
         public async Task LoadTimetableSetsTocs()
         {
@@ -244,32 +233,6 @@ namespace Timetable.Web.Test
             var data = await loader.LoadAsync(CancellationToken.None);
             
             Assert.NotNull(data.Tocs);
-        }
-
-        private IKnowledgebaseAsync MockKnowledgebase
-        {
-            get
-            {
-                var knowledgebase = Substitute.For<IKnowledgebaseAsync>();
-                knowledgebase.GetTocs(Arg.Any<CancellationToken>())
-                    .Returns(Task.FromResult(TestTocs.Tocs));
-                knowledgebase.GetStations(Arg.Any<CancellationToken>())
-                    .Returns(Task.FromResult(Timetable.Web.Test.Knowledgebase.TestStations.Stations));
-                return knowledgebase;
-            }            
-        }
-
-        [Fact]
-        public async Task UpdateStationNames()
-        {
-            var tocs = new TocLookup(Substitute.For<ILogger>());
-            var loader = CreateLoader(knowledgebase: MockKnowledgebase);
-
-            var locations = TestData.Locations;
-            locations =  await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, tocs, CancellationToken.None);
-
-            locations.TryGetStation("WAT", out Station waterloo);
-            Assert.Equal("Waterloo", waterloo.Name);
         }
     }
 }

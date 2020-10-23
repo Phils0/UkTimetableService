@@ -8,6 +8,8 @@ using NreKnowledgebase;
 using NSubstitute;
 using ReflectionMagic;
 using Serilog;
+using Timetable.DataLoader;
+using Timetable.Web.Loaders;
 using Timetable.Web.Mapping;
 using Timetable.Web.Mapping.Cif;
 using Xunit;
@@ -34,7 +36,8 @@ namespace Timetable.Web.Test
             var tocs = new TocLookup(Substitute.For<ILogger>());
             var loader = Create();
             var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
-            locations = await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, tocs, CancellationToken.None) as LocationData;
+            var knowledgebaseLoader = CreateKnowledgebaseLoader();
+            locations = await knowledgebaseLoader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, tocs, CancellationToken.None) as LocationData;
             
             Assert.NotEmpty(locations.Locations.Values.Where(l => !string.IsNullOrEmpty(l.Name)));
         }
@@ -43,6 +46,13 @@ namespace Timetable.Web.Test
         {
             var config = new Configuration(ConfigurationHelper.GetConfiguration());
             return Factory.CreateLoader(config, Substitute.For<ILogger>());
+        }
+        
+        private static IKnowledgebaseEnhancer CreateKnowledgebaseLoader()
+        {
+            var config = new Configuration(ConfigurationHelper.GetConfiguration());
+            var knowledgebase = Factory.CreateKnowledgebase(config, Substitute.For<ILogger>());
+            return new KnowledgebaseLoader(knowledgebase, Substitute.For<ILogger>());
         }
 
         [Fact]
@@ -66,8 +76,8 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadTocs()
         {
-            var loader = Create();
-            var tocs = await loader.LoadKnowledgebaseTocsAsync(CancellationToken.None);
+            var loader = CreateKnowledgebaseLoader();
+            var tocs = await loader.UpdateTocsWithKnowledgebaseAsync(new TocLookup(Substitute.For<ILogger>()),  CancellationToken.None);
             
             Assert.NotEmpty(tocs);
         }

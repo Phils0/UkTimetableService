@@ -4,6 +4,8 @@ using AutoMapper;
 using CifParser.Archives;
 using NreKnowledgebase;
 using Serilog;
+using Timetable.DataLoader;
+using Timetable.Web.Loaders;
 using Timetable.Web.Mapping.Cif;
 
 namespace Timetable.Web
@@ -25,7 +27,7 @@ namespace Timetable.Web
         {
             return new Archive(config.TimetableArchiveFile, logger);
         }
-        
+
         internal static IKnowledgebaseAsync CreateKnowledgebase(Configuration config, ILogger logger)
         {
             var muteErrors = new DowngradeErrorLogger(logger);
@@ -36,17 +38,15 @@ namespace Timetable.Web
             }, muteErrors);
             return new Knowledgebase(source, muteErrors);
         }
-        
+
         internal static IDataLoader CreateLoader(IArchive archive, IKnowledgebaseAsync knowledgebase, ILogger logger)
         {
             var mapperConfig = new MapperConfiguration(
-                cfg =>
-                {
-                    cfg.AddProfile<FromCifProfile>();
-                });
-            return new DataLoader(archive, knowledgebase, mapperConfig.CreateMapper(),logger);
+                cfg => { cfg.AddProfile<FromCifProfile>(); });
+            var knowledgebaseLoader = new KnowledgebaseLoader(knowledgebase, logger);
+            return new DataLoader(archive, knowledgebaseLoader, mapperConfig.CreateMapper(), logger);
         }
-        
+
         internal static IDataLoader CreateLoader(Configuration config, ILogger logger)
         {
             var archive = CreateArchive(config, logger);

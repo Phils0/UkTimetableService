@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Serilog;
+using Timetable.DataLoader;
 using Timetable.Web.ServiceConfiguration;
 using Xunit;
 
