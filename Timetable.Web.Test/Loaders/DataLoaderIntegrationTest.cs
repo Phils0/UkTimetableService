@@ -24,7 +24,7 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadStations()
         {
-            var loader = Create();
+            var loader = CreateCifLoader();
             var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
             
             Assert.NotEmpty(locations.Locations);
@@ -34,7 +34,7 @@ namespace Timetable.Web.Test
         public async Task StationsHaveNames()
         {
             var tocs = new TocLookup(Substitute.For<ILogger>());
-            var loader = Create();
+            var loader = CreateCifLoader();
             var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
             var knowledgebaseLoader = CreateKnowledgebaseLoader();
             locations = await knowledgebaseLoader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, tocs, CancellationToken.None) as LocationData;
@@ -42,6 +42,13 @@ namespace Timetable.Web.Test
             Assert.NotEmpty(locations.Locations.Values.Where(l => !string.IsNullOrEmpty(l.Name)));
         }
 
+        private static ICifLoader CreateCifLoader()
+        {
+            var config = new Configuration(ConfigurationHelper.GetConfiguration());
+            var archive = Factory.CreateArchive(config, Substitute.For<ILogger>());
+            return Factory.CreateCifLoader(archive, Substitute.For<ILogger>());
+        }
+        
         private static IDataLoader Create()
         {
             var config = new Configuration(ConfigurationHelper.GetConfiguration());

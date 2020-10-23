@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -7,32 +6,26 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CifParser;
 using CifParser.Archives;
-using CifParser.Records;
-using NreKnowledgebase;
-using NreKnowledgebase.SchemaV4;
 using Serilog;
 using Timetable.DataLoader;
-using Timetable.Web.Mapping.Knowledgebase;
 
-namespace Timetable.Web
-{ 
-    public class DataLoader : IDataLoader
+namespace Timetable.Web.Loaders
+{
+    public class CifLoader : ICifLoader
     {
         private const int LogAfter = 100000;
-        
+
         private IMapper _mapper;
         private readonly IArchive _archive;
-        private readonly IKnowledgebaseEnhancer _knowledgebase;
         private readonly ILogger _logger;
 
-        public DataLoader(IArchive archive, IKnowledgebaseEnhancer knowledgebase, IMapper mapper, ILogger logger)
+        public CifLoader(IArchive archive, IMapper mapper, ILogger logger)
         {
             _mapper = mapper;
             _archive = archive;
-            _knowledgebase = knowledgebase;
             _logger = logger;
         }
-       
+
         public async Task<ILocationData> LoadStationMasterListAsync(CancellationToken token)
         {
             if (!_archive.IsRdgZip)
@@ -42,29 +35,24 @@ namespace Timetable.Web
             {
                 _logger.Information("Loading Master Station List in {file}", _archive.FullName);
                 var parser = _archive.CreateParser();
-                var stationRecords = parser.ReadFile(RdgZipExtractor.StationExtension).OfType<CifParser.RdgRecords.Station>();
-                var locations = _mapper.Map<IEnumerable<CifParser.RdgRecords.Station>, IEnumerable<Timetable.Location>>(stationRecords);
+                var stationRecords = parser.ReadFile(RdgZipExtractor.StationExtension)
+                    .OfType<CifParser.RdgRecords.Station>();
+                var locations =
+                    _mapper.Map<IEnumerable<CifParser.RdgRecords.Station>, IEnumerable<Timetable.Location>>(
+                        stationRecords);
                 _logger.Information("Loaded Master Station List");
                 return new LocationData(locations.ToArray(), _logger);
             }, token).ConfigureAwait(false);
         }
 
-        public async Task<Data> LoadAsync(CancellationToken token)
-        {
-            var tocs = await _knowledgebase.UpdateTocsWithKnowledgebaseAsync(new TocLookup(_logger),  token);
-            var masterLocations = await LoadStationMasterListAsync(token).ConfigureAwait(false);
-            masterLocations = await _knowledgebase.UpdateLocationsWithKnowledgebaseStationsAsync(masterLocations, tocs, token).ConfigureAwait(false);
-            return await LoadCif(masterLocations, tocs, token);
-        }
-
-        private async Task<Data> LoadCif(ILocationData locations, TocLookup tocs, CancellationToken token)
+        public async Task<Data> LoadCif(ILocationData locations, TocLookup tocs, CancellationToken token)
         {
             return await Task.Run(() =>
             {
                 _logger.Information("Loading Cif timetable in {file}", _archive.FullName);
                 var parser = _archive.CreateCifParser();
                 var records = parser.Read();
-                var data = Add(records, locations, tocs, _archive.FullName); 
+                var data = Add(records, locations, tocs, _archive.FullName);
                 _logger.Information("Loaded timetable");
                 return data;
             }, token).ConfigureAwait(false);
@@ -74,7 +62,7 @@ namespace Timetable.Web
         {
             var timetable = new TimetableData(_logger);
             var associations = new List<Association>(6000);
-            
+
             Timetable.Schedule MapSchedule(CifParser.Schedule schedule)
             {
                 return _mapper.Map<CifParser.Schedule, Timetable.Schedule>(schedule, o =>
@@ -84,15 +72,13 @@ namespace Timetable.Web
                     o.Items.Add("Timetable", timetable);
                 });
             }
-            
+
             Timetable.Association MapAssociation(CifParser.Records.Association association)
             {
-                return _mapper.Map<CifParser.Records.Association, Timetable.Association>(association, o =>
-                {
-                    o.Items.Add("Locations", locations);
-                });
+                return _mapper.Map<CifParser.Records.Association, Timetable.Association>(association,
+                    o => { o.Items.Add("Locations", locations); });
             }
-            
+
             int count = 0;
 
             foreach (var record in records)
@@ -108,7 +94,7 @@ namespace Timetable.Web
                     case CifParser.Records.Association association:
                         var a = MapAssociation(association);
                         associations.Add(a);
-                        break;  
+                        break;
                     case CifParser.Records.Header header:
                     case CifParser.Records.Trailer trailer:
                         _logger.Information("Ignored record {recordType}: {record}", record.GetType(), record);
@@ -127,7 +113,7 @@ namespace Timetable.Web
 
             var applied = timetable.AddAssociations(associations.Where(a => a.IsPassenger || a.IsCancelled()));
             _logger.Information("Applied Associations: {applied} of {Count}", applied, associations.Count);
-            
+
             return new Data()
             {
                 Archive = archiveFile,

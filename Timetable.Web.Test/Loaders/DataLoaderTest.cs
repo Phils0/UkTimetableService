@@ -12,9 +12,7 @@ using NSubstitute;
 using ReflectionMagic;
 using Serilog;
 using Timetable.DataLoader;
-using Timetable.Test.Data;
 using Timetable.Web.Mapping.Cif;
-using Timetable.Web.Test.Knowledgebase;
 using Xunit;
 
 namespace Timetable.Web.Test
@@ -24,16 +22,6 @@ namespace Timetable.Web.Test
         private static readonly MapperConfiguration _mapperConfig = new MapperConfiguration(
             cfg => cfg.AddProfile<FromCifProfile>());
         
-        [Fact]
-        public async Task LoadStations()
-        {
-            var loader = CreateLoader(MockRdgArchive);
-            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
-            
-            Assert.Equal(3, locations.LocationsByTiploc.Count());
-            Assert.Equal(2, locations.Locations.Count());
-        }
-
         private IArchive MockRdgArchive
         {
             get
@@ -70,17 +58,6 @@ namespace Timetable.Web.Test
 
             archive.FullName.Returns(@"TestData.zip");
             return archive;
-        }
-
-        [Fact]
-        public async Task LoadStationsThrowsExceptionIfNotRdgArchive()
-        {
-            var archive = Substitute.For<IArchive>();
-            archive.IsRdgZip.Returns(false);
-
-            var loader = CreateLoader(archive);
-  
-            var ex = await Assert.ThrowsAnyAsync<InvalidDataException>(() =>  loader.LoadStationMasterListAsync(CancellationToken.None));
         }
         
         [Fact]

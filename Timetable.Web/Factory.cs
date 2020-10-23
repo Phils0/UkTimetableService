@@ -38,20 +38,28 @@ namespace Timetable.Web
             }, muteErrors);
             return new Knowledgebase(source, muteErrors);
         }
-
-        internal static IDataLoader CreateLoader(IArchive archive, IKnowledgebaseAsync knowledgebase, ILogger logger)
-        {
-            var mapperConfig = new MapperConfiguration(
-                cfg => { cfg.AddProfile<FromCifProfile>(); });
-            var knowledgebaseLoader = new KnowledgebaseLoader(knowledgebase, logger);
-            return new DataLoader(archive, knowledgebaseLoader, mapperConfig.CreateMapper(), logger);
-        }
-
+        
         internal static IDataLoader CreateLoader(Configuration config, ILogger logger)
         {
             var archive = CreateArchive(config, logger);
             var knowledgebase = CreateKnowledgebase(config, logger);
             return CreateLoader(archive, knowledgebase, logger);
+        }
+        
+        internal static IDataLoader CreateLoader(IArchive archive, IKnowledgebaseAsync knowledgebase, ILogger logger)
+        {
+            var cifLoader = CreateCifLoader(archive, logger);
+            var knowledgebaseLoader = new KnowledgebaseLoader(knowledgebase, logger);
+            return new Loaders.DataLoader(cifLoader, knowledgebaseLoader, logger);
+        }
+
+        
+        internal static CifLoader CreateCifLoader(IArchive archive, ILogger logger)
+        {
+            var mapperConfig = new MapperConfiguration(
+                cfg => { cfg.AddProfile<FromCifProfile>(); });
+            var cifLoader = new CifLoader(archive, mapperConfig.CreateMapper(), logger);
+            return cifLoader;
         }
     }
 }
