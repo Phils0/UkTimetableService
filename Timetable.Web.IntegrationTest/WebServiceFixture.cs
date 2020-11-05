@@ -10,7 +10,7 @@ namespace Timetable.Web.IntegrationTest
 {
     public class WebServiceFixture : IDisposable 
     {
-        public static TimeSpan Timeout = new TimeSpan(0, 1, 0);
+        public static TimeSpan Timeout = new TimeSpan(0, 0, 10);
         
         public IHost Host { get; private set; }
 

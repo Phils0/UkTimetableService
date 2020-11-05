@@ -21,7 +21,7 @@ namespace Timetable.Web.IntegrationTest
         [InlineData("EUS", "MAN", "VT")]
         [InlineData("LDS", "KGX", "GR")]
         [InlineData("PAD", "BRI", "GW")]
-        [InlineData("EDB", "EUS", "CS")]
+        [InlineData("INV", "EUS", "CS")]
         public async void MakeDeparturesRequest(string origin, string destination, string toc)
         {
             var client = Host.GetTestClient();
