@@ -73,34 +73,46 @@ namespace Timetable.Test
         public static TheoryData<BankHolidayRunning, DateTime, bool> BankHolidays =>
             new TheoryData<BankHolidayRunning, DateTime, bool>()
             {
-                {BankHolidayRunning.RunsOnBankHoliday, new DateTime(2019, 8, 5), true}, // Scotish Bank Holiday
-                {BankHolidayRunning.RunsOnBankHoliday, new DateTime(2019, 8, 26), true}, // English Bank Holiday
-                {BankHolidayRunning.RunsOnBankHoliday, new DateTime(2019, 8, 27), true}, // No Bank Holiday
+                {BankHolidayRunning.RunsOnBankHoliday, new DateTime(2021, 8, 2), true}, // Scotish Bank Holiday
+                {BankHolidayRunning.RunsOnBankHoliday, new DateTime(2021, 8, 30), true}, // English Bank Holiday
+                {BankHolidayRunning.RunsOnBankHoliday, new DateTime(2021, 8, 27), true}, // No Bank Holiday
                 {
-                    BankHolidayRunning.DoesNotRunOnEnglishBankHolidays, new DateTime(2019, 8, 5), true
+                    BankHolidayRunning.DoesNotRunOnEnglishBankHolidays, new DateTime(2021, 8, 2), true
                 }, // Scotish Bank Holiday
                 {
-                    BankHolidayRunning.DoesNotRunOnEnglishBankHolidays, new DateTime(2019, 8, 26), false
+                    BankHolidayRunning.DoesNotRunOnEnglishBankHolidays, new DateTime(2021, 8, 30), false
                 }, // English Bank Holiday
                 {
-                    BankHolidayRunning.DoesNotRunOnEnglishBankHolidays, new DateTime(2019, 8, 27), true
+                    BankHolidayRunning.DoesNotRunOnEnglishBankHolidays, new DateTime(2021, 8, 27), true
                 }, // No Bank Holiday
                 {
-                    BankHolidayRunning.DoesNotRunOnScotishBankHolidays, new DateTime(2019, 8, 5), false
+                    BankHolidayRunning.DoesNotRunOnScotishBankHolidays, new DateTime(2021, 8, 2), false
                 }, // Scotish Bank Holiday
                 {
-                    BankHolidayRunning.DoesNotRunOnScotishBankHolidays, new DateTime(2019, 8, 26), true
+                    BankHolidayRunning.DoesNotRunOnScotishBankHolidays, new DateTime(2021, 8, 30), true
                 }, // English Bank Holiday
                 {
-                    BankHolidayRunning.DoesNotRunOnScotishBankHolidays, new DateTime(2019, 8, 27), true
+                    BankHolidayRunning.DoesNotRunOnScotishBankHolidays, new DateTime(2021, 8, 27), true
                 }, // No Bank Holiday
             };
 
+        public static ICalendar CreateAugust2021Calendar(DaysFlag dayMask = DaysFlag.Everyday,
+            BankHolidayRunning bankHolidays = BankHolidayRunning.RunsOnBankHoliday)
+        {
+            var calendar = new Calendar(
+                new DateTime(2021, 8, 1),
+                new DateTime(2021, 8, 31),
+                dayMask,
+                bankHolidays);
+            calendar.Generate();
+            return calendar;
+        }
+        
         [Theory]
         [MemberData(nameof(BankHolidays))]
         public void IsActiveWhenRunsOnBankHolidays(BankHolidayRunning bankHolidays, DateTime day, bool expected)
         {
-            var calendar = TestSchedules.CreateAugust2019Calendar(bankHolidays: bankHolidays);
+            var calendar = CreateAugust2021Calendar(bankHolidays: bankHolidays);
 
             Assert.Equal(expected, calendar.IsActiveOn(day));
         }
