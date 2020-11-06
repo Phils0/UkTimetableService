@@ -15,5 +15,9 @@
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// NRE url
+        /// </summary>
+        public string NationalRailUrl { get; set; }
     }
 }

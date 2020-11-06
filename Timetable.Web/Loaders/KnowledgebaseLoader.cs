@@ -20,12 +20,12 @@ namespace Timetable.Web.Loaders
             _logger = logger;
         }
 
-        public async Task<TocLookup> UpdateTocsWithKnowledgebaseAsync(TocLookup lookup, CancellationToken token)
+        public async Task<TocLookup> UpdateTocsAsync(TocLookup lookup, CancellationToken token)
         {
             TrainOperatingCompanyList tocs = null;
             try
             {
-                tocs = await _knowledgebase.GetTocs(token);
+                tocs = await _knowledgebase.GetTocs(token).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -40,7 +40,7 @@ namespace Timetable.Web.Loaders
                 try
                 {
                     var t = TocMapper.Map(toc);
-                    lookup.Add(toc.AtocCode, t);
+                    lookup.AddIfNotExist(toc.AtocCode, t);
                 }
                 catch (Exception e)
                 {
@@ -59,7 +59,7 @@ namespace Timetable.Web.Loaders
             StationList stations = null;
             try
             {
-                stations = await _knowledgebase.GetStations(token);
+                stations = await _knowledgebase.GetStations(token).ConfigureAwait(false);
             }
             catch (Exception e)
             {

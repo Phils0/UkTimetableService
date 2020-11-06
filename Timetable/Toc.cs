@@ -9,6 +9,8 @@ namespace Timetable
         public string Code { get; }
 
         public string Name { get; set; }
+        
+        public string NationalRailUrl { get; set; }
 
         public Toc(string code, string name = null)
         {

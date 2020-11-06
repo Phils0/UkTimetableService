@@ -2,25 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
-using CifParser.Archives;
-using NreKnowledgebase;
 using NSubstitute;
 using ReflectionMagic;
 using Serilog;
 using Timetable.DataLoader;
-using Timetable.Web.Loaders;
-using Timetable.Web.Mapping;
-using Timetable.Web.Mapping.Cif;
 using Xunit;
 
 namespace Timetable.Web.Test
 {
     public class DataLoaderIntegrationTest
     {
-        private static readonly MapperConfiguration _mapperConfig = new MapperConfiguration(
-            cfg => cfg.AddProfile<FromCifProfile>());
-        
         [Fact]
         public async Task LoadStations()
         {
@@ -31,7 +22,7 @@ namespace Timetable.Web.Test
         }
         
         [Fact]
-        public async Task StationsHaveNames()
+        public async Task StationsHaveNamesFromKnowledgebase()
         {
             var tocs = new TocLookup(Substitute.For<ILogger>());
             var loader = CreateCifLoader();
@@ -42,26 +33,37 @@ namespace Timetable.Web.Test
             Assert.NotEmpty(locations.Locations.Values.Where(l => !string.IsNullOrEmpty(l.Name)));
         }
 
+        [Fact]
+        public async Task StationsHaveNamesFromDarwin()
+        {
+            var tocs = new TocLookup(Substitute.For<ILogger>());
+            var loader = CreateCifLoader();
+            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
+            var darwinLoader = await CreateDarwinLoader();
+            locations = await darwinLoader.UpdateLocationsAsync(locations, tocs, CancellationToken.None) as LocationData;
+            
+            Assert.NotEmpty(locations.Locations.Values.Where(l => !string.IsNullOrEmpty(l.Name)));
+        }
+        
         private static ICifLoader CreateCifLoader()
         {
-            var config = new Configuration(ConfigurationHelper.GetConfiguration());
+            var config = new Configuration(ConfigurationHelper.GetConfiguration(), Substitute.For<ILogger>());
             var archive = Factory.CreateArchive(config, Substitute.For<ILogger>());
             return Factory.CreateCifLoader(archive, Substitute.For<ILogger>());
         }
         
         private static IDataLoader Create()
         {
-            var config = new Configuration(ConfigurationHelper.GetConfiguration());
-            return Factory.CreateLoader(config, Substitute.For<ILogger>());
+            var config = new Configuration(ConfigurationHelper.GetConfiguration(), Substitute.For<ILogger>());
+            return Factory.CreateLoader(config, Substitute.For<ILogger>()).Result;
         }
         
         private static IKnowledgebaseEnhancer CreateKnowledgebaseLoader()
         {
-            var config = new Configuration(ConfigurationHelper.GetConfiguration());
-            var knowledgebase = Factory.CreateKnowledgebase(config, Substitute.For<ILogger>());
-            return new KnowledgebaseLoader(knowledgebase, Substitute.For<ILogger>());
+            var config = new Configuration(ConfigurationHelper.GetConfiguration(), Substitute.For<ILogger>());
+            return Factory.CreateKnowledgebase(config, Substitute.For<ILogger>());;
         }
-
+        
         [Fact]
         public async Task LoadCif()
         {
@@ -81,10 +83,25 @@ namespace Timetable.Web.Test
         }
         
         [Fact]
-        public async Task LoadTocs()
+        public async Task LoadKnowledgebaseTocs()
         {
             var loader = CreateKnowledgebaseLoader();
-            var tocs = await loader.UpdateTocsWithKnowledgebaseAsync(new TocLookup(Substitute.For<ILogger>()),  CancellationToken.None);
+            var tocs = await loader.UpdateTocsAsync(new TocLookup(Substitute.For<ILogger>()),  CancellationToken.None);
+            
+            Assert.NotEmpty(tocs);
+        }
+        
+        private static async Task<IDarwinLoader> CreateDarwinLoader()
+        {
+            var config = new Configuration(ConfigurationHelper.GetConfiguration(), Substitute.For<ILogger>());
+            return await Factory.CreateDarwinLoader(config, Substitute.For<ILogger>());;
+        }
+        
+        [Fact]
+        public async Task LoadDarwinTocs()
+        {
+            var loader = await CreateDarwinLoader();
+            var tocs = await loader.UpdateTocsAsync(new TocLookup(Substitute.For<ILogger>()),  CancellationToken.None);
             
             Assert.NotEmpty(tocs);
         }

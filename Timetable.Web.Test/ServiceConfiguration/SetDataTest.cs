@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CifParser.Archives;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -40,7 +39,7 @@ namespace Timetable.Web.Test.ServiceConfiguration
             return descriptors;
         }
 
-        private IDataLoader CreateDataLoader(ILogger logger, Data data = null)
+        private IDataLoader CreateDataLoader(ILogger logger, Timetable.Data data = null)
         {
             data = data ?? CreateDummyData(logger);
             var loader = Substitute.For<IDataLoader>();
@@ -48,9 +47,9 @@ namespace Timetable.Web.Test.ServiceConfiguration
             return loader;
         }
 
-        private Data CreateDummyData(ILogger logger)
+        private Timetable.Data CreateDummyData(ILogger logger)
         {
-            var data = new Data();
+            var data = new Timetable.Data();
             data.Locations = new LocationData(new List<Location>(), logger);
             data.Timetable = new TimetableData(logger);
             data.Tocs = new TocLookup(logger);

@@ -17,14 +17,15 @@ namespace Timetable.Web
         {
             var logConfig = new LoggerConfiguration();
             Logging.Configure(config, logConfig);
-            return Find(new Configuration(config), logConfig.CreateLogger());
+            var logger = logConfig.CreateLogger();
+            return Find(new Configuration(config, logger), logger);
         }
         
         internal static ServiceConfigurations Find(Configuration config, ILogger logger)
         {
             logger.Information("Loading configuration", PluginDir);
             
-            var configurations = new ServiceConfigurations( logger);
+            var configurations = new ServiceConfigurations(logger);
             AddInternalConfigurations();
             AddExternalPlugins();
             return configurations;
@@ -33,7 +34,7 @@ namespace Timetable.Web
             {
                 logger.Information("Loading internal service configuration", PluginDir);
                 
-                var loader = Factory.CreateLoader(config, logger);
+                var loader = Factory.CreateLoader(config, logger).Result;
                 var addData = new SetData(loader, logger);
                 
                 configurations.Add(new Singletons());

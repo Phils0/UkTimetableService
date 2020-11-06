@@ -1,10 +1,10 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NreKnowledgebase;
 using NSubstitute;
 using Serilog;
 using Timetable.DataLoader;
-using Timetable.Test.Data;
 using Timetable.Web.Loaders;
 using Timetable.Web.Test.Knowledgebase;
 using Xunit;
@@ -15,8 +15,6 @@ namespace Timetable.Web.Test.Loaders
     {
         private IKnowledgebaseEnhancer CreateLoader(IKnowledgebaseAsync knowledgebase)
         {
-
-            knowledgebase = knowledgebase ?? Substitute.For<IKnowledgebaseAsync>();
             return new KnowledgebaseLoader(knowledgebase, Substitute.For<ILogger>());
         }
         
@@ -34,25 +32,63 @@ namespace Timetable.Web.Test.Loaders
         }
         
         [Fact]
-        public async Task LoadTocs()
+        public async Task UpdatesTocs()
         {
             var loader = CreateLoader(knowledgebase: MockKnowledgebase);
-            var tocs = await loader.UpdateTocsWithKnowledgebaseAsync(new TocLookup(Substitute.For<ILogger>()),  CancellationToken.None);
+            var tocs = await loader.UpdateTocsAsync(new TocLookup(Substitute.For<ILogger>()),  CancellationToken.None);
             
             Assert.NotEmpty(tocs);
         }
         
+        //TODO This is too simplistic, need to actually handle start and end dates but will do for now
         [Fact]
-        public async Task UpdateStationNames()
+        public async Task UpdatesTocsOnlyAddsFirstFound()
+        {
+            var loader = CreateLoader(knowledgebase: MockKnowledgebase);
+            var tocs = await loader.UpdateTocsAsync(new TocLookup(Substitute.For<ILogger>()),  CancellationToken.None);
+
+            var vt = tocs["VT"].Single();
+            Assert.Equal("Avanti West Coast", vt.Name);
+        }
+        
+        [Fact]
+        public async Task UpdateTocsDoesNotAddIfExists()
+        {
+            var loader = CreateLoader(knowledgebase: MockKnowledgebase);
+            var tocLookup = new TocLookup(Substitute.For<ILogger>());
+            tocLookup.AddOrReplace("VT", new Toc("VT", "Already added"));
+            var tocs = await loader.UpdateTocsAsync(tocLookup,  CancellationToken.None);
+            
+            var vt = tocs["VT"].Single();
+            Assert.Equal("Already added", vt.Name);
+        }
+        
+        [Fact]
+        public async Task UpdateStations()
         {
             var tocs = new TocLookup(Substitute.For<ILogger>());
             var loader = CreateLoader(knowledgebase: MockKnowledgebase);
 
-            var locations = TestData.Locations;
+            var locations = Timetable.Test.Data.TestData.Locations;
             locations =  await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, tocs, CancellationToken.None);
 
             locations.TryGetStation("WAT", out Station waterloo);
             Assert.Equal("Waterloo", waterloo.Name);
+        }
+        
+        [Fact]
+        public async Task UpdateStationsEvenWhenSet()
+        {
+            var tocs = new TocLookup(Substitute.For<ILogger>());
+            var loader = CreateLoader(knowledgebase: MockKnowledgebase);
+
+            var locations = Timetable.Test.Data.TestData.Locations;
+            locations.TryGetStation("SUR", out var surbiton);
+            surbiton.Name = "Original";
+            
+            locations =  await loader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, tocs, CancellationToken.None);
+            
+            Assert.Equal("Surbiton", surbiton.Name);
         }
     }
 }

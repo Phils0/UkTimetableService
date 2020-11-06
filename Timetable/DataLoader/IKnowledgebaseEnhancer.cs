@@ -13,7 +13,7 @@ namespace Timetable.DataLoader
         /// </summary>
         /// <param name="token"></param>
         /// <returns>Returns list of tocs loaded from the knowledgebase toc data</returns>
-        Task<TocLookup> UpdateTocsWithKnowledgebaseAsync(TocLookup lookup, CancellationToken token);
+        Task<TocLookup> UpdateTocsAsync(TocLookup lookup, CancellationToken token);
 
         /// <summary>
         /// Update Station with Knowledgebase Station data

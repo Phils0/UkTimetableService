@@ -12,6 +12,7 @@ using NSubstitute;
 using ReflectionMagic;
 using Serilog;
 using Timetable.DataLoader;
+using Timetable.Web.Loaders;
 using Timetable.Web.Mapping.Cif;
 using Xunit;
 
@@ -32,11 +33,16 @@ namespace Timetable.Web.Test
             }
         }
 
-        private IDataLoader CreateLoader(IArchive archive = null, ICifParser cifParser = null, IKnowledgebaseAsync knowledgebase = null)
+        private Web.Loaders.DataLoader CreateLoader(IArchive archive = null, 
+            ICifParser cifParser = null, 
+            IKnowledgebaseEnhancer knowledgebase = null,
+            IDarwinLoader darwin = null)
         {
             archive = CreateMockArchive(archive, cifParser);
-            knowledgebase = knowledgebase ?? Substitute.For<IKnowledgebaseAsync>();
-            return Factory.CreateLoader(archive, knowledgebase, Substitute.For<ILogger>());
+            darwin ??= new NopLoader();
+            knowledgebase ??= new KnowledgebaseLoader(Substitute.For<IKnowledgebaseAsync>(), Substitute.For<ILogger>());
+            
+            return Factory.CreateLoader(archive, darwin, knowledgebase, Substitute.For<ILogger>()) as Web.Loaders.DataLoader;
         }
 
         private IArchive CreateMockArchive(IArchive archive, ICifParser cifParser)
@@ -205,6 +211,15 @@ namespace Timetable.Web.Test
                 
         [Fact]
         public async Task LoadTimetableSetsTocs()
+        {
+            var loader = CreateLoader();
+            var data = await loader.LoadAsync(CancellationToken.None);
+            
+            Assert.NotNull(data.Tocs);
+        }
+        
+        [Fact]
+        public async Task LoadKnowledgebaseTocsDoesNotOverwriteDarwin()
         {
             var loader = CreateLoader();
             var data = await loader.LoadAsync(CancellationToken.None);

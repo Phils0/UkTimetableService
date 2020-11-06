@@ -35,11 +35,20 @@ namespace Timetable
             return value;
         }
         
-        public void Add(string key, Toc toc)
+        public void AddIfNotExist(string key, Toc toc)
         {
             if (!_values.TryAdd(key, toc))
             {
                 _logger.Error("Duplicate Toc {key}.", key);
+            }
+        }
+        
+        public void AddOrReplace(string key, Toc toc)
+        {
+            if (!_values.TryAdd(key, toc))
+            {
+                _values[key] = toc;
+                _logger.Information("Replace Toc {key}.", key);
             }
         }
 

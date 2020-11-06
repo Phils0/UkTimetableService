@@ -138,6 +138,7 @@ namespace Timetable.Web.Test.Controllers
             Assert.Equal(expected, stations.Length);
         }
         
+        [Fact]
         public async Task ReturnsNotFoundWhenTocRunsNoServices()
         {
             var data = Substitute.For<ILocationData>();
@@ -145,7 +146,8 @@ namespace Timetable.Web.Test.Controllers
 
             var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.LocationAsync("XC") as ObjectResult;
-            Assert.IsType<NotFoundResponse>(response);
+            Assert.IsType<NotFoundObjectResult>(response);
+            Assert.IsType<ReferenceError>(response.Value);
         }
         
         [Fact]

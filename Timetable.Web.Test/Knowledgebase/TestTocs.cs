@@ -23,6 +23,16 @@ namespace Timetable.Web.Test.Knowledgebase
                     },
                     new TrainOperatingCompanyStructure()
                     {
+                        AtocCode = "VT",
+                        Name = "Virgin Trains",
+                        OperatingPeriod = new OperatingPeriodStructure()
+                        {
+                            StartDate = new DateTime(2018, 12, 08),
+                            EndDate = new DateTime(2019, 12, 07)
+                        }
+                    },
+                    new TrainOperatingCompanyStructure()
+                    {
                         AtocCode = "CC",
                         Name = "c2c",
                         OperatingPeriod = new OperatingPeriodStructure()

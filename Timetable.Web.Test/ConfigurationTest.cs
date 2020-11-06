@@ -1,7 +1,9 @@
+using System;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
+using Serilog;
 using Xunit;
 
 namespace Timetable.Web.Test
@@ -27,7 +29,7 @@ namespace Timetable.Web.Test
         public void EnableCustomPlugins(string configValue, bool expected)
         {
             var config = ConfigurationHelper.GetConfiguration(enableCustomPlugins: configValue);
-            var pluginConfig = new Configuration(config);
+            var pluginConfig = new Configuration(config, Substitute.For<ILogger>());
 
             pluginConfig.EnableCustomPlugins.Should().Be(expected);
         }
@@ -36,7 +38,7 @@ namespace Timetable.Web.Test
         public void EnableCustomPluginsIsFalseWhenNoConfigValue()
         {
             var config = Substitute.For<IConfigurationRoot>();;
-            var pluginConfig = new Configuration(config);
+            var pluginConfig = new Configuration(config, Substitute.For<ILogger>());
 
             pluginConfig.EnableCustomPlugins.Should().BeFalse();
         }
@@ -46,7 +48,7 @@ namespace Timetable.Web.Test
         public void EnablePrometheus(string configValue, bool expected)
         {
             var config = ConfigurationHelper.GetConfiguration(enablePrometheus: configValue);
-            var pluginConfig = new Configuration(config);
+            var pluginConfig = new Configuration(config, Substitute.For<ILogger>());
 
             pluginConfig.EnablePrometheusMonitoring.Should().Be(expected);
         }
@@ -55,20 +57,41 @@ namespace Timetable.Web.Test
         public void EnablePrometheusIsFalseWhenNoConfigValue()
         {
             var config = Substitute.For<IConfigurationRoot>();;
-            var pluginConfig = new Configuration(config);
+            var pluginConfig = new Configuration(config, Substitute.For<ILogger>());
 
             pluginConfig.EnablePrometheusMonitoring.Should().BeFalse();
         }
         
         [Fact]
-        public void GetPropertiesFromAppSettings()
+        public void GetTimetableFromAppSettings()
         {
             var appSettings = Substitute.For<IConfiguration>();
             appSettings["TimetableArchive"].Returns("ttis144.zip");
             
-            var config = new Configuration(appSettings);
+            var config = new Configuration(appSettings, Substitute.For<ILogger>());
             
             Assert.Matches(new Regex("ttis144.zip$"),  config.TimetableArchiveFile);
+        }
+        
+        public static TheoryData<string, DateTime?> DarwinDateCheck =>
+            new TheoryData<string, DateTime?>()
+            {
+                {"2020-10-05", new DateTime(2020, 10 ,5)},
+                {"INVALID", null},
+                {"", null},
+                {null, null},
+            };
+        
+        [Theory]
+        [MemberData(nameof(DarwinDateCheck))]
+        public void GetDarwinFromAppSettings(string configValue, DateTime? expected)
+        {
+            var appSettings = Substitute.For<IConfiguration>();
+            appSettings["DarwinDate"].Returns(configValue);
+            
+            var config = new Configuration(appSettings, Substitute.For<ILogger>());
+            
+            Assert.Equal(expected,  config.DarwinDate);
         }
     }
 }

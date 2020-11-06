@@ -57,5 +57,26 @@ namespace Timetable.Web.Test.Mapping
             
             Assert.Null(output.Name);
         }
+        
+        [Fact]
+        public void TocToToc_Url()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var output = mapper.Map<Timetable.Toc, Model.Toc>(TestSchedules.VirginTrains);
+            
+            Assert.Equal("http://www.nationalrail.co.uk/tocs_maps/tocs/VT.aspx", output.NationalRailUrl);
+        }
+        
+        [Fact]
+        public void TocToToc_NoUrl()
+        {
+            var mapper = ToViewProfileConfiguration.CreateMapper();
+
+            var source = new Timetable.Toc("SW");
+            var output = mapper.Map<Timetable.Toc, Model.Toc>(source);
+            
+            Assert.Null(output.NationalRailUrl);
+        }
     }
 }

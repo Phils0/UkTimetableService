@@ -114,12 +114,12 @@ namespace Timetable.Test
         }
         
         [Fact]
-        public void AddsNewToc()
+        public void AddIfNotExistNewToc()
         {         
             var avanti = new Toc("VT", "Avanti");
             var lookup = new TocLookup(Substitute.For<ILogger>(), new Dictionary<string, Toc>());
 
-            lookup.Add("VT", avanti);
+            lookup.AddIfNotExist("VT", avanti);
             var toc = lookup["VT"].Single();
             Assert.Same(avanti, toc);
         }
@@ -136,9 +136,37 @@ namespace Timetable.Test
                 });
 
             var virgin = new Toc("VT", "Virgin");
-            lookup.Add("VT", virgin);
+            lookup.AddIfNotExist("VT", virgin);
             var toc = lookup["VT"].Single();
             Assert.Same(avanti, toc);
+        }
+        
+        [Fact]
+        public void AddOrReplaceAddsNewTocWhenNotExist()
+        {         
+            var avanti = new Toc("VT", "Avanti");
+            var lookup = new TocLookup(Substitute.For<ILogger>(), new Dictionary<string, Toc>());
+
+            lookup.AddOrReplace("VT", avanti);
+            var toc = lookup["VT"].Single();
+            Assert.Same(avanti, toc);
+        }
+        
+        [Fact]
+        public void AddOrReplaceReplacesExistingToc()
+        {
+            var avanti = new Toc("VT", "Avanti");
+            
+            var lookup = new TocLookup(Substitute.For<ILogger>(),
+                new Dictionary<string, Toc>()
+                {
+                    {"VT", avanti}
+                });
+
+            var virgin = new Toc("VT", "Virgin");
+            lookup.AddOrReplace("VT", virgin);
+            var toc = lookup["VT"].Single();
+            Assert.Same(virgin, toc);
         }
     }
 }

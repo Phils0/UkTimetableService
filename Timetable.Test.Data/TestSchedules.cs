@@ -7,7 +7,12 @@ namespace Timetable.Test.Data
 {
     public static class TestSchedules
     {
-        public static Toc VirginTrains => new Toc("VT") {Name = "Virgin Trains"};
+        public static Toc VirginTrains => new Toc("VT")
+            {
+                Name = "Virgin Trains",
+                NationalRailUrl = "http://www.nationalrail.co.uk/tocs_maps/tocs/VT.aspx"
+            };
+        
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
         
         public static ResolvedAssociation[] NoAssociations => new ResolvedAssociation[0];

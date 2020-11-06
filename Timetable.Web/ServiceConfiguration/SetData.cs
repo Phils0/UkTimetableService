@@ -14,7 +14,6 @@ namespace Timetable.Web.ServiceConfiguration
 {
     internal class SetData : IPlugin
     {
-        private static readonly TimeSpan Timeout = new TimeSpan(0, 5, 0);
         
         private readonly IDataLoader _loader;
 
@@ -47,12 +46,16 @@ namespace Timetable.Web.ServiceConfiguration
                 try
                 {
                     var loaderTask = _loader.LoadAsync(CancellationToken.None);
-                    HasLoadedData = loaderTask.Wait(Timeout);
+                    HasLoadedData = loaderTask.Wait(Loaders.DataLoader.Timeout);
 
                     if (!HasLoadedData)
-                        throw new InvalidDataException($"Timeout loading file");
+                        throw new InvalidDataException($"Timeout loading data");
+
+                    var data = loaderTask.Result;
+                    if(data.IsLoaded)
+                        throw new InvalidDataException($"Data not loaded");
                     
-                    return loaderTask.Result;
+                    return data;
                 }
                 catch (Exception e)
                 {
