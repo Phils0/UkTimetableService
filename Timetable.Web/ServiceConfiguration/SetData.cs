@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using AutoMapper;
-using CifParser.Archives;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -11,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Context;
 using Timetable.DataLoader;
-using Timetable.Web.Mapping.Cif;
 using Timetable.Web.Plugin;
 
 namespace Timetable.Web.ServiceConfiguration

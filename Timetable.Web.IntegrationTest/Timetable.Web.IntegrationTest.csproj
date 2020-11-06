@@ -31,7 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Data\RJTTF797.ZIP">
+        <None Update="Data\RJTTF818.ZIP">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
