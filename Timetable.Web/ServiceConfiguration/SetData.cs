@@ -52,20 +52,20 @@ namespace Timetable.Web.ServiceConfiguration
                         throw new InvalidDataException($"Timeout loading data");
 
                     var data = loaderTask.Result;
-                    if(data.IsLoaded)
+                    if(!data.IsLoaded)
                         throw new InvalidDataException($"Data not loaded");
                     
                     return data;
                 }
                 catch (Exception e)
                 {
-                    Log.Fatal(e, "Timetable not loaded");
+                    Logger.Fatal(e, "Timetable not loaded");
                     throw;
                 }
                 finally
                 {
                     activity.Stop();
-                    Log.Information("Data loaded in: {duration}ms", activity.Duration.TotalMilliseconds);
+                    Logger.Information("Data loaded in: {duration}ms", activity.Duration.TotalMilliseconds);
                 }
             }
         }

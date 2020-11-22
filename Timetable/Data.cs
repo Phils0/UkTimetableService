@@ -9,6 +9,7 @@ namespace Timetable
         public ITimetable Timetable { get; set; }
         public ITocLookup Tocs { get; set; }
 
-        public bool IsLoaded => !string.IsNullOrEmpty(Archive);
+        public bool IsLoaded => (Locations?.IsLoaded ?? false) 
+            && (Timetable?.IsLoaded ?? false);
     }
 }

@@ -87,7 +87,7 @@ namespace Timetable
                 values.Add((association.StpIndicator, association.Calendar), association);
                 return true;
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 // Can have 2 associations that are different but for the same services, see tests
                 if (values.TryGetValue((association.StpIndicator, association.Calendar), out var duplicate))

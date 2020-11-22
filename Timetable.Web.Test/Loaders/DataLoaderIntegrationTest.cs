@@ -71,6 +71,8 @@ namespace Timetable.Web.Test
             var data = await loader.LoadAsync(CancellationToken.None);
             var locationData = data.Locations;
             
+            Assert.True(data.IsLoaded);
+            
             Assert.NotEmpty(locationData.Locations);
             Assert.NotEmpty(locationData.LocationsByTiploc);
             Assert.NotEmpty(data.Tocs);

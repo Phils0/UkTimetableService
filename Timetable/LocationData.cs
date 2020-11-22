@@ -25,7 +25,11 @@ namespace Timetable
         /// </summary>
         IReadOnlyDictionary<string, Location> LocationsByTiploc { get; }
 
-
+        /// <summary>
+        /// Locations loaded
+        /// </summary>
+        bool IsLoaded { get; }
+        
         /// <summary>
         /// Update a location with its NLC
         /// </summary>
@@ -109,13 +113,15 @@ namespace Timetable
                 ToDictionary(g => g.Key, CreateStation);
         }
         
+        public bool IsLoaded { get; set; }
+        
         private Station CreateStation(IGrouping<string, Location> locations)
         {
             var station = new Station();
 
             foreach (var location in locations)
             {
-                station.Add(location);
+                station. Add(location);
             }
 
             return station;

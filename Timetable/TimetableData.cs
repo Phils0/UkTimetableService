@@ -20,6 +20,7 @@ namespace Timetable
         (LookupStatus status, ResolvedService service) GetScheduleByTimetableUid(string timetableUid, DateTime date);
         (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
         (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary);
+        bool IsLoaded { get; }
     }
 
     public class TimetableData : ITimetable
@@ -33,6 +34,8 @@ namespace Timetable
             _logger = logger;
         }
 
+        public bool IsLoaded { get; set; }
+        
         public void AddSchedule(Schedule schedule)
         {
             void AddToRetailServiceMap(Service trainService)

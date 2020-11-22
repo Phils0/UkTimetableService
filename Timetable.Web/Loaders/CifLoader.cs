@@ -41,7 +41,11 @@ namespace Timetable.Web.Loaders
                     _mapper.Map<IEnumerable<CifParser.RdgRecords.Station>, IEnumerable<Timetable.Location>>(
                         stationRecords);
                 _logger.Information("Loaded Master Station List");
-                return new LocationData(locations.ToArray(), _logger);
+                return new LocationData(locations.ToArray(), _logger)
+                    {
+                        IsLoaded = true
+                    };
+                
             }, token).ConfigureAwait(false);
         }
 
@@ -114,6 +118,7 @@ namespace Timetable.Web.Loaders
             var applied = timetable.AddAssociations(associations.Where(a => a.IsPassenger || a.IsCancelled()));
             _logger.Information("Applied Associations: {applied} of {Count}", applied, associations.Count);
 
+            timetable.IsLoaded = true;
             return new Data()
             {
                 Archive = archiveFile,

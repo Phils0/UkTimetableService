@@ -19,6 +19,7 @@ namespace Timetable.Web.Test.Loaders
             var loader = CreateLoader(MockRdgArchive);
             var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
 
+            Assert.True(locations.IsLoaded);
             Assert.Equal(3, locations.LocationsByTiploc.Count());
             Assert.Equal(2, locations.Locations.Count());
         }
