@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Context;
-using Timetable.DataLoader;
 using Timetable.Web.Plugin;
 
 namespace Timetable.Web.ServiceConfiguration

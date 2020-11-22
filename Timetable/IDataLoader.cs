@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Timetable.DataLoader
+namespace Timetable
 {
     /// <summary>
     /// Timetable data loader

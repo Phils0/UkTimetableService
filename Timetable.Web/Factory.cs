@@ -8,7 +8,6 @@ using CifParser.Archives;
 using DarwinClient;
 using NreKnowledgebase;
 using Serilog;
-using Timetable.DataLoader;
 using Timetable.Web.Loaders;
 using Timetable.Web.Mapping.Cif;
 using FileSource = NreKnowledgebase.FileSource;

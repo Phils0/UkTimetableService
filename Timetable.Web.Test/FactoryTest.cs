@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using NSubstitute;
 using Serilog;
-using Timetable.DataLoader;
 using Timetable.Web.Loaders;
 using Xunit;
 

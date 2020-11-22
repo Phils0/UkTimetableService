@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
-using Timetable.DataLoader;
 
 namespace Timetable.Web.Loaders
 { 

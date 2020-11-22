@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using NreKnowledgebase;
 using NreKnowledgebase.SchemaV4;
 using Serilog;
-using Timetable.DataLoader;
 using Timetable.Web.Mapping.Knowledgebase;
 
 namespace Timetable.Web.Loaders

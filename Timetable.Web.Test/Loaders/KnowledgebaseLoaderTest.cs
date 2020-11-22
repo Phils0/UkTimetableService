@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using NreKnowledgebase;
 using NSubstitute;
 using Serilog;
-using Timetable.DataLoader;
 using Timetable.Web.Loaders;
 using Timetable.Web.Test.Knowledgebase;
 using Xunit;

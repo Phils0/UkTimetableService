@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using NSubstitute;
 using ReflectionMagic;
 using Serilog;
-using Timetable.DataLoader;
+using Timetable.Web.Loaders;
 using Xunit;
 
 namespace Timetable.Web.Test

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using DarwinClient;
 using DarwinClient.SchemaV16;
 using Serilog;
-using Timetable.DataLoader;
 using Timetable.Web.Mapping.Darwin;
 
 namespace Timetable.Web.Loaders

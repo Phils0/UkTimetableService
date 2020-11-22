@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using DarwinClient;
 using NSubstitute;
 using Serilog;
-using Timetable.DataLoader;
 using Timetable.Test.Data;
 using Timetable.Web.Loaders;
 using Xunit;

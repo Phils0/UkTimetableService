@@ -11,7 +11,6 @@ using NreKnowledgebase;
 using NSubstitute;
 using ReflectionMagic;
 using Serilog;
-using Timetable.DataLoader;
 using Timetable.Web.Loaders;
 using Timetable.Web.Mapping.Cif;
 using Xunit;

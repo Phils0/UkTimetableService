@@ -7,7 +7,6 @@ using AutoMapper;
 using CifParser;
 using CifParser.Archives;
 using Serilog;
-using Timetable.DataLoader;
 
 namespace Timetable.Web.Loaders
 {
