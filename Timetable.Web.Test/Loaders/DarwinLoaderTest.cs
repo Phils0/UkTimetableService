@@ -43,6 +43,21 @@ namespace Timetable.Web.Test.Loaders
         }
         
         [Fact]
+        public async Task EnrichAddsTocs()
+        {
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = TestData.Locations
+            };
+            var loader = CreateLoader(darwin: MockDownloader);
+
+            data =  await loader.EnrichReferenceDataAsync(data, CancellationToken.None);
+
+            Assert.NotEmpty(data.Tocs);
+        }
+        
+        [Fact]
         public async Task UpdateLocations()
         {
             var data = new Timetable.Data()
@@ -56,6 +71,48 @@ namespace Timetable.Web.Test.Loaders
 
             data.Locations.TryGetStation("WAT", out Station waterloo);
             Assert.Equal("London Waterloo", waterloo.Name);
+        }
+        
+        [Fact]
+        public async Task LoadCancellationReasons()
+        {
+            var loader = CreateLoader(darwin: MockDownloader);
+            var data = await loader.AddReasonsAsync(new RealtimeData(),  CancellationToken.None);
+            
+            Assert.NotEmpty(data.CancelReasons);
+            foreach (var reason in data.CancelReasons.Values)
+            {
+                Assert.Contains("cancelled", reason);
+            }
+        }
+        
+        [Fact]
+        public async Task LoadLateRunningReasons()
+        {
+            var loader = CreateLoader(darwin: MockDownloader);
+            var data = await loader.AddReasonsAsync(new RealtimeData(),  CancellationToken.None);
+            
+            Assert.NotEmpty(data.LateRunningReasons);
+            foreach (var reason in data.LateRunningReasons.Values)
+            {
+                Assert.Contains("delayed", reason);
+            }       
+        }
+        
+        [Fact]
+        public async Task EnrichAddsReasons()
+        {
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = TestData.Locations
+            };
+            var loader = CreateLoader(darwin: MockDownloader);
+
+            data =  await loader.EnrichReferenceDataAsync(data, CancellationToken.None);
+
+            Assert.NotEmpty(data.Darwin.CancelReasons);
+            Assert.NotEmpty(data.Darwin.LateRunningReasons);
         }
         
         [Fact]

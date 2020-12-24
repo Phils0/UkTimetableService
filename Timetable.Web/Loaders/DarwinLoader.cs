@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DarwinClient;
@@ -95,9 +97,12 @@ namespace Timetable.Web.Loaders
             return tocs;
         }
 
-        public Task<Data> AddReasonsAsync(Data data, CancellationToken cancellationToken)
+        public async Task<RealtimeData> AddReasonsAsync(RealtimeData data, CancellationToken token)
         {
-            throw new System.NotImplementedException();
+            var refData = await GetReferenceData(token).ConfigureAwait(false);
+            data.CancelReasons = refData.CancellationReasons.ToDictionary(r => r.code, r => r.reasontext);
+            data.LateRunningReasons = refData.LateRunningReasons.ToDictionary(r => r.code, r => r.reasontext);
+            return data;
         }
 
         public async Task<Data> EnrichReferenceDataAsync(Data data, CancellationToken token)
@@ -110,6 +115,7 @@ namespace Timetable.Web.Loaders
             var tocLookup = data.Tocs as TocLookup;
             await UpdateTocsAsync(tocLookup, token).ConfigureAwait(false);
             await EnrichLocationsAsync(data.Locations, tocLookup, token).ConfigureAwait(false);
+            await AddReasonsAsync(data.Darwin, token).ConfigureAwait(false);
             return data;
         }
 
