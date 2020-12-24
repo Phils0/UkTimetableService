@@ -8,7 +8,7 @@ using Timetable.Web.Mapping.Knowledgebase;
 
 namespace Timetable.Web.Loaders
 {
-    public class KnowledgebaseLoader : IKnowledgebaseEnhancer
+    public class KnowledgebaseLoader : IDataEnricher
     {
         private readonly IKnowledgebaseAsync _knowledgebase;
         private readonly ILogger _logger;
@@ -84,6 +84,19 @@ namespace Timetable.Web.Loaders
             }
 
             return locations;
+        }
+
+        public async Task<Data> EnrichReferenceDataAsync(Data data, CancellationToken token)
+        {
+            var tocLookup = data.Tocs as TocLookup;
+            await UpdateTocsAsync(tocLookup, token).ConfigureAwait(false);
+            await UpdateLocationsWithKnowledgebaseStationsAsync(data.Locations, tocLookup, token).ConfigureAwait(false);
+            return data;
+        }
+
+        public Task<Data> EnrichTimetableAsync(Data data, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(data);
         }
     }
 }

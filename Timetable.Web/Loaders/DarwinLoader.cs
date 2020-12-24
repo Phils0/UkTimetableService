@@ -8,7 +8,7 @@ using Timetable.Web.Mapping.Darwin;
 
 namespace Timetable.Web.Loaders
 {
-    public class DarwinLoader : IDarwinLoader
+    public class DarwinLoader : IDataEnricher
     {
         private readonly DateTime? _date;
         private readonly ITimetableDownloader _darwinData;
@@ -17,7 +17,7 @@ namespace Timetable.Web.Loaders
         public DarwinLoader(ITimetableDownloader darwinData, ILogger logger, DateTime? date = null)
         {
             _darwinData = darwinData;
-            _logger = logger;
+            _logger = logger.ForContext<DarwinLoader>();
             _date = date;
         }
 
@@ -50,7 +50,7 @@ namespace Timetable.Web.Loaders
                 return _refData;
         }
         
-        public async Task<ILocationData> UpdateLocationsAsync(ILocationData locations, TocLookup lookup, CancellationToken token)
+        public async Task<ILocationData> EnrichLocationsAsync(ILocationData locations, TocLookup lookup, CancellationToken token)
         {
             var refData = await GetReferenceData(token).ConfigureAwait(false);
             var mapper = new StationMapper(lookup);
@@ -72,7 +72,7 @@ namespace Timetable.Web.Loaders
                     }
                 }
                 else
-                    _logger.Information("Darwin Location not loaded: {tpl} : {name}", location.tpl, location.locname);
+                    _logger.Debug("Darwin Location not loaded: {tpl} : {name}", location.tpl, location.locname);
             }
 
             return locations;
@@ -83,7 +83,6 @@ namespace Timetable.Web.Loaders
             }
         }
         
-
         public async Task<TocLookup> UpdateTocsAsync(TocLookup tocs, CancellationToken token)
         {
             var refData = await GetReferenceData(token).ConfigureAwait(false);
@@ -101,7 +100,20 @@ namespace Timetable.Web.Loaders
             throw new System.NotImplementedException();
         }
 
-        public Task<Data> AddDarwinTimetableAsync(Data data, CancellationToken cancellationToken)
+        public async Task<Data> EnrichReferenceDataAsync(Data data, CancellationToken token)
+        {
+            var refData = await GetReferenceData(token).ConfigureAwait(false);
+            data.Darwin = new RealtimeData()
+            {
+                Reference = refData.File
+            };
+            var tocLookup = data.Tocs as TocLookup;
+            await UpdateTocsAsync(tocLookup, token).ConfigureAwait(false);
+            await EnrichLocationsAsync(data.Locations, tocLookup, token).ConfigureAwait(false);
+            return data;
+        }
+
+        public Task<Data> EnrichTimetableAsync(Data data, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }

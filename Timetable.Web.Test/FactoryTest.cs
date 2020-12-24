@@ -15,7 +15,7 @@ namespace Timetable.Web.Test
             Assert.IsType<DarwinLoader>(loader);
         }
         
-        private static async Task<IDarwinLoader> CreateDarwinLoader(string darwinDate)
+        private static async Task<IDataEnricher> CreateDarwinLoader(string darwinDate)
         {
             var config = new Configuration(ConfigurationHelper.GetConfiguration(darwinDate: darwinDate), Substitute.For<ILogger>());
             return await Factory.CreateDarwinLoader(config, Substitute.For<ILogger>());;

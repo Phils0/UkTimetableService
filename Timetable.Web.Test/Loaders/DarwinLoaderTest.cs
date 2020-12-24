@@ -14,7 +14,7 @@ namespace Timetable.Web.Test.Loaders
     {
         private readonly static DateTime TestDate = new DateTime(2020, 11, 2);
         
-        private IDarwinLoader CreateLoader(ITimetableDownloader darwin, DateTime? date = null)
+        private DarwinLoader CreateLoader(ITimetableDownloader darwin, DateTime? date = null)
         {
             
             return new DarwinLoader(darwin, Substitute.For<ILogger>(), date);
@@ -45,13 +45,16 @@ namespace Timetable.Web.Test.Loaders
         [Fact]
         public async Task UpdateLocations()
         {
-            var tocs = new TocLookup(Substitute.For<ILogger>());
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = TestData.Locations
+            };
             var loader = CreateLoader(darwin: MockDownloader);
 
-            var locations = TestData.Locations;
-            locations =  await loader.UpdateLocationsAsync(locations, tocs, CancellationToken.None);
+            data =  await loader.EnrichReferenceDataAsync(data, CancellationToken.None);
 
-            locations.TryGetStation("WAT", out Station waterloo);
+            data.Locations.TryGetStation("WAT", out Station waterloo);
             Assert.Equal("London Waterloo", waterloo.Name);
         }
         

@@ -12,7 +12,7 @@ namespace Timetable.Web.Test.Loaders
 {
     public class KnowledgebaseLoaderTest
     {
-        private IKnowledgebaseEnhancer CreateLoader(IKnowledgebaseAsync knowledgebase)
+        private KnowledgebaseLoader CreateLoader(IKnowledgebaseAsync knowledgebase)
         {
             return new KnowledgebaseLoader(knowledgebase, Substitute.For<ILogger>());
         }

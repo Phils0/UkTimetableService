@@ -29,12 +29,12 @@ namespace Timetable.Web
 
         internal static IArchive CreateArchive(Configuration config, ILogger logger)
         {
-            return new Archive(config.TimetableArchiveFile, logger);
+            return new Archive(config.TimetableArchiveFile, logger.ForContext<Archive>());
         }
 
-        internal static async Task<IDarwinLoader> CreateDarwinLoader(Configuration config, ILogger logger)
+        internal static async Task<IDataEnricher> CreateDarwinLoader(Configuration config, ILogger logger)
         {
-            var muteErrors = new DowngradeErrorLogger(logger);
+            var muteErrors = new DowngradeErrorLogger(logger.ForContext<DarwinClient.FileSource>());
             var source = new DarwinClient.FileSource(
                 new DirectoryInfo(Configuration.DataDirectory), muteErrors);
             var darwin = new TimetableDownloader(source, muteErrors);
@@ -46,9 +46,9 @@ namespace Timetable.Web
             return new NopLoader();
         }
         
-        internal static IKnowledgebaseEnhancer CreateKnowledgebase(Configuration config, ILogger logger)
+        internal static IDataEnricher CreateKnowledgebase(Configuration config, ILogger logger)
         {
-            var muteErrors = new DowngradeErrorLogger(logger);
+            var muteErrors = new DowngradeErrorLogger(logger.ForContext<NreKnowledgebase.FileSource>());
             var source = new NreKnowledgebase.FileSource(new Dictionary<KnowedgebaseSubjects, string>()
             {
                 {KnowedgebaseSubjects.Stations, config.StationsKnowledgebaseFile},
@@ -65,7 +65,7 @@ namespace Timetable.Web
             return CreateLoader(archive, darwin, knowledgebase, logger);
         }
         
-        internal static IDataLoader CreateLoader(IArchive archive, IDarwinLoader darwin, IKnowledgebaseEnhancer knowledgebase, ILogger logger)
+        internal static IDataLoader CreateLoader(IArchive archive, IDataEnricher darwin, IDataEnricher knowledgebase, ILogger logger)
         {
             var cifLoader = CreateCifLoader(archive, logger);
             return new Loaders.DataLoader(cifLoader, darwin, knowledgebase, logger);

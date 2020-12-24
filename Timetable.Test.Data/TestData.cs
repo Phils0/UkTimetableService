@@ -1,6 +1,5 @@
 using System;
 using NSubstitute;
-using NSubstitute.Core.Arguments;
 using Serilog;
 
 namespace Timetable.Test.Data

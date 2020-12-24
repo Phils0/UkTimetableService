@@ -39,7 +39,7 @@ namespace Timetable
         {
             if (!_values.TryAdd(key, toc))
             {
-                _logger.Error("Duplicate Toc {key}.", key);
+                _logger.Information("Duplicate Toc {key} new value not set {@toc}.", key, toc);
             }
         }
         

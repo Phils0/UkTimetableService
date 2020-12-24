@@ -34,8 +34,8 @@ namespace Timetable.Web.Test
 
         private Web.Loaders.DataLoader CreateLoader(IArchive archive = null, 
             ICifParser cifParser = null, 
-            IKnowledgebaseEnhancer knowledgebase = null,
-            IDarwinLoader darwin = null)
+            IDataEnricher knowledgebase = null,
+            IDataEnricher darwin = null)
         {
             archive = CreateMockArchive(archive, cifParser);
             darwin ??= new NopLoader();

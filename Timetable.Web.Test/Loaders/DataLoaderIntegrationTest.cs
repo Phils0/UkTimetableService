@@ -24,24 +24,34 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task StationsHaveNamesFromKnowledgebase()
         {
-            var tocs = new TocLookup(Substitute.For<ILogger>());
             var loader = CreateCifLoader();
-            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
-            var knowledgebaseLoader = CreateKnowledgebaseLoader();
-            locations = await knowledgebaseLoader.UpdateLocationsWithKnowledgebaseStationsAsync(locations, tocs, CancellationToken.None) as LocationData;
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = await loader.LoadStationMasterListAsync(CancellationToken.None)
+            };
             
+            var knowledgebaseLoader = CreateKnowledgebaseLoader();
+            data = await knowledgebaseLoader.EnrichReferenceDataAsync(data, CancellationToken.None);
+            
+            var locations = data.Locations as LocationData;
             Assert.NotEmpty(locations.Locations.Values.Where(l => !string.IsNullOrEmpty(l.Name)));
         }
 
         [Fact]
         public async Task StationsHaveNamesFromDarwin()
         {
-            var tocs = new TocLookup(Substitute.For<ILogger>());
             var loader = CreateCifLoader();
-            var locations = await loader.LoadStationMasterListAsync(CancellationToken.None) as LocationData;
-            var darwinLoader = await CreateDarwinLoader();
-            locations = await darwinLoader.UpdateLocationsAsync(locations, tocs, CancellationToken.None) as LocationData;
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = await loader.LoadStationMasterListAsync(CancellationToken.None)
+            };
             
+            var darwinLoader = await CreateDarwinLoader();
+            data = await darwinLoader.EnrichReferenceDataAsync(data, CancellationToken.None);
+            
+            var locations = data.Locations as LocationData;
             Assert.NotEmpty(locations.Locations.Values.Where(l => !string.IsNullOrEmpty(l.Name)));
         }
         
@@ -58,7 +68,7 @@ namespace Timetable.Web.Test
             return Factory.CreateLoader(config, Substitute.For<ILogger>()).Result;
         }
         
-        private static IKnowledgebaseEnhancer CreateKnowledgebaseLoader()
+        private static IDataEnricher CreateKnowledgebaseLoader()
         {
             var config = new Configuration(ConfigurationHelper.GetConfiguration(), Substitute.For<ILogger>());
             return Factory.CreateKnowledgebase(config, Substitute.For<ILogger>());;
@@ -86,14 +96,20 @@ namespace Timetable.Web.Test
         
         [Fact]
         public async Task LoadKnowledgebaseTocs()
-        {
-            var loader = CreateKnowledgebaseLoader();
-            var tocs = await loader.UpdateTocsAsync(new TocLookup(Substitute.For<ILogger>()),  CancellationToken.None);
+        {  
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = new LocationData(new List<Location>(), Substitute.For<ILogger>())
+            };
             
-            Assert.NotEmpty(tocs);
+            var loader = CreateKnowledgebaseLoader();
+            data = await loader.EnrichReferenceDataAsync(data,  CancellationToken.None);
+            
+            Assert.NotEmpty(data.Tocs);
         }
         
-        private static async Task<IDarwinLoader> CreateDarwinLoader()
+        private static async Task<IDataEnricher> CreateDarwinLoader()
         {
             var config = new Configuration(ConfigurationHelper.GetConfiguration(), Substitute.For<ILogger>());
             return await Factory.CreateDarwinLoader(config, Substitute.For<ILogger>());;
@@ -102,10 +118,16 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadDarwinTocs()
         {
-            var loader = await CreateDarwinLoader();
-            var tocs = await loader.UpdateTocsAsync(new TocLookup(Substitute.For<ILogger>()),  CancellationToken.None);
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = new LocationData(new List<Location>(), Substitute.For<ILogger>())
+            };
             
-            Assert.NotEmpty(tocs);
+            var loader = await CreateDarwinLoader();
+            data = await loader.EnrichReferenceDataAsync(data,  CancellationToken.None);
+            
+            Assert.NotEmpty(data.Tocs);
         }
     }
 }

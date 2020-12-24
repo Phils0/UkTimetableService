@@ -44,5 +44,9 @@
     <ItemGroup>
       <Folder Include="logs" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Loaders\IKnowledgebaseEnhancer.cs" />
+    </ItemGroup>
     
 </Project>
