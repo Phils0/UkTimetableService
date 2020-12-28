@@ -31,8 +31,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Data\RJTTF867.ZIP">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
+        <DataFiles Include="..\Timetable.Web\Data\*.*"/>
     </ItemGroup>
+
+    <Target Name="CopyData" AfterTargets="AfterBuild">
+        <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(TargetDir)Data" SkipUnchangedFiles="true" />
+    </Target>
 </Project>

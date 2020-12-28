@@ -33,7 +33,7 @@ namespace Timetable.Web.ServiceConfiguration
             services
                 .AddSingleton<ILocationData>(data.Locations)
                 .AddSingleton<ITimetable>(data.Timetable)
-                .AddSingleton<ITocLookup>(data.Tocs)
+                .AddSingleton<Timetable.Data>(data)
                 .AddSingleton<Model.Configuration>(Factory.CreateConfigurationResponse(data.Archive));
         }
 

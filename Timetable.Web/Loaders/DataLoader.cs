@@ -27,6 +27,7 @@ namespace Timetable.Web.Loaders
             var tocs = new TocLookup(_logger);
             Data data = new Data()
             {
+                Archive = _cif.ArchiveFile,
                 Tocs = tocs,
                 Locations = await LoadLocationsAsync(tocs, token).ConfigureAwait(false)
             };
@@ -38,7 +39,7 @@ namespace Timetable.Web.Loaders
             });
             var cifTask = Task.Run(async () =>
             {
-                data = await _cif.LoadCif(data.Locations, tocs, token).ConfigureAwait(false);
+                data = await _cif.LoadCif(data, token).ConfigureAwait(false);
             });
 
             if (Task.WaitAll(new Task[] {enrichRefDataTask, cifTask}, Timeout))

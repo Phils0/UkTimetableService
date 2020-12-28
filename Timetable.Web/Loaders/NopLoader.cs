@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Timetable.Web.Loaders
@@ -7,6 +8,11 @@ namespace Timetable.Web.Loaders
     {
         public Task<Data> EnrichReferenceDataAsync(Data data, CancellationToken token)
         {
+            data.Darwin = new RealtimeData()
+            {
+                CancelReasons = new Dictionary<int, string>(),
+                LateRunningReasons = new Dictionary<int, string>()
+            };            
             return Task.FromResult(data);
         }
 

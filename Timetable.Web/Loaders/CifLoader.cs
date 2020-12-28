@@ -25,6 +25,8 @@ namespace Timetable.Web.Loaders
             _logger = logger;
         }
 
+        public string ArchiveFile => _archive.FullName;
+        
         public async Task<ILocationData> LoadStationMasterListAsync(CancellationToken token)
         {
             if (!_archive.IsRdgZip)
@@ -48,24 +50,26 @@ namespace Timetable.Web.Loaders
             }, token).ConfigureAwait(false);
         }
 
-        public async Task<Data> LoadCif(ILocationData locations, TocLookup tocs, CancellationToken token)
+        public async Task<Data> LoadCif(Data data, CancellationToken token)
         {
             return await Task.Run(() =>
             {
                 _logger.Information("Loading Cif timetable in {file}", _archive.FullName);
                 var parser = _archive.CreateCifParser();
                 var records = parser.Read();
-                var data = Add(records, locations, tocs, _archive.FullName);
+                AddSchedules(records, data);
                 _logger.Information("Loaded timetable");
                 return data;
             }, token).ConfigureAwait(false);
         }
 
-        private Data Add(IEnumerable<IRecord> records, ILocationData locations, TocLookup tocLookup, string archiveFile)
+        private Data AddSchedules(IEnumerable<IRecord> records, Data data)
         {
+            var tocLookup = data.Tocs as TocLookup;
+            var locations = data.Locations;
             var timetable = new TimetableData(_logger);
             var associations = new List<Association>(6000);
-
+            
             Timetable.Schedule MapSchedule(CifParser.Schedule schedule)
             {
                 return _mapper.Map<CifParser.Schedule, Timetable.Schedule>(schedule, o =>
@@ -118,13 +122,8 @@ namespace Timetable.Web.Loaders
             _logger.Information("Applied Associations: {applied} of {Count}", applied, associations.Count);
 
             timetable.IsLoaded = true;
-            return new Data()
-            {
-                Archive = archiveFile,
-                Locations = locations,
-                Timetable = timetable,
-                Tocs = tocLookup
-            };
+            data.Timetable = timetable;
+            return data;
         }
     }
 }

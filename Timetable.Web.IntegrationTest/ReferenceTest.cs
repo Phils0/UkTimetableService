@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
+using Timetable.Web.Model;
 using Xunit;
 
 namespace Timetable.Web.IntegrationTest
@@ -35,8 +37,34 @@ namespace Timetable.Web.IntegrationTest
             
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
-            var locations = JsonConvert.DeserializeObject<Model.Toc[]>(responseString);
-            locations.Should().NotBeEmpty("{url} should return values", url);
+            var tocs = JsonConvert.DeserializeObject<Model.Toc[]>(responseString);
+            tocs.Should().NotBeEmpty("{url} should return values", url);
+        }
+        
+        [Fact]
+        public async void MakeCancelReasonsRequest()
+        {
+            var client = Host.GetTestClient();
+            var url = $"/api/reference/reasons/cancellation/";
+            var response = await client.GetAsync(url);
+            
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var reasons = JsonConvert.DeserializeObject<Reason[]>(responseString);
+            reasons.Should().NotBeEmpty("{url} should return values", url);
+        }
+        
+        [Fact]
+        public async void MakeLateReasonsRequest()
+        {
+            var client = Host.GetTestClient();
+            var url = $"/api/reference/reasons/late/";
+            var response = await client.GetAsync(url);
+            
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var reasons = JsonConvert.DeserializeObject<Reason[]>(responseString);
+            reasons.Should().NotBeEmpty("{url} should return values", url);
         }
     }
 }

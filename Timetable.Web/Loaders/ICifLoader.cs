@@ -9,6 +9,12 @@ namespace Timetable.Web.Loaders
     public interface ICifLoader
     {
         /// <summary>
+        /// Cif file loading
+        /// </summary>
+        /// <returns>Returns the file name of the cif file</returns>
+        string ArchiveFile { get; }
+        
+        /// <summary>
         /// Load Station Master List
         /// </summary>
         /// <param name="token"></param>
@@ -18,10 +24,9 @@ namespace Timetable.Web.Loaders
         /// <summary>
         /// Load CIf file
         /// </summary>
-        /// <param name="locations"></param>
-        /// <param name="tocs"></param>
+        /// <param name="data"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        Task<Data> LoadCif(ILocationData locations, TocLookup tocs, CancellationToken token);       
+        Task<Data> LoadCif(Data data, CancellationToken token);       
     }
 }

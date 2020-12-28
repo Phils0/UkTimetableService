@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -17,35 +16,33 @@ namespace Timetable.Web.Test.Controllers
     {
         private static readonly MapperConfiguration _config = new MapperConfiguration(
             cfg => cfg.AddProfile<ToViewModelProfile>());
-
-
-        private readonly TocLookup _tocs;
-
-        public ReferenceControllerTest()
+        
+        private static Timetable.Data TestData()
         {
-            _tocs = new TocLookup(Substitute.For<ILogger>(),
+            var tocs = new TocLookup(Substitute.For<ILogger>(),
                 new Dictionary<string, Toc>()
                 {
                     {"VT", new Toc("VT")
-                        {
-                            Name = "Avanti"
-                        }}
+                    {
+                        Name = "Avanti"
+                    }}
                 });
-        }
-        
-        [Fact]
-        public async Task ReturnsLocations()
-        {
+            
             var data = Substitute.For<ILocationData>();
             data.Locations.Returns(TestLocations());
-
-            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.LocationAsync() as ObjectResult;;
             
-            Assert.Equal(200, response.StatusCode);
-            Assert.NotEmpty(response.Value as Model.Station[]);
+            return new Timetable.Data()
+            {
+                Tocs = tocs,
+                Locations = data,
+                Darwin = new RealtimeData()
+                {
+                    CancelReasons = CreateReasons("Cancel"),
+                    LateRunningReasons = CreateReasons("Late")
+                }
+            };
         }
-
+        
         private static Dictionary<string, Station> TestLocations()
         {
             var surbiton = TestStations.Surbiton;
@@ -65,12 +62,30 @@ namespace Timetable.Web.Test.Controllers
                 {"WYB", weybridge}
             };
         }
-
+        
         private static void AddToc(Station station, string toc)
         {
             station.TocServices.Add(new Toc(toc));
         }
-        
+
+        private static IReadOnlyDictionary<int, string> CreateReasons(string prefix)
+        {
+            return new Dictionary<int, string>()
+            {
+                {1, $"{prefix} Reason 1"},
+                {999, $"{prefix} Reason 999"}
+            };
+        }
+
+        [Fact]
+        public async Task ReturnsLocations()
+        {
+            var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.LocationAsync() as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+            Assert.NotEmpty(response.Value as Model.Station[]);
+        }
         
         public static TheoryData<string[], int> TocFilterData =>
             new TheoryData<string[], int>()
@@ -91,10 +106,7 @@ namespace Timetable.Web.Test.Controllers
         [MemberData(nameof(TocFilterData))]
         public async Task ReturnsFilteredLocations(string[] tocs, int expected)
         {
-            var data = Substitute.For<ILocationData>();
-            data.Locations.Returns(TestLocations());
-
-            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.LocationAsync(toc: tocs) as ObjectResult;
             
             var stations = response.Value as Model.Station[];
@@ -104,10 +116,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task Returns400WhenInvalidToc()
         {
-            var data = Substitute.For<ILocationData>();
-            data.Locations.Returns(TestLocations());
-
-            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.LocationAsync(toc: new []{"SWR", "VT"}) as ObjectResult;
             
             Assert.Equal(400, response.StatusCode);
@@ -128,10 +137,7 @@ namespace Timetable.Web.Test.Controllers
         [MemberData(nameof(ServiceOperatorData))]
         public async Task ReturnsServiceOperatorFilteredLocations(string serviceOperator, int expected)
         {
-            var data = Substitute.For<ILocationData>();
-            data.Locations.Returns(TestLocations());
-
-            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.LocationAsync(serviceOperator) as ObjectResult;
             
             var stations = response.Value as Model.Station[];
@@ -141,10 +147,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ReturnsNotFoundWhenTocRunsNoServices()
         {
-            var data = Substitute.For<ILocationData>();
-            data.Locations.Returns(TestLocations());
-
-            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.LocationAsync("XC") as ObjectResult;
             Assert.IsType<NotFoundObjectResult>(response);
             Assert.IsType<ReferenceError>(response.Value);
@@ -153,14 +156,42 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ReturnsTocs()
         {
-            var data = Substitute.For<ILocationData>();
-            data.Locations.Returns(TestLocations());
-
-            var controller = new ReferenceController(data, _tocs, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.TocsAsync() as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
             Assert.NotEmpty(response.Value as Model.Toc[]);
+        }
+        
+        [Fact]
+        public async Task ReturnsCancellationReasons()
+        {
+            var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.CancellationReasonsAsync() as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+            var reasons = (response.Value) as Reason[];
+            Assert.NotEmpty(reasons);
+            foreach (var reason in reasons)
+            {
+                Assert.StartsWith("Cancel", reason.Text);
+            }
+            
+        }
+        
+        [Fact]
+        public async Task ReturnsLateRunningReasons()
+        {
+            var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.CancellationReasonsAsync() as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+            var reasons = (response.Value) as Reason[];
+            Assert.NotEmpty(reasons);
+            foreach (var reason in reasons)
+            {
+                Assert.StartsWith("Cancel", reason.Text);
+            }
         }
     }
 }

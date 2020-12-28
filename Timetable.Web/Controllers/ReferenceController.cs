@@ -17,15 +17,13 @@ namespace Timetable.Web.Controllers
     [ApiController]
     public class ReferenceController : ControllerBase
     {
-        private readonly ILocationData _data;
-        private readonly ITocLookup _tocs;
+        private readonly Data _data;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public ReferenceController(ILocationData data, ITocLookup tocs, IMapper mapper, ILogger logger)
+        public ReferenceController(Data data, IMapper mapper, ILogger logger)
         {
             _data = data;
-            _tocs = tocs;
             _mapper = mapper;
             _logger = logger;
         }
@@ -57,7 +55,7 @@ namespace Timetable.Web.Controllers
                         BadRequest(new ReferenceError($"Invalid tocs provided in request {tocFilter.Tocs}")));                   
                 }
     
-                var locations = _data.Locations.Values;
+                var locations = _data.Locations.Locations.Values;
                 locations = string.IsNullOrEmpty(stationOperator)
                     ? locations
                     : locations.Where(s => s.StationOperator.Equals(stationOperator));
@@ -78,12 +76,12 @@ namespace Timetable.Web.Controllers
             }
 
         }
+
         
-        
-                /// <summary>
-        /// Returns UK tos that you can use in this API
+        /// <summary>
+        /// Returns UK tocs 
         /// </summary>
-        /// <returns>Set of locations</returns>
+        /// <returns>Set of tocs</returns>
         /// <response code="200">Ok</response>
         /// <response code="400">Bad Request</response>
         /// <response code="404">Not Found</response>
@@ -97,7 +95,7 @@ namespace Timetable.Web.Controllers
         {
             try
             {
-                var model = _mapper.Map<IEnumerable<Timetable.Toc>, Model.Toc[]>(_tocs);
+                var model = _mapper.Map<IEnumerable<Timetable.Toc>, Model.Toc[]>(_data.Tocs);
                 if (model.Any())
                     return await Task.FromResult(Ok(model));
 
@@ -110,6 +108,76 @@ namespace Timetable.Web.Controllers
                 return await Task.FromResult(StatusCode(500, new ReferenceError("Server error")));
             }
 
+        }
+        
+        /// <summary>
+        /// Returns Cancellation Reasons
+        /// </summary>
+        /// <returns>Set of reasons</returns>
+        /// <response code="200">Ok</response>
+        /// <response code="400">Bad Request</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Dictionary<int, string>)), 
+         ProducesResponseType(400, Type = typeof(Model.ReferenceError)),
+         ProducesResponseType(404, Type = typeof(Model.ReferenceError)), 
+         ProducesResponseType(500, Type = typeof(Model.ReferenceError)), 
+         Route("reasons/cancellation"), HttpGet]
+        public async Task<IActionResult> CancellationReasonsAsync()
+        {
+            try
+            {
+                if (_data.Darwin.CancelReasons.Any())
+                    return await Task.FromResult(Ok(_data.Darwin.CancelReasons.Select(ToReason).ToArray()));
+
+                return await Task.FromResult(
+                    NotFound(new ReferenceError("No cancellation reasons found.")));
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error getting cancellation reasons");
+                return await Task.FromResult(StatusCode(500, new ReferenceError("Server error")));
+            }
+        }
+
+        /// <summary>
+        /// Returns Late Running Reasons
+        /// </summary>
+        /// <returns>Set of reasons</returns>
+        /// <response code="200">Ok</response>
+        /// <response code="400">Bad Request</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Dictionary<int, string>)), 
+         ProducesResponseType(400, Type = typeof(Model.ReferenceError)),
+         ProducesResponseType(404, Type = typeof(Model.ReferenceError)), 
+         ProducesResponseType(500, Type = typeof(Model.ReferenceError)), 
+         Route("reasons/late"), HttpGet]
+        public async Task<IActionResult> LateReasonsAsync()
+        {
+            try
+            {
+                if (_data.Darwin.LateRunningReasons.Any())
+                    return await Task.FromResult(Ok(_data.Darwin.LateRunningReasons.Select(ToReason)));
+
+                return await Task.FromResult(
+                    NotFound(new ReferenceError("No late running reasons found.")));
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error getting late running reasons");
+                return await Task.FromResult(StatusCode(500, new ReferenceError("Server error")));
+            }
+
+        }
+
+        private static Reason ToReason(KeyValuePair<int, string> value)
+        {
+            return new Reason()
+            {
+                Id = value.Key,
+                Text = value.Value
+            };
         }
     }
 }
