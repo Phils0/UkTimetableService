@@ -128,7 +128,7 @@ namespace Timetable.Web.Controllers
             try
             {
                 if (_data.Darwin.CancelReasons.Any())
-                    return await Task.FromResult(Ok(_data.Darwin.CancelReasons.Select(ToReason).ToArray()));
+                    return await Task.FromResult(Ok(_data.Darwin.CancelReasons.Select(ToReason)));
 
                 return await Task.FromResult(
                     NotFound(new ReferenceError("No cancellation reasons found.")));
@@ -178,6 +178,37 @@ namespace Timetable.Web.Controllers
                 Id = value.Key,
                 Text = value.Value
             };
+        }
+        
+        /// <summary>
+        /// Returns Darwin Sources
+        /// </summary>
+        /// <returns>Set of Darwin Sources</returns>
+        /// <response code="200">Ok</response>
+        /// <response code="400">Bad Request</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Dictionary<int, string>)), 
+         ProducesResponseType(400, Type = typeof(Model.ReferenceError)),
+         ProducesResponseType(404, Type = typeof(Model.ReferenceError)), 
+         ProducesResponseType(500, Type = typeof(Model.ReferenceError)), 
+         Route("darwin/sources"), HttpGet]
+        public async Task<IActionResult> DarwinSourcesAsync()
+        {
+            try
+            {
+                if (_data.Darwin.Sources.Any())
+                    return await Task.FromResult(Ok(_data.Darwin.Sources.Select(kvp => new DarwinSource() { Code = kvp.Key, Name = kvp.Value})));
+
+                return await Task.FromResult(
+                    NotFound(new ReferenceError("No Darwin sources found.")));
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error getting Darwin sources");
+                return await Task.FromResult(StatusCode(500, new ReferenceError("Server error")));
+            }
+
         }
     }
 }

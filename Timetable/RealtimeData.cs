@@ -20,5 +20,9 @@ namespace Timetable
         /// Darwin Late Running Reasons
         /// </summary>
         public IReadOnlyDictionary<int, string> LateRunningReasons { get; set; }
+        /// <summary>
+        /// Darwin Sources
+        /// </summary>
+        public IReadOnlyDictionary<string, string> Sources { get; set; }
     }
 }

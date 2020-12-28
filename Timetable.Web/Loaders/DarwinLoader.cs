@@ -105,6 +105,13 @@ namespace Timetable.Web.Loaders
             return data;
         }
 
+        public async Task<RealtimeData> AddSourcesAsync(RealtimeData data, CancellationToken token)
+        {
+            var refData = await GetReferenceData(token).ConfigureAwait(false);
+            data.Sources = refData.CISSource.ToDictionary(r => r.code, r => r.name);
+            return data;
+        }
+        
         public async Task<Data> EnrichReferenceDataAsync(Data data, CancellationToken token)
         {
             var refData = await GetReferenceData(token).ConfigureAwait(false);
@@ -116,6 +123,7 @@ namespace Timetable.Web.Loaders
             await UpdateTocsAsync(tocLookup, token).ConfigureAwait(false);
             await EnrichLocationsAsync(data.Locations, tocLookup, token).ConfigureAwait(false);
             await AddReasonsAsync(data.Darwin, token).ConfigureAwait(false);
+            await AddSourcesAsync(data.Darwin, token).ConfigureAwait(false);
             return data;
         }
 

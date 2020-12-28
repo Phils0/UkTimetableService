@@ -116,6 +116,34 @@ namespace Timetable.Web.Test.Loaders
         }
         
         [Fact]
+        public async Task LoadDarwinSources()
+        {
+            var loader = CreateLoader(darwin: MockDownloader);
+            var data = await loader.AddSourcesAsync(new RealtimeData(),  CancellationToken.None);
+            
+            Assert.NotEmpty(data.Sources);
+            
+            Assert.Equal("Southern Metropolitan", data.Sources["AM01"]);
+            Assert.Equal("Southern Suburban  (Legacy)", data.Sources["AMO2"]);
+            Assert.Equal("East Midlands", data.Sources["at07"]);
+        }
+        
+        [Fact]
+        public async Task EnrichAddsSources()
+        {
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = TestData.Locations
+            };
+            var loader = CreateLoader(darwin: MockDownloader);
+
+            data =  await loader.EnrichReferenceDataAsync(data, CancellationToken.None);
+
+            Assert.NotEmpty(data.Darwin.Sources);
+        }
+        
+        [Fact]
         public async Task NoDateGetsLatest()
         {
             var darwin = MockDownloader;

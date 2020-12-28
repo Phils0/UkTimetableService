@@ -66,5 +66,18 @@ namespace Timetable.Web.IntegrationTest
             var reasons = JsonConvert.DeserializeObject<Reason[]>(responseString);
             reasons.Should().NotBeEmpty("{url} should return values", url);
         }
+        
+        [Fact]
+        public async void MakeDarwinSourcesRequest()
+        {
+            var client = Host.GetTestClient();
+            var url = $"/api/reference/darwin/sources/";
+            var response = await client.GetAsync(url);
+            
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var reasons = JsonConvert.DeserializeObject<DarwinSource[]>(responseString);
+            reasons.Should().NotBeEmpty("{url} should return values", url);
+        }
     }
 }

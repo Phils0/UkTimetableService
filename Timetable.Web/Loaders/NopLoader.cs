@@ -11,7 +11,8 @@ namespace Timetable.Web.Loaders
             data.Darwin = new RealtimeData()
             {
                 CancelReasons = new Dictionary<int, string>(),
-                LateRunningReasons = new Dictionary<int, string>()
+                LateRunningReasons = new Dictionary<int, string>(),
+                Sources = new Dictionary<string, string>()
             };            
             return Task.FromResult(data);
         }

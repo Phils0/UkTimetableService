@@ -16,7 +16,8 @@ namespace Timetable.Web.Test.Loaders
             
             Assert.NotNull(data.Darwin);
             Assert.Empty(data.Darwin.CancelReasons);    
-            Assert.Empty(data.Darwin.LateRunningReasons);    
+            Assert.Empty(data.Darwin.LateRunningReasons);   
+            Assert.Empty(data.Darwin.Sources);  
         }
     }
 }

@@ -38,7 +38,13 @@ namespace Timetable.Web.Test.Controllers
                 Darwin = new RealtimeData()
                 {
                     CancelReasons = CreateReasons("Cancel"),
-                    LateRunningReasons = CreateReasons("Late")
+                    LateRunningReasons = CreateReasons("Late"),
+                    Sources = new Dictionary<string, string>()
+                    {
+                        {"AM01", "Southern Metropolitan" },
+                        {"at02", "Birmingham" },
+                        {"si01", "St Pancras" },
+                    }
                 }
             };
         }
@@ -170,7 +176,7 @@ namespace Timetable.Web.Test.Controllers
             var response = await controller.CancellationReasonsAsync() as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
-            var reasons = (response.Value) as Reason[];
+            var reasons = (response.Value) as IEnumerable<Reason>;
             Assert.NotEmpty(reasons);
             foreach (var reason in reasons)
             {
@@ -183,15 +189,26 @@ namespace Timetable.Web.Test.Controllers
         public async Task ReturnsLateRunningReasons()
         {
             var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
-            var response = await controller.CancellationReasonsAsync() as ObjectResult;;
+            var response = await controller.LateReasonsAsync() as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
-            var reasons = (response.Value) as Reason[];
+            var reasons = (response.Value) as IEnumerable<Reason>;
             Assert.NotEmpty(reasons);
             foreach (var reason in reasons)
             {
-                Assert.StartsWith("Cancel", reason.Text);
+                Assert.StartsWith("Late", reason.Text);
             }
+        }
+        
+        [Fact]
+        public async Task ReturnsDarwinSources()
+        {
+            var controller = new ReferenceController(TestData(), _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.DarwinSourcesAsync() as ObjectResult;;
+            
+            Assert.Equal(200, response.StatusCode);
+            var sources = (response.Value) as IEnumerable<DarwinSource>;
+            Assert.NotEmpty(sources);
         }
     }
 }
