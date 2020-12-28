@@ -7,11 +7,18 @@ It loads a GB timetable in the CIF file format and provides a simple API to quer
 
 ## API
 
-* `/api/Timetable//service/C26193/2019-08-11`  - request a service for a date using the TimetableUID
-* `/api/Timetable/retailService/GW622100/2019-07-15`   - request a service for a date using the Retail Service Id. Note some Retail Service Ids return multiple services.
+* `/api/Timetable/service/C26193/2019-08-11`  - request a service for a date using the TimetableUID
+* `/api/Timetable/retailService/GW622100/2019-07-15`   - request a service for a date using the Retail Service Id.  Can be either 4 or 6 digit RSID.  If 4 and has multiple services (generally associations) returns them all.
 * `/api/Timetable/arrivals/SUR/2019-08-23T10:00:00`   - arrivals at a location around a specific date time
 * `/api/Timetable/departures/SUR/2019-08-23T10:00:00`   - departures at a location around a specific date time
-* `/api/Timetable/toc/GR/2019-07-30`   - services for a train operating compaany (toc) on a specific date
+* `/api/Timetable/toc/GR/2019-07-30`   - services for a train operating company (toc) on a specific date
+
+### Reference API
+
+* `/api/Reference/location`   - locations grouped by CRS
+* `/api/Reference/toc`   - tocs in timetable
+* `/api/Reference/reasons/cancellation` - Darwin cancellation reasons
+* `/api/Reference/reasons/late` - Darwin late reasons
 
 The API has Swagger documentation which provides fuller details at `/swagger`
 
@@ -34,3 +41,11 @@ Edit `Timetable.Web/appsettings.json`, to set  `TimetableArchive` to match the n
 Run `dotnet build` and `dotnet test` from the repos root directory (containing `TimetableService.sln`).
 
 Alternatively open the solution `TimetableService.sln` in Visual Studio or Rider and it should just work.
+
+### Dependencies
+
+It has dependencies on various other rail related open source projects to load the various data files:
+
+* CIF: https://github.com/Phils0/CifParser
+* Darwin: https://github.com/Phils0/DarwinClient
+* Knowledgebase: https://github.com/Phils0/NreKnowledgebaseClient
