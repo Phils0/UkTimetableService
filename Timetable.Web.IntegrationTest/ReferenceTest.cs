@@ -1,5 +1,6 @@
-using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
@@ -14,6 +15,8 @@ namespace Timetable.Web.IntegrationTest
         public ReferenceTest(WebServiceFixture fixture) : base(fixture)
         {
         }
+        
+        private bool HasDarwinReferenceFile => Directory.EnumerateFiles( "./Data", "*_ref_v3").Any();
         
         [Fact]
         public async void MakeLocationRequest()
@@ -47,11 +50,18 @@ namespace Timetable.Web.IntegrationTest
             var client = Host.GetTestClient();
             var url = $"/api/reference/reasons/cancellation/";
             var response = await client.GetAsync(url);
-            
-            response.EnsureSuccessStatusCode();
-            var responseString = await response.Content.ReadAsStringAsync();
-            var reasons = JsonConvert.DeserializeObject<Reason[]>(responseString);
-            reasons.Should().NotBeEmpty("{url} should return values", url);
+
+            if (HasDarwinReferenceFile)
+            {
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
+                var reasons = JsonConvert.DeserializeObject<Reason[]>(responseString);
+                reasons.Should().NotBeEmpty("{url} should return values", url);                
+            }
+            else
+            {
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
         }
         
         [Fact]
@@ -61,10 +71,17 @@ namespace Timetable.Web.IntegrationTest
             var url = $"/api/reference/reasons/late/";
             var response = await client.GetAsync(url);
             
-            response.EnsureSuccessStatusCode();
-            var responseString = await response.Content.ReadAsStringAsync();
-            var reasons = JsonConvert.DeserializeObject<Reason[]>(responseString);
-            reasons.Should().NotBeEmpty("{url} should return values", url);
+            if (HasDarwinReferenceFile)
+            {            
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
+                var reasons = JsonConvert.DeserializeObject<Reason[]>(responseString);
+                reasons.Should().NotBeEmpty("{url} should return values", url);
+            }
+            else
+            {
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
         }
         
         [Fact]
@@ -74,10 +91,17 @@ namespace Timetable.Web.IntegrationTest
             var url = $"/api/reference/darwin/sources/";
             var response = await client.GetAsync(url);
             
-            response.EnsureSuccessStatusCode();
-            var responseString = await response.Content.ReadAsStringAsync();
-            var reasons = JsonConvert.DeserializeObject<DarwinSource[]>(responseString);
-            reasons.Should().NotBeEmpty("{url} should return values", url);
+            if (HasDarwinReferenceFile)
+            {            
+                response.EnsureSuccessStatusCode();
+                var responseString = await response.Content.ReadAsStringAsync();
+                var reasons = JsonConvert.DeserializeObject<DarwinSource[]>(responseString);
+                reasons.Should().NotBeEmpty("{url} should return values", url);
+            }
+            else
+            {
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
         }
     }
 }
