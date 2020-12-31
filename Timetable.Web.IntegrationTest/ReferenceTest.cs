@@ -16,7 +16,7 @@ namespace Timetable.Web.IntegrationTest
         {
         }
         
-        private bool HasDarwinReferenceFile => Directory.EnumerateFiles( "./Data", "*_ref_v3").Any();
+        private bool HasDarwinReferenceFile => Directory.EnumerateFiles( "./Data", "*_ref_v3.*").Any();
         
         [Fact]
         public async void MakeLocationRequest()
