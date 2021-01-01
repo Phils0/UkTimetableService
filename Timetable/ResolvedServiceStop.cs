@@ -16,11 +16,13 @@ namespace Timetable
         public DateTime On => Service.On;
 
         public Toc Operator => Service.Details.Operator;
+        public string ViaText { get; }
         
         public ResolvedServiceStop(ResolvedService service, ScheduleLocation stop)
         {
             Service = service;
             Stop = new ResolvedStop(stop, service.On);
+            ViaText = Stop.Stop.Station.GetViaText(Service.Details);
         }
 
         public override string ToString()

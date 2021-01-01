@@ -53,9 +53,14 @@ namespace Timetable
 
         public abstract bool IsStopAt(StopSpecification spec);
 
-        protected bool IsStopAt(Station at)
+        protected internal bool IsStopAt(Station at)
         {
             return Station.Equals(at);
+        }
+        
+        internal bool IsStopAt(Location at)
+        {
+            return Location.Equals(at);
         }
         
         internal bool HasAdvertisedTime(bool useDepartures)

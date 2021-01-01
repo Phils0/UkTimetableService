@@ -56,6 +56,11 @@ namespace Timetable
         /// </summary>
         internal LocationTimetable Timetable { get; }
 
+        /// <summary>
+        /// Rules to add Via Text
+        /// </summary>
+        internal ViaRules ViaTextRules { get; } = new ViaRules();
+
         public Station()
         {
             Timetable = new LocationTimetable(this);
@@ -108,6 +113,23 @@ namespace Timetable
             Timetable.AddService(stop);
             if(stop.IsAdvertised())
                 TocServices.Add(stop.Schedule.Operator);
+        }
+
+        /// <summary>
+        /// Add a Darwin via text rule
+        /// </summary>
+        /// <param name="rule">Via text rule</param>
+        public void Add(ViaRule rule)
+        {
+            if (!this.Equals(rule.At))
+                throw new ArgumentException($"Via Rule is not for {this}: {rule}");
+
+            ViaTextRules.AddRule(rule);
+        }
+        
+        public string GetViaText(Schedule schedule)
+        {
+            return ViaTextRules.GetViaText(schedule);
         }
         
         public override string ToString()
