@@ -91,6 +91,20 @@ namespace Timetable.Web.Test.Data
                             crs = "SUR",
                             toc = "SW",
                             locname = "Surbiton",
+                        },
+                        new LocationRef()
+                        {
+                            tpl = "GUILDFD",
+                            crs = "GLD",
+                            toc = "RT",
+                            locname = "Guildford",
+                        },
+                        new LocationRef()
+                        {
+                            tpl = "WOKING",
+                            crs = "WOK",
+                            toc = "SW",
+                            locname = "Woking",
                         }                    },
                     TocRef = new []
                     {

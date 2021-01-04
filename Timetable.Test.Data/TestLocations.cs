@@ -136,5 +136,20 @@ namespace Timetable.Test.Data
                 IsEstimate = false
             }
         };
+        
+        public static Location Guildford => new Location()
+        {
+            Tiploc = "GUILDFD",
+            ThreeLetterCode = "GLD",
+            Nlc = "563100",
+            Name = "GUILDFORD",
+            InterchangeStatus = InterchangeStatus.Normal,
+            Coordinates = new OrdnanceSurveyCoordinates()
+            {
+                Eastings = 15006,
+                Northings = 61587,
+                IsEstimate = false
+            }
+        };
     }
 }

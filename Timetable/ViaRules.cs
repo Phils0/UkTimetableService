@@ -27,7 +27,9 @@ namespace Timetable
         
         public string GetViaText(Schedule schedule)
         {
-            if (_rules.TryGetValue(schedule.Destination.Location, out var destinationRules))
+            //HACK Destination can be null when not in the Stations file.
+            //TODO Fix, need better locations: ideally would be IDMS.
+            if (_rules.TryGetValue(schedule.Destination?.Location ?? Location.NotSet, out var destinationRules))
             {
                 foreach (var rule in destinationRules)
                 {

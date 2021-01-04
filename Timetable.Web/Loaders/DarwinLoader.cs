@@ -55,26 +55,34 @@ namespace Timetable.Web.Loaders
         public async Task<ILocationData> EnrichLocationsAsync(ILocationData locations, TocLookup lookup, CancellationToken token)
         {
             var refData = await GetReferenceData(token).ConfigureAwait(false);
-            var mapper = new StationMapper(lookup);
+            var mapper = new StationMapper(lookup, locations, _logger);
             
             foreach (var location in refData.LocationRef)
             {
-                if (ShouldUpdate(location))
+                try
                 {
-                    try
-                    {
-                        if (locations.TryGetStation(location.crs, out var target))
-                        {
-                            mapper.Update(target, location);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Warning(e, "Error updating station: {station} with Darwin data.", location.crs);
-                    }
+                    if (ShouldUpdate(location) && locations.TryGetStation(location.crs, out var target))
+                        mapper.Update(target, location);
+                    else
+                        _logger.Debug("Darwin Location not loaded: {tpl} : {name}", location.tpl, location.locname);                   
                 }
-                else
-                    _logger.Debug("Darwin Location not loaded: {tpl} : {name}", location.tpl, location.locname);
+                catch (Exception e)
+                {
+                    _logger.Warning(e, "Error updating station: {station} with Darwin data.", location.crs);
+                }
+            }
+            
+            foreach (var viaRule in refData.Via)
+            {
+                try
+                {
+                    if (locations.TryGetStation(viaRule.at, out var target))
+                        mapper.AddRule(target, viaRule);
+                }
+                catch (Exception e)
+                {
+                    _logger.Warning(e, "Error updating station: {station} with Via rule.", viaRule.at);
+                }
             }
 
             return locations;

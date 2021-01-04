@@ -3,9 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using DarwinClient;
 using NSubstitute;
+using ReflectionMagic;
 using Serilog;
 using Timetable.Test.Data;
 using Timetable.Web.Loaders;
+using Timetable.Web.Test.Mapping.Darwin;
 using Xunit;
 
 namespace Timetable.Web.Test.Loaders
@@ -71,6 +73,33 @@ namespace Timetable.Web.Test.Loaders
 
             data.Locations.TryGetStation("WAT", out Station waterloo);
             Assert.Equal("London Waterloo", waterloo.Name);
+        }
+        
+        [Fact]
+        public async Task AddViaRulesToStations()
+        {
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = new Timetable.LocationData(
+                    new[]
+                    {
+                        TestLocations.Surbiton,
+                        TestLocations.WaterlooMain,
+                        TestLocations.WaterlooWindsor,
+                        TestLocations.CLPHMJN,
+                        TestLocations.CLPHMJC,
+                        TestLocations.Woking,
+                        TestLocations.Guildford
+                    }, Substitute.For<ILogger>())
+            };
+            var loader = CreateLoader(darwin: MockDownloader);
+
+            data =  await loader.EnrichReferenceDataAsync(data, CancellationToken.None);
+
+            data.Locations.TryGetStation("SUR", out Station surbiton);
+            var rules = StationMapperTest.GetViaRules(surbiton);
+            Assert.NotEmpty(rules);
         }
         
         [Fact]

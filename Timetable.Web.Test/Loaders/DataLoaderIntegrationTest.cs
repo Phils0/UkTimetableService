@@ -6,6 +6,7 @@ using NSubstitute;
 using ReflectionMagic;
 using Serilog;
 using Timetable.Web.Loaders;
+using Timetable.Web.Test.Mapping.Darwin;
 using Xunit;
 
 namespace Timetable.Web.Test
@@ -53,6 +54,23 @@ namespace Timetable.Web.Test
             
             var locations = data.Locations as LocationData;
             Assert.NotEmpty(locations.Locations.Values.Where(l => !string.IsNullOrEmpty(l.Name)));
+        }
+        
+        [Fact]
+        public async Task StationsHaveViaTextFromDarwin()
+        {
+            var loader = CreateCifLoader();
+            var data = new Timetable.Data()
+            {
+                Tocs = new TocLookup(Substitute.For<ILogger>()),
+                Locations = await loader.LoadStationMasterListAsync(CancellationToken.None)
+            };
+            
+            var darwinLoader = await CreateDarwinLoader();
+            data = await darwinLoader.EnrichReferenceDataAsync(data, CancellationToken.None);
+            
+            var locations = data.Locations as LocationData;
+            Assert.NotEmpty(locations.Locations.Values.Where(s => StationMapperTest.GetViaRules(s).Any()));
         }
         
         private static ICifLoader CreateCifLoader()
