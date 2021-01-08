@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace Timetable
 {
@@ -33,7 +32,7 @@ namespace Timetable
         DoesNotRunOnScotishBankHolidays = 2 // G
     }
 
-    public interface ICalendar : IComparable<ICalendar>
+    public interface ICalendar
     {
         /// <summary>
         /// The calendar container is active on the day
@@ -41,46 +40,13 @@ namespace Timetable
         /// <param name="date">Date to check</param>
         /// <returns></returns>
         bool IsActiveOn(DateTime date);
-
-        /// <summary>
-        /// THe calendar contains data for the date
-        /// </summary>
-        /// <param name="date">Date to check</param>
-        /// <returns></returns>
-        bool IsWithinCalendar(DateTime date);
     }
 
     /// <summary>
     /// Schedule Calendar
     /// </summary>
-    public class Calendar : ICalendar, IEquatable<Calendar>
+    public class Calendar : ICalendar, IEquatable<Calendar>, IComparable<Calendar>
     {
-        private sealed class CalendarRangeComparer : IComparer<Calendar>
-        {
-            public int Compare(Calendar x, Calendar y)
-            {
-                if (ReferenceEquals(null, x) && ReferenceEquals(null, y)) return 0;
-                if (ReferenceEquals(null, x)) return -1;
-                if (ReferenceEquals(null, y)) return 1;
-
-                var compare = x.RunsFrom.CompareTo(y.RunsFrom);
-                if (compare != 0)
-                    return compare;
-
-                compare = x.RunsTo.CompareTo(y.RunsTo);
-                if (compare != 0)
-                    return compare;
-
-                compare = x.DayMask.CompareTo(y.DayMask);
-                if (compare != 0)
-                    return compare;               
-                
-                return x.BankHolidays.CompareTo(y.BankHolidays);
-            }
-        }
-
-        public static IComparer<Calendar> CalendarComparer { get; } = new CalendarRangeComparer();
-
         public DateTime RunsFrom { get; }
 
         public DateTime RunsTo { get; }
@@ -157,10 +123,24 @@ namespace Timetable
             return RunsFrom.Equals(other.RunsFrom) && RunsTo.Equals(other.RunsTo) && DayMask == other.DayMask &&
                    BankHolidays == other.BankHolidays;
         }
-
-        public int CompareTo(ICalendar other)
+        
+        public int CompareTo(Calendar other)
         {
-            return CalendarComparer.Compare(this, other as Calendar);
+            if (ReferenceEquals(null, other)) return -1;
+
+            var compare = RunsFrom.CompareTo(other.RunsFrom);
+            if (compare != 0)
+                return compare;
+
+            compare = RunsTo.CompareTo(other.RunsTo);
+            if (compare != 0)
+                return compare;
+
+            compare = DayMask.CompareTo(other.DayMask);
+            if (compare != 0)
+                return compare;               
+                
+            return BankHolidays.CompareTo(other.BankHolidays);
         }
 
         public override bool Equals(object obj)

@@ -51,7 +51,7 @@ namespace Timetable
             void MoveToMultipleSchedules()
             {
                 _multipleSchedules =
-                    new SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>(new StpDescendingComparer());
+                    new SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>(StpDescendingComparer.Instance);
                 _multipleSchedules.Add((_schedule.StpIndicator, _schedule.Calendar), _schedule);
                 _schedule = null;
             }

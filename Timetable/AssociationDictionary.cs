@@ -76,8 +76,7 @@ namespace Timetable
             var uid = isMain ? association.Associated.TimetableUid : association.Main.TimetableUid;
             if (!TryGetValue(uid, out var values))
             {
-                values = new SortedList<(StpIndicator indicator, ICalendar calendar), Association>(
-                    new StpDescendingComparer());
+                values = new SortedList<(StpIndicator indicator, ICalendar calendar), Association>(StpDescendingComparer.Instance);
                 Add(uid, values);
             }
 
