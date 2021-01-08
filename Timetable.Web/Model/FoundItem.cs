@@ -24,6 +24,11 @@ namespace Timetable.Web.Model
         /// Whether found journey includes splitting\joining 
         /// </summary>
         public IncludedAssociation Association { get; set; }
+        
+        /// <summary>
+        /// Via information for service at location
+        /// </summary>
+        public string ViaText { get; set; } = string.Empty;
     }
     
     /// <summary>

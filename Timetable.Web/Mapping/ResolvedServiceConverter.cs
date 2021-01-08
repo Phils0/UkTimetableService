@@ -134,7 +134,8 @@ namespace Timetable.Web.Mapping
                 At = context.Mapper.Map<Model.ScheduledStop>(source.Stop),
                 To = context.Mapper.Map<Model.ScheduledStop>(source.FoundToStop),
                 From = context.Mapper.Map<Model.ScheduledStop>(source.FoundFromStop),
-                Association = context.Mapper.Map<Model.IncludedAssociation>(source.Association)
+                Association = context.Mapper.Map<Model.IncludedAssociation>(source.Association),
+                ViaText = source.ViaText
             };
             var service = Convert(source.Service, (S) null, context);
             SetService(item, service);

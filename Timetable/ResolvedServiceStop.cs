@@ -16,7 +16,7 @@ namespace Timetable
         public DateTime On => Service.On;
 
         public Toc Operator => Service.Details.Operator;
-        public string ViaText { get; }
+        public string ViaText { get; private set; }
         
         public ResolvedServiceStop(ResolvedService service, ScheduleLocation stop)
         {

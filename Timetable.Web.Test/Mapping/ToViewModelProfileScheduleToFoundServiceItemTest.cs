@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper;
+using ReflectionMagic;
 using Xunit;
 using Timetable.Test.Data;
 
@@ -29,8 +30,11 @@ namespace Timetable.Web.Test.Mapping
         }
 
         private static Model.FoundServiceItem MapResolvedStop(Timetable.Schedule schedule = null, 
-            Timetable.Station at = null, Time? time = null,
-            Timetable.Station from = null, Timetable.Station to = null)
+            Timetable.Station at = null, 
+            Time? time = null,
+            Timetable.Station from = null, 
+            Timetable.Station to = null,
+            string via = "")
         {
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();
             at = at ?? TestStations.Surbiton;
@@ -43,7 +47,7 @@ namespace Timetable.Web.Test.Mapping
                 stop.GoesTo(to);
             if(from != null)
                 stop.ComesFrom(from);
-            
+            stop.AsDynamic().ViaText = via;
             var mapper = ToViewProfileConfiguration.CreateMapper();
             return mapper.Map<Timetable.ResolvedServiceStop, Model.FoundServiceItem>(stop, opts => opts.Items["On"] = stop.On);
         }
@@ -125,6 +129,13 @@ namespace Timetable.Web.Test.Mapping
             var stop = output.From;
             Assert.Equal("SUR", stop.Location.ThreeLetterCode);
             Assert.Equal(TestDate, stop.Departure.Value.Date);
+        }
+        
+        [Fact]
+        public void MapViaText()
+        {
+            var output = MapResolvedStop(via: "Via Test");
+            Assert.Equal("Via Test", output.ViaText);
         }
     }
 }
