@@ -144,10 +144,10 @@ namespace Timetable.Test
         public void FilterTocs(TocFilter tocFilter, int expected)
         {
             var source = ComesFromSource;
-            source[0].Service.Details.Operator = new Toc("GR");
-            source[1].Service.Details.Operator = new Toc("VT");
-            source[2].Service.Details.Operator = new Toc("VT");
-            source[3].Service.Details.Operator = new Toc("SW");
+            ((CifSchedule) source[0].Service.Details).Operator = new Toc("GR");
+            ((CifSchedule) source[1].Service.Details).Operator = new Toc("VT");
+            ((CifSchedule) source[2].Service.Details).Operator = new Toc("VT");
+            ((CifSchedule) source[3].Service.Details).Operator = new Toc("SW");
 
             var filter = Factory.ProvidedByToc(tocFilter, Factory.NoFilter);
 
@@ -160,10 +160,10 @@ namespace Timetable.Test
         public void FilterTocsHandlesExceptions()
         {
             var source = ComesFromSource;
-            source[0].Service.Details.Operator = new Toc("GR");
-            source[1].Service.Details.Operator = null;
-            source[2].Service.Details.Operator = new Toc("VT");
-            source[3].Service.Details.Operator = new Toc("SW");
+            ((CifSchedule) source[0].Service.Details).Operator = new Toc("GR");
+            ((CifSchedule) source[1].Service.Details).Operator = null;
+            ((CifSchedule) source[2].Service.Details).Operator = new Toc("VT");
+            ((CifSchedule) source[3].Service.Details).Operator = new Toc("SW");
 
             var filter = Factory.ProvidedByToc(TocFilter, Factory.NoFilter);
 

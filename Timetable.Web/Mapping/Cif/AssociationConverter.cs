@@ -15,6 +15,8 @@ namespace Timetable.Web.Mapping.Cif
                     return AssociationCategory.Split;
                 case "NP":
                     return AssociationCategory.NextPrevious;
+                case "LK":
+                    return AssociationCategory.Linked;
                 case "":
                 case null:
                     return AssociationCategory.None;

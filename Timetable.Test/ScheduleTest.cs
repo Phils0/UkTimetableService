@@ -16,7 +16,7 @@ namespace Timetable.Test
         [Fact]
         public void ParentSetToService()
         {
-            var service = new Service("X12345", Substitute.For<ILogger>());
+            var service = new CifService("X12345", Substitute.For<ILogger>());
             var schedule = TestSchedules.CreateSchedule();
             schedule.AddToService(service);
 
@@ -26,7 +26,7 @@ namespace Timetable.Test
         [Fact]
         public void CanAddSchedulesWithDifferentStpIndicator()
         {
-            var service = new Service("X12345", Substitute.For<ILogger>());
+            var service = new CifService("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.EverydayAugust2019);
             
@@ -41,7 +41,7 @@ namespace Timetable.Test
         [Fact]
         public void CanAddSchedulesWithSameStpIndicator()
         {
-            var service = new Service("X12345", Substitute.For<ILogger>());
+            var service = new CifService("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var permanent2 = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
@@ -57,7 +57,7 @@ namespace Timetable.Test
         {
             var schedule = TestSchedules.CreateSchedule(timetableId: "A00002", indicator: StpIndicator.Permanent);
             
-            var service = new Service("A00001", Substitute.For<ILogger>());
+            var service = new CifService("A00001", Substitute.For<ILogger>());
             
             Assert.Throws<ArgumentException>(() => schedule.AddToService(service));
         }
@@ -121,7 +121,7 @@ namespace Timetable.Test
         public void OperatedByToc(string toc, bool expected)
         {
             var schedule = TestSchedules.CreateSchedule();
-            Assert.Equal(expected, schedule.OperatedBy(toc));
+            Assert.Equal(expected, schedule.IsOperatedBy(toc));
         }
 
         public static IEnumerable<object[]> Stops

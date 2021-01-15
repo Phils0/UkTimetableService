@@ -14,7 +14,7 @@ namespace Timetable.Test
             Assert.True(rule.IsSatisfied(schedule));
         }
 
-        private static Schedule CreateTestSchedule()
+        private static CifSchedule CreateTestSchedule()
         {
             return TestSchedules.CreateSchedule(stops: TestSchedules.CreateFourStopSchedule(TestSchedules.Ten));
         }

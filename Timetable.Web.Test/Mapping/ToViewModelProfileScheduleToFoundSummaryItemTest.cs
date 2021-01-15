@@ -28,7 +28,7 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal(TestDate, service.Date);
         }
 
-        private static Model.FoundSummaryItem MapResolvedStop(Timetable.Schedule schedule = null, 
+        private static Model.FoundSummaryItem MapResolvedStop(Timetable.CifSchedule schedule = null, 
             Timetable.Station at = null, Time? time = null,
             Timetable.Station from = null, Timetable.Station to = null)
         {

@@ -102,6 +102,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         [InlineData("JJ", AssociationCategory.Join)]
         [InlineData("VV", AssociationCategory.Split)]
         [InlineData("NP", AssociationCategory.NextPrevious)]
+        [InlineData("LK", AssociationCategory.Linked)]
         [InlineData("", AssociationCategory.None)]
         [InlineData(null, AssociationCategory.None)]
         public void MapCategory(string input, AssociationCategory expected)

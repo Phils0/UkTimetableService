@@ -70,9 +70,9 @@ namespace Timetable.Web.Loaders
             var timetable = new TimetableData(_logger);
             var associations = new List<Association>(6000);
             
-            Timetable.Schedule MapSchedule(CifParser.Schedule schedule)
+            Timetable.CifSchedule MapSchedule(CifParser.Schedule schedule)
             {
-                return _mapper.Map<CifParser.Schedule, Timetable.Schedule>(schedule, o =>
+                return _mapper.Map<CifParser.Schedule, Timetable.CifSchedule>(schedule, o =>
                 {
                     o.Items.Add("Tocs", tocLookup);
                     o.Items.Add("Locations", locations);

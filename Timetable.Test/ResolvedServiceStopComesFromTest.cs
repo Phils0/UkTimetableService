@@ -324,7 +324,10 @@ namespace Timetable.Test
         public void DoNotUseCancelledAssociations()
         {
             var association = CreateJoinServices();
-            var cancelledAssociation  = TestAssociations.CreateAssociationWithServices(association.Main.Service, association.Associated.Service, StpIndicator.Cancelled);
+            var cancelledAssociation  = TestAssociations.CreateAssociationWithServices(
+                    association.Main.Service as CifService, 
+                    association.Associated.Service as CifService, 
+                    StpIndicator.Cancelled);
             
             var waterloo = new StopSpecification(TestStations.Waterloo, TestSchedules.TenThirty, MondayAugust12, TimesToUse.Arrivals);
             var found = cancelledAssociation.Main.Service.TryFindScheduledStop(waterloo, out var stop);

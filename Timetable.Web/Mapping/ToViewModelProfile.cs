@@ -33,12 +33,12 @@ namespace Timetable.Web.Mapping
                 .ConvertUsing((s, d, c) => ConvertToStop(s, c));
             CreateMap<Timetable.ResolvedStop, Model.ScheduledStop>()
                 .ConvertUsing((s, d, c) => ConvertToStop(s, c));
-            CreateMap<Timetable.Schedule, Model.Service>()
+            CreateMap<Timetable.CifSchedule, Model.Service>()
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
                 .ForMember(d => d.Associations, o => o.Ignore())
                 .ForMember(d => d.Stops, o => o.MapFrom((s, d, dm, c) => MapStops(s.Locations, c)));
-            CreateMap<Timetable.Schedule, Model.ServiceSummary>()
+            CreateMap<Timetable.CifSchedule, Model.ServiceSummary>()
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
                 .ForMember(d => d.Origin, o => o.MapFrom(s => s.Locations.First()))

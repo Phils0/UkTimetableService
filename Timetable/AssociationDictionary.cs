@@ -71,7 +71,7 @@ namespace Timetable
                     throw new ArgumentException($"Unhandled DateIndicator value {indicator}", nameof(indicator));
             }
         }
-        public bool Add(Association association, bool isMain, Service service)
+        public bool Add(Association association, bool isMain, CifService service)
         {
             var uid = isMain ? association.Associated.TimetableUid : association.Main.TimetableUid;
             if (!TryGetValue(uid, out var values))

@@ -25,7 +25,7 @@ namespace Timetable.Web.Test.Mapping
             Assert.Equal("X12345", output.TimetableUid);
         }
 
-        private static Model.ServiceSummary MapSchedule(Timetable.Schedule schedule = null, bool isCancelled = false)
+        private static Model.ServiceSummary MapSchedule(Timetable.CifSchedule schedule = null, bool isCancelled = false)
         {
             var mapper = ToViewProfileConfiguration.CreateMapper();
             schedule = schedule ?? TestSchedules.CreateScheduleWithService();

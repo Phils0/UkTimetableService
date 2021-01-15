@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Serilog;
 
 namespace Timetable
@@ -10,7 +8,8 @@ namespace Timetable
         None,
         Join,          // JJ
         Split,         // VV
-        NextPrevious   // NP
+        NextPrevious,  // NP
+        Linked,        // LK 
     }
 
     public static class AssociationCategoryExtensions

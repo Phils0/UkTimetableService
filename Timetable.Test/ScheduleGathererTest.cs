@@ -24,7 +24,7 @@ namespace Timetable.Test
             Assert.Equal(TestSchedules.TenFifteen, stop.Departure);
         }
 
-        private IGathererScheduleData CreateMockSchedule((int idx, (Time, Service[]) services)[] responses = null, ICalendar calendar = null)
+        private IGathererScheduleData CreateMockSchedule((int idx, (Time, CifService[]) services)[] responses = null, ICalendar calendar = null)
         {
             responses = responses ?? (new []
             {
@@ -45,7 +45,7 @@ namespace Timetable.Test
             return schedule;
         }
 
-        private (Time, Service[]) CreateTimeEntry(Time time, ICalendar calendar = null)
+        private (Time, CifService[]) CreateTimeEntry(Time time, ICalendar calendar = null)
         {
             calendar = calendar ?? TestSchedules.EverydayAugust2019;
             return (time, new[]

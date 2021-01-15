@@ -52,7 +52,7 @@ namespace Timetable
 
             if (!_timetableUidMap.TryGetValue(schedule.TimetableUid, out var service))
             {
-                service = new Service(schedule.TimetableUid, _logger);
+                service = new CifService(schedule.TimetableUid, _logger);
                 _timetableUidMap.Add(service.TimetableUid, service);
             }
             

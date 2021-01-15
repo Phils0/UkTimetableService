@@ -18,10 +18,10 @@ namespace Timetable.Web.Test.Mapping.Cif
         private readonly MapperConfiguration _fromCifProfileConfiguration =
             FromCifProfileLocationsTest.FromCifProfileConfiguration;
 
-        private Schedule MapSchedule(CifParser.Records.ScheduleExtraData input)
+        private CifSchedule MapSchedule(CifParser.Records.ScheduleExtraData input)
         {
             var mapper = _fromCifProfileConfiguration.CreateMapper();
-            return mapper.Map<CifParser.Records.ScheduleExtraData, Timetable.Schedule>(input, new Schedule(), o =>
+            return mapper.Map<CifParser.Records.ScheduleExtraData, Timetable.CifSchedule>(input, new CifSchedule(), o =>
             {
                 o.Items.Add("Tocs", CreateTocLookup());
             });
@@ -62,7 +62,7 @@ namespace Timetable.Web.Test.Mapping.Cif
             var schedule = TestSchedules.CreateScheduleExtraDetails();
             var mapper = _fromCifProfileConfiguration.CreateMapper();
 
-            var  ex = Assert.Throws<AutoMapperMappingException>(() => mapper.Map<CifParser.Records.ScheduleExtraData, Timetable.Schedule>(schedule, new Schedule()));
+            var  ex = Assert.Throws<AutoMapperMappingException>(() => mapper.Map<CifParser.Records.ScheduleExtraData, Timetable.CifSchedule>(schedule, new CifSchedule()));
             Assert.IsType<ArgumentException>(ex.InnerException);
         }
     }

@@ -1,69 +1,27 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Timetable
 {
-    /// <summary>
-    /// Accomodation classes supported
-    /// </summary>
-    public enum AccomodationClass
+    public interface Schedule
     {
-        None, // Not available (Sleepers only)
-        Both, // B Both First and Standard
-        Standard, // S Standard only
-        First // F First only (Sleepers only)
-    }
-
-    /// <summary>
-    /// Possible reservation settings, making the ARSE mnemonic
-    /// </summary>
-    public enum ReservationIndicator
-    {
-        None, // Not supported
-        Mandatory, // A Always - Manadatory
-        Recommended, // R Recommended
-        Supported, // S Supported
-        EssentialBikes // E Essential for bicycles - never seen this value set
-    }
-
-    /// <summary>
-    /// Short Term Plan (STP) 
-    /// </summary>
-    /// <remarks>Order is by priority</remarks>
-    public enum StpIndicator
-    {
-        Permanent = 0, // P - Permanent schedule
-        Override = 1, // O - STP overlay of Permanent schedule
-        New = 2, // N - New STP schedule (not an overlay)
-        Cancelled = 3, // C - STP Cancellation of Permanent schedule
-    }
-
-    /// <summary>
-    /// An individual schedule
-    /// </summary>
-    public class Schedule
-    {
-        public Service Service { get; private set;  }
+        /// <summary>
+        /// Service container
+        /// </summary>
+        Service Service { get; }
+        /// <summary>
+        /// Add this schedule to the service
+        /// </summary>
+        /// <param name="service"></param>
+        void AddToService(Service service);
         /// <summary>
         /// Timetable Id
         /// </summary>
-        public string TimetableUid { get; set; }
-
+        string TimetableUid { get; }
         /// <summary>
-        /// STP (Short Term Plan) Indicator
+        /// When schedule runs
         /// </summary>
-        /// <remarks>
-        /// P - Permanent schedule
-        /// O - STP overlay of Permanent schedule
-        /// N - New STP schedule (not an overlay)
-        /// C - STP Cancellation of Permanent schedule
-        /// </remarks>
-        public StpIndicator StpIndicator { get; set; }
-
-        public bool IsCancelled() => StpIndicator.Cancelled == StpIndicator;
-        
-        public ICalendar Calendar { get; set; }
+        ICalendar Calendar { get; }
         /// <summary>
         /// 2 char\6 digit Retail Service ID - used by NRS
         /// </summary>
@@ -71,8 +29,7 @@ namespace Timetable
         /// First 4 digits indicate the logical service
         /// with last 2 digits for splits and joins
         /// </remarks>
-        public string RetailServiceId { get; set; }
-
+        string RetailServiceId { get; }
         /// <summary>
         /// 2 char\4 digit Retail Service ID - used by NRS
         /// </summary>
@@ -80,105 +37,93 @@ namespace Timetable
         /// Indicates the retail service in NRS
         /// Use to not have to worry about splits and joins
         /// </remarks>
-        public string NrsRetailServiceId
-        {
-            get { return string.IsNullOrEmpty(RetailServiceId) ? "" : RetailServiceId.Substring(0, 6); }
-        }
-        
+        string NrsRetailServiceId { get; }
         /// <summary>
         /// Train Identity - sometimes called HeadCode
         /// </summary>
-        public string TrainIdentity { get; set; }
-
+        string TrainIdentity { get; }
         /// <summary>
         /// Toc
         /// </summary>
-        public Toc Operator { get; set; }
+        Toc Operator { get; }
         /// <summary>
         /// Seat Accomodation class
         /// </summary>
-        public AccomodationClass SeatClass { get; set; }
+        AccomodationClass SeatClass { get; }
         /// <summary>
         /// Sleeper Accomodation Class
         /// </summary>
-        public AccomodationClass SleeperClass { get; set; }
+        AccomodationClass SleeperClass { get; }
         /// <summary>
         ///  Reservation indicator
         /// </summary>
-        public ReservationIndicator ReservationIndicator { get; set; }
-
+        ReservationIndicator ReservationIndicator { get; }
         /// <summary>
         /// Status - values incorporates transport mode and whether its permanent or STP
         /// </summary>
         /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Status </remarks>
-        public string Status { get; set; }
-
+        string Status { get; }
         /// <summary>
         /// Train Category
         /// </summary>
         /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Category </remarks>
-        public string Category { get; set; }
-        
-        public void AddToService(Service service)
-        {
-            if (service.TimetableUid != TimetableUid)
-                throw new ArgumentException(
-                    $"Service: {TimetableUid}  TimetableUID does not match. Failed to add schedule: {service}");  
-            
-            service.Add(this);            
-            Service = service;
-        }
-
-        public IReadOnlyList<ScheduleLocation> Locations => _locations;
-
-        public IEnumerable<IArrival> Arrivals =>
-            Locations.Where(l => l.HasAdvertisedTime(false)).OfType<IArrival>();
-        
-        public IEnumerable<IDeparture> Departures =>
-            Locations.Where(l => l.HasAdvertisedTime(true)).OfType<IDeparture>();
-        
-        private List<ScheduleLocation> _locations = new List<ScheduleLocation>(8);
-
-        internal void AddLocation(ScheduleLocation location) => _locations.Add(location);
-        
-        public bool RunsOn(DateTime date)
-        {
-            return Calendar.IsActiveOn(date);
-        }
-
-        public bool HasRetailServiceId(string retailServiceId)
-        {
-            return !string.IsNullOrEmpty(RetailServiceId) && 
-                   retailServiceId != null && 
-                   retailServiceId.StartsWith(NrsRetailServiceId);
-        }
-
-        public bool OperatedBy(string toc)
-        {
-            return Operator.Equals(toc);
-        }
-        
-        public bool TryFindStop(StopSpecification find, out ScheduleLocation stop)
-        {
-            stop = Locations.FirstOrDefault(l => l.IsStopAt(find));
-            return stop != default;
-        }
-        
-        public ScheduleLocation GetStop(Location at, int sequence)
-        {
-            var stop = Locations.SingleOrDefault(s => s.IsStop(at, sequence));
-            return stop ?? throw new ArgumentException( 
-                        sequence > 1 ?
-                        $"Stop {at}({sequence}) not found in {this}" :                             
-                        $"Stop {at} not found in {this}");
-        }
-
-        public ScheduleStop Origin => Locations.FirstOrDefault() as ScheduleStop;
-        public ScheduleStop Destination => Locations.LastOrDefault() as ScheduleStop;
-        
-        public override string ToString()
-        {
-            return $"{TimetableUid} -{StpIndicator} {Calendar}";
-        }
+        string Category { get; }
+        /// <summary>
+        /// Stops and passing points
+        /// </summary>
+        IReadOnlyList<ScheduleLocation> Locations { get; }
+        /// <summary>
+        /// Public arrivals
+        /// </summary>
+        IEnumerable<IArrival> Arrivals { get; }
+        /// <summary>
+        /// Public Departures
+        /// </summary>
+        IEnumerable<IDeparture> Departures { get; }
+        /// <summary>
+        /// Schedule Origin
+        /// </summary>
+        ScheduleStop Origin { get; }
+        /// <summary>
+        /// Schedule Terminus
+        /// </summary>
+        ScheduleStop Destination { get; }
+        /// <summary>
+        /// Schedule cancelled
+        /// </summary>
+        /// <returns></returns>
+        bool IsCancelled();
+        /// <summary>
+        /// Schedule runs on date
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        bool RunsOn(DateTime date);
+        /// <summary>
+        /// Schedule has the retail service id
+        /// </summary>
+        /// <param name="retailServiceId"></param>
+        /// <returns></returns>
+        bool HasRetailServiceId(string retailServiceId);
+        /// <summary>
+        /// Is Operating Toc
+        /// </summary>
+        /// <param name="toc"></param>
+        /// <returns></returns>
+        bool IsOperatedBy(string toc);
+        /// <summary>
+        /// Try find stop
+        /// </summary>
+        /// <param name="find"></param>
+        /// <param name="stop"></param>
+        /// <returns></returns>
+        bool TryFindStop(StopSpecification find, out ScheduleLocation stop);
+        /// <summary>
+        /// Get a specific stop
+        /// </summary>
+        /// <param name="at"></param>
+        /// <param name="sequence"></param>
+        /// <returns></returns>
+        ScheduleLocation GetStop(Location at, int sequence);
     }
 }

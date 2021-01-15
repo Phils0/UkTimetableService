@@ -9,6 +9,7 @@ namespace Timetable.Test
         [InlineData(AssociationCategory.Split, false)]
         [InlineData(AssociationCategory.None, false)]
         [InlineData(AssociationCategory.NextPrevious, false)]
+        [InlineData(AssociationCategory.Linked, false)]
         public void IsJoin(AssociationCategory category, bool expected)
         {
             Assert.Equal(expected, category.IsJoin());
@@ -19,6 +20,7 @@ namespace Timetable.Test
         [InlineData(AssociationCategory.Split, true)]
         [InlineData(AssociationCategory.None, false)]
         [InlineData(AssociationCategory.NextPrevious, false)]
+        [InlineData(AssociationCategory.Linked, false)]
         public void IsSplit(AssociationCategory category, bool expected)
         {
             Assert.Equal(expected, category.IsSplit());

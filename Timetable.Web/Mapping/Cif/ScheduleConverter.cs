@@ -7,7 +7,7 @@ using Serilog;
 
 namespace Timetable.Web.Mapping.Cif
 {
-    internal class ScheduleConverter : ITypeConverter<CifParser.Schedule, Timetable.Schedule>
+    internal class ScheduleConverter : ITypeConverter<CifParser.Schedule, Timetable.CifSchedule>
     {
         private readonly ILogger _logger;
 
@@ -16,13 +16,13 @@ namespace Timetable.Web.Mapping.Cif
             _logger = logger;
         }
 
-        public Schedule Convert(CifParser.Schedule source, Schedule destination, ResolutionContext context)
+        public CifSchedule Convert(CifParser.Schedule source, CifSchedule destination, ResolutionContext context)
         {
             var timetable = context.Items["Timetable"] as TimetableData;
 
-            var schedule = new Schedule();           
+            var schedule = new CifSchedule();           
             schedule = context.Mapper
-                    .Map<CifParser.Records.ScheduleDetails, Timetable.Schedule>(source.GetScheduleDetails(), schedule);
+                    .Map<CifParser.Records.ScheduleDetails, Timetable.CifSchedule>(source.GetScheduleDetails(), schedule);
             
             var skipTwo = SetExtraDetails();
 

@@ -25,7 +25,7 @@ namespace Timetable
         
         public string TimetableUid => Details.TimetableUid;
 
-        public bool OperatedBy(string toc) => Details.OperatedBy(toc);
+        public bool OperatedBy(string toc) => Details.IsOperatedBy(toc);
 
         public bool TryFindStop(StopSpecification find, out ResolvedServiceStop stop)
         {

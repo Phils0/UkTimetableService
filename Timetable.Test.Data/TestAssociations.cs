@@ -45,8 +45,8 @@ namespace Timetable.Test.Data
         }
         
         public static Association CreateAssociationWithServices(
-            Service mainService = null,
-            Service associatedService = null,
+            CifService mainService = null,
+            CifService associatedService = null,
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null,
             Location location = null,

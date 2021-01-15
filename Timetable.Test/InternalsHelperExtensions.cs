@@ -11,9 +11,9 @@ namespace Timetable.Test
             return associations == null ? null : (Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>) associations.RealObject;
         }
 
-        internal static SortedList<(StpIndicator indicator, ICalendar calendar), Schedule> GetSchedules(this Service service)
+        internal static SortedList<(StpIndicator indicator, ICalendar calendar), CifSchedule> GetSchedules(this CifService service)
         {
-            return (SortedList<(StpIndicator indicator, ICalendar calendar), Schedule>) service.AsDynamic()._multipleSchedules.RealObject;
+            return (SortedList<(StpIndicator indicator, ICalendar calendar), CifSchedule>) service.AsDynamic()._multipleSchedules.RealObject;
         }
         
         internal static Service GetService(this TimetableData timetable, string timetableUid)

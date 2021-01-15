@@ -22,7 +22,7 @@ namespace Timetable.Web.Test.Mapping.Cif
             Assert.NotEmpty(output.Locations);
         }
 
-        private Schedule MapSchedule()
+        private CifSchedule MapSchedule()
         {
             var helper = new FromCifProfileScheduleTest();
             return helper.MapSchedule();

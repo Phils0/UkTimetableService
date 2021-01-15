@@ -19,7 +19,7 @@ namespace Timetable.Test
             Assert.Equal("Correct", rules.GetViaText(schedule));
         }
 
-        private static Schedule CreateTestSchedule()
+        private static CifSchedule CreateTestSchedule()
         {
             return TestSchedules.CreateSchedule(stops: TestSchedules.CreateFourStopSchedule(TestSchedules.Ten));
         }

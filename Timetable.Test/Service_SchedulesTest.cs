@@ -11,7 +11,7 @@ namespace Timetable.Test
         [Fact]
         public void CanAddSchedulesWithDifferentStpIndicator()
         {
-            var service = new Service("X12345", Substitute.For<ILogger>());
+            var service = new CifService("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.EverydayAugust2019);
             
@@ -27,7 +27,7 @@ namespace Timetable.Test
         [Fact]
         public void CanAddSchedulesWithSameStpIndicator()
         {
-            var service = new Service("X12345", Substitute.For<ILogger>());
+            var service = new CifService("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var permanent2 = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
@@ -41,7 +41,7 @@ namespace Timetable.Test
         [Fact]
         public void CannotAddSameSchedulesTwice()
         {
-            var service = new Service("X12345", Substitute.For<ILogger>());
+            var service = new CifService("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             
             service.Add(permanent);
@@ -199,7 +199,7 @@ namespace Timetable.Test
             Assert.Equal(MondayAugust12.AddDays(-1), found.On);
         }
 
-        private Schedule CreateServiceStartingAt(Time startsAt)
+        private CifSchedule CreateServiceStartingAt(Time startsAt)
         {
             var stops = TestSchedules.CreateThreeStopSchedule(startsAt);
             return TestSchedules.CreateScheduleWithService(stops: stops);
@@ -240,7 +240,7 @@ namespace Timetable.Test
         [Fact]
         public void TryGetScheduleNoSchedules()
         {
-            var service = new Service("X12345", Substitute.For<ILogger>());
+            var service = new CifService("X12345", Substitute.For<ILogger>());
             
             Assert.False(service.TryGetSchedule((StpIndicator.Permanent, TestSchedules.EverydayAugust2019), out var schedule));
             Assert.Null(schedule);
@@ -268,7 +268,7 @@ namespace Timetable.Test
         [MemberData(nameof(StpTests))]
         public void TryGetScheduleMultipleSchedulesDifferentStp(StpIndicator indicator, bool expectedFound, bool isPermanent)
         {
-            var service = new Service("X12345", Substitute.For<ILogger>());
+            var service = new CifService("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var overlay = TestSchedules.CreateSchedule(indicator: StpIndicator.Override, calendar: TestSchedules.EverydayAugust2019);
             
@@ -295,7 +295,7 @@ namespace Timetable.Test
         [MemberData(nameof(CalendarTests))]
         public void TryGetScheduleMultipleSchedulesDifferentCalendar(ICalendar calendar, bool expectedFound, bool isFirst)
         {
-            var service = new Service("X12345", Substitute.For<ILogger>());
+            var service = new CifService("X12345", Substitute.For<ILogger>());
             var permanent = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.EverydayAugust2019);
             var permanent2 = TestSchedules.CreateSchedule(indicator: StpIndicator.Permanent, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             

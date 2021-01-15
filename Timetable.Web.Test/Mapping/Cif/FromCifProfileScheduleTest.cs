@@ -31,11 +31,11 @@ namespace Timetable.Web.Test.Mapping.Cif
         
         private static TimetableData CreateTimetable() => new TimetableData(Substitute.For<ILogger>());
         
-        public Schedule MapSchedule(CifParser.Schedule input = null, IMapper mapper = null)
+        public CifSchedule MapSchedule(CifParser.Schedule input = null, IMapper mapper = null)
         {
             input = input ?? Test.Cif.TestSchedules.Test;
             mapper = mapper ?? _fromCifProfileConfiguration.CreateMapper();
-            return mapper.Map<CifParser.Schedule, Timetable.Schedule>(input, o =>
+            return mapper.Map<CifParser.Schedule, Timetable.CifSchedule>(input, o =>
             {
                 o.Items.Add("Tocs", CreateLookup());
                 o.Items.Add("Locations", TestData.Locations);
@@ -146,13 +146,13 @@ namespace Timetable.Web.Test.Mapping.Cif
             var lookup = CreateLookup();
             var mapper = _fromCifProfileConfiguration.CreateMapper();
             
-            var output1 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(Test.Cif.TestSchedules.Test, o =>
+            var output1 = mapper.Map<CifParser.Schedule, Timetable.CifSchedule>(Test.Cif.TestSchedules.Test, o =>
                 {
                     o.Items.Add("Tocs", lookup);
                     o.Items.Add("Locations", TestData.Locations);
                     o.Items.Add("Timetable", CreateTimetable());
                 });
-            var output2 = mapper.Map<CifParser.Schedule, Timetable.Schedule>(Test.Cif.TestSchedules.Test, o => 
+            var output2 = mapper.Map<CifParser.Schedule, Timetable.CifSchedule>(Test.Cif.TestSchedules.Test, o => 
                 {
                     o.Items.Add("Tocs", lookup);
                     o.Items.Add("Locations", TestData.Locations);

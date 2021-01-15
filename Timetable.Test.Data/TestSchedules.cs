@@ -23,7 +23,7 @@ namespace Timetable.Test.Data
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
             int id = 1,
-            Service service = null,
+            CifService service = null,
             string retailServiceId = null,
             DateTime on =  default(DateTime),
             bool isCancelled = false,
@@ -47,7 +47,7 @@ namespace Timetable.Test.Data
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            Service service = null,
+            CifService service = null,
             string retailServiceId = null,
             DateTime on =  default(DateTime),
             bool isCancelled = false,
@@ -71,7 +71,7 @@ namespace Timetable.Test.Data
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            Service service = null,
+            CifService service = null,
             string retailServiceId = null,
             DateTime on =  default(DateTime),
             bool isCancelled = false)
@@ -81,16 +81,16 @@ namespace Timetable.Test.Data
             return new ResolvedService(schedule, on, isCancelled);
         }
         
-        public static Schedule CreateSchedule(string timetableId = "X12345",
+        public static CifSchedule CreateSchedule(string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            Service service = null,
+            CifService service = null,
             string retailServiceId = null)
         {
             retailServiceId = retailServiceId ?? $"VT{timetableId.Substring(1, 4)}00";
 
-            var schedule = new Schedule()
+            var schedule = new CifSchedule()
             {
                 TimetableUid = timetableId,
                 StpIndicator = indicator,
@@ -120,19 +120,19 @@ namespace Timetable.Test.Data
             return schedule;
         }
 
-        public static Schedule CreateScheduleWithService(string timetableId = "X12345",
+        public static CifSchedule CreateScheduleWithService(string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
-            Service service = null,
+            CifService service = null,
             string retailServiceId = null)
         {
-            service = service ?? new Service(timetableId, Substitute.For<ILogger>());
+            service = service ?? new CifService(timetableId, Substitute.For<ILogger>());
 
             return CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
         }
 
-        public static Schedule CreateScheduleInTimetable(TimetableData timetable, 
+        public static CifSchedule CreateScheduleInTimetable(TimetableData timetable, 
             string timetableId = "X12345",
             StpIndicator indicator = StpIndicator.Permanent,
             ICalendar calendar = null, 
@@ -244,7 +244,7 @@ namespace Timetable.Test.Data
         public static ResolvedAssociation CreateAssociation(ResolvedService main, string associatedUid, bool associationIsCancelled = false, bool isNextDay = false)
         {
             var associated = CreateScheduleWithService(associatedUid, stops: CreateWokingClaphamSchedule(NineForty));
-            var association = TestAssociations.CreateAssociationWithServices(main.Details.Service, associated.Service);
+            var association = TestAssociations.CreateAssociationWithServices((CifService) main.Details.Service, associated.Service);
             var associatedDate = isNextDay ? main.On.AddDays(1) : main.On;
             var resolvedAssociated = new ResolvedService(associated, associatedDate, false);
             return new ResolvedAssociation(

@@ -34,9 +34,9 @@ namespace Timetable
         
         public PublicStop AdvertisedStop => Activities.AdvertisedStop;
         
-        public Schedule Schedule { get; private set; }
+        public CifSchedule Schedule { get; private set; }
 
-        public void SetParent(Schedule schedule)
+        public void SetParent(CifSchedule schedule)
         {
             Schedule = schedule;
             Schedule.AddLocation(this);

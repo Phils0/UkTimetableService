@@ -189,7 +189,7 @@ namespace Timetable.Test
         
         private static ScheduleStop CreateStop(string timetableUid)
         {
-            var service = new Service(timetableUid, Substitute.For<ILogger>());
+            var service = new CifService(timetableUid, Substitute.For<ILogger>());
             var schedule = TestSchedules.CreateSchedule(timetableId: timetableUid, service: service);
             var stop = schedule.Destination;
             return stop;
@@ -199,7 +199,7 @@ namespace Timetable.Test
         public void DoesNotAddTocIfDoesNotStop()
         {
             var test = TestStations.Waterloo;
-            var service = new Service( "X12345", Substitute.For<ILogger>());
+            var service = new CifService( "X12345", Substitute.For<ILogger>());
             var schedule = TestSchedules.CreateSchedule(timetableId: "X12345", service: service, stops: TestSchedules.CreateThreeStopSchedule(TestSchedules.Ten));
             var stop = schedule.Locations[2];    // Pass
             
@@ -216,7 +216,7 @@ namespace Timetable.Test
 
             test.Add(stop);
             
-            var service = new Service("X98765", Substitute.For<ILogger>());
+            var service = new CifService("X98765", Substitute.For<ILogger>());
             var schedule = TestSchedules.CreateSchedule("X98765", retailServiceId: "SW123400");
             var stop2 = schedule.Destination;
             test.Add(stop2);
