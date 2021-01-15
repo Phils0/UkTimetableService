@@ -7,7 +7,7 @@ namespace Timetable
     /// Calendar for a single day
     /// </summary>
     /// <remarks>Used for Darwin Realtime schedules</remarks>
-    public class DayCalendar : ICalendar, IComparable<DayCalendar>, IComparable<Calendar>
+    public class DayCalendar : ICalendar, IComparable<DayCalendar>, IComparable<CifCalendar>
     {
         public DateTime Date { get; }
 
@@ -28,7 +28,7 @@ namespace Timetable
             return Date.CompareTo(other.Date);
         }
         
-        public int CompareTo(Calendar other)
+        public int CompareTo(CifCalendar other)
         {
             if (ReferenceEquals(null, other)) return -1;
 

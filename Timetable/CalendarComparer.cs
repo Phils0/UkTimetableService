@@ -19,17 +19,17 @@ namespace Timetable
                 if (y is DayCalendar day)
                     return dayX.CompareTo(day);
 
-                if(y is Calendar calendar)
+                if(y is CifCalendar calendar)
                     return dayX.CompareTo(calendar);
             }
 
             if (y is DayCalendar dayY)
             {
-                if(x is Calendar calendar)
+                if(x is CifCalendar calendar)
                     return -dayY.CompareTo(calendar);
             }
 
-            if (x is Calendar calendarX && y is Calendar calendarY)
+            if (x is CifCalendar calendarX && y is CifCalendar calendarY)
                 return calendarX.CompareTo(calendarY);
             
             throw new ArgumentException($"Unknown Calendar type x: {x.GetType()} and y: {y.GetType()}");

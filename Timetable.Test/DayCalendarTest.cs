@@ -42,19 +42,19 @@ namespace Timetable.Test
             Assert.Equal(expected, TestDay.CompareTo(calendar));
         }
         
-        public static TheoryData<Calendar,int> OrderingTests =>
-            new TheoryData<Calendar, int>()
+        public static TheoryData<CifCalendar,int> OrderingTests =>
+            new TheoryData<CifCalendar, int>()
             {
-                {(Calendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 7, 31), new DateTime(2019, 8, 31)), 1},
-                {(Calendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 8, 1)), 0},
-                {(Calendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 2), new DateTime(2019, 8, 2)), -1},
-                {(Calendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 8, 2)), -1},
+                {(CifCalendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 7, 31), new DateTime(2019, 8, 31)), 1},
+                {(CifCalendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 8, 1)), 0},
+                {(CifCalendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 2), new DateTime(2019, 8, 2)), -1},
+                {(CifCalendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 8, 2)), -1},
                 {null, -1}
             };
 
         [Theory]
         [MemberData(nameof(OrderingTests))]
-        public void CompareToCalendar(Calendar calendar, int expected)
+        public void CompareToCalendar(CifCalendar calendar, int expected)
         {
             Assert.Equal(expected, TestDay.CompareTo(calendar));
         }

@@ -148,7 +148,7 @@ namespace Timetable.Test.Data
 
         public static ICalendar CreateEverydayCalendar(DateTime runsFrom, DateTime runsTo)
         {
-            var calendar = new Calendar(
+            var calendar = new CifCalendar(
                 runsFrom,
                 runsTo,
                 DaysFlag.Everyday,
@@ -160,7 +160,7 @@ namespace Timetable.Test.Data
         public static ICalendar CreateAugust2019Calendar(DaysFlag dayMask = DaysFlag.Everyday,
             BankHolidayRunning bankHolidays = BankHolidayRunning.RunsOnBankHoliday)
         {
-            var calendar = new Calendar(
+            var calendar = new CifCalendar(
                 new DateTime(2019, 8, 1),
                 new DateTime(2019, 8, 31),
                 dayMask,

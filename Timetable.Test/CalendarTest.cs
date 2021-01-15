@@ -35,7 +35,7 @@ namespace Timetable.Test
         [MemberData(nameof(CalendarBoundaries))]
         public void IsWithinCalendar(DateTime day, bool expected)
         {
-            var calendar = (Calendar) TestSchedules.EverydayAugust2019;
+            var calendar = (CifCalendar) TestSchedules.EverydayAugust2019;
 
             Assert.Equal(expected, calendar.IsWithinCalendar(day));
         }
@@ -99,7 +99,7 @@ namespace Timetable.Test
         public static ICalendar CreateAugust2021Calendar(DaysFlag dayMask = DaysFlag.Everyday,
             BankHolidayRunning bankHolidays = BankHolidayRunning.RunsOnBankHoliday)
         {
-            var calendar = new Calendar(
+            var calendar = new CifCalendar(
                 new DateTime(2021, 8, 1),
                 new DateTime(2021, 8, 31),
                 dayMask,
@@ -129,7 +129,7 @@ namespace Timetable.Test
         [MemberData(nameof(SingleDayCalendarBoundaries))]
         public void HandlesSingleDayCalendars(DateTime day, bool expected)
         {
-            var calendar = new Calendar(
+            var calendar = new CifCalendar(
                 new DateTime(2019, 8, 1),
                 new DateTime(2019, 8, 1),
                 DaysFlag.Everyday,
@@ -142,7 +142,7 @@ namespace Timetable.Test
         [Fact]
         public void ThrowsExceptionIfCalendarCannotExist()
         {
-            var calendar = new Calendar(
+            var calendar = new CifCalendar(
                 new DateTime(2019, 8, 2),
                 new DateTime(2019, 8, 1),
                 DaysFlag.Everyday,
@@ -151,24 +151,24 @@ namespace Timetable.Test
             Assert.Throws<ArgumentOutOfRangeException>(() => calendar.Generate());
         }
         
-        public static TheoryData<Calendar,int> ComparisonCalendars =>
-            new TheoryData<Calendar, int>()
+        public static TheoryData<CifCalendar,int> ComparisonCalendars =>
+            new TheoryData<CifCalendar, int>()
             {
-                {(Calendar) TestSchedules.EverydayAugust2019, 0},
-                {(Calendar) TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), 1},
-                {(Calendar) TestSchedules.CreateAugust2019Calendar(bankHolidays: BankHolidayRunning.DoesNotRunOnEnglishBankHolidays), -1},
-                {(Calendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 2), new DateTime(2019, 8, 31)), -1},
-                {(Calendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 7, 31), new DateTime(2019, 8, 31)), 1},
-                {(Calendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 8, 30)), 1},
-                {(Calendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 9, 1)), -1},
+                {(CifCalendar) TestSchedules.EverydayAugust2019, 0},
+                {(CifCalendar) TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), 1},
+                {(CifCalendar) TestSchedules.CreateAugust2019Calendar(bankHolidays: BankHolidayRunning.DoesNotRunOnEnglishBankHolidays), -1},
+                {(CifCalendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 2), new DateTime(2019, 8, 31)), -1},
+                {(CifCalendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 7, 31), new DateTime(2019, 8, 31)), 1},
+                {(CifCalendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 8, 30)), 1},
+                {(CifCalendar) TestSchedules.CreateEverydayCalendar(new DateTime(2019, 8, 1), new DateTime(2019, 9, 1)), -1},
                 {null, -1}
             };
 
         [Theory]
         [MemberData(nameof(ComparisonCalendars))]
-        public void CompareTo(Calendar calendar, int expected)
+        public void CompareTo(CifCalendar calendar, int expected)
         {
-            var calendar1 = (Calendar) TestSchedules.EverydayAugust2019;
+            var calendar1 = (CifCalendar) TestSchedules.EverydayAugust2019;
             Assert.Equal(expected, calendar1.CompareTo(calendar));
         }
         

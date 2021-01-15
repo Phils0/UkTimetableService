@@ -72,7 +72,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         public void MapCalendar()
         {
             var output = MapAssociation();
-            var calendar = output.Calendar as Calendar;
+            var calendar = output.Calendar as CifCalendar;
             Assert.Equal(new DateTime(2019, 8, 1), calendar.RunsFrom);
             Assert.Equal(new DateTime(2019, 8, 31), calendar.RunsTo);
             Assert.Equal(DaysFlag.Weekdays, calendar.DayMask);

@@ -32,20 +32,10 @@ namespace Timetable
         DoesNotRunOnScotishBankHolidays = 2 // G
     }
 
-    public interface ICalendar
-    {
-        /// <summary>
-        /// The calendar container is active on the day
-        /// </summary>
-        /// <param name="date">Date to check</param>
-        /// <returns></returns>
-        bool IsActiveOn(DateTime date);
-    }
-
     /// <summary>
     /// Schedule Calendar
     /// </summary>
-    public class Calendar : ICalendar, IEquatable<Calendar>, IComparable<Calendar>
+    public class CifCalendar : ICalendar, IEquatable<CifCalendar>, IComparable<CifCalendar>
     {
         public DateTime RunsFrom { get; }
 
@@ -57,7 +47,7 @@ namespace Timetable
 
         private BitArray _calendarMask;
 
-        public Calendar(DateTime runsFrom, DateTime runsTo, DaysFlag days, BankHolidayRunning bankHolidays)
+        public CifCalendar(DateTime runsFrom, DateTime runsTo, DaysFlag days, BankHolidayRunning bankHolidays)
         {
             RunsFrom = runsFrom;
             RunsTo = runsTo;
@@ -116,7 +106,7 @@ namespace Timetable
             return RunsFrom <= date && date <= RunsTo;
         }
 
-        public bool Equals(Calendar other)
+        public bool Equals(CifCalendar other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -124,7 +114,7 @@ namespace Timetable
                    BankHolidays == other.BankHolidays;
         }
         
-        public int CompareTo(Calendar other)
+        public int CompareTo(CifCalendar other)
         {
             if (ReferenceEquals(null, other)) return -1;
 
@@ -148,7 +138,7 @@ namespace Timetable
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Calendar) obj);
+            return Equals((CifCalendar) obj);
         }
 
         public override int GetHashCode()

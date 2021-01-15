@@ -5,13 +5,13 @@ using CifParser.Records;
 
 namespace Timetable.Web.Mapping.Cif
 {
-    public class CalendarConverter : IValueConverter<ScheduleDetails, Calendar>, IValueConverter<CifParser.Records.Association, Calendar>
+    public class CalendarConverter : IValueConverter<ScheduleDetails, CifCalendar>, IValueConverter<CifParser.Records.Association, CifCalendar>
     {
-        private ConcurrentDictionary<Calendar, Calendar> _lookup = new ConcurrentDictionary<Calendar, Calendar>();
+        private ConcurrentDictionary<CifCalendar, CifCalendar> _lookup = new ConcurrentDictionary<CifCalendar, CifCalendar>();
 
-        public Calendar Convert(ScheduleDetails source, ResolutionContext context)
+        public CifCalendar Convert(ScheduleDetails source, ResolutionContext context)
         {
-            var calendar = new Calendar(
+            var calendar = new CifCalendar(
                     source.RunsFrom,
                     source.RunsTo.Value,
                     MapMask(source.DayMask),
@@ -53,9 +53,9 @@ namespace Timetable.Web.Mapping.Cif
             }
         }
 
-        public Calendar Convert(CifParser.Records.Association source, ResolutionContext context)
+        public CifCalendar Convert(CifParser.Records.Association source, ResolutionContext context)
         {
-            var calendar = new Calendar(
+            var calendar = new CifCalendar(
                     source.RunsFrom,
                     source.RunsTo.Value,
                     MapMask(source.DayMask),
