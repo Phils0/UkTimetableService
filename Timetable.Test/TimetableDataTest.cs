@@ -208,14 +208,14 @@ namespace Timetable.Test
            
             var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight);
             var schedules = found.services.Select(s => s.Details).ToArray();
-            Assert.Contains<Schedule>(schedule, schedules);
-            Assert.Contains<Schedule>(schedule3, schedules);
+            Assert.Contains<ISchedule>(schedule, schedules);
+            Assert.Contains<ISchedule>(schedule3, schedules);
             Assert.All(found.services, s => { Assert.Equal(MondayAugust12, s.On);});
 
             
             found = timetable.GetSchedulesByToc("VT", TuesdayAugust13, Time.Midnight);
             schedules = found.services.Select(s => s.Details).ToArray();
-            Assert.Contains<Schedule>(schedule2, schedules);
+            Assert.Contains<ISchedule>(schedule2, schedules);
             Assert.All(found.services, s => { Assert.Equal(TuesdayAugust13, s.On);});
         }
         
@@ -289,13 +289,13 @@ namespace Timetable.Test
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "CORRUPT", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule3 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "X98765", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
 
-            var data = timetable.AsDynamic()._timetableUidMap.RealObject as Dictionary<string, Service>;
+            var data = timetable.AsDynamic()._timetableUidMap.RealObject as Dictionary<string, IService>;
             data["CORRUPT"] = null;    // Force an error
             
             var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight);
             var schedules = found.services.Select(s => s.Details).ToArray();
-            Assert.Contains<Schedule>(schedule, schedules);
-            Assert.Contains<Schedule>(schedule3, schedules);
+            Assert.Contains<ISchedule>(schedule, schedules);
+            Assert.Contains<ISchedule>(schedule3, schedules);
             Assert.All(found.services, s => { Assert.Equal(MondayAugust12, s.On);});
         }
     }

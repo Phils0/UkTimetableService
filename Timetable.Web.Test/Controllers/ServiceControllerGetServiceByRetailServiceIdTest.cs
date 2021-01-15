@@ -23,7 +23,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServiceByRetailServiceIdReturnsService()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
@@ -41,7 +41,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServiceByRetailServiceIdReturnsNotFoundWithReason()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.ServiceNotFound, new ResolvedService[0]));
 
@@ -58,7 +58,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServiceByRetailServiceIdReturnsCancelledWithReason()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.Success, new [] { TestSchedules.CreateService(isCancelled: true)}));
 
@@ -76,7 +76,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServiceByRetailServiceIdReturnsInvalidWithReason()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.InvalidRetailServiceId, new ResolvedService[0]));
 
@@ -93,7 +93,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServiceByRetailServiceIdReturnsErrorWithReason()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetScheduleByRetailServiceId(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Throws(new Exception("Test"));
 

@@ -5,7 +5,7 @@ namespace Timetable
         bool IsPublic { get; }
         Time Time { get; }
         bool IsNextDay { get; }
-        Service Service { get; }   
+        IService Service { get; }   
         Station Station { get; }
     }
 }

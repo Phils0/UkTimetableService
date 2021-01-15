@@ -2,7 +2,7 @@
 
 namespace Timetable
 {
-    public interface Service
+    public interface IService
     {
         /// <summary>
         /// CIF Timetable ID

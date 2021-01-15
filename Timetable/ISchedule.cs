@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 namespace Timetable
 {
-    public interface Schedule
+    public interface ISchedule
     {
         /// <summary>
         /// Service container
         /// </summary>
-        Service Service { get; }
+        IService Service { get; }
         /// <summary>
         /// Add this schedule to the service
         /// </summary>
         /// <param name="service"></param>
-        void AddToService(Service service);
+        void AddToService(IService service);
         /// <summary>
         /// Timetable Id
         /// </summary>

@@ -127,7 +127,7 @@ namespace Timetable
             ViaTextRules.AddRule(rule);
         }
         
-        public string GetViaText(Schedule schedule)
+        public string GetViaText(ISchedule schedule)
         {
             return ViaTextRules.GetViaText(schedule);
         }

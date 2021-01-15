@@ -9,7 +9,7 @@
         public string Text { get; set; }
         public bool HasLocation2 => !Location2.Equals(Location.NotSet);
         
-        public bool IsSatisfied(Schedule schedule)
+        public bool IsSatisfied(ISchedule schedule)
         {
             if(!schedule.Destination.Location.Equals(Destination))
                 return false;

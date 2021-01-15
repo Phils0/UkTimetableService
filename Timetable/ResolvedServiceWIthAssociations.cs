@@ -12,7 +12,7 @@ namespace Timetable
         {
         }
         
-        public ResolvedServiceWithAssociations(Schedule service, DateTime on, bool isCancelled, ResolvedAssociation[] associations)
+        public ResolvedServiceWithAssociations(ISchedule service, DateTime on, bool isCancelled, ResolvedAssociation[] associations)
             : base(service, on, isCancelled)
         {
             Associations = associations;

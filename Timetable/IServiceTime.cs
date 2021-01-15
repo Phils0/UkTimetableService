@@ -3,14 +3,14 @@ namespace Timetable
     public interface IServiceTime
     {
         Time Time { get; }
-        Service Service { get; }        
+        IService Service { get; }        
     }
     
     public class ArrivalServiceTime : IServiceTime
     {
         public IArrival Arrival { get; }
         public Time Time => Arrival.Time;
-        public Service Service => Arrival.Service;
+        public IService Service => Arrival.Service;
         
         internal ArrivalServiceTime(IArrival arrival)
         {
@@ -22,7 +22,7 @@ namespace Timetable
     {
         public IDeparture Departure { get; }
         public Time Time => Departure.Time;
-        public Service Service => Departure.Service;
+        public IService Service => Departure.Service;
         
         internal DepartureServiceTime(IDeparture departure)
         {

@@ -5,7 +5,7 @@ using Serilog;
 
 namespace Timetable
 {
-    public class CifService : Service
+    public class CifService : IService
     {
         private readonly ILogger _logger;
         

@@ -19,7 +19,7 @@ namespace Timetable
     {
         public Station Location { get; }
 
-        private readonly SortedList<Time, Service[]> _services;
+        private readonly SortedList<Time, IService[]> _services;
         private readonly TimesToUse _arrivalsOrDepartures;
         private readonly IComparer<Time> _comparer;
 
@@ -28,7 +28,7 @@ namespace Timetable
             Location = at;
             _arrivalsOrDepartures = arrivalsOrDepartures;
             _comparer = comparer;
-            _services = new SortedList<Time, Service[]>(comparer);
+            _services = new SortedList<Time, IService[]>(comparer);
         }
 
         public void AddService(IServiceTime stop)
@@ -49,13 +49,13 @@ namespace Timetable
             }
         }
         
-        public (Time time, Service[] services) ValuesAt(int index)
+        public (Time time, IService[] services) ValuesAt(int index)
         {
             return (_services.Keys[index], _services.Values[index]);
         }
 
-        public IEnumerable<KeyValuePair<Time, Service[]>> GetValuesBefore(int index) => _services.Take(index);
-        public IEnumerable<KeyValuePair<Time, Service[]>> GetValuesAtAndAfter(int index) => _services.Skip(index);
+        public IEnumerable<KeyValuePair<Time, IService[]>> GetValuesBefore(int index) => _services.Take(index);
+        public IEnumerable<KeyValuePair<Time, IService[]>> GetValuesAtAndAfter(int index) => _services.Skip(index);
        
         public int Count => _services.Count;
 

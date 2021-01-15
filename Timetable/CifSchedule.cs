@@ -42,11 +42,11 @@ namespace Timetable
     /// <summary>
     /// An individual schedule
     /// </summary>
-    public class CifSchedule : Schedule
+    public class CifSchedule : ISchedule
     {
         public CifService Service { get; private set;  }
 
-        Service Schedule.Service => Service;
+        IService ISchedule.Service => Service;
         
         /// <summary>
         /// Timetable Id
@@ -122,7 +122,7 @@ namespace Timetable
         /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Category </remarks>
         public string Category { get; set; }
         
-        public void AddToService(Service service)
+        public void AddToService(IService service)
         {
             if (service.TimetableUid != TimetableUid)
                 throw new ArgumentException(

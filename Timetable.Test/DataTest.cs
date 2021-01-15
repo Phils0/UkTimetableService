@@ -7,8 +7,8 @@ namespace Timetable.Test
 {
     public class DataTest
     {
-        public static TheoryData<ILocationData, ITimetable, bool> HasDataTests =>
-            new TheoryData<ILocationData, ITimetable, bool>()
+        public static TheoryData<ILocationData, ITimetableLookup, bool> HasDataTests =>
+            new TheoryData<ILocationData, ITimetableLookup, bool>()
             {
                 {LoadedLocations(true), LoadedTimetable(true), true},
                 {LoadedLocations(false), LoadedTimetable(true), false},
@@ -21,12 +21,12 @@ namespace Timetable.Test
         private static ILocationData LoadedLocations(bool isLoaded) =>
             new LocationData( Substitute.For<ICollection<Location>>(), Substitute.For<ILogger>()) { IsLoaded = isLoaded};
         
-        private static ITimetable LoadedTimetable(bool isLoaded) =>
+        private static ITimetableLookup LoadedTimetable(bool isLoaded) =>
             new TimetableData(Substitute.For<ILogger>()) { IsLoaded = isLoaded };
         
         [Theory]
         [MemberData(nameof(HasDataTests))]
-        public void IsLoadedSet(ILocationData locations, ITimetable timetable, bool expeected)
+        public void IsLoadedSet(ILocationData locations, ITimetableLookup timetable, bool expeected)
         {
             var data = new Timetable.Data();
             data.Locations = locations;

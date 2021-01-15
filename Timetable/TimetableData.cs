@@ -15,7 +15,7 @@ namespace Timetable
         Error
     }
     
-    public interface ITimetable
+    public interface ITimetableLookup
     {
         (LookupStatus status, ResolvedService service) GetScheduleByTimetableUid(string timetableUid, DateTime date);
         (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
@@ -23,11 +23,11 @@ namespace Timetable
         bool IsLoaded { get; }
     }
 
-    public class TimetableData : ITimetable
+    public class TimetableData : ITimetableLookup
     {
         private readonly ILogger _logger;
-        private Dictionary<string, Service> _timetableUidMap { get; } = new Dictionary<string, Service>(400000);
-        private Dictionary<string, IList<Service>> _retailServiceIdMap { get; } = new Dictionary<string, IList<Service>>(400000);
+        private Dictionary<string, IService> _timetableUidMap { get; } = new Dictionary<string, IService>(400000);
+        private Dictionary<string, IList<IService>> _retailServiceIdMap { get; } = new Dictionary<string, IList<IService>>(400000);
 
         public TimetableData(ILogger logger)
         {
@@ -36,13 +36,13 @@ namespace Timetable
 
         public bool IsLoaded { get; set; }
         
-        public void AddSchedule(Schedule schedule)
+        public void AddSchedule(ISchedule schedule)
         {
-            void AddToRetailServiceMap(Service trainService)
+            void AddToRetailServiceMap(IService trainService)
             {
                 if (!_retailServiceIdMap.TryGetValue(schedule.NrsRetailServiceId, out var services))
                 {
-                    services = new List<Service>();
+                    services = new List<IService>();
                     _retailServiceIdMap.Add(schedule.NrsRetailServiceId, services);
                 }
 
@@ -129,7 +129,7 @@ namespace Timetable
             var reason = services.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
             return (reason, services.ToArray());
             
-            bool IsNextDay(Service service) => service.StartsBefore(dayBoundary);
+            bool IsNextDay(IService service) => service.StartsBefore(dayBoundary);
         }
         
         public int AddAssociations(IEnumerable<Association> associations)

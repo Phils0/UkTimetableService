@@ -168,13 +168,13 @@ namespace Timetable.Web.Test
             Assert.Single(GetAssociations(a12345));            
         }
         
-        private static Service GetService(TimetableData timetable, string timetableUid)
+        private static IService GetService(TimetableData timetable, string timetableUid)
         {
-            var services = (Dictionary<string, Service>) timetable.AsDynamic()._timetableUidMap.RealObject;
+            var services = (Dictionary<string, IService>) timetable.AsDynamic()._timetableUidMap.RealObject;
             return services[timetableUid];
         }
         
-        private static Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> GetAssociations(Service service)
+        private static Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>> GetAssociations(IService service)
         {
             var associations = service.AsDynamic()._associations;
             return associations == null ? null : (Dictionary<string, SortedList<(StpIndicator indicator, ICalendar calendar), Association>>) associations.RealObject;

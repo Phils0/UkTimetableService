@@ -19,11 +19,11 @@ namespace Timetable.Web.Controllers
     [Produces("application/json")]
     public class ServiceController : ControllerBase
     {
-        private readonly ITimetable _timetable;
+        private readonly ITimetableLookup _timetable;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public ServiceController(ITimetable timetable, IMapper mapper, ILogger logger)
+        public ServiceController(ITimetableLookup timetable, IMapper mapper, ILogger logger)
         {
             _timetable = timetable;
             _mapper = mapper;

@@ -43,7 +43,7 @@ namespace Timetable
             Station.Add(this);
         }
 
-        public Service Service => Schedule.Service;
+        public IService Service => Schedule.Service;
 
         public Station Station => Location.Station;
         

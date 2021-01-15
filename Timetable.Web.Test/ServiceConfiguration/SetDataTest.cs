@@ -67,7 +67,7 @@ namespace Timetable.Web.Test.ServiceConfiguration
         {
             var descriptors = ConfigureServices();
 
-            var dataDescription = descriptors.Single(d => d.ServiceType.Equals(typeof(ITimetable)));
+            var dataDescription = descriptors.Single(d => d.ServiceType.Equals(typeof(ITimetableLookup)));
             dataDescription.ImplementationInstance.Should().NotBeNull();
         }
         

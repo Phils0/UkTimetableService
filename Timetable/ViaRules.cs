@@ -25,7 +25,7 @@ namespace Timetable
             }
         }
         
-        public string GetViaText(Schedule schedule)
+        public string GetViaText(ISchedule schedule)
         {
             //HACK Destination can be null when not in the Stations file.
             //TODO Fix, need better locations: ideally would be IDMS.

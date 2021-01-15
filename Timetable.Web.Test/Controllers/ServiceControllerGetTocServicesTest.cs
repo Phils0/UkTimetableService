@@ -23,7 +23,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServicesByTocReturnsServices()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
@@ -39,7 +39,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServicesByTocReturnsFullSchedulewsWhenSetFullScheduleParameter()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
@@ -55,7 +55,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task RailDayServicesByTocReturnsServices()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.StartRailDay)
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
@@ -71,7 +71,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServicesByTocReturnsNotFoundWithReason()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Returns((LookupStatus.ServiceNotFound, new ResolvedService[0]));
 
@@ -88,7 +88,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServicesByTocReturnsError()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Throws(new Exception("Test"));
 

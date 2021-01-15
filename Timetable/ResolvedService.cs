@@ -9,9 +9,9 @@ namespace Timetable
         
         public DateTime On { get; }
 
-        public Schedule Details { get; }
+        public ISchedule Details { get; }
         
-        public ResolvedService(Schedule service, DateTime on, bool isCancelled)
+        public ResolvedService(ISchedule service, DateTime on, bool isCancelled)
         {
             Details = service;
             On = on;

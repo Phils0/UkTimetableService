@@ -7,10 +7,10 @@ namespace Timetable
     public interface IGathererScheduleData
     {
         Station Location { get; }
-        (Time time, Service[] services) ValuesAt(int index);
+        (Time time, IService[] services) ValuesAt(int index);
         int Count { get; }
-        IEnumerable<KeyValuePair<Time, Service[]>> GetValuesBefore(int index);
-        IEnumerable<KeyValuePair<Time, Service[]>> GetValuesAtAndAfter(int index);
+        IEnumerable<KeyValuePair<Time, IService[]>> GetValuesBefore(int index);
+        IEnumerable<KeyValuePair<Time, IService[]>> GetValuesAtAndAfter(int index);
     }
     
     internal class ScheduleGatherer
@@ -97,7 +97,7 @@ namespace Timetable
 
         private int LastIdx => _schedule.Count - 1;
 
-        private IEnumerable<ResolvedServiceStop> ResolveServices(Service[] services, Time atTime, DateTime onDate)
+        private IEnumerable<ResolvedServiceStop> ResolveServices(IService[] services, Time atTime, DateTime onDate)
         {
             var source = MatchServiceStop();
             return FilterFoundServices(source);

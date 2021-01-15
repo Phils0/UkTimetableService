@@ -64,7 +64,7 @@ namespace Timetable
             _logger = logger;
         }
         
-        public void SetService(Service service, bool isMain)
+        public void SetService(IService service, bool isMain)
         {
             var associationService = isMain ? Main : Associated;
             if (!associationService.TrySetService(service))
@@ -84,14 +84,14 @@ namespace Timetable
             return Main.IsService(timetableUid);
         }
 
-        internal Service GetOtherService(string timetableUid)
+        internal IService GetOtherService(string timetableUid)
         {
             return IsMain(timetableUid) ? 
                 Associated.Service :
                 Main.Service;
         }
         
-        internal bool HasConsistentLocation(Schedule service, bool isMain)
+        internal bool HasConsistentLocation(ISchedule service, bool isMain)
         {
             try
             {

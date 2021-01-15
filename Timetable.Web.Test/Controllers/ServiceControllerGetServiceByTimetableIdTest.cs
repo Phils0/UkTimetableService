@@ -23,7 +23,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServiceByTimetableUidReturnsService()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.Success, TestSchedules.CreateService()));
 
@@ -45,7 +45,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServiceByTimetableUidReturnsNotFoundWithReason()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.ServiceNotFound, null));
 
@@ -62,7 +62,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServiceByTimetableUidReturnsCancelledWithReason()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Returns((LookupStatus.Success, TestSchedules.CreateService(isCancelled: true)));
 
@@ -78,7 +78,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServiceByTimetableUidReturnsError()
         {
-            var data = Substitute.For<ITimetable>();
+            var data = Substitute.For<ITimetableLookup>();
             data.GetScheduleByTimetableUid(Arg.Any<string>(), Arg.Any<DateTime>())
                 .Throws(new Exception("Test"));
 

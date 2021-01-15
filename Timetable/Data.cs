@@ -6,7 +6,7 @@ namespace Timetable
     {
         public string Archive { get; set; }
         public ILocationData Locations { get; set; }
-        public ITimetable Timetable { get; set; }
+        public ITimetableLookup Timetable { get; set; }
         public ITocLookup Tocs { get; set; }
         
         public RealtimeData Darwin { get; set; }
