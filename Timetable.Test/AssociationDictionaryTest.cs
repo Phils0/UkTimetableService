@@ -179,6 +179,24 @@ namespace Timetable.Test
         }
         
         [Fact]
+        public void HandleWhenAssociationHasNoServiceDoesNotResolve()
+        {
+            var main = TestSchedules.CreateScheduleWithService(calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            var other = TestSchedules.CreateScheduleWithService("Z98765", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            
+            var association = TestAssociations.CreateAssociationWithServices(
+                mainService: main.Service,
+                associatedService: other.Service);    // Next day means other schedule will not resolve
+                        
+            association.Associated.AsDynamic().Service = null;  // Force the service to be null which should nt happen but can do
+            
+            var associations = main.Service.AsDynamic()._associations.RealObject as AssociationDictionary;
+
+            var resolved = associations.Resolve(main.TimetableUid, MondayAugust12, main.RetailServiceId);
+            Assert.Empty(resolved);
+        }
+        
+        [Fact]
         public void AddSameAssociationTwiceResultsInNeitherBeingAdded()
         {
             var service = TestSchedules.CreateScheduleWithService("A12345").Service;

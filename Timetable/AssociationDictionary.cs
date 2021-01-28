@@ -30,9 +30,8 @@ namespace Timetable
                         else
                         {
                             var other = association.GetOtherService(timetableUid);
-                            var otherDate = ResolveDate(on, association.DateIndicator,
-                                association.IsMain(timetableUid));
-                            if (other.TryResolveOn(otherDate, out var resolved, false))
+                            var otherDate = ResolveDate(on, association.DateIndicator, association.IsMain(timetableUid));
+                            if (other != null && other.TryResolveOn(otherDate, out var resolved, false))
                             {
                                 if (!resolved.HasRetailServiceId(retailServiceId))
                                     _logger.Information(
