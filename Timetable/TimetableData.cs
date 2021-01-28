@@ -141,9 +141,11 @@ namespace Timetable
                 if (_timetableUidMap.TryGetValue(association.Main.TimetableUid, out var mainService) &&
                     _timetableUidMap.TryGetValue(association.Associated.TimetableUid, out var otherService))
                 {
-                    mainService.AddAssociation(association, true);
-                    otherService.AddAssociation(association, false);
-                    count++;
+                    if (mainService.AddAssociation(association, true))
+                    {
+                        otherService.AddAssociation(association, false);
+                        count++;                        
+                    }
                 }
                 else
                 {

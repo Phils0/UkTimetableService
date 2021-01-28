@@ -12,8 +12,7 @@ namespace Timetable.Test
             var service = TestSchedules.CreateScheduleWithService().Service;
             var association = TestAssociations.CreateAssociation();
 
-            service.AddAssociation(association, true);
-
+            Assert.True(service.AddAssociation(association, true));
             Assert.True(service.HasAssociations());
             var associations = service.GetAssociations();
             Assert.NotEmpty( associations["A98765"]);
@@ -25,8 +24,7 @@ namespace Timetable.Test
             var service = TestSchedules.CreateScheduleWithService("A98765").Service;
             var association = TestAssociations.CreateAssociation();
 
-            service.AddAssociation(association, false);
-
+            Assert.True(service.AddAssociation(association, false));
             Assert.True(service.HasAssociations());
             var associations = service.GetAssociations();
             Assert.NotEmpty( associations["X12345"]);
@@ -97,6 +95,18 @@ namespace Timetable.Test
             Assert.False(service.HasAssociations());
             var associations = service.GetAssociations();
             Assert.Empty(associations);
+        }
+        
+        [Fact]
+        public void FailToAddAssociation()
+        {
+            var service = TestSchedules.CreateScheduleWithService().Service;
+            var association = TestAssociations.CreateAssociation();
+
+            service.AddAssociation(association, true);
+            // Adding same association can result in failing to add
+            Assert.False(service.AddAssociation(association, true));
+            Assert.False(service.HasAssociations());
         }
         
         [Fact(Skip="Not currently implemented")]

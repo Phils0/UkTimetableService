@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NSubstitute;
 using Serilog;
 using Timetable.Test.Data;
@@ -93,7 +94,29 @@ namespace Timetable.Test
             Assert.Null(service.GetAssociations());
         }
 
+        [Fact]
+        public void DoNotAddToOtherServiceIfAddingToMainFails()
+        {
+            var timetable =  CreateTimetable();           
+            TestSchedules.CreateScheduleInTimetable(timetable, "X12345");
+            TestSchedules.CreateScheduleInTimetable(timetable, "A98765");
 
+            var associations = new [] {
+                TestAssociations.CreateAssociation("X12345", "A98765", StpIndicator.Permanent),
+                TestAssociations.CreateAssociation("X12345", "A98765", StpIndicator.Override),
+                TestAssociations.CreateAssociation("X12345", "A98765", StpIndicator.Override),
+            };
+
+            var count = timetable.AddAssociations(associations);
+
+            Assert.Equal(2, count);
+            //TODO Inconsistent We remove original association in main but leave the original in the other service.
+            var service = timetable.GetService("X12345");
+            Assert.Single(service.GetAssociations().First().Value);
+            var other = timetable.GetService("A98765");
+            Assert.Equal(2, other.GetAssociations().First().Value.Count);
+        }
+        
         [Fact]
         public void ResolvedServiceAlsoIncludesAssociatedServices()
         {
