@@ -126,5 +126,45 @@ namespace Timetable.Test
             Assert.Contains(services[0], deduped);
             Assert.Contains(services[2], deduped);
         }
+        
+        [Fact]
+        public void DedupMultipleDifferentArrivalStops()
+        {
+            ResolvedServiceStop[] services = {
+                TestSchedules.CreateResolvedArrivalStop("A98765"),
+                TestSchedules.CreateResolvedArrivalStop(isCancelled: true),
+                TestSchedules.CreateResolvedArrivalStop("Z12345"),
+                TestSchedules.CreateResolvedArrivalStop("X98765", isCancelled: true)
+            };
+            
+            var deduped = Deduplicate(services);
+
+            Assert.Equal(2, deduped.Length);
+            Assert.Contains(services[0], deduped);
+            Assert.Contains(services[2], deduped);
+        }
+        
+        private static ResolvedServiceStop[] Deduplicate(ResolvedServiceStop[] services)
+        {
+            var d = new ServiceDeduplicator();
+            return d.Filter(services).ToArray();
+        }
+        
+        [Fact]
+        public void DedupMultipleDifferentDepartureStops()
+        {
+            ResolvedServiceStop[] services = {
+                TestSchedules.CreateResolvedDepartureStop("A98765"),
+                TestSchedules.CreateResolvedDepartureStop(isCancelled: true),
+                TestSchedules.CreateResolvedDepartureStop("Z12345"),
+                TestSchedules.CreateResolvedDepartureStop("X98765", isCancelled: true)
+            };
+            
+            var deduped = Deduplicate(services);
+
+            Assert.Equal(2, deduped.Length);
+            Assert.Contains(services[0], deduped);
+            Assert.Contains(services[2], deduped);
+        }
     }
 }

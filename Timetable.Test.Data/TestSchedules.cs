@@ -34,9 +34,9 @@ namespace Timetable.Test.Data
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
             var resolved = new ResolvedService(schedule, on, isCancelled);
 
-            var origin = schedule.Locations.First() as ScheduleStop; 
-            atLocation = atLocation ?? origin.Station;
-            when = when.Equals(default(Time)) ? origin.Departure : when;
+            var destination = schedule.Locations.Last() as ScheduleStop; 
+            atLocation = atLocation ?? destination.Station;
+            when = when.Equals(default(Time)) ? destination.Arrival : when;
             var find = new StopSpecification(atLocation, when, on, TimesToUse.Arrivals);
             resolved.TryFindStop(find, out var stop);
             return stop;

@@ -98,7 +98,8 @@ namespace Timetable
     public class LocationData : ILocationData
     {
         private readonly ILogger _logger;
-
+        private readonly IServiceFilter _filter = new ServiceDeduplicator();
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -190,14 +191,22 @@ namespace Timetable
             if (!string.IsNullOrEmpty(location) && TryGetStation(location, out var station))
             {
                 var departures = findFunc(station);
-                
+
                 if (departures.Any())
-                    return (status: FindStatus.Success, services: departures);
+                {
+                    var returnedDepartures = Filter(departures);
+                    return (status: FindStatus.Success, services: returnedDepartures);
+                }
 
                 status = FindStatus.NoServicesForLocation;
             }
 
             return (status: status, services: new ResolvedServiceStop[0]);
+        }
+        
+        private ResolvedServiceStop[] Filter(IEnumerable<ResolvedServiceStop> services)
+        {
+            return _filter.Filter(services).ToArray();
         }
 
         public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config)
