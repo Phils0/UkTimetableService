@@ -24,7 +24,7 @@ The API has Swagger documentation which provides fuller details at `/swagger`
 
 ## Timetable Data
 
-It loads a timetable in the CIF file format.  It can load an RDG timetable archive - zips named RJTTFnnn.ZIP and TTIS archives - zips named ttisnnn.zip where nnn is a 3 digit number.  It has a dependency on loading the Master Station List (MSN) file from these archives to get the set of locations. Therefore it currently does support the Network Rail version of the CIF which only has the timetable file. 
+It loads a timetable in the CIF file format.  It can load an RDG timetable archive - zips named RJTTFnnn.ZIP and TTIS archives - zips named ttisnnn.zip where nnn is a 3 digit number.  It has a dependency on loading the Master Station List (MSN) file from these archives to get the set of locations. Therefore it currently does not support the Network Rail version of the CIF which only has the timetable file. 
 
 * RJTTFxxx.zip files are available from https://opendata.nationalrail.co.uk. Details on how to download it can be found at https://wiki.openraildata.com/index.php?title=DTD.
 
@@ -35,6 +35,18 @@ git clone https://github.com/phils0/RailOpenDataScripts
 The data file needs to be placed in the `Timetable.Web\Data` directory
 
 Edit `Timetable.Web/appsettings.json`, to set  `TimetableArchive` to match the name of the downloaded timetable file.
+
+## Knowledgebase Data
+
+Optionally can load some of the NRE knowledgebase files to provide additional names.  Currently loads
+* stations
+* tocs
+
+The data files need to be placed in the `Timetable.Web\Data` directory
+
+Edit `Timetable.Web/appsettings.json`, to set  `StationKnowledgebase` and `TocKnowledgebase` to match the name of the downloaded knowledgebase files.
+
+More information about accessing these files can be found at https://wiki.openraildata.com/index.php?title=KnowledgeBase
 
 ## Build and Test
 
