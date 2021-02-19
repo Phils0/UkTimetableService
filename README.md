@@ -48,6 +48,9 @@ Edit `Timetable.Web/appsettings.json`, to set  `StationKnowledgebase` and `TocKn
 
 More information about accessing these files can be found at https://wiki.openraildata.com/index.php?title=KnowledgeBase
 
+## Darwin Data - WIP
+Optionally can load Darwin data.  Currently only loades reference data.
+
 ## Build and Test
 
 Run `dotnet build` and `dotnet test` from the repos root directory (containing `TimetableService.sln`).
