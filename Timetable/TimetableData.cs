@@ -26,9 +26,10 @@ namespace Timetable
     public class TimetableData : ITimetableLookup
     {
         private readonly ILogger _logger;
+        private readonly IServiceFilter _filter = new ServiceDeduplicator();
         private Dictionary<string, IService> _timetableUidMap { get; } = new Dictionary<string, IService>(400000);
         private Dictionary<string, IList<IService>> _retailServiceIdMap { get; } = new Dictionary<string, IList<IService>>(400000);
-
+        
         public TimetableData(ILogger logger)
         {
             _logger = logger;
@@ -103,8 +104,14 @@ namespace Timetable
             }
 
             var reason = schedules.Any() ? LookupStatus.Success : LookupStatus.NoScheduleOnDate;
-            
-            return (reason, schedules.ToArray());
+
+            var servicesToReturn = Filter(schedules);
+            return (reason, servicesToReturn);
+        }
+
+        private ResolvedService[] Filter(IEnumerable<ResolvedService> services)
+        {
+            return _filter.Filter(services).ToArray();
         }
 
         public (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary)
@@ -127,7 +134,8 @@ namespace Timetable
             }
 
             var reason = services.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
-            return (reason, services.ToArray());
+            var servicesToReturn = Filter(services);
+            return (reason, servicesToReturn.ToArray());
             
             bool IsNextDay(IService service) => service.StartsBefore(dayBoundary);
         }
