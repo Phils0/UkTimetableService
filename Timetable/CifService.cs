@@ -117,13 +117,18 @@ namespace Timetable
             return false;
         }
 
-        public void AddAssociation(Association association, bool isMain)
+        public bool AddAssociation(Association association, bool isMain)
         {
             if (!HasAssociations())
                 _associations = new AssociationDictionary(1, _logger);
 
-            if(_associations.Add(association, isMain, this))
+            if (_associations.Add(association, isMain, this))
+            {
                 association.SetService(this, isMain);
+                return true;
+            }
+            _logger.Warning("Did not add association {association} to {service}", association, this );
+            return false;
         }
         
         public bool HasAssociations()

@@ -33,7 +33,7 @@ namespace Timetable
         /// </summary>
         /// <param name="association"></param>
         /// <param name="isMain"></param>
-        void AddAssociation(Association association, bool isMain);
+        bool AddAssociation(Association association, bool isMain);
         /// <summary>
         /// Starts before time (date agnostic)
         /// </summary>
