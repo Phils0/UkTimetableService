@@ -31,5 +31,21 @@ namespace Timetable.Web.IntegrationTest
     //             output.WriteLine($"{station.ThreeLetterCode}   {station.Locations.First().Tiploc}  {station.Name}");
     //         }
     //     }
+    //     
+    //     [Fact]
+    //     public async void MakeTocServicesRequest()
+    //     {
+    //         var client = new HttpClient();
+    //         var url = @"http://localhost:8484/api/timetable/toc/TP/2021-02-16?includeStops=false";
+    //         var response = await client.GetAsync(url);
+    //         
+    //         response.EnsureSuccessStatusCode();
+    //         var responseString = await response.Content.ReadAsStringAsync();
+    //         var services = JsonConvert.DeserializeObject<Model.ServiceSummary[]>(responseString);
+    //         foreach (var service in services.OrderBy(s => s.NrsRetailServiceId).ThenBy(s => s.RetailServiceId).ThenBy(s => s.TimetableUid))
+    //         {
+    //             output.WriteLine($"{service.RetailServiceId} | {service.Origin.Location.ThreeLetterCode}-{service.Destination.Location.ThreeLetterCode} | {service.TimetableUid} | {service.IsCancelled}");
+    //         }
+    //     }
     // }
 }
