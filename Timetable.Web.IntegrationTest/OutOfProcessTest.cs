@@ -36,15 +36,19 @@ namespace Timetable.Web.IntegrationTest
     //     public async void MakeTocServicesRequest()
     //     {
     //         var client = new HttpClient();
-    //         var url = @"http://localhost:8484/api/timetable/toc/TP/2021-02-16?includeStops=false";
+    //         var url = @"http://localhost:8484/api/timetable/toc/GR/2021-02-22?includeStops=true";
     //         var response = await client.GetAsync(url);
     //         
     //         response.EnsureSuccessStatusCode();
     //         var responseString = await response.Content.ReadAsStringAsync();
-    //         var services = JsonConvert.DeserializeObject<Model.ServiceSummary[]>(responseString);
+    //         var services = JsonConvert.DeserializeObject<Model.Service[]>(responseString);
     //         foreach (var service in services.OrderBy(s => s.NrsRetailServiceId).ThenBy(s => s.RetailServiceId).ThenBy(s => s.TimetableUid))
     //         {
-    //             output.WriteLine($"{service.RetailServiceId} | {service.Origin.Location.ThreeLetterCode}-{service.Destination.Location.ThreeLetterCode} | {service.TimetableUid} | {service.IsCancelled}");
+    //             // output.WriteLine($"{service.RetailServiceId} | {service.Origin.Location.ThreeLetterCode}-{service.Destination.Location.ThreeLetterCode} | {service.TimetableUid} | {service.IsCancelled}");
+    //             if (service.Stops.Any(s => s.Location.ThreeLetterCode == "YRK"))
+    //             {
+    //                 output.WriteLine($"{service.RetailServiceId} | {service.Stops.First().Location.ThreeLetterCode}-{service.Stops.Last().Location.ThreeLetterCode} | {service.TimetableUid} | {service.IsCancelled}");
+    //             }
     //         }
     //     }
     // }

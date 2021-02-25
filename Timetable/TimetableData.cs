@@ -19,14 +19,13 @@ namespace Timetable
     {
         (LookupStatus status, ResolvedService service) GetScheduleByTimetableUid(string timetableUid, DateTime date);
         (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
-        (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary);
+        (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary, bool returnCancelled);
         bool IsLoaded { get; }
     }
 
     public class TimetableData : ITimetableLookup
     {
         private readonly ILogger _logger;
-        private readonly IServiceFilter _filter = new ServiceDeduplicator();
         private Dictionary<string, IService> _timetableUidMap { get; } = new Dictionary<string, IService>(400000);
         private Dictionary<string, IList<IService>> _retailServiceIdMap { get; } = new Dictionary<string, IList<IService>>(400000);
         
@@ -104,17 +103,18 @@ namespace Timetable
             }
 
             var reason = schedules.Any() ? LookupStatus.Success : LookupStatus.NoScheduleOnDate;
-
-            var servicesToReturn = Filter(schedules);
+            
+            var servicesToReturn = Filter(schedules, true);
             return (reason, servicesToReturn);
         }
 
-        private ResolvedService[] Filter(IEnumerable<ResolvedService> services)
+        private ResolvedService[] Filter(IEnumerable<ResolvedService> services, bool returnCancelled)
         {
-            return _filter.Filter(services).ToArray();
+            var filter = returnCancelled ? (IServiceFilter) new ServiceDeduplicator() : new ServiceCancelledFilter();
+            return filter.Filter(services).ToArray();
         }
 
-        public (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary)
+        public (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary, bool returnCancelled)
         {
             var services = new List<ResolvedService>();
             var nextDay = date.AddDays(1);
@@ -134,7 +134,7 @@ namespace Timetable
             }
 
             var reason = services.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
-            var servicesToReturn = Filter(services);
+            var servicesToReturn = Filter(services, returnCancelled);
             return (reason, servicesToReturn.ToArray());
             
             bool IsNextDay(IService service) => service.StartsBefore(dayBoundary);

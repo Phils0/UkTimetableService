@@ -206,14 +206,14 @@ namespace Timetable.Test
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
             var schedule3 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "X98765", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
            
-            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight);
+            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight, false);
             var schedules = found.services.Select(s => s.Details).ToArray();
             Assert.Contains<ISchedule>(schedule, schedules);
             Assert.Contains<ISchedule>(schedule3, schedules);
             Assert.All(found.services, s => { Assert.Equal(MondayAugust12, s.On);});
 
             
-            found = timetable.GetSchedulesByToc("VT", TuesdayAugust13, Time.Midnight);
+            found = timetable.GetSchedulesByToc("VT", TuesdayAugust13, Time.Midnight, false);
             schedules = found.services.Select(s => s.Details).ToArray();
             Assert.Contains<ISchedule>(schedule2, schedules);
             Assert.All(found.services, s => { Assert.Equal(TuesdayAugust13, s.On);});
@@ -236,7 +236,7 @@ namespace Timetable.Test
                 calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday | DaysFlag.Tuesday),
                 stops: TestSchedules.CreateThreeStopSchedule(Time.StartRailDay.AddMinutes(1)));
             
-            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.StartRailDay);
+            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.StartRailDay, false);
 
             var startDaySchedule = found.services.Single(s => s.Details == startsRailDay);
             Assert.Equal(MondayAugust12, startDaySchedule.On);
@@ -259,9 +259,22 @@ namespace Timetable.Test
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday));
             var schedule3 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "X98765", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
            
-            var found = timetable.GetSchedulesByToc("GR", MondayAugust12, Time.Midnight);
+            var found = timetable.GetSchedulesByToc("GR", MondayAugust12, Time.Midnight, false);
             Assert.Empty(found.services);
             Assert.Equal(LookupStatus.ServiceNotFound, found.status);
+        }
+        
+        [Fact]
+        public void DoesNotReturnCancelledSchedulesRunningOnDate()
+        {
+            var timetable = CreateTimetable();           
+
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Everyday));
+            var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            schedule2.StpIndicator = StpIndicator.Cancelled;
+           
+            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight, false);
+            Assert.Empty(found.services);
         }
         
         [Fact]
@@ -273,7 +286,7 @@ namespace Timetable.Test
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             schedule2.StpIndicator = StpIndicator.Cancelled;
            
-            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight);
+            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight, true);
             var service = found.services[0];
             Assert.True(service.IsCancelled);
             Assert.Equal(MondayAugust12, service.On);
@@ -292,7 +305,7 @@ namespace Timetable.Test
             var data = timetable.AsDynamic()._timetableUidMap.RealObject as Dictionary<string, IService>;
             data["CORRUPT"] = null;    // Force an error
             
-            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight);
+            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight, false);
             var schedules = found.services.Select(s => s.Details).ToArray();
             Assert.Contains<ISchedule>(schedule, schedules);
             Assert.Contains<ISchedule>(schedule3, schedules);
