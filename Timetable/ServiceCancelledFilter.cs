@@ -8,18 +8,18 @@ namespace Timetable
     {
         public IEnumerable<ResolvedService> Filter(IEnumerable<ResolvedService> services)
         {
-            var dedupedServices = services
+            var filteredServices = services
                 .Where(s => !s.IsCancelled)
                 .ToArray();
-            return dedupedServices;
+            return filteredServices;
         }
         
         public IEnumerable<ResolvedServiceStop> Filter(IEnumerable<ResolvedServiceStop> services)
         {
-            var dedupedServices = services
+            var filteredServices = services
                 .Where(s => !s.Service.IsCancelled)
                 .ToArray();
-            return dedupedServices;
+            return filteredServices;
         }
     }
 }

@@ -7,8 +7,8 @@ namespace Timetable
 {
     public enum FindStatus
     {
-        Success,
         Error,
+        Success,
         LocationNotFound,
         NoServicesForLocation
     }
@@ -59,8 +59,9 @@ namespace Timetable
         /// <param name="location">Three Letter Code</param>
         /// <param name="at">Date and Time</param>
         /// <param name="config">Configuration for gathering the results</param>
+        /// <param name="returnCancelled">Whether to return cancelled services</param>
         /// <returns>Schedules of running services.  If a service departs at time counts as first of after.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config);
+        (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config, bool returnCancelled);
 
         /// <summary>
         /// Scheduled services departing on date
@@ -69,8 +70,9 @@ namespace Timetable
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
         /// <param name="dayBoundary"></param>
+        /// <param name="returnCancelled">Whether to return cancelled services</param>
         /// <returns>Schedules of running services.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary);
+        (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, bool returnCancelled, Time dayBoundary);
         
         /// <summary>
         /// Scheduled services arriving at location on date near to time
@@ -78,8 +80,9 @@ namespace Timetable
         /// <param name="location">Three Letter Code</param>
         /// <param name="at">Date and Time</param>
         /// <param name="config">Configuration for gathering the results</param>
+        /// <param name="returnCancelled">Whether to return cancelled services</param>
         /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config);
+        (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config, bool returnCancelled);
 
         /// <summary>
         /// Scheduled services arriving on date
@@ -87,9 +90,10 @@ namespace Timetable
         /// <param name="location"></param>
         /// <param name="onDate">Date and Time</param>
         /// <param name="filter">Any filter</param>
+        /// <param name="returnCancelled">Whether to return cancelled services</param>
         /// <param name="dayBoundary"></param>
         /// <returns>Schedules of running services.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter,  Time dayBoundary);
+        (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, bool returnCancelled,  Time dayBoundary);
     }
 
     /// <summary>
@@ -98,7 +102,6 @@ namespace Timetable
     public class LocationData : ILocationData
     {
         private readonly ILogger _logger;
-        private readonly IServiceFilter _filter = new ServiceDeduplicator();
         
         /// <summary>
         /// Constructor
@@ -174,28 +177,28 @@ namespace Timetable
             return false;
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config)
+        public (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config, bool returnCancelled)
         {
-            return Find(location, (station) => station.Timetable.FindDepartures(at, config));
+            return Find(location, (station) => station.Timetable.FindDepartures(at, config), returnCancelled);
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter,  Time dayBoundary)
+        public (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, bool returnCancelled,  Time dayBoundary)
         {
-            return Find(location, (station) => station.Timetable.AllDepartures(onDate, filter, dayBoundary));
+            return Find(location, (station) => station.Timetable.AllDepartures(onDate, filter, dayBoundary), returnCancelled);
         }
 
-        private (FindStatus status, ResolvedServiceStop[] services) Find(string location,  Func<Station, ResolvedServiceStop[]> findFunc)
+        private (FindStatus status, ResolvedServiceStop[] services) Find(string location,  Func<Station, ResolvedServiceStop[]> findFunc, bool returnCancelled)
         {
             var status = FindStatus.LocationNotFound;
 
             if (!string.IsNullOrEmpty(location) && TryGetStation(location, out var station))
             {
                 var departures = findFunc(station);
+                departures = Filter(departures, returnCancelled);
 
                 if (departures.Any())
                 {
-                    var returnedDepartures = Filter(departures);
-                    return (status: FindStatus.Success, services: returnedDepartures);
+                    return (status: FindStatus.Success, services: departures);
                 }
 
                 status = FindStatus.NoServicesForLocation;
@@ -204,19 +207,20 @@ namespace Timetable
             return (status: status, services: new ResolvedServiceStop[0]);
         }
         
-        private ResolvedServiceStop[] Filter(IEnumerable<ResolvedServiceStop> services)
+        private ResolvedServiceStop[] Filter(IEnumerable<ResolvedServiceStop> services, bool returnCancelled)
         {
-            return _filter.Filter(services).ToArray();
+            var filter = returnCancelled ? (IServiceFilter) new ServiceDeduplicator() : new ServiceCancelledFilter();
+            return filter.Filter(services).ToArray();
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config)
+        public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config, bool returnCancelled)
         {
-            return Find(location, (station) => station.Timetable.FindArrivals(at, config));
+            return Find(location, (station) => station.Timetable.FindArrivals(at, config), returnCancelled);
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter,  Time dayBoundary)
+        public (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, bool returnCancelled,  Time dayBoundary)
         {
-            return Find(location, (station) => station.Timetable.AllArrivals(onDate, filter, dayBoundary));
+            return Find(location, (station) => station.Timetable.AllArrivals(onDate, filter, dayBoundary), returnCancelled);
         }
     }
 }

@@ -28,10 +28,7 @@ namespace Timetable.Web.Test.Controllers
         [InlineData("clj")]
         public async Task ArrivalsReturnsServices(string clapham)
         {
-            var data = Substitute.For<ILocationData>();
-            data.FindArrivals("CLJ", Aug12AtTenFifteen, Arg.Any<GatherConfiguration>())
-               .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
-
+            var data = CreateStubDataWithFindArrivals("CLJ", Aug12AtTenFifteen);
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Arrivals(clapham, Aug12AtTenFifteen) as ObjectResult;;
             
@@ -42,6 +39,19 @@ namespace Timetable.Web.Test.Controllers
             Assert.NotEmpty(services.Services);
         }
 
+        private ILocationData CreateStubDataWithFindArrivals(string atLocation = null, DateTime? atTime = null,
+            GatherConfiguration config = null, bool returnsCancelled = false, FindStatus returnedStatus = FindStatus.Success, ResolvedServiceStop[] returnedStops = null)
+        {
+            atLocation = atLocation ?? Arg.Any<string>();
+            atTime = atTime ?? Arg.Any<DateTime>();
+            config = config ?? Arg.Any<GatherConfiguration>();
+            returnedStops = returnedStops ?? new [] { CreateClaphamResolvedStop() };
+
+            var data = Substitute.For<ILocationData>();
+            data.FindArrivals(atLocation, atTime.Value, config, returnsCancelled)
+                .Returns((returnedStatus, returnedStops));
+            return data;
+        }
         private ResolvedServiceStop CreateClaphamResolvedStop()
         {
             return TestSchedules.CreateResolvedDepartureStop(atLocation: TestStations.ClaphamJunction, when: TestSchedules.TenSixteen);
@@ -66,10 +76,7 @@ namespace Timetable.Web.Test.Controllers
         [Theory]
         public async Task ArrivalsReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
-            var data = Substitute.For<ILocationData>();
-            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
-                .Returns((status, new ResolvedServiceStop[0]));
-
+            var data = CreateStubDataWithFindArrivals(returnedStatus: status, returnedStops:  new ResolvedServiceStop[0]);
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;
             
@@ -84,7 +91,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ArrivalsReturnsError()
         {
             var data = Substitute.For<ILocationData>();
-            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
+            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>(), false)
                 .Throws(new Exception("Something went wrong"));
 
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -104,10 +111,8 @@ namespace Timetable.Web.Test.Controllers
         [InlineData(null, false)]
         public async Task SetsFromFilter(string location, bool hasFilter)
         {
-            var data = Substitute.For<ILocationData>();
+            var data = CreateStubDataWithFindArrivals();
             data.TryGetStation("SUR", out Arg.Any<Station>()).Returns(true);
-            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
-                .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
 
             var filterFactory = Substitute.For<IFilterFactory>();
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
@@ -125,10 +130,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task SetsTocFilter()
         {
-            var data = Substitute.For<ILocationData>();
-            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
-                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
-
+            var data = CreateStubDataWithFindArrivals();
             var filter = Substitute.For<GatherConfiguration.GatherFilter>();
             var filterFactory = Substitute.For<IFilterFactory>();
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
@@ -143,10 +145,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ArrivalsNowSetsTocFilter()
         {
-            var data = Substitute.For<ILocationData>();
-            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
-                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
-
+            var data = CreateStubDataWithFindArrivals();
             var filter = Substitute.For<GatherConfiguration.GatherFilter>();
             var filterFactory = Substitute.For<IFilterFactory>();
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
@@ -158,15 +157,32 @@ namespace Timetable.Web.Test.Controllers
             filterFactory.Received().ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter);
         }
         
+        [Fact]
+        public async Task SetsReturnCancelledFlag()
+        {
+            var data = CreateStubDataWithFindArrivals(returnsCancelled: true);
+            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen, returnCancelledServices: true) as ObjectResult;
+            
+            Assert.Equal(200, response.StatusCode);
+        }
+        
+        [Fact]
+        public async Task ArrivalsNowSetsReturnCancelledFlag()
+        {
+            var data = CreateStubDataWithFindArrivals(returnsCancelled: true);
+            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var response = await controller.Arrivals("CLJ", returnCancelledServices: true) as ObjectResult;
+            
+            Assert.Equal(200, response.StatusCode);
+        }
+        
         [Theory]
         [InlineData("CLJ")]
         [InlineData("clj")]
         public async Task FullDayArrivalsReturnsServices(string clapham)
         {
-            var data = Substitute.For<ILocationData>();
-            data.AllArrivals("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
-                .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
-
+            var data = CreateStubDataWithAllArrivals("CLJ", Aug12);
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Arrivals(clapham, Aug12, fullDay: true) as ObjectResult;;
             
@@ -177,13 +193,24 @@ namespace Timetable.Web.Test.Controllers
             Assert.NotEmpty(services.Services);
         }
         
+        private ILocationData CreateStubDataWithAllArrivals(string atLocation = null, DateTime? atTime = null,
+            GatherConfiguration.GatherFilter config = null, Time? boundary = null, FindStatus returnedStatus = FindStatus.Success, ResolvedServiceStop[] returnedStops = null)
+        {
+            atLocation = atLocation ?? Arg.Any<string>();
+            atTime = atTime ?? Arg.Any<DateTime>();
+            config = config ?? Arg.Any<GatherConfiguration.GatherFilter>();
+            returnedStops = returnedStops ?? new [] { CreateClaphamResolvedStop() };
+            boundary = boundary ?? Time.Midnight;
+
+            var data = Substitute.For<ILocationData>();
+            data.AllArrivals(atLocation, atTime.Value, config, false, boundary.Value)
+                .Returns((returnedStatus, returnedStops));
+            return data;
+        }
         [Fact]
         public async Task FullRailDayArrivalsReturnsServices()
         {
-            var data = Substitute.For<ILocationData>();
-            data.AllArrivals("CLJ", Aug12, Arg.Any<GatherConfiguration.GatherFilter>(), Time.StartRailDay)
-                .Returns((FindStatus.Success,  new [] { CreateClaphamResolvedStop() }));
-
+            var data = CreateStubDataWithAllArrivals("CLJ", Aug12, boundary: Time.StartRailDay);
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Arrivals("CLJ", Aug12, fullDay: true, dayBoundary:"02:30") as ObjectResult;;
             
@@ -199,10 +226,7 @@ namespace Timetable.Web.Test.Controllers
         [Theory]
         public async Task ArrivalsForDayReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
-            var data = Substitute.For<ILocationData>();
-            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
-                .Returns((status, new ResolvedServiceStop[0]));
-
+            var data = CreateStubDataWithAllArrivals(returnedStatus: status, returnedStops: new ResolvedServiceStop[0]);
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Arrivals("CLJ", Aug12, fullDay: true) as ObjectResult;
             
@@ -217,7 +241,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ArrivalsForDayReturnsError()
         {
             var data = Substitute.For<ILocationData>();
-            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
+            data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), false, Arg.Any<Time>())
                 .Throws(new Exception("Something went wrong"));
 
             var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -243,10 +267,7 @@ namespace Timetable.Web.Test.Controllers
         [MemberData(nameof(ReturnsStops))]
         public async Task ReturnsServicesWithStops(bool includeStops, Type expected)
         {
-            var data = Substitute.For<ILocationData>();
-            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
-                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
-            
+            var data = CreateStubDataWithFindArrivals();
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen, includeStops: includeStops) as ObjectResult;
             Assert.IsType(expected, response.Value);
@@ -256,10 +277,7 @@ namespace Timetable.Web.Test.Controllers
         [MemberData(nameof(ReturnsStops))]
         public async Task ArrivalsNowReturnsServicesWithStops(bool includeStops, Type expected)
         {
-            var data = Substitute.For<ILocationData>();
-            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
-                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
-            
+            var data = CreateStubDataWithFindArrivals();
             var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Arrivals("CLJ", includeStops: includeStops) as ObjectResult;
             Assert.IsType(expected, response.Value);
@@ -268,10 +286,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ArrivalsReturns400WithInvalidTocs()
         {
-            var data = Substitute.For<ILocationData>();
-            data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
-                .Returns((FindStatus.Success,  new [] { TestSchedules.CreateResolvedDepartureStop() }));
-
+            var data = CreateStubDataWithFindArrivals();
             var filter = Substitute.For<GatherConfiguration.GatherFilter>();
             var filterFactory = Substitute.For<IFilterFactory>();
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);

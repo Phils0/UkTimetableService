@@ -18,7 +18,7 @@ namespace Timetable.Test.Data
 
         private static readonly Time First = new Time(new TimeSpan(0, 7, 0));
         
-        public static ILocationData CreateTimetabledLocations(int duration = 1440)
+        public static ILocationData CreateTimetabledLocations(int duration = 1440, bool cancelTimetable = false)
         {
             var data = Locations;
             var surbiton = data.LocationsByTiploc["SURBITN"];
@@ -38,6 +38,11 @@ namespace Timetable.Test.Data
 
                 var uid = $"X{i:D5}";
                 var testSchedule = TestSchedules.CreateScheduleWithService(timetableId: uid,  stops: stops);
+                if (cancelTimetable)
+                {
+                    var cancelledSchedule =
+                        TestSchedules.CreateScheduleWithService(uid, StpIndicator.Cancelled, service: testSchedule.Service);
+                }
             }
 
             return data;

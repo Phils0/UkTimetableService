@@ -133,9 +133,9 @@ namespace Timetable
                 }
             }
 
-            var reason = services.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
-            var servicesToReturn = Filter(services, returnCancelled);
-            return (reason, servicesToReturn.ToArray());
+            var returnedServices = Filter(services, returnCancelled);
+            var reason = returnedServices.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
+            return (reason, returnedServices);
             
             bool IsNextDay(IService service) => service.StartsBefore(dayBoundary);
         }

@@ -101,7 +101,7 @@ namespace Timetable.Test
         public void FindDeparture(string threeLetterCode, FindStatus found)
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.FindDepartures(threeLetterCode, Ten, GathererConfig.OneService);
+            var find = data.FindDepartures(threeLetterCode, Ten, GathererConfig.OneService, false);
             
             Assert.Equal(found, find.status);
             if(found == FindStatus.Success)
@@ -114,10 +114,30 @@ namespace Timetable.Test
         public void DoNotFindDeparturesWhenNone()
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.FindDepartures("WAT", Ten, GathererConfig.OneService);
+            var find = data.FindDepartures("WAT", Ten, GathererConfig.OneService, false);
             
             Assert.Equal(FindStatus.NoServicesForLocation, find.status);
             Assert.Empty(find.services);
+        }
+        
+        [Fact]
+        public void DoNotFindDeparturesWhenAllCancelled()
+        {
+            var data = TestData.CreateTimetabledLocations(cancelTimetable: true);
+            var find = data.FindDepartures("SUR", Ten, GathererConfig.OneService, false);
+            
+            Assert.Equal(FindStatus.NoServicesForLocation, find.status);
+            Assert.Empty(find.services);
+        }
+        
+        [Fact]
+        public void FindDeparturesWhenAllCancelledAndReturningCancelled()
+        {
+            var data = TestData.CreateTimetabledLocations(cancelTimetable: true);
+            var find = data.FindDepartures("SUR", Ten, GathererConfig.OneService, true);
+            
+            Assert.Equal(FindStatus.Success, find.status);
+            Assert.NotEmpty(find.services);
         }
         
         [Theory]
@@ -128,7 +148,7 @@ namespace Timetable.Test
         public void AllDeparture(string threeLetterCode, FindStatus found)
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllDepartures(threeLetterCode, Aug12, GatherFilterFactory.NoFilter, Time.Midnight);
+            var find = data.AllDepartures(threeLetterCode, Aug12, GatherFilterFactory.NoFilter, false, Time.Midnight);
             
             Assert.Equal(found, find.status);
             if(found == FindStatus.Success)
@@ -144,7 +164,7 @@ namespace Timetable.Test
             var expectedFirstDate = Aug12;
 
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllDepartures("SUR", Ten, GatherFilterFactory.NoFilter, Time.Midnight);
+            var find = data.AllDepartures("SUR", Ten, GatherFilterFactory.NoFilter, false, Time.Midnight);
             
             var first = find.services.First();
             AssertDeparture(expectedFirstDate, expectedFirstTime, first);
@@ -162,7 +182,7 @@ namespace Timetable.Test
         public void AllDepartureTimes(Time dayBoundary, DateTime expectedFirstDate, TimeSpan expectedFirstTime, DateTime expectedLastDate, TimeSpan expectedLastTime)
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllDepartures("SUR", Aug12, GatherFilterFactory.NoFilter, dayBoundary);
+            var find = data.AllDepartures("SUR", Aug12, GatherFilterFactory.NoFilter, false, dayBoundary);
 
             var first = find.services.First();
             AssertDeparture(expectedFirstDate, expectedFirstTime, first);
@@ -182,7 +202,7 @@ namespace Timetable.Test
         public void EmptyDeparturesWhenNone()
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllDepartures("WAT", Aug12, GatherFilterFactory.NoFilter, Time.Midnight);
+            var find = data.AllDepartures("WAT", Aug12, GatherFilterFactory.NoFilter, false, Time.Midnight);
             
             Assert.Equal(FindStatus.NoServicesForLocation, find.status);
             Assert.Empty(find.services);
@@ -196,7 +216,7 @@ namespace Timetable.Test
         public void FindArrivals(string threeLetterCode, FindStatus found)
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.FindArrivals(threeLetterCode, Ten, GathererConfig.OneService);
+            var find = data.FindArrivals(threeLetterCode, Ten, GathererConfig.OneService, false);
             
             Assert.Equal(found, find.status);
             if(found == FindStatus.Success)
@@ -209,10 +229,30 @@ namespace Timetable.Test
         public void DoNotFindArrivalsWhenNone()
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.FindArrivals("SUR", Ten, GathererConfig.OneService);
+            var find = data.FindArrivals("SUR", Ten, GathererConfig.OneService, false);
             
             Assert.Equal(FindStatus.NoServicesForLocation, find.status);
             Assert.Empty(find.services);
+        }
+        
+        [Fact]
+        public void DoNotFindArrivalsWhenAllCancelled()
+        {
+            var data = TestData.CreateTimetabledLocations(cancelTimetable: true);
+            var find = data.FindArrivals("WAT", Ten, GathererConfig.OneService, false);
+            
+            Assert.Equal(FindStatus.NoServicesForLocation, find.status);
+            Assert.Empty(find.services);
+        }
+        
+        [Fact]
+        public void FindArrivalsWhenAllCancelledAndReturningCancelled()
+        {
+            var data = TestData.CreateTimetabledLocations(cancelTimetable: true);
+            var find = data.FindArrivals("WAT", Ten, GathererConfig.OneService, true);
+            
+            Assert.Equal(FindStatus.Success, find.status);
+            Assert.NotEmpty(find.services);
         }
         
         [Theory]
@@ -223,7 +263,7 @@ namespace Timetable.Test
         public void AllArrivals(string threeLetterCode, FindStatus found)
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllArrivals(threeLetterCode, Aug12, GatherFilterFactory.NoFilter, Time.Midnight);
+            var find = data.AllArrivals(threeLetterCode, Aug12, GatherFilterFactory.NoFilter, false, Time.Midnight);
             
             Assert.Equal(found, find.status);
             if(found == FindStatus.Success)
@@ -240,7 +280,7 @@ namespace Timetable.Test
             var expectedFirstDate = Aug12.AddDays(-1);
 
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllArrivals("WAT", Ten, GatherFilterFactory.NoFilter, Time.Midnight);
+            var find = data.AllArrivals("WAT", Ten, GatherFilterFactory.NoFilter, false, Time.Midnight);
             
             var first = find.services.First();
             AssertArrival(expectedFirstDate, expectedFirstTime, first);
@@ -259,7 +299,7 @@ namespace Timetable.Test
         public void AllArrivalTimes(Time dayBoundary, DateTime expectedFirstDate, TimeSpan expectedFirstTime, DateTime expectedLastDate, TimeSpan expectedLastTime)
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllArrivals("WAT", Aug12, GatherFilterFactory.NoFilter, dayBoundary);
+            var find = data.AllArrivals("WAT", Aug12, GatherFilterFactory.NoFilter, false, dayBoundary);
 
             var first = find.services.First();
             AssertArrival(expectedFirstDate, expectedFirstTime, first);
@@ -279,7 +319,7 @@ namespace Timetable.Test
         public void EmptyArrivalsWhenNone()
         {
             var data = TestData.CreateTimetabledLocations();
-            var find = data.AllArrivals("SUR", Aug12, GatherFilterFactory.NoFilter, Time.Midnight);
+            var find = data.AllArrivals("SUR", Aug12, GatherFilterFactory.NoFilter, false, Time.Midnight);
             
             Assert.Equal(FindStatus.NoServicesForLocation, find.status);
             Assert.Empty(find.services);
