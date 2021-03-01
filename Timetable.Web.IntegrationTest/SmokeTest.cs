@@ -15,8 +15,8 @@ namespace Timetable.Web.IntegrationTest
         {
         }
 
+        // [InlineData("SHF", "MAN", "TP")]
         [Theory]
-        [InlineData("SHF", "MAN", "TP")]
         [InlineData("LDS", "EDB", "XC")]
         [InlineData("EUS", "MAN", "VT")]
         [InlineData("LDS", "KGX", "GR")]
