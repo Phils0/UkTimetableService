@@ -39,7 +39,7 @@ namespace Timetable.Web.Test.Controllers
         }
 
         private static ILocationData CreateStubDataWithFindDepartures(string atLocation = null, DateTime? atTime = null,
-            GatherConfiguration config = null, bool returnsCancelled = false, FindStatus returnedStatus = FindStatus.Success, ResolvedServiceStop[] returnedStops = null)
+            GatherConfiguration config = null, FindStatus returnedStatus = FindStatus.Success, ResolvedServiceStop[] returnedStops = null)
         {
             atLocation = atLocation ?? Arg.Any<string>();
             atTime = atTime ?? Arg.Any<DateTime>();
@@ -47,7 +47,7 @@ namespace Timetable.Web.Test.Controllers
             returnedStops = returnedStops ?? new [] { TestSchedules.CreateResolvedDepartureStop() };
 
             var data = Substitute.For<ILocationData>();
-            data.FindDepartures(atLocation, atTime.Value, config, returnsCancelled)
+            data.FindDepartures(atLocation, atTime.Value, config)
                 .Returns((returnedStatus, returnedStops));
             return data;
         }
@@ -86,7 +86,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task DeparturesReturnsError()
         {
             var data = Substitute.For<ILocationData>();
-            data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>(), false)
+            data.FindDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
                 .Throws(new Exception("Something went wrong"));
 
             var controller = new DeparturesController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -155,21 +155,29 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task SetsReturnedCancelledFlag()
         {
-            var data = CreateStubDataWithFindDepartures(returnsCancelled: true);
+            var returnedStop = TestSchedules.CreateResolvedDepartureStop(isCancelled: true);
+            var data = CreateStubDataWithFindDepartures(returnedStops:  new [] { returnedStop });
             var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Departures("SUR", Aug12AtTen, returnCancelledServices: true) as ObjectResult;
             
             Assert.Equal(200, response.StatusCode);
+            var services = response.Value as Model.FoundSummaryResponse;
+            Assert.Single(services.Services);
+            Assert.True(services.Services[0].Service.IsCancelled);
         }
         
         [Fact]
         public async Task DeparturesNowSetsReturnedCancelledFlag()
         {
-            var data = CreateStubDataWithFindDepartures(returnsCancelled: true);
+            var returnedStop = TestSchedules.CreateResolvedDepartureStop(isCancelled: true);
+            var data = CreateStubDataWithFindDepartures(returnedStops:  new [] { returnedStop });
             var controller = new DeparturesController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.Departures("SUR", returnCancelledServices: true) as ObjectResult;
             
             Assert.Equal(200, response.StatusCode);
+            var services = response.Value as Model.FoundSummaryResponse;
+            Assert.Single(services.Services);
+            Assert.True(services.Services[0].Service.IsCancelled);
         }
         
         [Theory]
@@ -198,7 +206,7 @@ namespace Timetable.Web.Test.Controllers
             boundary = boundary ?? Time.Midnight;
 
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures(atLocation, atTime.Value, config, false, boundary.Value)
+            data.AllDepartures(atLocation, atTime.Value, config, boundary.Value)
                 .Returns((returnedStatus, returnedStops));
             return data;
         }
@@ -237,7 +245,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task DeparturesForDayReturnsError()
         {
             var data = Substitute.For<ILocationData>();
-            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), false, Arg.Any<Time>())
+            data.AllDepartures(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
                 .Throws(new Exception("Something went wrong"));
 
             var controller = new DeparturesController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());

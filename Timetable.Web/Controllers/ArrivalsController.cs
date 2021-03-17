@@ -83,9 +83,9 @@ namespace Timetable.Web.Controllers
             return await Process(request, tocFilter, async () =>
             {
                 var config = CreateGatherConfig(request, tocFilter);
-                var result =  _timetable.FindArrivals(request.Location, at, config, returnCancelledServices);
+                var result =  _timetable.FindArrivals(request.Location, at, config);
                 return await Task.FromResult(result);
-            }, includeStops);
+            }, includeStops, returnCancelledServices);
         }
         
         private async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, string from, bool includeStops, TocFilter tocFilter, bool returnCancelledServices,  string dayBoundary)
@@ -95,9 +95,9 @@ namespace Timetable.Web.Controllers
             {
                 var boundary = Time.Parse(dayBoundary);
                 var filter = CreateFilter(request, tocFilter);
-                var result = _timetable.AllArrivals(request.Location, onDate, filter, returnCancelledServices, boundary);
+                var result = _timetable.AllArrivals(request.Location, onDate, filter, boundary);
                 return await Task.FromResult(result);
-            }, includeStops);
+            }, includeStops, returnCancelledServices);
         }
         
         protected override GatherConfiguration.GatherFilter CreateFilter(Station station)

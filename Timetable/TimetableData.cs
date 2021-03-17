@@ -103,10 +103,9 @@ namespace Timetable
                 if(service.TryResolveOn(date, out var schedule) && schedule.HasRetailServiceId(retailServiceId))
                     schedules.Add(schedule);
             }
-
-            var reason = schedules.Any() ? LookupStatus.Success : LookupStatus.NoScheduleOnDate;
             
-            var servicesToReturn = FilterServicesDecorator.Filter(schedules, true);
+            var servicesToReturn = ServiceFilter.Filter(schedules, true);
+            var reason = servicesToReturn.Any() ? LookupStatus.Success : LookupStatus.NoScheduleOnDate;
             return (reason, servicesToReturn);
         }
 

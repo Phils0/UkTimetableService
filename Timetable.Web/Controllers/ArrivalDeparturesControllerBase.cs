@@ -11,10 +11,11 @@ namespace Timetable.Web.Controllers
 {
     public abstract class ArrivalDeparturesControllerBase : ControllerBase
     {
-        protected ILocationData _timetable;
-        protected IFilterFactory _filters;
-        protected IMapper _mapper;
-        protected ILogger _logger;
+        protected readonly ILocationData _timetable;
+        protected readonly IFilterFactory _filters;
+        protected readonly IMapper _mapper;
+        protected readonly ILogger _logger;
+        private readonly ServiceFilter _resultsFilter = new ServiceFilter();
 
         protected ArrivalDeparturesControllerBase(ILocationData data,  IFilterFactory filters, IMapper mapper, ILogger logger)
         {
@@ -55,7 +56,7 @@ namespace Timetable.Web.Controllers
             return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true, dayBoundary);
         }
         
-        protected async Task<IActionResult> Process(SearchRequest request, TocFilter tocFilter, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find, bool includeStops)
+        protected async Task<IActionResult> Process(SearchRequest request, TocFilter tocFilter, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find, bool includeStops, bool returnCancelled)
         {
             using (LogContext.PushProperty("Request", request, true))
             {
@@ -74,34 +75,23 @@ namespace Timetable.Web.Controllers
                 FindStatus status;
                 try
                 {
-                    var (findStatus, services) = await find();
-
+                    var (findStatus, found) = await find();
+                    
                     if (findStatus == FindStatus.Success)
                     {
-                        if (includeStops)
+                        var (findStatusAfterFilter, services) = _resultsFilter.Filter(found, returnCancelled);
+                        if (findStatusAfterFilter == FindStatus.Success)
                         {
-                            var items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundServiceItem[]>(services, ServiceController.InitialiseContext);
-                            return Ok(new Model.FoundServiceResponse()
-                            {
-                                Request = request,
-                                GeneratedAt = DateTime.Now,
-                                Services = items
-                            });                           
+                            return MapSuccessResponse(request, includeStops, services);
                         }
-                        else
-                        {
-                            var items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundSummaryItem[]>(services, ServiceController.InitialiseContext);
-                            return Ok(new Model.FoundSummaryResponse()
-                            {
-                                Request = request,
-                                GeneratedAt = DateTime.Now,
-                                Services = items
-                            });
-                        }
-                    }
 
-                    status = findStatus;
-                }
+                        status = findStatusAfterFilter;
+                    }
+                    else
+                    {
+                        status = findStatus;
+                    }
+                 }
                 catch (Exception e)
                 {
                     status = FindStatus.Error;
@@ -111,7 +101,33 @@ namespace Timetable.Web.Controllers
                 return CreateNoServiceResponse(status, request);
             }
         }
-        
+
+        private IActionResult MapSuccessResponse(SearchRequest request, bool includeStops, ResolvedServiceStop[] services)
+        {
+            if (includeStops)
+            {
+                var items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundServiceItem[]>(services,
+                    options => ServiceController.InitialiseContext(options));
+                return Ok(new Model.FoundServiceResponse()
+                {
+                    Request = request,
+                    GeneratedAt = DateTime.Now,
+                    Services = items
+                });
+            }
+            else
+            {
+                var items = _mapper.Map<Timetable.ResolvedServiceStop[], Model.FoundSummaryItem[]>(services,
+                    options => ServiceController.InitialiseContext(options));
+                return Ok(new Model.FoundSummaryResponse()
+                {
+                    Request = request,
+                    GeneratedAt = DateTime.Now,
+                    Services = items
+                });
+            }
+        }
+
         protected GatherConfiguration CreateGatherConfig(SearchRequest request, TocFilter tocFilter)
         {
             var filter = CreateFilter(request, tocFilter);
