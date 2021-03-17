@@ -15,7 +15,16 @@ namespace Timetable
         public ResolvedServiceWithAssociations(ISchedule service, DateTime on, bool isCancelled, ResolvedAssociation[] associations)
             : base(service, on, isCancelled)
         {
-            Associations = associations;
+            Associations = associations ?? new ResolvedAssociation[0];
+            SetAssociationStop();
+        }
+
+        private void SetAssociationStop()
+        {
+            foreach (var association in Associations)
+            {
+                association.SetAssociationStop(this);
+            }
         }
         
         public bool HasAssociations()

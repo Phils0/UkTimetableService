@@ -58,6 +58,43 @@ namespace Timetable.Test
             Assert.Equal("A98765", stop.Service.TimetableUid);        
         }
 
+        [Fact]
+        public void GetStopNotFoundReturnsNull()
+        {
+            var association = TestAssociations.CreateAssociationWithServices(location: TestLocations.Weybridge);
+            association.Main.Service.TryResolveOn(Aug10, out var resolvedService);
+            var resolved = new ResolvedAssociation(
+                association,
+                DateTime.Today, 
+                false,
+                null);
+
+
+            var stop = resolved.GetStop(resolvedService);
+            Assert.Null(stop);
+        }
+        
+        [Fact]
+        public void SetAssociationStop()
+        {
+            var association = TestAssociations.CreateAssociationWithServices();
+            association.Main.Service.TryResolveOn(Aug10, out var resolvedService);
+            association.Associated.Service.TryResolveOn(Aug10, out var resolvedAssociatedService);
+            
+            var resolved = new ResolvedAssociation(
+                association,
+                DateTime.Today, 
+                false,
+                resolvedAssociatedService);
+            ;
+
+            resolved.SetAssociationStop(resolvedService);
+            var stop = resolved.Stop;
+            Assert.NotNull(stop);
+            Assert.Equal(TestLocations.CLPHMJN, stop.Stop.Stop.Location);
+            Assert.Equal(TestLocations.CLPHMJN, stop.AssociatedServiceStop.Stop.Location);
+        }
+        
         [Theory]
         [InlineData(AssociationCategory.Join, true)]
         [InlineData(AssociationCategory.Split, false)]

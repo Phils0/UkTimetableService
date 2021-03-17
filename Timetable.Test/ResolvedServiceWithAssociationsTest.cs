@@ -12,8 +12,8 @@ namespace Timetable.Test
         public static TheoryData<ResolvedAssociation[], bool> HasAssociationsTestData =>
             new TheoryData<ResolvedAssociation[], bool>()
             {
-                { new ResolvedAssociation[1], true }, 
-                { new ResolvedAssociation[0], false }, 
+                { TestSchedules.CreateServiceWithAssociation().Associations, true }, 
+                { TestSchedules.NoAssociations, false }, 
                 { null, false }, 
             };
         
@@ -25,5 +25,29 @@ namespace Timetable.Test
             Assert.Equal(expected, resolved.HasAssociations());
         }
 
+        [Fact]
+        public void SetsAssociationStopWhenConstructed()
+        {
+            var main = TestSchedules.CreateService();
+            var association = TestSchedules.CreateAssociation(main, "X98765");
+            Assert.Null(association.Stop);
+            
+            var withAssociation = new ResolvedServiceWithAssociations(main, new [] {association});
+            Assert.NotNull(association.Stop);
+        }
+        
+        [Fact]
+        public void SetsAssociationWhenMultipleAssociations()
+        {
+            var main = TestSchedules.CreateService();
+            var association1 = TestSchedules.CreateAssociation(main, "X98765");
+            var association2 = TestSchedules.CreateAssociation(main, "X56789");
+            Assert.Null(association1.Stop);
+            Assert.Null(association2.Stop);
+            
+            var withAssociation = new ResolvedServiceWithAssociations(main, new [] {association1, association2});
+            Assert.NotNull(association1.Stop);
+            Assert.NotNull(association2.Stop);
+        }
     }
 }

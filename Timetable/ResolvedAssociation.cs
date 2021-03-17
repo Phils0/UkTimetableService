@@ -1,5 +1,6 @@
 using System;
-using System.Collections.Generic;
+using Serilog;
+using Serilog.Events;
 
 namespace Timetable
 {
@@ -11,8 +12,8 @@ namespace Timetable
         public Association Details { get; }
         public AssociationCategory Category => Details.Category;
 
-        public bool IsJoin => AssociationCategory.Join.Equals(Category);
-        public bool IsSplit => AssociationCategory.Split.Equals(Category);
+        public bool IsJoin => AssociationCategory.Join == Category;
+        public bool IsSplit => AssociationCategory.Split == Category;
 
         public ResolvedAssociation(Association association, DateTime on, bool isCancelled, ResolvedService associatedService)
         {
@@ -21,14 +22,26 @@ namespace Timetable
             IsCancelled = isCancelled;
             AssociatedService = associatedService;
         }
-        
-        public ResolvedServiceStop GetStop(ResolvedService service)
-        {
-            var association = IsMain(service.TimetableUid) ?
-                Details.Main :
-                Details.Associated;
 
-            return service.GetStop(association.AtLocation, association.Sequence);
+        internal ILogger Logger => Details.Logger;
+        
+        internal ResolvedServiceStop GetStop(ResolvedService service)
+        {
+            try
+            {
+                var association = IsMain(service.TimetableUid) ?
+                    Details.Main :
+                    Details.Associated;
+
+                var stop = service.GetStop(association.AtLocation, association.Sequence);
+                return stop;
+            }
+            catch (Exception e)
+            {
+                var level = IsCancelled ? LogEventLevel.Information : LogEventLevel.Warning;
+                Logger.Write(level, e, "Did not find association stop in service {source} : {service}", this, service);
+                return null;
+            }
         }
         
         public bool IsMain(string timetableUid)
@@ -39,6 +52,15 @@ namespace Timetable
         public bool IsAssociated(string timetableUid)
         {
             return !IsMain(timetableUid);
+        }
+        
+        public ResolvedAssociationStop Stop { get; private set; }
+        
+        internal  void SetAssociationStop(ResolvedService service)
+        {
+            var stop = GetStop(service)?.Stop;
+            var associatedServiceStop = GetStop(AssociatedService)?.Stop;
+            Stop = new ResolvedAssociationStop(stop, associatedServiceStop);
         }
         
         public override string ToString()

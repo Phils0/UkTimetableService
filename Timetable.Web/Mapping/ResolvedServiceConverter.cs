@@ -63,18 +63,17 @@ namespace Timetable.Web.Mapping
 
         private A MapAssociation(ResolvedAssociation source, ResolvedService service, ResolutionContext context)
         {
-            var atStop = FindAndMapStop(source, service, context);
-            var (associatedService, associatedStop) = MapOtherService();
+            var (associatedService, associatedServiceStop) = MapOtherService();
 
             var association = new A()
             {
-                Stop = atStop,
-                IsBroken = (atStop == null  || associatedStop == null),
+                Stop = MapStop(source.Stop.Stop, context),
+                IsBroken = source.Stop.IsBroken,
                 IsCancelled = source.IsCancelled,
                 IsMain = source.IsMain(service.TimetableUid),
                 Date = source.On,
                 AssociationCategory = source.Details.Category.ToString(),
-                AssociatedServiceStop = associatedStop
+                AssociatedServiceStop = associatedServiceStop
             };
             SetAssociatedService(association, associatedService);
             return association;
@@ -86,7 +85,7 @@ namespace Timetable.Web.Mapping
                 try
                 {
                     var otherService = CreateService(source.AssociatedService, context);
-                    var otherStop = FindAndMapStop(source, source.AssociatedService, context);
+                    var otherStop = MapStop(source.Stop.AssociatedServiceStop, context);
                     return (otherService, otherStop);
                 }
                 finally
@@ -99,19 +98,11 @@ namespace Timetable.Web.Mapping
 
         protected abstract void SetAssociatedService(A association, S service);
 
-        private Model.ScheduledStop FindAndMapStop(ResolvedAssociation source, Timetable.ResolvedService service, ResolutionContext context)
+        private Model.ScheduledStop MapStop(ResolvedStop source, ResolutionContext context)
         {
-            try
-            {
-                var stop = source.GetStop(service).Stop.Stop;
-                return context.Mapper.Map<Timetable.ScheduleLocation, Model.ScheduledStop>(stop);
-            }
-            catch (Exception e)
-            {
-                var level = source.IsCancelled ? LogEventLevel.Information : LogEventLevel.Warning;
-                _logger.Write(level, e, "Did not find association stop in service {source} : {service}", source, service);
-                return null;
-            }
+            return source == null ?
+                null :
+                context.Mapper.Map<Timetable.ScheduleLocation, Model.ScheduledStop>(source.Stop);
         }
 
         public S[] Convert(ResolvedService[] source, S[] destination, ResolutionContext context)

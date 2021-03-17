@@ -31,7 +31,7 @@ namespace Timetable
     /// </summary>
     public class Association
     {
-        private readonly ILogger _logger;
+        internal ILogger Logger { get; }
         public AssociationService Main { get; set;  }
         
         public AssociationService Associated { get; set;  }
@@ -61,7 +61,7 @@ namespace Timetable
 
         public Association(ILogger logger)
         {
-            _logger = logger;
+            Logger = logger;
         }
         
         public void SetService(IService service, bool isMain)
@@ -100,7 +100,7 @@ namespace Timetable
             }
             catch (Exception e)
             {
-                _logger.Warning(e, 
+                Logger.Warning(e, 
                     "Error when matching association location {location} {service} {association}:{main}", Main.AtLocation, service, this, isMain);
                 return false;
             }

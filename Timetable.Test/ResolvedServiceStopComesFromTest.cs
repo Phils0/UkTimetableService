@@ -171,7 +171,6 @@ namespace Timetable.Test
             var mainStops = CreateMainStops();
             mainStops = new [] {
                 TestScheduleLocations.CreateOrigin(TestStations.ClaphamJunction, TestSchedules.TenTen),
-                mainStops[2],
                 mainStops[3]
             };
             var association = CreateSplitServices(mainStops);
