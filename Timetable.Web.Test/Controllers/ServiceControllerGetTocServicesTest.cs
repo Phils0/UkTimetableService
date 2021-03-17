@@ -24,7 +24,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ServicesByTocReturnsServices()
         {
             var data = Substitute.For<ITimetableLookup>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight, false)
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -40,7 +40,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ServicesByTocReturnsFullSchedulewsWhenSetFullScheduleParameter()
         {
             var data = Substitute.For<ITimetableLookup>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight, false)
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -56,7 +56,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task RailDayServicesByTocReturnsServices()
         {
             var data = Substitute.For<ITimetableLookup>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.StartRailDay, false)
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.StartRailDay)
                 .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
 
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -72,7 +72,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ServicesByTocReturnsNotFoundWithReason()
         {
             var data = Substitute.For<ITimetableLookup>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight, false)
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Returns((LookupStatus.ServiceNotFound, new ResolvedService[0]));
 
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
@@ -89,7 +89,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ServicesByTocReturnsError()
         {
             var data = Substitute.For<ITimetableLookup>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight, false)
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
                 .Throws(new Exception("Test"));
 
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());

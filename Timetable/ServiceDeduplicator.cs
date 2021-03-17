@@ -4,11 +4,7 @@ using System.Linq;
 
 namespace Timetable
 {
-    internal interface IServiceFilter
-    {
-        IEnumerable<ResolvedService> Filter(IEnumerable<ResolvedService> services);
-        IEnumerable<ResolvedServiceStop> Filter(IEnumerable<ResolvedServiceStop> services);
-    }
+
 
     internal class ServiceDeduplicator : IServiceFilter
     {

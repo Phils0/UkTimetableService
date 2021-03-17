@@ -19,12 +19,14 @@ namespace Timetable.Web.Controllers
         private readonly ITimetableLookup _timetable;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly FilterServicesDecorator _tocFilterDecorator;
 
         public ServiceController(ITimetableLookup timetable, IMapper mapper, ILogger logger)
         {
             _timetable = timetable;
             _mapper = mapper;
             _logger = logger;
+            _tocFilterDecorator = new FilterServicesDecorator(timetable);
         }
 
         /// <summary>
@@ -153,7 +155,7 @@ namespace Timetable.Web.Controllers
             try
             {
                 var boundary = Time.Parse(dayBoundary);
-                var service = _timetable.GetSchedulesByToc(toc, @on, boundary, returnCancelledServices);
+                var service = _tocFilterDecorator.GetServicesByToc(returnCancelledServices)(toc, @on, boundary);
                 if (service.status == LookupStatus.Success)
                 {
                     if (includeStops)
