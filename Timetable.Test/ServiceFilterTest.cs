@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -33,6 +34,17 @@ namespace Timetable.Test
             
             Assert.Equal(FindStatus.Success, filtered.status);
             Assert.NotEmpty(filtered.services);
+        }
+        
+        [Fact]
+        public void DeduplicateReturnsCancelled()
+        {
+            var data = TestData.CreateTimetabledLocations(cancelTimetable: true);
+            var found = data.FindDepartures("SUR", Ten, GathererConfig.OneService);
+            var services = found.services.Select(s => s.Service).ToArray();
+            
+            var filtered = ServiceFilter.Deduplicate(services);
+            Assert.NotEmpty(filtered);
         }
     }
 }

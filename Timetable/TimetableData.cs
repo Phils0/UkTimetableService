@@ -104,7 +104,7 @@ namespace Timetable
                     schedules.Add(schedule);
             }
             
-            var servicesToReturn = ServiceFilter.Filter(schedules, true);
+            var servicesToReturn = ServiceFilter.Deduplicate(schedules);
             var reason = servicesToReturn.Any() ? LookupStatus.Success : LookupStatus.NoScheduleOnDate;
             return (reason, servicesToReturn);
         }

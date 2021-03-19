@@ -11,6 +11,11 @@ namespace Timetable
 
     public class ServiceFilter
     {
+        internal static ResolvedService[] Deduplicate(IEnumerable<ResolvedService> services)
+        {
+            return Filter(services, true);
+        }
+        
         internal static IServiceFilter CreateFilter(bool returnCancelled)
         {
             return returnCancelled ? (IServiceFilter) new ServiceDeduplicator() : new ServiceCancelledFilter();
