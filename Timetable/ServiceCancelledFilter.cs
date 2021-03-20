@@ -8,18 +8,36 @@ namespace Timetable
     {
         public IEnumerable<ResolvedService> Filter(IEnumerable<ResolvedService> services)
         {
-            var filteredServices = services
-                .Where(s => !s.IsCancelled)
-                .ToArray();
-            return filteredServices;
+            return Filter(services, (s) => s);;
         }
         
         public IEnumerable<ResolvedServiceStop> Filter(IEnumerable<ResolvedServiceStop> services)
         {
+            return Filter(services, (s) => s.Service);
+        }
+        
+        public IEnumerable<T> Filter<T>(IEnumerable<T> services, Func<T, ResolvedService> getService)
+        {
             var filteredServices = services
-                .Where(s => !s.Service.IsCancelled)
+                .Where(s => !getService(s).IsCancelled)
                 .ToArray();
+
+            foreach (var service in filteredServices)
+            {
+                RemoveCancelledAssociations(service, getService);
+            }
             return filteredServices;
+        }
+
+        private T RemoveCancelledAssociations<T>(T original, Func<T, ResolvedService> getService)
+        {
+            var service = getService(original);
+            if (service.HasAssociations())
+            {
+                var withAssociation = (ResolvedServiceWithAssociations) service;
+                withAssociation.RemoveCancelledAssociations();
+            }
+            return original;
         }
     }
 }

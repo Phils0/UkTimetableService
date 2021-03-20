@@ -51,5 +51,7 @@ namespace Timetable
         {
             return IsCancelled ? $"{Details.TimetableUid} {On.ToYMD()} CANCELLED" : $"{Details.TimetableUid} {On.ToYMD()}";
         }
+
+        public virtual bool HasAssociations() => false;
     }
 }

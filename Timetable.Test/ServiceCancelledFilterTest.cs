@@ -17,6 +17,18 @@ namespace Timetable.Test
 
             Assert.Empty(notCancelled);
         }
+        
+        [Fact]
+        public void RemovedCancelledAssocation()
+        {
+            ResolvedService service = TestSchedules.CreateServiceWithAssociation(associationIsCancelled: true);
+            Assert.True(service.HasAssociations());
+            
+            var notCancelled = FilterCancelled(new []{service});
+
+            Assert.NotEmpty(notCancelled);
+            Assert.False(notCancelled[0].HasAssociations());
+        }
 
         private static ResolvedService[] FilterCancelled(ResolvedService[] services)
         {

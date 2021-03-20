@@ -244,14 +244,19 @@ namespace Timetable.Test.Data
         public static ResolvedAssociation CreateAssociation(ResolvedService main, string associatedUid, bool associationIsCancelled = false, bool isNextDay = false)
         {
             var associated = CreateScheduleWithService(associatedUid, stops: CreateWokingClaphamSchedule(NineForty));
-            var association = TestAssociations.CreateAssociationWithServices((CifService) main.Details.Service, associated.Service);
             var associatedDate = isNextDay ? main.On.AddDays(1) : main.On;
             var resolvedAssociated = new ResolvedService(associated, associatedDate, false);
+            return CreateAssociation(main, resolvedAssociated, associationIsCancelled);
+        }
+        
+        public static ResolvedAssociation CreateAssociation(ResolvedService main, ResolvedService associated, bool associationIsCancelled = false)
+        {
+            var association = TestAssociations.CreateAssociationWithServices((CifService) main.Details.Service, (CifService) associated.Details.Service);
             return new ResolvedAssociation(
                 association,
                 main.On,
                 associationIsCancelled,
-                resolvedAssociated);
+                associated);
         }
     }
 }

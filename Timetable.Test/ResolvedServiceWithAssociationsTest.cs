@@ -24,6 +24,13 @@ namespace Timetable.Test
             var resolved = new ResolvedServiceWithAssociations(TestSchedules.CreateService(), associations);
             Assert.Equal(expected, resolved.HasAssociations());
         }
+        
+        [Fact]
+        public void ResolvedServiceDoesNotHaveAssociations()
+        {
+            var resolved = TestSchedules.CreateService();
+            Assert.False(resolved.HasAssociations());
+        }
 
         [Fact]
         public void SetsAssociationStopWhenConstructed()
@@ -48,6 +55,49 @@ namespace Timetable.Test
             var withAssociation = new ResolvedServiceWithAssociations(main, new [] {association1, association2});
             Assert.NotNull(association1.Stop);
             Assert.NotNull(association2.Stop);
+        }
+        
+        [Fact]
+        public void RemoveCancelledAssociation()
+        {
+            var main = TestSchedules.CreateService();
+            var association1 = TestSchedules.CreateAssociation(main, "X98765", true);
+            var association2 = TestSchedules.CreateAssociation(main, "X56789");
+            
+            var withAssociation = new ResolvedServiceWithAssociations(main, new [] {association1, association2});
+            withAssociation.RemoveCancelledAssociations();
+            
+            Assert.Single(withAssociation.Associations);
+            Assert.Equal(association2, withAssociation.Associations[0]);
+        }
+        
+        [Fact]
+        public void RemoveAssociationWithCancelledService()
+        {
+            var main = TestSchedules.CreateService();
+            var associated = TestSchedules.CreateService("X98765", stops: TestSchedules.CreateWokingClaphamSchedule(TestSchedules.NineForty), isCancelled: true);
+            var association1 = TestSchedules.CreateAssociation(main, associated);
+            var association2 = TestSchedules.CreateAssociation(main, "X56789");
+            
+            var withAssociation = new ResolvedServiceWithAssociations(main, new [] {association1, association2});
+            withAssociation.RemoveCancelledAssociations();
+            
+            Assert.Single(withAssociation.Associations);
+            Assert.Equal(association2, withAssociation.Associations[0]);
+        }
+        
+        [Fact]
+        public void AllAssociationsAreCancelled()
+        {
+            var main = TestSchedules.CreateService();
+            var association1 = TestSchedules.CreateAssociation(main, "X98765", true);
+            var association2 = TestSchedules.CreateAssociation(main, "X56789", true);
+            
+            var withAssociation = new ResolvedServiceWithAssociations(main, new [] {association1, association2});
+            withAssociation.RemoveCancelledAssociations();
+            
+            Assert.False(withAssociation.HasAssociations());
+            Assert.Empty(withAssociation.Associations);
         }
     }
 }
