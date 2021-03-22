@@ -62,6 +62,25 @@ namespace Timetable.Web.Test
             pluginConfig.EnablePrometheusMonitoring.Should().BeFalse();
         }
         
+        [Theory]
+        [MemberData(nameof(BooleanConfigCheck))]
+        public void EnableDebugResponses(string configValue, bool expected)
+        {
+            var config = ConfigurationHelper.GetConfiguration(enableDebugResponses: configValue);
+            var pluginConfig = new Configuration(config, Substitute.For<ILogger>());
+
+            pluginConfig.EnableDebugResponses.Should().Be(expected);
+        }
+        
+        [Fact]
+        public void EnableDebugResponsesIsFalseWhenNoConfigValue()
+        {
+            var config = Substitute.For<IConfigurationRoot>();;
+            var pluginConfig = new Configuration(config, Substitute.For<ILogger>());
+
+            pluginConfig.EnableDebugResponses.Should().BeFalse();
+        }
+        
         [Fact]
         public void GetTimetableFromAppSettings()
         {

@@ -26,6 +26,8 @@ namespace Timetable.Web
             return !string.IsNullOrEmpty(val) && val.Equals("true", StringComparison.InvariantCultureIgnoreCase);
         }
         
+        internal bool EnableDebugResponses => IsTrue(_config["EnableDebugResponses"], "EnableDebugResponses");
+
         public string TimetableArchiveFile
         {
             get
