@@ -51,5 +51,19 @@ namespace Timetable
 
             Associations = active.ToArray();
         }
+        
+        internal void RemoveBrokenAssociations()
+        {
+            var active = new List<ResolvedAssociation>();
+            foreach (var association in Associations)
+            {
+                if(association.Stop != null && !association.Stop.IsBroken)
+                {
+                    active.Add(association);
+                }
+            }
+
+            Associations = active.ToArray();
+        }
     }
 }

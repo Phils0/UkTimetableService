@@ -57,12 +57,20 @@ namespace Timetable.Test.Data
             on = on == default(DateTime) ? MondayAugust12 : on;
             var schedule = CreateSchedule(timetableId, indicator, calendar, stops, service, retailServiceId);
             var resolved = new ResolvedService(schedule, on, isCancelled);
-
-            var origin = schedule.Locations.First() as ScheduleStop; 
+            
+            return CreateResolvedDepartureStop(resolved, atLocation, when);
+        }
+        
+        public static ResolvedServiceStop CreateResolvedDepartureStop(
+            ResolvedService service,
+            Station atLocation = null,
+            Time when = default(Time))
+        {
+            var origin = service.Details.Locations.First() as ScheduleStop; 
             atLocation = atLocation ?? origin.Station;
             when = when.Equals(default(Time)) ? origin.Departure : when;
-            var find = new StopSpecification(atLocation, when, on, TimesToUse.Departures);
-            resolved.TryFindStop(find, out var stop);
+            var find = new StopSpecification(atLocation, when, service.On, TimesToUse.Departures);
+            service.TryFindStop(find, out var stop);
             return stop;
         }
         

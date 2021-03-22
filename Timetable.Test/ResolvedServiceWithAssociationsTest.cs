@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Net;
 using ReflectionMagic;
 using Timetable.Test.Data;
@@ -98,6 +99,54 @@ namespace Timetable.Test
             
             Assert.False(withAssociation.HasAssociations());
             Assert.Empty(withAssociation.Associations);
+        }
+        
+        [Fact]
+        public void RemoveBrokenAssociation()
+        {
+            var main = TestSchedules.CreateService();
+            var association1 = TestSchedules.CreateAssociation(main, "X98765");
+            var association2 = TestSchedules.CreateAssociation(main, "X56789");
+            var withAssociation = new ResolvedServiceWithAssociations(main, new [] {association1, association2});
+
+            association2.AsDynamic().Stop = new ResolvedAssociationStop(association2.Stop.Stop, null);        
+            
+            withAssociation.RemoveBrokenAssociations();
+            
+            Assert.Single(withAssociation.Associations);
+            Assert.Equal(association1, withAssociation.Associations[0]);
+        }
+        
+        [Fact]
+        public void RemoveAssociationWithNoStop()
+        {
+            var main = TestSchedules.CreateService();
+            var association1 = TestSchedules.CreateAssociation(main, "X98765");
+            var association2 = TestSchedules.CreateAssociation(main, "X56789");
+            var withAssociation = new ResolvedServiceWithAssociations(main, new [] {association1, association2});
+            
+            association2.AsDynamic().Stop = null;
+            
+            withAssociation.RemoveBrokenAssociations();
+            
+            Assert.Single(withAssociation.Associations);
+            Assert.Equal(association1, withAssociation.Associations[0]);
+        }
+        
+        [Fact]
+        public void RemoveBrokenWhenCancelledAssociation()
+        {
+            var main = TestSchedules.CreateService();
+            var association1 = TestSchedules.CreateAssociation(main, "X98765", true);
+            var association2 = TestSchedules.CreateAssociation(main, "X56789");
+            var withAssociation = new ResolvedServiceWithAssociations(main, new [] {association1, association2});
+            
+            association2.AsDynamic().Stop = new ResolvedAssociationStop(association2.Stop.Stop, null);        
+            
+            withAssociation.RemoveBrokenAssociations();
+            
+            Assert.Single(withAssociation.Associations);
+            Assert.Equal(association1, withAssociation.Associations[0]);
         }
     }
 }
