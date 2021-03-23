@@ -23,10 +23,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task ServicesByTocReturnsServices()
         {
-            var data = Substitute.For<ITimetableLookup>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
-                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
-
+            var data = CreateTimetableMock(Time.Midnight, LookupStatus.Success);
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1) as ObjectResult;;
             
@@ -36,13 +33,24 @@ namespace Timetable.Web.Test.Controllers
             Assert.NotEmpty(services);
         }
         
+        private ITimetableLookup CreateTimetableMock(Time dayBoundary, LookupStatus status)
+        {
+            var services = status == LookupStatus.Success
+                ? new[] {TestSchedules.CreateService()}
+                : new ResolvedService[0];
+            
+            var data = Substitute.For<ITimetableLookup>();
+            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), dayBoundary)
+                .Returns((LookupStatus.Success, services));
+            data.CreateFilter()
+                .Returns(new FilterServicesDecorator(data, Timetable.Test.Data.Filters.Instance));
+            return data;
+        }
+        
         [Fact]
         public async Task ServicesByTocReturnsFullSchedulewsWhenSetFullScheduleParameter()
         {
-            var data = Substitute.For<ITimetableLookup>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
-                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
-
+            var data = CreateTimetableMock(Time.Midnight, LookupStatus.Success);
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1, includeStops: true) as ObjectResult;;
             
@@ -55,10 +63,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public async Task RailDayServicesByTocReturnsServices()
         {
-            var data = Substitute.For<ITimetableLookup>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.StartRailDay)
-                .Returns((LookupStatus.Success,  new [] {TestSchedules.CreateService()}));
-
+            var data = CreateTimetableMock(Time.StartRailDay, LookupStatus.Success);
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1, "02:30") as ObjectResult;;
             
@@ -67,14 +72,11 @@ namespace Timetable.Web.Test.Controllers
             var services = response.Value as Model.ServiceSummary[];
             Assert.NotEmpty(services);
         }
-
+        
         [Fact]
         public async Task ServicesByTocReturnsNotFoundWithReason()
         {
-            var data = Substitute.For<ITimetableLookup>();
-            data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), Time.Midnight)
-                .Returns((LookupStatus.ServiceNotFound, new ResolvedService[0]));
-
+            var data = CreateTimetableMock(Time.Midnight, LookupStatus.ServiceNotFound);
             var controller = new ServiceController(data, _config.CreateMapper(), Substitute.For<ILogger>());
             var response = await controller.GetTocServices("VT", April1) as ObjectResult;;
             

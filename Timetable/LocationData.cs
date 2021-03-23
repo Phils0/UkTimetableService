@@ -97,6 +97,11 @@ namespace Timetable
         /// <param name="dayBoundary"></param>
         /// <returns>Schedules of running services.</returns>
         (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary);
+        
+        /// <summary>
+        /// Results filter
+        /// </summary>
+        ServiceFilters Filters { get; }
     }
 
     /// <summary>
@@ -110,9 +115,10 @@ namespace Timetable
         /// Constructor
         /// </summary>
         /// <param name="masterLocations">Master list of locations (used as a filter)</param>
-        public LocationData(ICollection<Location> masterLocations, ILogger logger)
+        public LocationData(ICollection<Location> masterLocations, ILogger logger, ServiceFilters filters)
         {
-            _logger = logger;            
+            _logger = logger;
+            Filters = filters;
             _locations = masterLocations.ToDictionary(l => l.Tiploc, l => l);
             
             Locations = masterLocations.
@@ -217,5 +223,7 @@ namespace Timetable
         {
             return Find(location, (station) => station.Timetable.AllArrivals(onDate, filter, dayBoundary));
         }
+
+        public ServiceFilters Filters { get; }
     }
 }

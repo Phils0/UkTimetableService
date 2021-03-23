@@ -15,7 +15,6 @@ namespace Timetable.Web.Controllers
         protected readonly IFilterFactory _filters;
         protected readonly IMapper _mapper;
         protected readonly ILogger _logger;
-        private readonly ServiceFilter _resultsFilter = new ServiceFilter();
 
         protected ArrivalDeparturesControllerBase(ILocationData data,  IFilterFactory filters, IMapper mapper, ILogger logger)
         {
@@ -79,7 +78,7 @@ namespace Timetable.Web.Controllers
                     
                     if (findStatus == FindStatus.Success)
                     {
-                        var (findStatusAfterFilter, services) = _resultsFilter.Filter(found, returnCancelled);
+                        var (findStatusAfterFilter, services) = _timetable.Filters.Filter(found, returnCancelled);
                         if (findStatusAfterFilter == FindStatus.Success)
                         {
                             return MapSuccessResponse(request, includeStops, services);

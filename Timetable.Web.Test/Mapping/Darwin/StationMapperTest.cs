@@ -28,7 +28,9 @@ namespace Timetable.Web.Test.Mapping.Darwin
         
         private StationMapper CreateMapper(LocationData stations = null)
         {
-            stations =  stations ?? new LocationData(Locations, Substitute.For<ILogger>());
+            stations =  stations ?? new LocationData(Locations, 
+                Substitute.For<ILogger>(),
+                Timetable.Test.Data.Filters.Instance);
             return new StationMapper(_tocs, stations, Substitute.For<ILogger>());
         }
         
@@ -85,7 +87,7 @@ namespace Timetable.Web.Test.Mapping.Darwin
         [Fact]
         public void AddViaRule()
         {
-            var stations = new LocationData(Locations, Substitute.For<ILogger>());
+            var stations = LocationData;
             var mapper = CreateMapper(stations);
             var rule = CreateViaRule();
 
@@ -102,6 +104,11 @@ namespace Timetable.Web.Test.Mapping.Darwin
             Assert.Equal("via Test", targetrule.Text);
         }
 
+        private static LocationData LocationData => new LocationData(
+            Locations, 
+            Substitute.For<ILogger>(),
+            Timetable.Test.Data.Filters.Instance);
+
         public static Dictionary<Location, List<ViaRule>> GetViaRules(Station station)
         {
             return station.ViaTextRules.AsDynamic()._rules.RealObject as Dictionary<Location, List<ViaRule>>;
@@ -112,7 +119,7 @@ namespace Timetable.Web.Test.Mapping.Darwin
         [InlineData(null)]
         public void AddViaRuleWithNoLocation2(string loc2)
         {
-            var stations = new LocationData(Locations, Substitute.For<ILogger>());
+            var stations = LocationData;
             var mapper = CreateMapper(stations);
             var rule = CreateViaRule();
             rule.loc2 = loc2;
@@ -133,7 +140,7 @@ namespace Timetable.Web.Test.Mapping.Darwin
         [Fact]
         public void DoesNotAddIfCannotFindDestination()
         {
-            var stations = new LocationData(Locations, Substitute.For<ILogger>());
+            var stations = LocationData;
             var mapper = CreateMapper(stations);
             var rule = CreateViaRule();
             rule.dest = TestLocations.Woking.Tiploc;
@@ -148,7 +155,7 @@ namespace Timetable.Web.Test.Mapping.Darwin
         [Fact]
         public void DoesNotAddIfCannotFindLocation1()
         {
-            var stations = new LocationData(Locations, Substitute.For<ILogger>());
+            var stations = LocationData;
             var mapper = CreateMapper(stations);
             var rule = CreateViaRule();
             rule.loc1 = TestLocations.Woking.Tiploc;
@@ -163,7 +170,7 @@ namespace Timetable.Web.Test.Mapping.Darwin
         [Fact]
         public void DoesNotAddIfCannotFindLocation2()
         {
-            var stations = new LocationData(Locations, Substitute.For<ILogger>());
+            var stations = LocationData;
             var mapper = CreateMapper(stations);
             var rule = CreateViaRule();
             rule.loc2 = TestLocations.Woking.Tiploc;

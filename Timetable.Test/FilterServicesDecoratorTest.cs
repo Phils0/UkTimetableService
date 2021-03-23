@@ -12,7 +12,8 @@ namespace Timetable.Test
         
         private static TimetableData CreateTimetable()
         {
-            return new TimetableData(Substitute.For<ILogger>());
+            var logger = Substitute.For<ILogger>();
+            return new TimetableData(new ServiceFilters(false, logger), logger);
         }
         
         [Fact]
@@ -24,11 +25,13 @@ namespace Timetable.Test
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             schedule2.StpIndicator = StpIndicator.Cancelled;
 
-            var decorator = new FilterServicesDecorator(timetable);
+            var decorator = new FilterServicesDecorator(timetable, Filters);
             var found = decorator.GetServicesByToc(false)("VT", MondayAugust12, Time.Midnight);
             Assert.Empty(found.services);
         }
-        
+
+        private ServiceFilters Filters => new ServiceFilters(false, Substitute.For<ILogger>());
+
         [Fact]
         public void GetsCancelledSchedulesRunningOnDate()
         {
@@ -38,7 +41,7 @@ namespace Timetable.Test
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             schedule2.StpIndicator = StpIndicator.Cancelled;
            
-            var decorator = new FilterServicesDecorator(timetable);
+            var decorator = new FilterServicesDecorator(timetable, Filters);
             var found = decorator.GetServicesByToc(true)("VT", MondayAugust12, Time.Midnight);
             var service = found.services[0];
             Assert.True(service.IsCancelled);

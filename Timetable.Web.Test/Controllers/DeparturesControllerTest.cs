@@ -49,6 +49,8 @@ namespace Timetable.Web.Test.Controllers
             var data = Substitute.For<ILocationData>();
             data.FindDepartures(atLocation, atTime.Value, config)
                 .Returns((returnedStatus, returnedStops));
+            data.Filters
+                .Returns(Timetable.Test.Data.Filters.Instance);
             return data;
         }
 
@@ -208,6 +210,8 @@ namespace Timetable.Web.Test.Controllers
             var data = Substitute.For<ILocationData>();
             data.AllDepartures(atLocation, atTime.Value, config, boundary.Value)
                 .Returns((returnedStatus, returnedStops));
+            data.Filters
+                .Returns(Timetable.Test.Data.Filters.Instance);
             return data;
         }
         

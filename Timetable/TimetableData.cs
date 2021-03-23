@@ -23,21 +23,31 @@ namespace Timetable
         (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
         (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary);
         bool IsLoaded { get; }
+        FilterServicesDecorator CreateFilter();
     }
 
     public class TimetableData : ITimetableLookup
     {
         private readonly ILogger _logger;
+        public ServiceFilters Filters { get; }
+
         private Dictionary<string, IService> _timetableUidMap { get; } = new Dictionary<string, IService>(400000);
         private Dictionary<string, IList<IService>> _retailServiceIdMap { get; } = new Dictionary<string, IList<IService>>(400000);
+
         
-        public TimetableData(ILogger logger)
+        public TimetableData(ServiceFilters filters, ILogger logger)
         {
             _logger = logger;
+            Filters = filters;
         }
 
         public bool IsLoaded { get; set; }
         
+        public FilterServicesDecorator CreateFilter()
+        {
+            return new FilterServicesDecorator(this, Filters);
+        }
+
         public void AddSchedule(ISchedule schedule)
         {
             void AddToRetailServiceMap(IService trainService)
@@ -68,9 +78,12 @@ namespace Timetable
         {
             if (!_timetableUidMap.TryGetValue(timetableUid, out var service))
                 return (LookupStatus.ServiceNotFound, null);
-            
-            if(service.TryResolveOn(date, out var schedule))
+
+            if (service.TryResolveOn(date, out var schedule))
+            {
+                Filters.RemoveBrokenServices(new[] {schedule});
                 return (LookupStatus.Success, schedule);
+            }
             
             return (LookupStatus.NoScheduleOnDate, null);
         }
@@ -104,13 +117,11 @@ namespace Timetable
                     schedules.Add(schedule);
             }
             
-            var servicesToReturn = ServiceFilter.Deduplicate(schedules);
+            var servicesToReturn = Filters.Deduplicate(schedules);
             var reason = servicesToReturn.Any() ? LookupStatus.Success : LookupStatus.NoScheduleOnDate;
             return (reason, servicesToReturn);
         }
-
-
-
+        
         public (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary)
         {
             var services = new List<ResolvedService>();

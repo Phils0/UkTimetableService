@@ -48,13 +48,15 @@ namespace Timetable.Web.Test.ServiceConfiguration
         }
 
         private Timetable.Data CreateDummyData(ILogger logger)
-        {
+        {        
+            var filters = Timetable.Test.Data.Filters.Instance;
+
             var data = new Timetable.Data();
-            data.Locations = new LocationData(new List<Location>(), logger)
+            data.Locations = new LocationData(new List<Location>(), logger, filters)
             {
                 IsLoaded = true
             };
-            data.Timetable = new TimetableData(logger)
+            data.Timetable = new TimetableData(filters, logger)
             {
                 IsLoaded = true
             };

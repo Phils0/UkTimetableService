@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using NSubstitute;
 using Serilog;
+using Timetable.Test.Data;
 using Xunit;
 
 namespace Timetable.Test
@@ -19,10 +20,15 @@ namespace Timetable.Test
             };
 
         private static ILocationData LoadedLocations(bool isLoaded) =>
-            new LocationData( Substitute.For<ICollection<Location>>(), Substitute.For<ILogger>()) { IsLoaded = isLoaded};
+            new LocationData( Substitute.For<ICollection<Location>>(), 
+                Substitute.For<ILogger>(),
+                Filters.Instance)
+            {
+                IsLoaded = isLoaded
+            };
         
         private static ITimetableLookup LoadedTimetable(bool isLoaded) =>
-            new TimetableData(Substitute.For<ILogger>()) { IsLoaded = isLoaded };
+            new TimetableData(Filters.Instance, Substitute.For<ILogger>()) { IsLoaded = isLoaded };
         
         [Theory]
         [MemberData(nameof(HasDataTests))]

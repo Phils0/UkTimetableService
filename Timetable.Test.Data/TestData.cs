@@ -14,7 +14,8 @@ namespace Timetable.Test.Data
                 TestLocations.WaterlooWindsor,
                 TestLocations.CLPHMJN,
                 TestLocations.CLPHMJC
-            }, Substitute.For<ILogger>());
+            }, Substitute.For<ILogger>(), 
+            Filters.Instance);
 
         private static readonly Time First = new Time(new TimeSpan(0, 7, 0));
         

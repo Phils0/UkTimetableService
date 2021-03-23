@@ -17,12 +17,14 @@ namespace Timetable.Web.Loaders
         private IMapper _mapper;
         private readonly IArchive _archive;
         private readonly ILogger _logger;
+        private readonly ServiceFilters _filters;
 
-        public CifLoader(IArchive archive, IMapper mapper, ILogger logger)
+        public CifLoader(IArchive archive, IMapper mapper, ILogger logger, ServiceFilters filters)
         {
             _mapper = mapper;
             _archive = archive;
             _logger = logger;
+            _filters = filters;
         }
 
         public string ArchiveFile => _archive.FullName;
@@ -42,7 +44,7 @@ namespace Timetable.Web.Loaders
                     _mapper.Map<IEnumerable<CifParser.RdgRecords.Station>, IEnumerable<Timetable.Location>>(
                         stationRecords);
                 _logger.Information("Loaded Master Station List");
-                return new LocationData(locations.ToArray(), _logger)
+                return new LocationData(locations.ToArray(), _logger, _filters)
                     {
                         IsLoaded = true
                     };
@@ -67,7 +69,7 @@ namespace Timetable.Web.Loaders
         {
             var tocLookup = data.Tocs as TocLookup;
             var locations = data.Locations;
-            var timetable = new TimetableData(_logger);
+            var timetable = new TimetableData(_filters, _logger);
             var associations = new List<Association>(6000);
             
             Timetable.CifSchedule MapSchedule(CifParser.Schedule schedule)

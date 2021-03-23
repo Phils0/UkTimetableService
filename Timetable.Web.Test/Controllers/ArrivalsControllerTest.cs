@@ -50,6 +50,8 @@ namespace Timetable.Web.Test.Controllers
             var data = Substitute.For<ILocationData>();
             data.FindArrivals(atLocation, atTime.Value, config)
                 .Returns((returnedStatus, returnedStops));
+            data.Filters
+                .Returns(Timetable.Test.Data.Filters.Instance);
             return data;
         }
         private ResolvedServiceStop CreateClaphamResolvedStop(bool isCancelled = false)
@@ -213,6 +215,8 @@ namespace Timetable.Web.Test.Controllers
             var data = Substitute.For<ILocationData>();
             data.AllArrivals(atLocation, atTime.Value, config, boundary.Value)
                 .Returns((returnedStatus, returnedStops));
+            data.Filters
+                .Returns(Timetable.Test.Data.Filters.Instance);
             return data;
         }
         [Fact]

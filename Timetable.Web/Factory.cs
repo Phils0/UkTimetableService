@@ -62,21 +62,26 @@ namespace Timetable.Web
             var archive = CreateArchive(config, logger);
             var darwin = await CreateDarwinLoader(config, logger);
             var knowledgebase = CreateKnowledgebase(config, logger);
-            return CreateLoader(archive, darwin, knowledgebase, logger);
-        }
-        
-        internal static IDataLoader CreateLoader(IArchive archive, IDataEnricher darwin, IDataEnricher knowledgebase, ILogger logger)
-        {
-            var cifLoader = CreateCifLoader(archive, logger);
-            return new Loaders.DataLoader(cifLoader, darwin, knowledgebase, logger);
+            var filters = CreateFilters(config, logger);
+            return CreateLoader(archive, darwin, knowledgebase, logger, filters);
         }
 
+        internal static ServiceFilters CreateFilters(Configuration config, ILogger logger)
+        {
+            return new ServiceFilters(config.EnableDebugResponses, logger);
+        }
         
-        internal static CifLoader CreateCifLoader(IArchive archive, ILogger logger)
+        internal static IDataLoader CreateLoader(IArchive archive, IDataEnricher darwin, IDataEnricher knowledgebase, ILogger logger, ServiceFilters filters)
+        {
+            var cifLoader = CreateCifLoader(archive, logger, filters);
+            return new Loaders.DataLoader(cifLoader, darwin, knowledgebase, logger);
+        }
+        
+        internal static CifLoader CreateCifLoader(IArchive archive, ILogger logger, ServiceFilters filters)
         {
             var mapperConfig = new MapperConfiguration(
                 cfg => { cfg.AddProfile<FromCifProfile>(); });
-            var cifLoader = new CifLoader(archive, mapperConfig.CreateMapper(), logger);
+            var cifLoader = new CifLoader(archive, mapperConfig.CreateMapper(), logger, filters);
             return cifLoader;
         }
     }

@@ -38,7 +38,9 @@ namespace Timetable.Web.Test.Loaders
         {
             archive = CreateMockArchive(archive, cifParser);
             
-            return Factory.CreateCifLoader(archive, Substitute.For<ILogger>());
+            return Factory.CreateCifLoader(archive, 
+                Substitute.For<ILogger>(),
+                Timetable.Test.Data.Filters.Instance);
         }
         
         private IArchive CreateMockArchive(IArchive archive, ICifParser cifParser)

@@ -6,6 +6,7 @@ using NSubstitute;
 using ReflectionMagic;
 using Serilog;
 using Timetable.Web.Loaders;
+using Timetable.Web.Test.Loaders;
 using Timetable.Web.Test.Mapping.Darwin;
 using Xunit;
 
@@ -77,7 +78,8 @@ namespace Timetable.Web.Test
         {
             var config = new Configuration(ConfigurationHelper.GetConfiguration(), Substitute.For<ILogger>());
             var archive = Factory.CreateArchive(config, Substitute.For<ILogger>());
-            return Factory.CreateCifLoader(archive, Substitute.For<ILogger>());
+            var filters = Factory.CreateFilters(config, Substitute.For<ILogger>());
+            return Factory.CreateCifLoader(archive, Substitute.For<ILogger>(), filters);
         }
         
         private static IDataLoader Create()
@@ -118,7 +120,10 @@ namespace Timetable.Web.Test
             var data = new Timetable.Data()
             {
                 Tocs = new TocLookup(Substitute.For<ILogger>()),
-                Locations = new LocationData(new List<Location>(), Substitute.For<ILogger>())
+                Locations = new LocationData(
+                    new List<Location>(), 
+                    Substitute.For<ILogger>(),
+                    Timetable.Test.Data.Filters.Instance)
             };
             
             var loader = CreateKnowledgebaseLoader();
@@ -139,7 +144,10 @@ namespace Timetable.Web.Test
             var data = new Timetable.Data()
             {
                 Tocs = new TocLookup(Substitute.For<ILogger>()),
-                Locations = new LocationData(new List<Location>(), Substitute.For<ILogger>())
+                Locations = new LocationData(
+                    new List<Location>(), 
+                    Substitute.For<ILogger>(),
+                    Timetable.Test.Data.Filters.Instance)
             };
             
             var loader = await CreateDarwinLoader();

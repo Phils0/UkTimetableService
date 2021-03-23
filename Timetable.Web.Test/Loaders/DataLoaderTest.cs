@@ -13,6 +13,7 @@ using ReflectionMagic;
 using Serilog;
 using Timetable.Web.Loaders;
 using Timetable.Web.Mapping.Cif;
+using Timetable.Web.Test.Loaders;
 using Xunit;
 
 namespace Timetable.Web.Test
@@ -41,7 +42,12 @@ namespace Timetable.Web.Test
             darwin ??= new NopLoader();
             knowledgebase ??= new KnowledgebaseLoader(Substitute.For<IKnowledgebaseAsync>(), Substitute.For<ILogger>());
             
-            return Factory.CreateLoader(archive, darwin, knowledgebase, Substitute.For<ILogger>()) as Web.Loaders.DataLoader;
+            return Factory.CreateLoader(
+                archive, 
+                darwin, 
+                knowledgebase, 
+                Substitute.For<ILogger>(),
+                Timetable.Test.Data.Filters.Instance) as Web.Loaders.DataLoader;
         }
 
         private IArchive CreateMockArchive(IArchive archive, ICifParser cifParser)

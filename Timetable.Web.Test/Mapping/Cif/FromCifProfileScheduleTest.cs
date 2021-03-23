@@ -29,7 +29,9 @@ namespace Timetable.Web.Test.Mapping.Cif
 
         private static TocLookup CreateLookup() => new TocLookup(Substitute.For<ILogger>());
         
-        private static TimetableData CreateTimetable() => new TimetableData(Substitute.For<ILogger>());
+        private static TimetableData CreateTimetable() => new TimetableData(
+            Timetable.Test.Data.Filters.Instance,
+            Substitute.For<ILogger>());
         
         public CifSchedule MapSchedule(CifParser.Schedule input = null, IMapper mapper = null)
         {

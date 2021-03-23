@@ -16,7 +16,7 @@ namespace Timetable
             return Filter(services, (s) => s.Service);
         }
         
-        public IEnumerable<T> Filter<T>(IEnumerable<T> services, Func<T, ResolvedService> getService)
+        private IEnumerable<T> Filter<T>(IEnumerable<T> services, Func<T, ResolvedService> getService)
         {
             var filteredServices = services
                 .Where(s => !getService(s).IsCancelled)

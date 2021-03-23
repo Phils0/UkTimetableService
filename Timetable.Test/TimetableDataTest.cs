@@ -32,7 +32,8 @@ namespace Timetable.Test
 
         private static TimetableData CreateTimetable()
         {
-            return new TimetableData(Substitute.For<ILogger>());
+            var logger = Substitute.For<ILogger>();
+            return new TimetableData(Filters.Instance, logger);
         }
 
         [Fact]

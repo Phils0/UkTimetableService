@@ -91,7 +91,8 @@ namespace Timetable.Web.Test.Loaders
                         TestLocations.CLPHMJC,
                         TestLocations.Woking,
                         TestLocations.Guildford
-                    }, Substitute.For<ILogger>())
+                    }, Substitute.For<ILogger>(),
+                    Timetable.Test.Data.Filters.Instance)
             };
             var loader = CreateLoader(darwin: MockDownloader);
 
