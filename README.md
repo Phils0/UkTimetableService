@@ -13,6 +13,12 @@ It loads a GB timetable in the CIF file format and provides a simple API to quer
 * `/api/Timetable/departures/SUR/2019-08-23T10:00:00`   - departures at a location around a specific date time
 * `/api/Timetable/toc/GR/2019-07-30`   - services for a train operating company (toc) on a specific date
 
+### Filtered responses
+By default the `arrivals`, `departures` and `toc` endpoints filter out cancelled services.  
+There is a `returnCancelledServices` querystring parameter to allow callers to override this behavior.
+
+All endpoints will by default filter out broken associations.  If you want broken associations returned you can set the `EnableDebugResponses` setting in `appSettings`.  This is a service wide setting. 
+
 ### Reference API
 
 * `/api/Reference/location`   - locations grouped by CRS
@@ -49,7 +55,7 @@ Edit `Timetable.Web/appsettings.json`, to set  `StationKnowledgebase` and `TocKn
 More information about accessing these files can be found at https://wiki.openraildata.com/index.php?title=KnowledgeBase
 
 ## Darwin Data - WIP
-Optionally can load Darwin data.  Currently only loades reference data.
+Optionally can load Darwin data.  Currently only loads reference data.
 
 ## Build and Test
 
