@@ -111,7 +111,7 @@ namespace Timetable.Test
             var services = timetable.GetScheduleByRetailServiceId(retailServiceId, MondayAugust12);
             var service =  services.services.FirstOrDefault()?.Details;
             
-            Assert.Equal(expected, service?.RetailServiceId);
+            Assert.Equal(expected, service?.Properties.RetailServiceId);
         }
         
         [Fact]

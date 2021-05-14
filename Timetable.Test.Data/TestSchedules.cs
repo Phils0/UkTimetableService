@@ -98,10 +98,8 @@ namespace Timetable.Test.Data
         {
             retailServiceId = retailServiceId ?? $"VT{timetableId.Substring(1, 4)}00";
 
-            var schedule = new CifSchedule()
+            var properties = new CifScheduleProperties()
             {
-                TimetableUid = timetableId,
-                StpIndicator = indicator,
                 RetailServiceId = retailServiceId,
                 TrainIdentity = $"9Z{timetableId.Substring(1, 2)}",
                 Operator = new Toc(retailServiceId.Substring(0, 2)),
@@ -110,6 +108,13 @@ namespace Timetable.Test.Data
                 ReservationIndicator = ReservationIndicator.Supported,
                 SeatClass = AccomodationClass.Both,
                 SleeperClass = AccomodationClass.None,
+            };
+
+            var schedule = new CifSchedule()
+            {
+                TimetableUid = timetableId,
+                StpIndicator = indicator,
+                Properties = properties,
                 Calendar = calendar ?? EverydayAugust2019,
             };
 

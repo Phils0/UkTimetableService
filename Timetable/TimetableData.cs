@@ -68,7 +68,7 @@ namespace Timetable
                 _timetableUidMap.Add(service.TimetableUid, service);
             }
             
-            if(!string.IsNullOrEmpty(schedule.RetailServiceId))
+            if(!string.IsNullOrEmpty(schedule.Properties.RetailServiceId))
                 AddToRetailServiceMap(service);
             
             schedule.AddToService(service);

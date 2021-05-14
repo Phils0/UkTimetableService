@@ -19,12 +19,16 @@ namespace Timetable.Web.Mapping.Cif
         public CifSchedule Convert(CifParser.Schedule source, CifSchedule destination, ResolutionContext context)
         {
             var timetable = context.Items["Timetable"] as TimetableData;
-
-            var schedule = new CifSchedule();           
-            schedule = context.Mapper
-                    .Map<CifParser.Records.ScheduleDetails, Timetable.CifSchedule>(source.GetScheduleDetails(), schedule);
             
+            var cifSchedule = source.GetScheduleDetails();
+            var properties = new CifScheduleProperties();
+            properties = context.Mapper
+                .Map<CifParser.Records.ScheduleDetails, Timetable.CifScheduleProperties>(cifSchedule, properties);
             var skipTwo = SetExtraDetails();
+            
+            var schedule = context.Mapper
+                .Map<CifParser.Records.ScheduleDetails, Timetable.CifSchedule>(cifSchedule);
+            schedule.Properties = properties;
 
             // Only add to timetable after set both TimetableUid and RetailServiceId
             timetable.AddSchedule(schedule);
@@ -38,13 +42,13 @@ namespace Timetable.Web.Mapping.Cif
                 var extra = source.GetScheduleExtraDetails();
                 if (extra == null)
                 {
-                    schedule.Operator = Toc.Unknown;
-                    schedule.RetailServiceId = "";
+                    properties.Operator = Toc.Unknown;
+                    properties.RetailServiceId = "";
                     return false;
                 }
                 else
                 {
-                    context.Mapper.Map(extra, schedule);
+                    context.Mapper.Map(extra, properties);
                     return true;
                 }
             }

@@ -20,12 +20,12 @@ namespace Timetable
 
         public bool HasRetailServiceId(string retailServiceId)
         {
-            return Details.HasRetailServiceId(retailServiceId);
+            return Details.Properties.HasRetailServiceId(retailServiceId);
         }
         
         public string TimetableUid => Details.TimetableUid;
 
-        public bool OperatedBy(string toc) => Details.IsOperatedBy(toc);
+        public bool OperatedBy(string toc) => Details.Properties.IsOperatedBy(toc);
 
         public bool TryFindStop(StopSpecification find, out ResolvedServiceStop stop)
         {

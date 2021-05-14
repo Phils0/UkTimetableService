@@ -174,7 +174,7 @@ namespace Timetable.Test
 
             var associations = main.Service.AsDynamic()._associations.RealObject as AssociationDictionary;
 
-            var resolved = associations.Resolve(main.TimetableUid, MondayAugust12, main.RetailServiceId);
+            var resolved = associations.Resolve(main.TimetableUid, MondayAugust12, main.Properties.RetailServiceId);
             Assert.Empty(resolved);
         }
         
@@ -192,7 +192,7 @@ namespace Timetable.Test
             
             var associations = main.Service.AsDynamic()._associations.RealObject as AssociationDictionary;
 
-            var resolved = associations.Resolve(main.TimetableUid, MondayAugust12, main.RetailServiceId);
+            var resolved = associations.Resolve(main.TimetableUid, MondayAugust12, main.Properties.RetailServiceId);
             Assert.Empty(resolved);
         }
         

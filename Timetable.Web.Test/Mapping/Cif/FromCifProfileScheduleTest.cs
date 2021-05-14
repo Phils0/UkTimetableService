@@ -65,35 +65,35 @@ namespace Timetable.Web.Test.Mapping.Cif
         public void MapStatus()
         {
             var output = MapSchedule();
-            Assert.Equal(ServiceStatus.PermanentPassenger, output.Status);
+            Assert.Equal(ServiceStatus.PermanentPassenger, output.Properties.Status);
         }
 
         [Fact]
         public void MapCategory()
         {
             var output = MapSchedule();
-            Assert.Equal(ServiceCategory.ExpressPassenger, output.Category);
+            Assert.Equal(ServiceCategory.ExpressPassenger, output.Properties.Category);
         }
 
         [Fact]
         public void MapSeatClass()
         {
             var output = MapSchedule();
-            Assert.Equal(AccomodationClass.Both, output.SeatClass);
+            Assert.Equal(AccomodationClass.Both, output.Properties.SeatClass);
         }
 
         [Fact]
         public void MapSleeperClass()
         {
             var output = MapSchedule();
-            Assert.Equal(AccomodationClass.None, output.SleeperClass);
+            Assert.Equal(AccomodationClass.None, output.Properties.SleeperClass);
         }
 
         [Fact]
         public void MapReservationIndicator()
         {
             var output = MapSchedule();
-            Assert.Equal(ReservationIndicator.Recommended, output.ReservationIndicator);
+            Assert.Equal(ReservationIndicator.Recommended, output.Properties.ReservationIndicator);
         }
 
         [Fact]
@@ -123,21 +123,21 @@ namespace Timetable.Web.Test.Mapping.Cif
         public void MapRetailServiceId()
         {
             var output = MapSchedule();
-            Assert.Equal("SW123400", output.RetailServiceId);
+            Assert.Equal("SW123400", output.Properties.RetailServiceId);
         }
 
         [Fact]
         public void MapTrainIdentity()
         {
             var output = MapSchedule();
-            Assert.Equal("9X12", output.TrainIdentity);
+            Assert.Equal("9X12", output.Properties.TrainIdentity);
         }
         
         [Fact]
         public void MapToc()
         {
             var output = MapSchedule();
-            var toc = output.Operator;
+            var toc = output.Properties.Operator;
             Assert.Equal("SW", toc.Code);
             Assert.Null(toc.Name);
         }
@@ -162,7 +162,7 @@ namespace Timetable.Web.Test.Mapping.Cif
                 });
 
             Assert.NotSame(output1, output2);
-            Assert.Same(output1.Operator, output2.Operator);
+            Assert.Same(output1.Properties.Operator, output2.Properties.Operator);
         }
 
         [Fact]
@@ -178,8 +178,8 @@ namespace Timetable.Web.Test.Mapping.Cif
 
             var output = MapSchedule(schedule);
 
-            Assert.Equal(Toc.Unknown, output.Operator);
-            Assert.Equal("", output.RetailServiceId);
+            Assert.Equal(Toc.Unknown, output.Properties.Operator);
+            Assert.Equal("", output.Properties.RetailServiceId);
         }
         
         [Fact]
@@ -196,7 +196,7 @@ namespace Timetable.Web.Test.Mapping.Cif
 
             var output = MapSchedule(schedule);
 
-            Assert.Equal("", output.RetailServiceId);
+            Assert.Equal("", output.Properties.RetailServiceId);
         }
         
         [Fact]

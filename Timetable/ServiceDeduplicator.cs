@@ -9,7 +9,7 @@ namespace Timetable
         public IEnumerable<ResolvedService> Filter(IEnumerable<ResolvedService> services)
         {
             var dedupedServices = services
-                .GroupBy(s => $"{s.Details.RetailServiceId}|{s.Details.TrainIdentity}")
+                .GroupBy(s => $"{s.Details.Properties.RetailServiceId}|{s.Details.Properties.TrainIdentity}")
                 .SelectMany(g => Dedup<ResolvedService>(g, (s) => s.IsCancelled))
                 .ToArray();
             return dedupedServices;
@@ -27,7 +27,7 @@ namespace Timetable
         public IEnumerable<ResolvedServiceStop> Filter(IEnumerable<ResolvedServiceStop> services)
         {
             var dedupedServices = services
-                .GroupBy(s => $"{s.Service.Details.RetailServiceId}|{s.Service.Details.TrainIdentity}")
+                .GroupBy(s => $"{s.Service.Details.Properties.RetailServiceId}|{s.Service.Details.Properties.TrainIdentity}")
                 .SelectMany(g => Dedup<ResolvedServiceStop>(g, (s) => s.Service.IsCancelled))
                 .ToArray();
             return dedupedServices;

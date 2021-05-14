@@ -33,12 +33,27 @@ namespace Timetable.Web.Mapping
                 .ConvertUsing((s, d, c) => ConvertToStop(s, c));
             CreateMap<Timetable.ResolvedStop, Model.ScheduledStop>()
                 .ConvertUsing((s, d, c) => ConvertToStop(s, c));
-            CreateMap<Timetable.CifSchedule, Model.Service>()
+            CreateMap<Timetable.IScheduleProperties, Model.Service>()
+                .ForMember(d => d.TimetableUid, o => o.Ignore())
+                .ForMember(d => d.Date, o => o.Ignore())
+                .ForMember(d => d.IsCancelled, o => o.Ignore())
+                .ForMember(d => d.Associations, o => o.Ignore())
+                .ForMember(d => d.Stops, o => o.Ignore());
+            CreateMap<Timetable.ISchedule, Model.Service>()
+                .IncludeMembers(s => s.Properties)
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
                 .ForMember(d => d.Associations, o => o.Ignore())
                 .ForMember(d => d.Stops, o => o.MapFrom((s, d, dm, c) => MapStops(s.Locations, c)));
-            CreateMap<Timetable.CifSchedule, Model.ServiceSummary>()
+            CreateMap<Timetable.IScheduleProperties, Model.ServiceSummary>()
+                .ForMember(d => d.TimetableUid, o => o.Ignore())
+                .ForMember(d => d.Date, o => o.Ignore())
+                .ForMember(d => d.IsCancelled, o => o.Ignore())
+                .ForMember(d => d.Associations, o => o.Ignore())
+                .ForMember(d => d.Origin, o => o.Ignore())
+                .ForMember(d => d.Destination, o => o.Ignore());
+            CreateMap<Timetable.ISchedule, Model.ServiceSummary>()
+                .IncludeMembers(s => s.Properties)
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
                 .ForMember(d => d.Origin, o => o.MapFrom(s => s.Locations.First()))
