@@ -52,7 +52,7 @@ namespace Timetable
         /// Catering
         /// </summary>
         /// <remarks>Can have multiple values.  For values: https://wiki.openraildata.com/index.php?title=CIF_Schedule_Records </remarks>
-        // public Catering Catering { get; set; } = Catering.None;
+        public Catering Catering { get; set; } = Catering.None;
         
         /// <summary>
         /// Train Category

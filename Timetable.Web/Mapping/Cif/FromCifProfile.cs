@@ -19,6 +19,7 @@ namespace Timetable.Web.Mapping.Cif
                 ForMember(d => d.IsActive, o => o.Ignore());
                        
             // Schedule records
+            var cateringConverter = new CateringConverter(Log.Logger);
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.CifSchedule>()
                 .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
                 .ForMember(d => d.Service, o => o.Ignore())
@@ -28,6 +29,7 @@ namespace Timetable.Web.Mapping.Cif
                 .ForMember(d => d.Departures, o => o.Ignore());
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.CifScheduleProperties>()
                 .DisableCtorValidation()
+                .ForMember(d => d.Catering, o => o.ConvertUsing(cateringConverter))
                 .ForMember(d => d.RetailServiceId, o => o.Ignore())
                 .ForMember(d => d.Operator, o => o.Ignore());
             CreateMap<CifParser.Records.ScheduleExtraData, Timetable.CifScheduleProperties>()

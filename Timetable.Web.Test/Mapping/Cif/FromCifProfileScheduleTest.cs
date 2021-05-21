@@ -90,6 +90,23 @@ namespace Timetable.Web.Test.Mapping.Cif
         }
 
         [Fact]
+        public void MapCatering()
+        {
+            var schedule = Test.Cif.TestSchedules.CreateScheduleDetails(Test.Cif.TestSchedules.X12345);
+            schedule.Catering = "MT";
+            var input = Test.Cif.TestSchedules.CreateSchedule(schedule);
+            var output = MapSchedule(input);
+            Assert.Equal(Catering.FirstClass | Catering.Trolley, output.Properties.Catering);
+        }
+        
+        [Fact]
+        public void MapNoCatering()
+        {            
+            var output = MapSchedule();
+            Assert.Equal(Catering.None, output.Properties.Catering);
+        }
+        
+        [Fact]
         public void MapReservationIndicator()
         {
             var output = MapSchedule();

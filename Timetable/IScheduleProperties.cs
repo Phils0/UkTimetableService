@@ -32,12 +32,12 @@ namespace Timetable
     public enum Catering
     {
         None,
-        Buffet,         // C Buffet Service
-        RestaurantCar,  // F Restaurant Car available for First Class passengers
-        HotFood,        // H Service of hot food available
-        FirstClass,     // M Meal included for First Class passengers
-        Restaurant,     // R Restaurant
-        Trolley         // T Trolley Service
+        Buffet,             // C Buffet Service
+        FirstRestaurant,    // F Restaurant Car available for First Class passengers
+        HotFood,            // H Service of hot food available
+        FirstClass,         // M Meal included for First Class passengers
+        Restaurant,         // R Restaurant
+        Trolley             // T Trolley Service
     }
     
     /// <summary>
@@ -85,7 +85,7 @@ namespace Timetable
         /// Catering
         /// </summary>
         /// <remarks>Can have multiple values.  For values: https://wiki.openraildata.com/index.php?title=CIF_Schedule_Records </remarks>
-        // Catering Catering { get; }
+        Catering Catering { get; }
         /// <summary>
         /// Train Category
         /// </summary>

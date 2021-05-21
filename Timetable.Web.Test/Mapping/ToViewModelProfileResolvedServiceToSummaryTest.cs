@@ -85,6 +85,22 @@ namespace Timetable.Web.Test.Mapping
         }
         
         [Fact]
+        public void MapCatering()
+        {
+            var schedule = TestSchedules.CreateScheduleWithService();
+            schedule.Properties.Catering = Catering.Buffet | Catering.Trolley;
+            var output = MapResolvedService(schedule);
+            Assert.Equal("Buffet, Trolley", output.Catering);         
+        }
+        
+        [Fact]
+        public void MapNoCatering()
+        {
+            var output = MapResolvedService();
+            Assert.Equal("None", output.Catering);         
+        }
+        
+        [Fact]
         public void MapReservationIndicator()
         {
             var output = MapResolvedService();

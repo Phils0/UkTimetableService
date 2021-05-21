@@ -53,6 +53,11 @@ namespace Timetable.Web.Model
         ///  Reservation indicator
         /// </summary>
         public string ReservationIndicator { get; set; }
+        
+        /// <summary>
+        ///  Catering
+        /// </summary>
+        public string Catering { get; set; }
 
         /// <summary>
         /// Status - values incorporates transport mode and whether its permanent or STP
