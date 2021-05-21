@@ -52,10 +52,10 @@ namespace Timetable
         {
             void AddToRetailServiceMap(IService trainService)
             {
-                if (!_retailServiceIdMap.TryGetValue(schedule.NrsRetailServiceId, out var services))
+                if (!_retailServiceIdMap.TryGetValue(schedule.ShortRetailServiceId, out var services))
                 {
                     services = new List<IService>();
-                    _retailServiceIdMap.Add(schedule.NrsRetailServiceId, services);
+                    _retailServiceIdMap.Add(schedule.ShortRetailServiceId, services);
                 }
 
                 if (!services.Contains(trainService))

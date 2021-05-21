@@ -37,7 +37,7 @@ namespace Timetable
         /// Indicates the retail service in NRS
         /// Use to not have to worry about splits and joins
         /// </remarks>
-        public string NrsRetailServiceId => Properties.NrsRetailServiceId;
+        public string ShortRetailServiceId => Properties.ShortRetailServiceId;
         
         /// <summary>
         /// STP (Short Term Plan) Indicator

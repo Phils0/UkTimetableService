@@ -69,7 +69,7 @@ namespace Timetable
             ResolvedService CreateResolvedService(CifSchedule schedule, bool cancelled)
             {
                 var resolvedAssociations = HasAssociations() && resolveAssociations
-                    ? _associations.Resolve(schedule.TimetableUid, date, schedule.NrsRetailServiceId)
+                    ? _associations.Resolve(schedule.TimetableUid, date, schedule.ShortRetailServiceId)
                     : None;
                 
                 return resolvedAssociations.Any() ?

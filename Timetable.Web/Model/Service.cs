@@ -25,8 +25,10 @@ namespace Timetable.Web.Model
         public string RetailServiceId { get; set; }
 
         /// <summary>
-        /// Retail Service ID - short version to use when calling NRS to avoid having to worry about splits and joins
+        /// Retail Service ID - short version to use when calling NRS to avoid having to worry about splits and joins.
+        /// This version can be used when calling the RARS Broker that was the interim replacement for NRS
         /// </summary>
+        [Obsolete("New RARS API use RetailServiceId (with all 6 digits)")]
         public string NrsRetailServiceId { get; set; }
 
         /// <summary>

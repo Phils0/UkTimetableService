@@ -36,13 +36,13 @@ namespace Timetable
         /// </summary>
         IScheduleProperties Properties { get; }
         /// <summary>
-        /// 2 char\4 digit Retail Service ID - used by NRS
+        /// 2 char\4 digit Retail Service ID
         /// </summary>
         /// <remarks>
-        /// Indicates the retail service in NRS
+        /// Indicates the retail service
         /// Use to not have to worry about splits and joins
         /// </remarks>
-        string NrsRetailServiceId { get; }
+        string ShortRetailServiceId { get; }
         /// <summary>
         /// Public arrivals
         /// </summary>

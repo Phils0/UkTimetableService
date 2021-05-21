@@ -60,7 +60,7 @@ namespace Timetable
         /// Indicates the retail service in NRS
         /// Use to not have to worry about splits and joins
         /// </remarks>
-        string NrsRetailServiceId { get; }
+        string ShortRetailServiceId { get; }
         /// <summary>
         /// Train Identity - sometimes called HeadCode
         /// </summary>

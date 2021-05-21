@@ -34,6 +34,7 @@ namespace Timetable.Web.Mapping
             CreateMap<Timetable.ResolvedStop, Model.ScheduledStop>()
                 .ConvertUsing((s, d, c) => ConvertToStop(s, c));
             CreateMap<Timetable.IScheduleProperties, Model.Service>()
+                .ForMember(d => d.NrsRetailServiceId, o => o.MapFrom((s, d) => s.ShortRetailServiceId))
                 .ForMember(d => d.TimetableUid, o => o.Ignore())
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
@@ -47,6 +48,7 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.Associations, o => o.Ignore())
                 .ForMember(d => d.Stops, o => o.MapFrom((s, d, dm, c) => MapStops(s.Locations, c)));
             CreateMap<Timetable.IScheduleProperties, Model.ServiceSummary>()
+                .ForMember(d => d.NrsRetailServiceId, o => o.MapFrom((s, d) => s.ShortRetailServiceId))
                 .ForMember(d => d.TimetableUid, o => o.Ignore())
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())

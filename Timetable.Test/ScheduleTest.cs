@@ -66,7 +66,7 @@ namespace Timetable.Test
         public void ShortRetailServiceId()
         {
             var schedule = TestSchedules.CreateSchedule(retailServiceId: "VT123400");
-            Assert.Equal("VT1234", schedule.NrsRetailServiceId);
+            Assert.Equal("VT1234", schedule.ShortRetailServiceId);
         }
         
         [Fact]

@@ -39,7 +39,7 @@ namespace Timetable.Test
         {
             var properties = TestSchedules.CreateSchedule().Properties;
             properties.RetailServiceId = retailServiceId;
-            Assert.Equal(expected, properties.NrsRetailServiceId);
+            Assert.Equal(expected, properties.ShortRetailServiceId);
         }
         
         [Theory]
