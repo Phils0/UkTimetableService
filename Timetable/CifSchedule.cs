@@ -5,29 +5,6 @@ using System.Linq;
 namespace Timetable
 {
     /// <summary>
-    /// Accomodation classes supported
-    /// </summary>
-    public enum AccomodationClass
-    {
-        None, // Not available (Sleepers only)
-        Both, // B Both First and Standard
-        Standard, // S Standard only
-        First // F First only (Sleepers only)
-    }
-
-    /// <summary>
-    /// Possible reservation settings, making the ARSE mnemonic
-    /// </summary>
-    public enum ReservationIndicator
-    {
-        None, // Not supported
-        Mandatory, // A Always - Manadatory
-        Recommended, // R Recommended
-        Supported, // S Supported
-        EssentialBikes // E Essential for bicycles - never seen this value set
-    }
-
-    /// <summary>
     /// Short Term Plan (STP) 
     /// </summary>
     /// <remarks>Order is by priority</remarks>
@@ -73,6 +50,12 @@ namespace Timetable
         /// </remarks>
         public StpIndicator StpIndicator { get; set; }
 
+        /// <summary>
+        /// Status - values incorporates transport mode and whether its permanent or STP
+        /// </summary>
+        /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Status </remarks>
+        public string Status { get; set; }
+        
         public bool IsCancelled() => StpIndicator.Cancelled == StpIndicator;
         
         public ICalendar Calendar { get; set; }

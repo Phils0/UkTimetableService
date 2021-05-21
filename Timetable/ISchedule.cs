@@ -27,6 +27,11 @@ namespace Timetable
         /// </summary>
         IReadOnlyList<ScheduleLocation> Locations { get; }
         /// <summary>
+        /// Status - values incorporates transport mode and whether its permanent or STP
+        /// </summary>
+        /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Status </remarks>
+        string Status { get; }
+        /// <summary>
         /// Service Characteristics
         /// </summary>
         IScheduleProperties Properties { get; }

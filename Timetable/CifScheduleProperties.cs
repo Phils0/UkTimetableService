@@ -49,11 +49,11 @@ namespace Timetable
         public ReservationIndicator ReservationIndicator { get; set; }
 
         /// <summary>
-        /// Status - values incorporates transport mode and whether its permanent or STP
+        /// Catering
         /// </summary>
-        /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Status </remarks>
-        public string Status { get; set; }
-
+        /// <remarks>Can have multiple values.  For values: https://wiki.openraildata.com/index.php?title=CIF_Schedule_Records </remarks>
+        // public Catering Catering { get; set; } = Catering.None;
+        
         /// <summary>
         /// Train Category
         /// </summary>

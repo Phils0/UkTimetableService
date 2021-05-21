@@ -1,5 +1,45 @@
-﻿namespace Timetable
+﻿using System;
+
+namespace Timetable
 {
+    /// <summary>
+    /// Accomodation classes supported
+    /// </summary>
+    public enum AccomodationClass
+    {
+        None, // Not available (Sleepers only)
+        Both, // B Both First and Standard
+        Standard, // S Standard only
+        First // F First only (Sleepers only)
+    }
+
+    /// <summary>
+    /// Possible reservation settings, making the ARSE mnemonic
+    /// </summary>
+    public enum ReservationIndicator
+    {
+        None, // Not supported
+        Mandatory, // A Always - Manadatory
+        Recommended, // R Recommended
+        Supported, // S Supported
+        EssentialBikes // E Essential for bicycles - never seen this value set
+    }
+
+    /// <summary>
+    /// Possible catering values, can have 2 
+    /// </summary>
+    [Flags]
+    public enum Catering
+    {
+        None,
+        Buffet,         // C Buffet Service
+        RestaurantCar,  // F Restaurant Car available for First Class passengers
+        HotFood,        // H Service of hot food available
+        FirstClass,     // M Meal included for First Class passengers
+        Restaurant,     // R Restaurant
+        Trolley         // T Trolley Service
+    }
+    
     /// <summary>
     /// Service Characteristics
     /// </summary>
@@ -42,10 +82,10 @@
         /// </summary>
         ReservationIndicator ReservationIndicator { get; }
         /// <summary>
-        /// Status - values incorporates transport mode and whether its permanent or STP
+        /// Catering
         /// </summary>
-        /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Status </remarks>
-        string Status { get; }
+        /// <remarks>Can have multiple values.  For values: https://wiki.openraildata.com/index.php?title=CIF_Schedule_Records </remarks>
+        // Catering Catering { get; }
         /// <summary>
         /// Train Category
         /// </summary>

@@ -65,7 +65,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         public void MapStatus()
         {
             var output = MapSchedule();
-            Assert.Equal(ServiceStatus.PermanentPassenger, output.Properties.Status);
+            Assert.Equal(ServiceStatus.PermanentPassenger, output.Status);
         }
 
         [Fact]

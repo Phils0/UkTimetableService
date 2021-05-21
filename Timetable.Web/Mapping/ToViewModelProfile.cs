@@ -37,6 +37,7 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.TimetableUid, o => o.Ignore())
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
+                .ForMember(d => d.Status, o => o.Ignore())
                 .ForMember(d => d.Associations, o => o.Ignore())
                 .ForMember(d => d.Stops, o => o.Ignore());
             CreateMap<Timetable.ISchedule, Model.Service>()
@@ -49,6 +50,7 @@ namespace Timetable.Web.Mapping
                 .ForMember(d => d.TimetableUid, o => o.Ignore())
                 .ForMember(d => d.Date, o => o.Ignore())
                 .ForMember(d => d.IsCancelled, o => o.Ignore())
+                .ForMember(d => d.Status, o => o.Ignore())
                 .ForMember(d => d.Associations, o => o.Ignore())
                 .ForMember(d => d.Origin, o => o.Ignore())
                 .ForMember(d => d.Destination, o => o.Ignore());
