@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AutoMapper;
 
 namespace Timetable.Web.Mapping.Cif
@@ -10,12 +11,18 @@ namespace Timetable.Web.Mapping.Cif
             try
             {
                 var lookup = context.Items["Tocs"] as TocLookup;
-                return lookup.FindOrAdd(source);
+                return Convert(source, lookup);
             }
-            catch (InvalidOperationException ex)
+            catch (KeyNotFoundException ex)
             {
                 throw new ArgumentException("Add TocLookup to options using key \"Tocs\" when call Map", ex);
             }
+
+        }
+        
+        public Toc Convert(string source, TocLookup lookup)
+        {
+            return lookup.FindOrAdd(source);
         }
     }
 }

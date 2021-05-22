@@ -24,19 +24,14 @@ namespace Timetable.Web.Mapping.Cif
                 .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
                 .ForMember(d => d.Service, o => o.Ignore())
                 .ForMember(d => d.Properties, o => o.Ignore())
+                .ForMember(d => d.Operator, o => o.Ignore())
                 .ForMember(d => d.Locations, o => o.Ignore())
                 .ForMember(d => d.Arrivals, o => o.Ignore())
                 .ForMember(d => d.Departures, o => o.Ignore());
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.CifScheduleProperties>()
                 .DisableCtorValidation()
                 .ForMember(d => d.Catering, o => o.ConvertUsing(cateringConverter))
-                .ForMember(d => d.RetailServiceId, o => o.Ignore())
-                .ForMember(d => d.Operator, o => o.Ignore());
-            CreateMap<CifParser.Records.ScheduleExtraData, Timetable.CifScheduleProperties>()
-                .DisableCtorValidation()
-                .ForMember(d => d.RetailServiceId, o => o.MapFrom(s => s.RetailServiceId))
-                .ForMember(d => d.Operator, o => o.ConvertUsing(new TocConverter(), s => s.Toc))
-                .ForAllOtherMembers(o => o.Ignore());
+                .ForMember(d => d.RetailServiceId, o => o.Ignore());
 
             var locationConverter = new LocationsConverter();
             CreateMap<CifParser.Records.Association, Association>()
@@ -89,7 +84,7 @@ namespace Timetable.Web.Mapping.Cif
                 .ForMember(d => d.Schedule, o => o.Ignore())
                 .ForMember(d => d.Id, o => o.Ignore());
 
-            var scheduleConverter = new ScheduleConverter(Log.Logger);
+            var scheduleConverter = new ScheduleConverter(new TocConverter(), Log.Logger);
             CreateMap<CifParser.Schedule, Timetable.CifSchedule>()
                 .ConvertUsing(scheduleConverter);            
         }

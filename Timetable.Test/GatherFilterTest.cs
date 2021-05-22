@@ -158,8 +158,8 @@ namespace Timetable.Test
         
         private void SetToc(ResolvedServiceStop stop, string toc)
         {
-            var properties = ((CifSchedule) stop.Service.Details).Properties;
-            properties.Operator = (toc == null ? null : new Toc(toc));
+            var schedule = ((CifSchedule) stop.Service.Details);
+            schedule.Operator = (toc == null ? null : new Toc(toc));
         }
 
         [Fact]

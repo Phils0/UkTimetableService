@@ -6,6 +6,7 @@ using NSubstitute;
 using Serilog;
 using Timetable.Test.Data;
 using Xunit;
+using TestSchedules = Timetable.Web.Test.Cif.TestSchedules;
 
 namespace Timetable.Web.Test.Mapping.Cif
 {
@@ -154,7 +155,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         public void MapToc()
         {
             var output = MapSchedule();
-            var toc = output.Properties.Operator;
+            var toc = output.Operator;
             Assert.Equal("SW", toc.Code);
             Assert.Null(toc.Name);
         }
@@ -179,7 +180,7 @@ namespace Timetable.Web.Test.Mapping.Cif
                 });
 
             Assert.NotSame(output1, output2);
-            Assert.Same(output1.Properties.Operator, output2.Properties.Operator);
+            Assert.Same(output1.Operator, output2.Operator);
         }
 
         [Fact]
@@ -195,7 +196,7 @@ namespace Timetable.Web.Test.Mapping.Cif
 
             var output = MapSchedule(schedule);
 
-            Assert.Equal(Toc.Unknown, output.Properties.Operator);
+            Assert.Equal(Toc.Unknown, output.Operator);
             Assert.Equal("", output.Properties.RetailServiceId);
         }
         
@@ -277,6 +278,19 @@ namespace Timetable.Web.Test.Mapping.Cif
 
             var destination = output.Locations[4] as ScheduleStop;
             Assert.True(destination.Arrival.IsNextDay);
+        }
+        
+        [Fact]
+        public void ThrowsExceptionIfDoNotPassTocs()
+        {
+            var input = Test.Cif.TestSchedules.Test;
+            var mapper = _fromCifProfileConfiguration.CreateMapper();
+
+            var  ex = Assert.Throws<ArgumentException>(() => mapper.Map<CifParser.Schedule, Timetable.CifSchedule>(input, o =>
+            {
+                o.Items.Add("Locations", TestData.Locations);
+                o.Items.Add("Timetable", CreateTimetable());
+            }));
         }
     }
 }

@@ -27,6 +27,11 @@ namespace Timetable
         /// </summary>
         IReadOnlyList<ScheduleLocation> Locations { get; }
         /// <summary>
+        /// Toc
+        /// </summary>
+        Toc Operator { get; }
+        
+        /// <summary>
         /// Status - values incorporates transport mode and whether its permanent or STP
         /// </summary>
         /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Status </remarks>
@@ -84,5 +89,11 @@ namespace Timetable
         /// <param name="sequence"></param>
         /// <returns></returns>
         ScheduleLocation GetStop(Location at, int sequence);
+        /// <summary>
+        /// Is Operating Toc
+        /// </summary>
+        /// <param name="toc"></param>
+        /// <returns></returns>
+        bool IsOperatedBy(string toc);
     }
 }

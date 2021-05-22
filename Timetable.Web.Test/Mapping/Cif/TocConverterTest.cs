@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using NSubstitute;
 using Serilog;
+using Timetable.Web.Mapping.Cif;
 using Timetable.Web.Test.Cif;
 using Xunit;
 
@@ -15,17 +16,6 @@ namespace Timetable.Web.Test.Mapping.Cif
             Name = "Virgin Trains"
         };
         
-        private readonly MapperConfiguration _fromCifProfileConfiguration =
-            FromCifProfileLocationsTest.FromCifProfileConfiguration;
-
-        private CifScheduleProperties MapSchedule(CifParser.Records.ScheduleExtraData input)
-        {
-            var mapper = _fromCifProfileConfiguration.CreateMapper();
-            return mapper.Map<CifParser.Records.ScheduleExtraData, Timetable.CifScheduleProperties>(input, new CifScheduleProperties(), o =>
-            {
-                o.Items.Add("Tocs", CreateTocLookup());
-            });
-        }
         private static TocLookup CreateTocLookup()
         {
             var lookup = new TocLookup(Substitute.For<ILogger>(),
@@ -39,31 +29,17 @@ namespace Timetable.Web.Test.Mapping.Cif
         [Fact]
         public void ConvertUsesExistingToc()
         {
-            var schedule = TestSchedules.CreateScheduleExtraDetails(toc: "VT");
-            
-            var output = MapSchedule(schedule);
-
-            Assert.Same(VT, output.Operator);
+            var converter = new TocConverter();
+            Assert.Same(VT, converter.Convert("VT", CreateTocLookup()));
         }
         
         [Fact]
         public void ConvertCreatesNewToc()
         {
-            var schedule = TestSchedules.CreateScheduleExtraDetails(toc: "SW");
+            var converter = new TocConverter();
+            var toc = converter.Convert("SW", CreateTocLookup());
             
-            var output = MapSchedule(schedule);
-            
-            Assert.Equal("SW", output.Operator.Code);
-        }
-        
-        [Fact]
-        public void ThrowsExceptionIfDoNotPassTocs()
-        {
-            var schedule = TestSchedules.CreateScheduleExtraDetails();
-            var mapper = _fromCifProfileConfiguration.CreateMapper();
-
-            var  ex = Assert.Throws<AutoMapperMappingException>(() => mapper.Map<CifParser.Records.ScheduleExtraData, Timetable.CifScheduleProperties>(schedule, new CifScheduleProperties()));
-            Assert.IsType<ArgumentException>(ex.InnerException);
+            Assert.Equal("SW", toc.Code);
         }
     }
 }

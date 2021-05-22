@@ -102,7 +102,6 @@ namespace Timetable.Test.Data
             {
                 RetailServiceId = retailServiceId,
                 TrainIdentity = $"9Z{timetableId.Substring(1, 2)}",
-                Operator = new Toc(retailServiceId.Substring(0, 2)),
                 Category = ServiceCategory.ExpressPassenger,
                 ReservationIndicator = ReservationIndicator.Supported,
                 SeatClass = AccomodationClass.Both,
@@ -114,6 +113,7 @@ namespace Timetable.Test.Data
                 TimetableUid = timetableId,
                 StpIndicator = indicator,
                 Status = ServiceStatus.PermanentPassenger, 
+                Operator = new Toc(retailServiceId.Substring(0, 2)),
                 Properties = properties,
                 Calendar = calendar ?? EverydayAugust2019,
             };

@@ -41,16 +41,5 @@ namespace Timetable.Test
             properties.RetailServiceId = retailServiceId;
             Assert.Equal(expected, properties.ShortRetailServiceId);
         }
-        
-        [Theory]
-        [InlineData("VT", true)]
-        [InlineData("GW", false)]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        public void OperatedByToc(string toc, bool expected)
-        {
-            var schedule = TestSchedules.CreateSchedule();
-            Assert.Equal(expected, schedule.Properties.IsOperatedBy(toc));
-        }
     }
 }

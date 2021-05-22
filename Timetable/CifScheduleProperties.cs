@@ -30,11 +30,7 @@ namespace Timetable
         /// Train Identity - sometimes called HeadCode
         /// </summary>
         public string TrainIdentity { get; set; }
-
-        /// <summary>
-        /// Toc
-        /// </summary>
-        public Toc Operator { get; set; }
+        
         /// <summary>
         /// Seat Accomodation class
         /// </summary>
@@ -65,11 +61,6 @@ namespace Timetable
             return !string.IsNullOrEmpty(RetailServiceId) && 
                    retailServiceId != null && 
                    retailServiceId.StartsWith(ShortRetailServiceId);
-        }
-
-        public bool IsOperatedBy(string toc)
-        {
-            return Operator.Equals(toc);
         }
         
         public override string ToString()

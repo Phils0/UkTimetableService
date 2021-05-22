@@ -66,10 +66,6 @@ namespace Timetable
         /// </summary>
         string TrainIdentity { get; }
         /// <summary>
-        /// Toc
-        /// </summary>
-        Toc Operator { get; }
-        /// <summary>
         /// Seat Accomodation class
         /// </summary>
         AccomodationClass SeatClass { get; }
@@ -97,11 +93,5 @@ namespace Timetable
         /// <param name="retailServiceId"></param>
         /// <returns></returns>
         bool HasRetailServiceId(string retailServiceId);
-        /// <summary>
-        /// Is Operating Toc
-        /// </summary>
-        /// <param name="toc"></param>
-        /// <returns></returns>
-        bool IsOperatedBy(string toc);
     }
 }

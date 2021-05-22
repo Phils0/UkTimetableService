@@ -9,10 +9,12 @@ namespace Timetable.Web.Mapping.Cif
 {
     internal class ScheduleConverter : ITypeConverter<CifParser.Schedule, Timetable.CifSchedule>
     {
+        private readonly TocConverter _tocConverter;
         private readonly ILogger _logger;
 
-        internal ScheduleConverter(ILogger logger)
+        internal ScheduleConverter(TocConverter tocConverter, ILogger logger)
         {
+            _tocConverter = tocConverter;
             _logger = logger;
         }
 
@@ -24,12 +26,12 @@ namespace Timetable.Web.Mapping.Cif
             var properties = new CifScheduleProperties();
             properties = context.Mapper
                 .Map<CifParser.Records.ScheduleDetails, Timetable.CifScheduleProperties>(cifSchedule, properties);
-            var skipTwo = SetExtraDetails();
-            
             var schedule = context.Mapper
                 .Map<CifParser.Records.ScheduleDetails, Timetable.CifSchedule>(cifSchedule);
             schedule.Properties = properties;
-
+            
+            var skipTwo = SetExtraDetails();
+            
             // Only add to timetable after set both TimetableUid and RetailServiceId
             timetable.AddSchedule(schedule);
 
@@ -42,13 +44,14 @@ namespace Timetable.Web.Mapping.Cif
                 var extra = source.GetScheduleExtraDetails();
                 if (extra == null)
                 {
-                    properties.Operator = Toc.Unknown;
+                    schedule.Operator = Toc.Unknown;
                     properties.RetailServiceId = "";
                     return false;
                 }
                 else
                 {
-                    context.Mapper.Map(extra, properties);
+                    schedule.Operator = _tocConverter.Convert(extra.Toc, context);
+                    properties.RetailServiceId = extra.RetailServiceId;
                     return true;
                 }
             }

@@ -51,6 +51,16 @@ namespace Timetable
         public StpIndicator StpIndicator { get; set; }
 
         /// <summary>
+        /// Toc
+        /// </summary>
+        public Toc Operator { get; set; }
+        
+        public bool IsOperatedBy(string toc)
+        {
+            return Operator.Equals(toc);
+        }
+        
+        /// <summary>
         /// Status - values incorporates transport mode and whether its permanent or STP
         /// </summary>
         /// <remarks>For values: https://wiki.openraildata.com/index.php?title=CIF_Codes#Train_Status </remarks>

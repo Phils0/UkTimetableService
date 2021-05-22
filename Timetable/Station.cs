@@ -112,7 +112,7 @@ namespace Timetable
         {
             Timetable.AddService(stop);
             if(stop.IsAdvertised())
-                TocServices.Add(stop.Schedule.Properties.Operator);
+                TocServices.Add(stop.Schedule.Operator);
         }
 
         /// <summary>
