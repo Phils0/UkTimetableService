@@ -20,7 +20,7 @@ namespace Timetable.Web.IntegrationTest
     //     public async void MakeLocationRequest()
     //     {
     //         var client = new HttpClient();
-    //         var url = @"http://localhost:8484/api/reference/location?toc=TP";
+    //         var url = @"http://localhost:8484/api/reference/location?toc=GR";
     //         var response = await client.GetAsync(url);
     //         
     //         response.EnsureSuccessStatusCode();
@@ -36,7 +36,7 @@ namespace Timetable.Web.IntegrationTest
     //     public async void MakeTocServicesRequest()
     //     {
     //         var client = new HttpClient();
-    //         var url = @"http://localhost:8484/api/timetable/toc/GR/2021-03-24?includeStops=false";
+    //         var url = @"http://localhost:8484/api/timetable/toc/XR/2021-06-24?includeStops=false";
     //         var response = await client.GetAsync(url);
     //         
     //         response.EnsureSuccessStatusCode();
