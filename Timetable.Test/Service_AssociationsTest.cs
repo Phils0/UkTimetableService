@@ -152,6 +152,7 @@ namespace Timetable.Test
         }
         
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
+        private static readonly DateTime TuesdayAugust13 = new DateTime(2019, 8, 13);
         
         [Fact]
         public void NoAssociationsReturnsResolvedService()
@@ -169,9 +170,70 @@ namespace Timetable.Test
             var schedule = TestSchedules.CreateScheduleWithService();
             var service = schedule.Service;
             
-            var high = TestAssociations.CreateAssociationWithServices(indicator: StpIndicator.Override, mainService: service);
+            var association = TestAssociations.CreateAssociationWithServices(mainService: service);
 
             service.TryResolveOn(MondayAugust12, out var found);
+            Assert.IsType<ResolvedServiceWithAssociations>(found);
+        }
+        
+        [Fact]
+        public void AssociationsResolvedWithAssociationOnNextDay()
+        {
+            var mainCalendar = TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday);
+            var mainSchedule = TestSchedules.CreateScheduleWithService(calendar: mainCalendar);
+            var mainService = mainSchedule.Service;
+            
+            var associationCalendar = TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday);
+            var associationSchedule = TestSchedules.CreateScheduleWithService("Z98765", calendar: associationCalendar);
+            var associationService = associationSchedule.Service;
+            
+            var association = TestAssociations.CreateAssociationWithServices(
+                mainService: mainService, 
+                associatedService: associationService, 
+                dateIndicator: AssociationDateIndicator.NextDay);
+
+            mainService.TryResolveOn(MondayAugust12, out var found);
+            Assert.IsType<ResolvedServiceWithAssociations>(found);
+        }
+        
+        [Fact]
+        public void AssociationsResolvedWithAssociationOnPreviousDayWhenOnAssociatedService()
+        {
+            var mainCalendar = TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday);
+            var mainSchedule = TestSchedules.CreateScheduleWithService(calendar: mainCalendar);
+            var mainService = mainSchedule.Service;
+            
+            var associationCalendar = TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday);
+            var associationSchedule = TestSchedules.CreateScheduleWithService("Z98765", calendar: associationCalendar);
+            var associationService = associationSchedule.Service;
+            
+            var association = TestAssociations.CreateAssociationWithServices(
+                mainService: mainService, 
+                associatedService: associationService, 
+                dateIndicator: AssociationDateIndicator.NextDay);
+
+            associationService.TryResolveOn(TuesdayAugust13, out var found);
+            Assert.IsType<ResolvedServiceWithAssociations>(found);
+        }
+        
+        [Fact]
+        public void AssociationsResolvedWithAssociationOnPreviousDayWhenOnAssociatedServiceAndCalendarIsMainService()
+        {
+            var mainCalendar = TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday);
+            var mainSchedule = TestSchedules.CreateScheduleWithService(calendar: mainCalendar);
+            var mainService = mainSchedule.Service;
+            
+            var associationCalendar = TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday);
+            var associationSchedule = TestSchedules.CreateScheduleWithService("Z98765", calendar: associationCalendar);
+            var associationService = associationSchedule.Service;
+            
+            var association = TestAssociations.CreateAssociationWithServices(
+                mainService: mainService, 
+                associatedService: associationService, 
+                calendar: mainCalendar,
+                dateIndicator: AssociationDateIndicator.NextDay);
+
+            associationService.TryResolveOn(TuesdayAugust13, out var found);
             Assert.IsType<ResolvedServiceWithAssociations>(found);
         }
     }
