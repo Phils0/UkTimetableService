@@ -237,6 +237,22 @@ namespace Timetable.Test
             Assert.True(service.StartsBefore(Time.StartRailDay));   
         }
 
+        // This happens occasionally when get dodgy services in the cif file 
+        [Fact]
+        public void StartsBeforeThrowsInvalidOperationExceptionWhenNoDepartures()
+        {
+            var start = TestSchedules.Ten;
+            var stops = new ScheduleLocation[]
+            {
+                TestScheduleLocations.CreatePass(TestStations.Vauxhall, start.AddMinutes(10)),
+                TestScheduleLocations.CreatePass(TestStations.ClaphamJunction, start.AddMinutes(20)),
+                TestScheduleLocations.CreatePass(TestStations.Wimbledon, start.AddMinutes(20)),
+            };
+            var service =  TestSchedules.CreateScheduleWithService(stops: stops).Service;
+            
+            Assert.Throws<InvalidOperationException>(() => service.StartsBefore(Time.StartRailDay));   
+        }
+        
         [Fact]
         public void TryGetScheduleNoSchedules()
         {

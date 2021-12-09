@@ -141,7 +141,8 @@ namespace Timetable
             var schedule = HasSingleSchedule ? _schedule : _multipleSchedules.Values.First(s => !s.IsCancelled());
             
             var origin = schedule.Locations.First() as IDeparture;
-            return origin.Time.IsBeforeIgnoringDay(time);
+            
+            return origin?.Time.IsBeforeIgnoringDay(time) ?? throw new InvalidOperationException("Invalid service");
         }
 
         internal bool TryGetSchedule((StpIndicator indicator, ICalendar calendar) key, out CifSchedule schedule)

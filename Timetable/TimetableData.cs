@@ -135,6 +135,10 @@ namespace Timetable
                     if (service.TryResolveOn(onDate, out var schedule) && schedule.OperatedBy(toc))
                         services.Add(schedule);
                 }
+                catch (InvalidOperationException invalid)
+                {
+                    _logger.Warning(invalid, "Dodgy service {service}", service);
+                }
                 catch (Exception e)
                 {
                     _logger.Error(e, "Error processing {service}", service);
