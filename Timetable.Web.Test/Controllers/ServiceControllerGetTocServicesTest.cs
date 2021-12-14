@@ -42,8 +42,8 @@ namespace Timetable.Web.Test.Controllers
             var data = Substitute.For<ITimetableLookup>();
             data.GetSchedulesByToc(Arg.Any<string>(), Arg.Any<DateTime>(), dayBoundary)
                 .Returns((LookupStatus.Success, services));
-            data.CreateFilter()
-                .Returns(new FilterServicesDecorator(data, Timetable.Test.Data.Filters.Instance));
+            data.CreateTocFilter()
+                .Returns(new TocServicesFilter(data, Timetable.Test.Data.Filters.Instance));
             return data;
         }
         

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Timetable.Test
 {
-    public class FilterServicesDecoratorTest
+    public class TocServicesFilterTest
     {
         private static readonly DateTime MondayAugust12 = new DateTime(2019, 8, 12);
         
@@ -25,8 +25,8 @@ namespace Timetable.Test
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             schedule2.StpIndicator = StpIndicator.Cancelled;
 
-            var decorator = new FilterServicesDecorator(timetable, Filters);
-            var found = decorator.GetServicesByToc(false)("VT", MondayAugust12, Time.Midnight);
+            var filter = new TocServicesFilter(timetable, Filters);
+            var found = filter.GetServicesByToc(false)("VT", MondayAugust12, Time.Midnight);
             Assert.Empty(found.services);
         }
 
@@ -41,8 +41,8 @@ namespace Timetable.Test
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             schedule2.StpIndicator = StpIndicator.Cancelled;
            
-            var decorator = new FilterServicesDecorator(timetable, Filters);
-            var found = decorator.GetServicesByToc(true)("VT", MondayAugust12, Time.Midnight);
+            var filter = new TocServicesFilter(timetable, Filters);
+            var found = filter.GetServicesByToc(true)("VT", MondayAugust12, Time.Midnight);
             var service = found.services[0];
             Assert.True(service.IsCancelled);
             Assert.Equal(MondayAugust12, service.On);

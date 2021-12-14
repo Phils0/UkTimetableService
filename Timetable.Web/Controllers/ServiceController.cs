@@ -153,7 +153,7 @@ namespace Timetable.Web.Controllers
             try
             {
                 var boundary = Time.Parse(dayBoundary);
-                var service = _timetable.CreateFilter().GetServicesByToc(returnCancelledServices)(toc, @on, boundary);
+                var service = _timetable.CreateTocFilter().GetServicesByToc(returnCancelledServices)(toc, @on, boundary);
                 if (service.status == LookupStatus.Success)
                 {
                     if (includeStops)
