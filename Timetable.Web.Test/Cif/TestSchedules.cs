@@ -13,19 +13,15 @@ namespace Timetable.Web.Test.Cif
 
         internal static CifParser.Schedule CreateSchedule(string timetableUid)
         {
-            return new CifParser.Schedule()
-            {
-                Records = new List<IRecord>(new IRecord[]
-                {
-                    CreateScheduleDetails(timetableUid),
-                    CreateScheduleExtraDetails(),
-                    CreateOriginLocation(),
-                    CreateIntermediateLocation(),
-                    CreatePassLocation(pass: TestTime.TenTwenty),
-                    CreateIntermediateLocation(departure: TestTime.TenTwentyFive, sequence: 2),
-                    CreateTerminalLocation()
-                })
-            };
+            var schedule = new CifParser.Schedule();
+            schedule.Add(CreateScheduleDetails(timetableUid));
+            schedule.Add(CreateScheduleExtraDetails());
+            schedule.Add(CreateOriginLocation());
+            schedule.Add(CreateIntermediateLocation());
+            schedule.Add(CreatePassLocation(pass: TestTime.TenTwenty));
+            schedule.Add(CreateIntermediateLocation(departure: TestTime.TenTwentyFive, sequence: 2));
+            schedule.Add(CreateTerminalLocation());
+            return schedule;
         }
 
         internal static ScheduleDetails CreateScheduleDetails(

@@ -9,6 +9,7 @@ namespace Timetable
     /// </summary>
     public enum InterchangeStatus
     {
+        NotSet = -1,
         NotAnInterchange = 0,
         Minor = 1,
         Normal = 2,
@@ -87,8 +88,10 @@ namespace Timetable
         /// 1, 2, 3 Higher number more important interchange
         /// 9 a subsidiary TIPLOC at a station which has more than one TIPLOC.
         /// Stations which have more than one TIPLOC always have the same principal 3-Letter Code.</remarks>
-        public InterchangeStatus InterchangeStatus { get; set; }
+        public InterchangeStatus InterchangeStatus { get; set; } = InterchangeStatus.NotSet;
 
+        //HACK This is used to indicate whether we return the location or not
+        //TODO This property probably needs removing but needs some thought
         /// <summary>
         /// Whether known (in the Station Master list)
         /// </summary>
@@ -96,6 +99,8 @@ namespace Timetable
         public bool IsActive { get; set; } = true;
 
         public bool IsSubsidiary => InterchangeStatus.SubsidiaryLocation.Equals(InterchangeStatus);
+        
+        public bool HasThreeLetterCode => !string.IsNullOrEmpty(ThreeLetterCode);
 
         /// <summary>
         /// Containing station

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Timetable.Test
 {
-    public class Service_SchedulesTest
+    public class CifService_SchedulesTest
     {
         [Fact]
         public void CanAddSchedulesWithDifferentStpIndicator()

@@ -90,7 +90,7 @@ namespace Timetable
         /// Add a location to the station
         /// </summary>
         /// <param name="location"></param>
-        public void Add(Location location)
+        public void AddMasterStationLocation(Location location)
         {
             Locations.Add(location);
             location.Station = this;
@@ -100,6 +100,20 @@ namespace Timetable
                 if(!Main.Equals(Location.NotSet))
                     Log.Warning("Overriding main location {original} with {replacement}", Main, location);
                 
+                Main = location;               
+            }
+        }
+        
+        /// <summary>
+        /// Add a location to the station
+        /// </summary>
+        /// <param name="location"></param>
+        public void AddCifLocation(Location location)
+        {
+            Locations.Add(location);
+            location.Station = this;
+            if (Main.Equals(Location.NotSet))
+            {
                 Main = location;               
             }
         }

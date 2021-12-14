@@ -5,29 +5,6 @@ using System.Linq;
 namespace Timetable
 {
     /// <summary>
-    /// Accomodation classes supported
-    /// </summary>
-    public enum AccomodationClass
-    {
-        None, // Not available (Sleepers only)
-        Both, // B Both First and Standard
-        Standard, // S Standard only
-        First // F First only (Sleepers only)
-    }
-
-    /// <summary>
-    /// Possible reservation settings, making the ARSE mnemonic
-    /// </summary>
-    public enum ReservationIndicator
-    {
-        None, // Not supported
-        Mandatory, // A Always - Manadatory
-        Recommended, // R Recommended
-        Supported, // S Supported
-        EssentialBikes // E Essential for bicycles - never seen this value set
-    }
-
-    /// <summary>
     /// Short Term Plan (STP) 
     /// </summary>
     /// <remarks>Order is by priority</remarks>
@@ -105,6 +82,9 @@ namespace Timetable
         /// Sleeper Accomodation Class
         /// </summary>
         public AccomodationClass SleeperClass { get; set; }
+        
+        public bool IsSleeper() => SleeperClass != AccomodationClass.None;
+        
         /// <summary>
         ///  Reservation indicator
         /// </summary>
@@ -184,6 +164,12 @@ namespace Timetable
 
         public ScheduleStop Origin => Locations.FirstOrDefault() as ScheduleStop;
         public ScheduleStop Destination => Locations.LastOrDefault() as ScheduleStop;
+
+        public bool IsPublicSchedule()
+        {
+            // Test has false positives for Sleepers so assume they are ok.
+            return (Departures.Any() && Arrivals.Any()) || IsCancelled() || IsSleeper();
+        }
         
         public override string ToString()
         {

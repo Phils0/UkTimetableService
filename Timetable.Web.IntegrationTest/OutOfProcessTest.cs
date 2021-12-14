@@ -36,12 +36,13 @@ namespace Timetable.Web.IntegrationTest
     //     public async void MakeTocServicesRequest()
     //     {
     //         var client = new HttpClient();
-    //         var url = @"http://localhost:8484/api/timetable/toc/XR/2021-06-24?includeStops=false";
+    //         var url = @"http://localhost:8484/api/timetable/toc/VT/2022-01-12?includeStops=false";
     //         var response = await client.GetAsync(url);
     //         
     //         response.EnsureSuccessStatusCode();
     //         var responseString = await response.Content.ReadAsStringAsync();
     //         var services = JsonConvert.DeserializeObject<Model.ServiceSummary[]>(responseString);
+    //         output.WriteLine($"Services: {services.Length}");
     //         foreach (var service in services.OrderBy(s => s.NrsRetailServiceId).ThenBy(s => s.RetailServiceId).ThenBy(s => s.TimetableUid))
     //         {
     //             output.WriteLine($"{service.RetailServiceId} | {service.Origin.Location.ThreeLetterCode}-{service.Destination.Location.ThreeLetterCode} | {service.TimetableUid} | {service.IsCancelled}");

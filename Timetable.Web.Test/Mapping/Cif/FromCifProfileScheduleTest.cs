@@ -53,7 +53,7 @@ namespace Timetable.Web.Test.Mapping.Cif
         public void MapStpIndicator(CifParser.Records.StpIndicator input, StpIndicator expected)
         {
             var schedule = Test.Cif.TestSchedules.Test;
-            var details = schedule.GetScheduleDetails();
+            var details = schedule.ScheduleDetails;
             details.StpIndicator = input;
 
             var output = MapSchedule(schedule);
@@ -168,14 +168,9 @@ namespace Timetable.Web.Test.Mapping.Cif
         [Fact]
         public void MapNoExtraDataRecord()
         {
-            var schedule = new CifParser.Schedule()
-            {
-                Records = new List<IRecord>(new IRecord[]
-                {
-                    Test.Cif.TestSchedules.CreateScheduleDetails()
-                })
-            };
-
+            var schedule = new CifParser.Schedule();
+            schedule.Add(Test.Cif.TestSchedules.CreateScheduleDetails());
+            
             var output = MapSchedule(schedule);
 
             Assert.Equal(Toc.Unknown, output.Operator);
@@ -185,14 +180,9 @@ namespace Timetable.Web.Test.Mapping.Cif
         [Fact]
         public void MapNoRetailServiceIdSet()
         {
-            var schedule = new CifParser.Schedule()
-            {
-                Records = new List<IRecord>(new IRecord[]
-                {
-                    Test.Cif.TestSchedules.CreateScheduleDetails(),
-                    Test.Cif.TestSchedules.CreateScheduleExtraDetails(retailServiceId: "")
-                })
-            };
+            var schedule = new CifParser.Schedule();
+            schedule.Add(Test.Cif.TestSchedules.CreateScheduleDetails());
+            schedule.Add(Test.Cif.TestSchedules.CreateScheduleExtraDetails(retailServiceId: ""));
 
             var output = MapSchedule(schedule);
 
@@ -209,19 +199,14 @@ namespace Timetable.Web.Test.Mapping.Cif
         [Fact]
         public void DoNotMapUnknownLocations()
         {
-            var schedule = new CifParser.Schedule()
-            {
-                Records = new List<IRecord>(new IRecord[]
-                {
-                    Test.Cif.TestSchedules.CreateScheduleDetails(),
-                    Test.Cif.TestSchedules.CreateScheduleExtraDetails(),
-                    Test.Cif.TestSchedules.CreateOriginLocation(tiploc: "UNKNOWN1"),
-                    Test.Cif.TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN"),
-                    Test.Cif.TestSchedules.CreatePassLocation(tiploc: "UNKNOWN2"),
-                    Test.Cif.TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN", sequence: 2),
-                    Test.Cif.TestSchedules.CreateTerminalLocation(tiploc: "UNKNOWN3")
-                })
-            };
+            var schedule = new CifParser.Schedule();
+            schedule.Add(Test.Cif.TestSchedules.CreateScheduleDetails());
+            schedule.Add(Test.Cif.TestSchedules.CreateScheduleExtraDetails());
+            schedule.Add(Test.Cif.TestSchedules.CreateOriginLocation(tiploc: "UNKNOWN1"));
+            schedule.Add(Test.Cif.TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN"));
+            schedule.Add(Test.Cif.TestSchedules.CreatePassLocation(tiploc: "UNKNOWN2"));
+            schedule.Add(Test.Cif.TestSchedules.CreateIntermediateLocation(tiploc: "UNKNOWN", sequence: 2));
+            schedule.Add(Test.Cif.TestSchedules.CreateTerminalLocation(tiploc: "UNKNOWN3"));
             
             var output = MapSchedule(schedule);
             Assert.Empty(output.Locations);
@@ -230,19 +215,14 @@ namespace Timetable.Web.Test.Mapping.Cif
         [Fact]
         public void AddADayToTimesWhenGoIntoNextDay()
         {
-            var schedule = new CifParser.Schedule()
-            {
-                Records = new List<IRecord>(new IRecord[]
-                {
-                    Test.Cif.TestSchedules.CreateScheduleDetails(),
-                    Test.Cif.TestSchedules.CreateScheduleExtraDetails(),
-                    Test.Cif.TestSchedules.CreateOriginLocation(departure: new TimeSpan(23, 30, 0)),
-                    Test.Cif.TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(23, 45, 0)),
-                    Test.Cif.TestSchedules.CreatePassLocation(pass: new TimeSpan(0, 15, 0)),
-                    Test.Cif.TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(0, 30, 0), sequence: 2),
-                    Test.Cif.TestSchedules.CreateTerminalLocation(arrival: new TimeSpan(0, 45, 0))
-                })
-            };
+            var schedule = new CifParser.Schedule();
+            schedule.Add(Test.Cif.TestSchedules.CreateScheduleDetails());
+            schedule.Add(Test.Cif.TestSchedules.CreateScheduleExtraDetails());
+            schedule.Add(Test.Cif.TestSchedules.CreateOriginLocation(departure: new TimeSpan(23, 30, 0)));
+            schedule.Add(Test.Cif.TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(23, 45, 0)));
+            schedule.Add(Test.Cif.TestSchedules.CreatePassLocation(pass: new TimeSpan(0, 15, 0)));
+            schedule.Add(Test.Cif.TestSchedules.CreateIntermediateLocation(departure: new TimeSpan(0, 30, 0), sequence: 2));
+            schedule.Add(Test.Cif.TestSchedules.CreateTerminalLocation(arrival: new TimeSpan(0, 45, 0)));
             
             var output = MapSchedule(schedule);
 

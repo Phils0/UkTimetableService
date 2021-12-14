@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Timetable.Test
 {
-    public class Service_AssociationsTest
+    public class CifService_AssociationsTest
     {
         [Fact]
         public void WhenIsMainAddsAssociatedUid()

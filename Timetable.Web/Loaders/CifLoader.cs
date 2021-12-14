@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CifParser;
 using CifParser.Archives;
+using CifParser.Records;
 using Serilog;
 
 namespace Timetable.Web.Loaders
@@ -28,7 +29,7 @@ namespace Timetable.Web.Loaders
         }
 
         public string ArchiveFile => _archive.FullName;
-        
+
         public async Task<ILocationData> LoadStationMasterListAsync(CancellationToken token)
         {
             if (!_archive.IsRdgZip)
@@ -45,10 +46,9 @@ namespace Timetable.Web.Loaders
                         stationRecords);
                 _logger.Information("Loaded Master Station List");
                 return new LocationData(locations.ToArray(), _logger, _filters)
-                    {
-                        IsLoaded = true
-                    };
-                
+                {
+                    IsLoaded = true
+                };
             }, token).ConfigureAwait(false);
         }
 
@@ -71,6 +71,12 @@ namespace Timetable.Web.Loaders
             var locations = data.Locations;
             var timetable = new TimetableData(_filters, _logger);
             var associations = new List<Association>(6000);
+
+            void UpdateLocations(TiplocInsertAmend cifTiploc)
+            {
+                var location = _mapper.Map<CifParser.Records.TiplocInsertAmend, Timetable.Location>(cifTiploc);
+                locations.Update(location);
+            }
             
             Timetable.CifSchedule MapSchedule(CifParser.Schedule schedule)
             {
@@ -88,6 +94,7 @@ namespace Timetable.Web.Loaders
                     o => { o.Items.Add("Locations", locations); });
             }
 
+            var dodgySchedules = new List<ISchedule>();
             int count = 0;
 
             foreach (var record in records)
@@ -95,10 +102,12 @@ namespace Timetable.Web.Loaders
                 switch (record)
                 {
                     case CifParser.Records.TiplocInsertAmend tiploc:
-                        locations.UpdateLocationNlc(tiploc.Code, tiploc.Nalco);
+                        UpdateLocations(tiploc);
                         break;
                     case CifParser.Schedule schedule:
                         var s = MapSchedule(schedule);
+                        if (!s.IsPublicSchedule())
+                            dodgySchedules.Add(s);
                         break;
                     case CifParser.Records.Association association:
                         var a = MapAssociation(association);
@@ -118,6 +127,12 @@ namespace Timetable.Web.Loaders
                     _logger.Information("Loaded records: {count}", count);
             }
 
+            if (dodgySchedules.Any())
+            {
+                _logger.Warning("Dodgy schedules loaded: {count} {schedules}", dodgySchedules.Count, dodgySchedules);
+            }
+            
+            
             _logger.Information("Loaded records: {count}", count);
 
             var applied = timetable.AddAssociations(associations.Where(a => a.IsPassenger || a.IsCancelled()));

@@ -15,7 +15,7 @@ namespace Timetable.Test
         {
             var waterloo = TestLocations.WaterlooMain;
             var station = new Station();
-            station.Add(waterloo);
+            station.AddMasterStationLocation(waterloo);
 
             Assert.Equal(waterloo, station.Main);
         }
@@ -25,7 +25,7 @@ namespace Timetable.Test
         {
             var waterloo = TestLocations.WaterlooWindsor;
             var station = new Station();
-            station.Add(waterloo);
+            station.AddMasterStationLocation(waterloo);
 
             Assert.Equal(Location.NotSet, station.Main);
         }
@@ -36,8 +36,8 @@ namespace Timetable.Test
             var waterloo = TestLocations.WaterlooMain;
             var surbiton = TestLocations.Surbiton;
             var station = new Station();
-            station.Add(waterloo);
-            station.Add(surbiton);
+            station.AddMasterStationLocation(waterloo);
+            station.AddMasterStationLocation(surbiton);
 
             Assert.Equal(surbiton, station.Main);
         }
@@ -54,8 +54,8 @@ namespace Timetable.Test
                     var waterloo = TestLocations.WaterlooMain;
                     var surbiton = TestLocations.Surbiton;
                     var station = new Station();
-                    station.Add(waterloo);
-                    station.Add(surbiton);
+                    station.AddMasterStationLocation(waterloo);
+                    station.AddMasterStationLocation(surbiton);
 
                     var logEvent = TestCorrelator.GetLogEventsFromCurrentContext().Single();
                     var message = logEvent.RenderMessage();
@@ -70,7 +70,7 @@ namespace Timetable.Test
         {
             var waterloo = TestLocations.WaterlooMain;
             var station = new Station();
-            station.Add(waterloo);
+            station.AddMasterStationLocation(waterloo);
 
             Assert.Equal(waterloo.ThreeLetterCode, station.ThreeLetterCode);
         }
@@ -80,7 +80,7 @@ namespace Timetable.Test
         {
             var waterloo = TestLocations.WaterlooMain;
             var station = new Station();
-            station.Add(waterloo);
+            station.AddMasterStationLocation(waterloo);
 
             Assert.Null(station.Nlc);
         }
@@ -91,7 +91,7 @@ namespace Timetable.Test
             var station = new Station();
             station.Nlc = "123456";
             var waterloo = TestLocations.WaterlooMain;
-            station.Add(waterloo);
+            station.AddMasterStationLocation(waterloo);
 
             Assert.Equal("123456", station.Nlc);
         }
@@ -101,7 +101,7 @@ namespace Timetable.Test
         {
             var waterloo = TestLocations.WaterlooMain;
             var station = new Station();
-            station.Add(waterloo);
+            station.AddMasterStationLocation(waterloo);
 
             Assert.Null(station.Name);
         }
@@ -112,7 +112,7 @@ namespace Timetable.Test
             var station = new Station();
             station.Name = "MyName";
             var waterloo = TestLocations.WaterlooMain;
-            station.Add(waterloo);
+            station.AddMasterStationLocation(waterloo);
 
             Assert.Equal("MyName", station.Name);
         }
@@ -128,7 +128,7 @@ namespace Timetable.Test
         public void ToStringReturnsCode()
         {
             var station = new Station();
-            station.Add(TestLocations.WaterlooMain);
+            station.AddMasterStationLocation(TestLocations.WaterlooMain);
 
             Assert.Equal("WAT", station.ToString());
         }
@@ -162,7 +162,7 @@ namespace Timetable.Test
                 };
 
                 var s = new Station();
-                s.Add(main);
+                s.AddMasterStationLocation(main);
                 return s;
             }
         }

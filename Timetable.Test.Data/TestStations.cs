@@ -11,7 +11,7 @@ namespace Timetable.Test.Data
             get
             {
                 var s = new Station();
-                s.Add(TestLocations.Surbiton);
+                s.AddMasterStationLocation(TestLocations.Surbiton);
                 s.Name = "Surbiton";
                 s.Nlc = "557100";
                 s.Coordinates = new Coordinates()
@@ -29,8 +29,8 @@ namespace Timetable.Test.Data
             get
             {
                 var s = new Station();
-                s.Add(TestLocations.WaterlooMain);
-                s.Add(TestLocations.WaterlooWindsor);
+                s.AddMasterStationLocation(TestLocations.WaterlooMain);
+                s.AddMasterStationLocation(TestLocations.WaterlooWindsor);
                 s.StationOperator = new Toc("NR", "Network Rail");
                 return s;
             }
@@ -41,8 +41,8 @@ namespace Timetable.Test.Data
             get
             {
                 var s = new Station();
-                s.Add(TestLocations.CLPHMJN);
-                s.Add(TestLocations.CLPHMJC);
+                s.AddMasterStationLocation(TestLocations.CLPHMJN);
+                s.AddMasterStationLocation(TestLocations.CLPHMJC);
                 return s;
             }
         }
@@ -52,7 +52,7 @@ namespace Timetable.Test.Data
             get
             {
                 var s = new Station();
-                s.Add(TestLocations.Woking);
+                s.AddMasterStationLocation(TestLocations.Woking);
                 return s;
             }
         }
@@ -62,7 +62,7 @@ namespace Timetable.Test.Data
             get
             {
                 var s = new Station();
-                s.Add(TestLocations.Weybridge);
+                s.AddMasterStationLocation(TestLocations.Weybridge);
                 s.StationOperator = SWR;
                 return s;
             }
@@ -73,7 +73,7 @@ namespace Timetable.Test.Data
             get
             {
                 var s = new Station();
-                s.Add(TestLocations.Wimbledon);
+                s.AddMasterStationLocation(TestLocations.Wimbledon);
                 return s;
             }
         }
@@ -83,7 +83,7 @@ namespace Timetable.Test.Data
             get
             {
                 var s = new Station();
-                s.Add(TestLocations.Vauxhall);
+                s.AddMasterStationLocation(TestLocations.Vauxhall);
                 return s;
             }
         }
