@@ -66,14 +66,11 @@ namespace Timetable.Test
             Assert.Throws<ArgumentException>(() => schedule.AddToService(service));
         }
         
-        [Theory]
-        [InlineData("VT123400", "VT1234")]
-        [InlineData("", "")]
-        [InlineData(null, "")]
-        public void ShortRetailServiceId(string retailServiceId, string expected)
+        [Fact]
+        public void ShortRetailServiceId()
         {
-            var schedule = TestSchedules.CreateSchedule(retailServiceId: retailServiceId);
-            Assert.Equal(expected, schedule.ShortRetailServiceId);
+            var schedule = TestSchedules.CreateSchedule(retailServiceId: "VT123400");
+            Assert.Equal("VT1234", schedule.ShortRetailServiceId);
         }
 
         [Fact]
@@ -290,23 +287,6 @@ namespace Timetable.Test
         public void IsPublicService(CifSchedule schedule, bool expected)
         {
             Assert.Equal(expected, schedule.IsPublicSchedule());
-        }
-
-        [Theory]
-        [InlineData(AccomodationClass.First)]
-        [InlineData(AccomodationClass.Standard)]
-        [InlineData(AccomodationClass.Both)]
-        public void IsSleeper(AccomodationClass sleeperClass)
-        {
-            var schedule = TestSchedules.CreateSchedule(sleeperClass: sleeperClass);
-            Assert.True(schedule.IsSleeper());
-        }   
-        
-        [Fact]
-        public void IsNotSleeper()
-        {
-            var schedule = TestSchedules.CreateSchedule(sleeperClass: AccomodationClass.None);
-            Assert.False(schedule.IsSleeper());
         }
     }
 }

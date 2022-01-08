@@ -40,6 +40,11 @@ namespace Timetable
         /// </summary>
         public AccomodationClass SleeperClass { get; set; }
         /// <summary>
+        /// IsSleeper
+        /// </summary>
+        /// <returns></returns>
+        public bool IsSleeper() => SleeperClass != AccomodationClass.None;
+        /// <summary>
         ///  Reservation indicator
         /// </summary>
         public ReservationIndicator ReservationIndicator { get; set; }

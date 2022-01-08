@@ -41,5 +41,22 @@ namespace Timetable.Test
             properties.RetailServiceId = retailServiceId;
             Assert.Equal(expected, properties.ShortRetailServiceId);
         }
+        
+        [Theory]
+        [InlineData(AccomodationClass.First)]
+        [InlineData(AccomodationClass.Standard)]
+        [InlineData(AccomodationClass.Both)]
+        public void IsSleeper(AccomodationClass sleeperClass)
+        {
+            var properties = TestSchedules.CreateSchedule(sleeperClass: sleeperClass).Properties;
+            Assert.True(properties.IsSleeper());
+        }   
+        
+        [Fact]
+        public void IsNotSleeper()
+        {
+            var properties = TestSchedules.CreateSchedule(sleeperClass: AccomodationClass.None).Properties;
+            Assert.False(properties.IsSleeper());
+        }
     }
 }

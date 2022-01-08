@@ -19,19 +19,15 @@ namespace Timetable.Web.Test.Cif
         
         internal static CifParser.Schedule CreateSchedule(ScheduleDetails schedule)
         {
-            return new CifParser.Schedule()
-            {
-                Records = new List<IRecord>(new IRecord[]
-                {
-                    schedule,
-                    CreateScheduleExtraDetails(),
-                    CreateOriginLocation(),
-                    CreateIntermediateLocation(),
-                    CreatePassLocation(pass: TestTime.TenTwenty),
-                    CreateIntermediateLocation(departure: TestTime.TenTwentyFive, sequence: 2),
-                    CreateTerminalLocation()
-                })
-            };
+            var fullSchedule = new CifParser.Schedule();
+            fullSchedule.Add(schedule);
+            fullSchedule.Add(CreateScheduleExtraDetails());
+            fullSchedule.Add(CreateOriginLocation());
+            fullSchedule.Add(CreateIntermediateLocation());
+            fullSchedule.Add(CreatePassLocation(pass: TestTime.TenTwenty));
+            fullSchedule.Add(CreateIntermediateLocation(departure: TestTime.TenTwentyFive, sequence: 2));
+            fullSchedule.Add(CreateTerminalLocation());
+            return fullSchedule;
         }
 
         internal static ScheduleDetails CreateScheduleDetails(

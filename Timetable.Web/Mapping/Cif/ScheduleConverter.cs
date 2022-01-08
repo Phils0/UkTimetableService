@@ -29,11 +29,10 @@ namespace Timetable.Web.Mapping.Cif
         private CifSchedule CreateSchedule(Schedule source, ResolutionContext context)
         {
             var cifSchedule = source.ScheduleDetails;
-            var properties = new CifScheduleProperties();
-            properties = context.Mapper
-                .Map<CifParser.Records.ScheduleDetails, Timetable.CifScheduleProperties>(cifSchedule, properties);
+            var properties = context.Mapper
+                .Map<CifParser.Records.ScheduleDetails, Timetable.CifScheduleProperties>(cifSchedule, new CifScheduleProperties());
             var schedule = context.Mapper
-                .Map<CifParser.Records.ScheduleDetails, Timetable.CifSchedule>(cifSchedule);
+                .Map<CifParser.Records.ScheduleDetails, Timetable.CifSchedule>(cifSchedule, new CifSchedule());
             schedule.Properties = properties;
             SetExtraDetails();
             AddToTimetable();
@@ -43,7 +42,9 @@ namespace Timetable.Web.Mapping.Cif
             {
                 if (source.HasExtraDetails)
                 {
-                    context.Mapper.Map(source.ScheduleExtraDetails, schedule);
+                    var extraDetails = source.ScheduleExtraDetails!;
+                    schedule.Operator = _tocConverter.Convert(extraDetails.Toc, context);
+                    properties.RetailServiceId = extraDetails.RetailServiceId;
                     return;
                 }
 
