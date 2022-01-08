@@ -3,12 +3,12 @@ using System.Linq;
 
 namespace Timetable
 {
-    public class FilterServicesDecorator
+    public class TocServicesFilter
     {
         private readonly ITimetableLookup _timetable;
         private readonly ServiceFilters _filters;
 
-        public FilterServicesDecorator(ITimetableLookup timetable, ServiceFilters filters)
+        public TocServicesFilter(ITimetableLookup timetable, ServiceFilters filters)
         {
             _timetable = timetable;
             _filters = filters;

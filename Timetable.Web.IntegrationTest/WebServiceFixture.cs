@@ -4,18 +4,26 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Events;
 using Xunit.Abstractions;
 
 namespace Timetable.Web.IntegrationTest
 {
     public class WebServiceFixture : IDisposable 
     {
+        private readonly ILogger _logging;
         public static TimeSpan Timeout = new TimeSpan(0, 0, 10);
         
         public IHost Host { get; private set; }
 
         public WebServiceFixture(IMessageSink logging)
         {
+            _logging = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
+                .WriteTo.TestOutput(logging, LogEventLevel.Verbose)
+                .CreateLogger();
+            
+            _logging.Debug("Creating Host");
             var hostBuilder = CreateBuilder();
             Host = StartTestServer(hostBuilder);
 
@@ -57,12 +65,21 @@ namespace Timetable.Web.IntegrationTest
         {
             if (Host != null)
             {
-                var task = Host.StopAsync(CancellationToken.None);
+                _logging.Debug("Disposing Host");
+                var cancellation = new CancellationTokenSource();
+                var task = Host.StopAsync(cancellation.Token);
                 var shutdown = task.Wait(Timeout);
+                if (!shutdown)
+                {
+                    _logging.Debug("Disposing Host: Cancelling");
+                    cancellation.Cancel();
+                    shutdown = task.Wait(Timeout);
+                }
                 if(!shutdown)
                     throw new Exception("Failed to shutdown web host");
 
                 Host = null;
+                _logging.Debug("Disposed Host");
             }
         }
     }

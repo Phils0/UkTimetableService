@@ -18,8 +18,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="10.1.1" />
-        <PackageReference Include="CifParser" Version="0.2.6" />
+        <PackageReference Include="AutoMapper" Version="10.0.0" />
+        <PackageReference Include="CifParser" Version="1.0.0" />
         <PackageReference Include="DarwinClient" Version="0.1.22" />
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="3.1.6" />
         <PackageReference Include="NreKnowledgebaseClient" Version="0.1.9" />

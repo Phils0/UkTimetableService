@@ -20,7 +20,7 @@ namespace Timetable.Web.IntegrationTest
     //     public async void MakeLocationRequest()
     //     {
     //         var client = new HttpClient();
-    //         var url = @"http://localhost:8484/api/reference/location?toc=TP";
+    //         var url = @"http://localhost:8484/api/reference/location?toc=GR";
     //         var response = await client.GetAsync(url);
     //         
     //         response.EnsureSuccessStatusCode();
@@ -36,12 +36,13 @@ namespace Timetable.Web.IntegrationTest
     //     public async void MakeTocServicesRequest()
     //     {
     //         var client = new HttpClient();
-    //         var url = @"http://localhost:8484/api/timetable/toc/GR/2021-03-24?includeStops=false";
+    //         var url = @"http://localhost:8484/api/timetable/toc/VT/2022-01-12?includeStops=false";
     //         var response = await client.GetAsync(url);
     //         
     //         response.EnsureSuccessStatusCode();
     //         var responseString = await response.Content.ReadAsStringAsync();
     //         var services = JsonConvert.DeserializeObject<Model.ServiceSummary[]>(responseString);
+    //         output.WriteLine($"Services: {services.Length}");
     //         foreach (var service in services.OrderBy(s => s.NrsRetailServiceId).ThenBy(s => s.RetailServiceId).ThenBy(s => s.TimetableUid))
     //         {
     //             output.WriteLine($"{service.RetailServiceId} | {service.Origin.Location.ThreeLetterCode}-{service.Destination.Location.ThreeLetterCode} | {service.TimetableUid} | {service.IsCancelled}");

@@ -30,9 +30,9 @@ namespace Timetable.Test
             Assert.Equal(expected, service?.Details.TimetableUid);
         }
 
-        private static TimetableData CreateTimetable()
+        private static TimetableData CreateTimetable(ILogger logger = null)
         {
-            var logger = Substitute.For<ILogger>();
+            logger ??= Substitute.For<ILogger>();
             return new TimetableData(Filters.Instance, logger);
         }
 
@@ -269,7 +269,8 @@ namespace Timetable.Test
         [Fact]
         public void GetsTocSchedulesHandlesIndividualServiceError()
         {
-            var timetable = CreateTimetable();           
+            var logger = Substitute.For<ILogger>();
+            var timetable = CreateTimetable(logger);         
 
             var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
             var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "CORRUPT", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
@@ -283,6 +284,34 @@ namespace Timetable.Test
             Assert.Contains<ISchedule>(schedule, schedules);
             Assert.Contains<ISchedule>(schedule3, schedules);
             Assert.All(found.services, s => { Assert.Equal(MondayAugust12, s.On);});
+            
+            logger.Received().Error(Arg.Any<Exception>(), Arg.Any<string>(), Arg.Any<IService>());
+        }
+        
+        [Fact]
+        public void GetsTocSchedulesHandlesIndividualDodgyServicesAndLogsAsWarning()
+        {
+            var logger = Substitute.For<ILogger>();
+            var timetable = CreateTimetable(logger);           
+
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            var start = TestSchedules.Ten;
+            var stops = new ScheduleLocation[]
+            {
+                TestScheduleLocations.CreatePass(TestStations.Vauxhall, start.AddMinutes(10)),
+                TestScheduleLocations.CreatePass(TestStations.ClaphamJunction, start.AddMinutes(20)),
+                TestScheduleLocations.CreatePass(TestStations.Wimbledon, start.AddMinutes(20)),
+            };
+            var dodgySchedule = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "D11111", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday), stops: stops);
+            var schedule3 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "X98765", calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday));
+            
+            var found = timetable.GetSchedulesByToc("VT", MondayAugust12, Time.Midnight);
+            var schedules = found.services.Select(s => s.Details).ToArray();
+            Assert.Contains<ISchedule>(schedule, schedules);
+            Assert.Contains<ISchedule>(schedule3, schedules);
+            Assert.All(found.services, s => { Assert.Equal(MondayAugust12, s.On);});
+            
+            logger.Received().Warning(Arg.Any<InvalidOperationException>(), Arg.Any<string>(), Arg.Any<IService>());
         }
     }
 }

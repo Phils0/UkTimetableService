@@ -94,7 +94,8 @@ namespace Timetable.Test.Data
             ICalendar calendar = null, 
             ScheduleLocation[] stops = null,
             CifService service = null,
-            string retailServiceId = null)
+            string retailServiceId = null,
+            AccomodationClass sleeperClass = AccomodationClass.None)
         {
             retailServiceId = retailServiceId ?? $"VT{timetableId.Substring(1, 4)}00";
 
@@ -105,7 +106,7 @@ namespace Timetable.Test.Data
                 Category = ServiceCategory.ExpressPassenger,
                 ReservationIndicator = ReservationIndicator.Supported,
                 SeatClass = AccomodationClass.Both,
-                SleeperClass = AccomodationClass.None,
+                SleeperClass = sleeperClass,
             };
 
             var schedule = new CifSchedule()

@@ -3,6 +3,29 @@ using System.Collections.Generic;
 
 namespace Timetable
 {
+    /// <summary>
+    /// Accomodation classes supported
+    /// </summary>
+    public enum AccomodationClass
+    {
+        None, // Not available (Sleepers only)
+        Both, // B Both First and Standard
+        Standard, // S Standard only
+        First // F First only (Sleepers only)
+    }
+
+    /// <summary>
+    /// Possible reservation settings, making the ARSE mnemonic
+    /// </summary>
+    public enum ReservationIndicator
+    {
+        None, // Not supported
+        Mandatory, // A Always - Manadatory
+        Recommended, // R Recommended
+        Supported, // S Supported
+        EssentialBikes // E Essential for bicycles - never seen this value set
+    }
+    
     public interface ISchedule
     {
         /// <summary>
@@ -89,6 +112,11 @@ namespace Timetable
         /// <param name="sequence"></param>
         /// <returns></returns>
         ScheduleLocation GetStop(Location at, int sequence);
+        /// <summary>
+        /// Is public schedule
+        /// </summary>
+        /// <returns></returns>
+        bool IsPublicSchedule();
         /// <summary>
         /// Is Operating Toc
         /// </summary>

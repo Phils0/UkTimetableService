@@ -17,6 +17,16 @@ namespace Timetable.Web.Mapping.Cif
                 ForMember(d => d.Station, o => o.Ignore()).
                 ForMember(d => d.Nlc, o => o.Ignore()).
                 ForMember(d => d.IsActive, o => o.Ignore());
+            
+            CreateMap<CifParser.Records.TiplocInsertAmend, Timetable.Location>().
+                ForMember(d => d.Tiploc, o => o.MapFrom(s => s.Code)).
+                ForMember(d => d.ThreeLetterCode, o => o.MapFrom(s => s.ThreeLetterCode)).
+                ForMember(d => d.Nlc, o => o.MapFrom(s => s.Nalco)).
+                ForMember(d => d.Name, o => o.MapFrom(s => s.Description)).
+                ForMember(d => d.InterchangeStatus, o => o.Ignore()).
+                ForMember(d => d.Coordinates, o => o.Ignore()).
+                ForMember(d => d.Station, o => o.Ignore()).
+                ForMember(d => d.IsActive, o => o.MapFrom(s => false));
                        
             // Schedule records
             var cateringConverter = new CateringConverter(Log.Logger);

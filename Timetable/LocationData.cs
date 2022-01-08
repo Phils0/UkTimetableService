@@ -12,7 +12,7 @@ namespace Timetable
         LocationNotFound,
         NoServicesForLocation
     }
-    
+
     public interface ILocationData
     {
         /// <summary>
@@ -29,13 +29,12 @@ namespace Timetable
         /// Locations loaded
         /// </summary>
         bool IsLoaded { get; }
-        
+
         /// <summary>
         /// Update a location with its NLC
         /// </summary>
-        /// <param name="tiploc">Tiploc for Location to update</param>
-        /// <param name="nlc">NLC to set</param>
-        void UpdateLocationNlc(string tiploc, string nlc);
+        /// <param name="cifLocation"></param>
+        void Update(Location cifLocation);
 
         /// <summary>
         /// Try find station
@@ -53,9 +52,12 @@ namespace Timetable
         /// <returns></returns>
         bool TryGetLocation(string tiploc, out Location location);
 
-        delegate (FindStatus status, ResolvedServiceStop[] services) Find(string location, DateTime at, GatherConfiguration config);
-        delegate (FindStatus status, ResolvedServiceStop[] services) AllOnDay(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary);
-        
+        delegate (FindStatus status, ResolvedServiceStop[] services) Find(string location, DateTime at,
+            GatherConfiguration config);
+
+        delegate (FindStatus status, ResolvedServiceStop[] services) AllOnDay(string location, DateTime onDate,
+            GatherConfiguration.GatherFilter filter, Time dayBoundary);
+
         /// <summary>
         /// Scheduled services departing from location on date near to time 
         /// </summary>
@@ -64,7 +66,8 @@ namespace Timetable
         /// <param name="config">Configuration for gathering the results</param>
         /// <param name="returnCancelled">Whether to return cancelled services</param>
         /// <returns>Schedules of running services.  If a service departs at time counts as first of after.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config);
+        (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at,
+            GatherConfiguration config);
 
         /// <summary>
         /// Scheduled services departing on date
@@ -75,8 +78,9 @@ namespace Timetable
         /// <param name="dayBoundary"></param>
         /// <param name="returnCancelled">Whether to return cancelled services</param>
         /// <returns>Schedules of running services.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary);
-        
+        (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate,
+            GatherConfiguration.GatherFilter filter, Time dayBoundary);
+
         /// <summary>
         /// Scheduled services arriving at location on date near to time
         /// </summary>
@@ -85,7 +89,8 @@ namespace Timetable
         /// <param name="config">Configuration for gathering the results</param>
         /// <param name="returnCancelled">Whether to return cancelled services</param>
         /// <returns>Schedules of running services.  If a service arrives at time counts as first of before.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config);
+        (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at,
+            GatherConfiguration config);
 
         /// <summary>
         /// Scheduled services arriving on date
@@ -96,8 +101,9 @@ namespace Timetable
         /// <param name="returnCancelled">Whether to return cancelled services</param>
         /// <param name="dayBoundary"></param>
         /// <returns>Schedules of running services.</returns>
-        (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary);
-        
+        (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate,
+            GatherConfiguration.GatherFilter filter, Time dayBoundary);
+
         /// <summary>
         /// Results filter
         /// </summary>
@@ -110,7 +116,7 @@ namespace Timetable
     public class LocationData : ILocationData
     {
         private readonly ILogger _logger;
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -120,30 +126,28 @@ namespace Timetable
             _logger = logger;
             Filters = filters;
             _locations = masterLocations.ToDictionary(l => l.Tiploc, l => l);
-            
-            Locations = masterLocations.
-                GroupBy(l => l.ThreeLetterCode, l => l).
-                ToDictionary(g => g.Key, CreateStation);
+
+            _stations = masterLocations.GroupBy(l => l.ThreeLetterCode, l => l).ToDictionary(g => g.Key, CreateStation);
         }
-        
+
         public bool IsLoaded { get; set; }
-        
+
         private Station CreateStation(IGrouping<string, Location> locations)
         {
             var station = new Station();
 
             foreach (var location in locations)
             {
-                station. Add(location);
+                station.AddMasterStationLocation(location);
             }
 
             return station;
         }
-        
+
         /// <summary>
         /// Stations by Three Letter Code (CRS)
         /// </summary>
-        public IReadOnlyDictionary<string, Station> Locations { get; }
+        public IReadOnlyDictionary<string, Station> Locations => _stations;
 
         /// <summary>
         /// Locations by TIPLOC
@@ -151,23 +155,33 @@ namespace Timetable
         public IReadOnlyDictionary<string, Location> LocationsByTiploc => _locations;
 
         private Dictionary<string, Location> _locations;
+        private Dictionary<string, Station> _stations;
 
-        public void UpdateLocationNlc(string tiploc, string nlc)
+        public void Update(Location cifLocation)
         {
-            if (TryGetLocation(tiploc, out Location location))
+            if (TryGetLocation(cifLocation.Tiploc, out Location location))
             {
-                location.Nlc = nlc;
+                location.Nlc = cifLocation.Nlc;
             }
             else
             {
-                location = new Location()
-                {
-                    Tiploc = tiploc,
-                    Nlc = nlc,
-                    IsActive = false
-                };
-                _locations.Add(tiploc, location);
+                _locations.Add(cifLocation.Tiploc, cifLocation);
+                if (cifLocation.HasThreeLetterCode)
+                    AddOrUpdateStation(cifLocation);
             }
+        }
+
+        private void AddOrUpdateStation(Location location)
+        {
+            // Has CRS so should be active
+            location.IsActive = true;
+            if (!TryGetStation(location.ThreeLetterCode, out var station))
+            {
+                station = new Station();
+                _stations.Add(location.ThreeLetterCode, station);
+            }
+
+            station.AddCifLocation(location);
         }
 
         public bool TryGetStation(string threeLetterCode, out Station location)
@@ -179,24 +193,27 @@ namespace Timetable
         public bool TryGetLocation(string tiploc, out Location location)
         {
             location = Location.NotSet;
-            if(!string.IsNullOrEmpty(tiploc) && LocationsByTiploc.TryGetValue(tiploc, out location))
+            if (!string.IsNullOrEmpty(tiploc) && LocationsByTiploc.TryGetValue(tiploc, out location))
                 return location.IsActive;
-            
+
             _logger.Information("Did not find location {tiploc}", tiploc);
             return false;
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at, GatherConfiguration config)
+        public (FindStatus status, ResolvedServiceStop[] services) FindDepartures(string location, DateTime at,
+            GatherConfiguration config)
         {
             return Find(location, (station) => station.Timetable.FindDepartures(at, config));
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary)
+        public (FindStatus status, ResolvedServiceStop[] services) AllDepartures(string location, DateTime onDate,
+            GatherConfiguration.GatherFilter filter, Time dayBoundary)
         {
             return Find(location, (station) => station.Timetable.AllDepartures(onDate, filter, dayBoundary));
         }
 
-        private (FindStatus status, ResolvedServiceStop[] services) Find(string location,  Func<Station, ResolvedServiceStop[]> findFunc)
+        private (FindStatus status, ResolvedServiceStop[] services) Find(string location,
+            Func<Station, ResolvedServiceStop[]> findFunc)
         {
             var status = FindStatus.LocationNotFound;
 
@@ -213,13 +230,15 @@ namespace Timetable
 
             return (status: status, services: new ResolvedServiceStop[0]);
         }
-        
-        public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at, GatherConfiguration config)
+
+        public (FindStatus status, ResolvedServiceStop[] services) FindArrivals(string location, DateTime at,
+            GatherConfiguration config)
         {
             return Find(location, (station) => station.Timetable.FindArrivals(at, config));
         }
 
-        public (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate, GatherConfiguration.GatherFilter filter,  Time dayBoundary)
+        public (FindStatus status, ResolvedServiceStop[] services) AllArrivals(string location, DateTime onDate,
+            GatherConfiguration.GatherFilter filter, Time dayBoundary)
         {
             return Find(location, (station) => station.Timetable.AllArrivals(onDate, filter, dayBoundary));
         }

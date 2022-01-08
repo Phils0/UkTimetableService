@@ -23,7 +23,7 @@ namespace Timetable
         (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
         (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary);
         bool IsLoaded { get; }
-        FilterServicesDecorator CreateFilter();
+        TocServicesFilter CreateTocFilter();
     }
 
     public class TimetableData : ITimetableLookup
@@ -43,9 +43,9 @@ namespace Timetable
 
         public bool IsLoaded { get; set; }
         
-        public FilterServicesDecorator CreateFilter()
+        public TocServicesFilter CreateTocFilter()
         {
-            return new FilterServicesDecorator(this, Filters);
+            return new TocServicesFilter(this, Filters);
         }
 
         public void AddSchedule(ISchedule schedule)
@@ -134,6 +134,10 @@ namespace Timetable
                     var onDate = IsNextDay(service) ? nextDay : date;
                     if (service.TryResolveOn(onDate, out var schedule) && schedule.OperatedBy(toc))
                         services.Add(schedule);
+                }
+                catch (InvalidOperationException invalid)
+                {
+                    _logger.Warning(invalid, "Dodgy service {service}", service);
                 }
                 catch (Exception e)
                 {

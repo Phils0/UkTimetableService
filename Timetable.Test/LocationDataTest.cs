@@ -39,7 +39,10 @@ namespace Timetable.Test
         public void UpdateNlc()
         {
             var data = TestData.Locations;
-            data.UpdateLocationNlc("SURBITN", "123456");
+            var tiploc = TestLocations.Surbiton;
+            tiploc.Nlc = "123456";
+            
+            data.Update(tiploc);
             
             var surbiton = data.LocationsByTiploc["SURBITN"];
             Assert.Equal("123456", surbiton.Nlc);
@@ -49,13 +52,44 @@ namespace Timetable.Test
         }
         
         [Fact]
-        public void AddUnknownTiplocsAsNotActive()
+        public void AddUnknownTiplocWithCRS()
         {
             var data = TestData.Locations;
-            data.UpdateLocationNlc("NOTFOUND", "123456");
+            var tiploc = new Location()
+            {
+                Tiploc = "NOTFOUND",
+                Nlc = "123456",
+                Name = "New location",
+                ThreeLetterCode = "NEW",
+                IsActive = false
+            };
+            data.Update(tiploc);
 
             var location = data.LocationsByTiploc["NOTFOUND"];
-            Assert.False(location.IsActive);
+            Assert.Equal("123456", location.Nlc);
+            
+            var station = data.Locations["NEW"];
+            Assert.NotNull(station);
+        }
+        
+        [Fact]
+        public void AddUnknownTiplocWithNoCRS()
+        {
+            var data = TestData.Locations;
+            var tiploc = new Location()
+            {
+                Tiploc = "NOTFOUND",
+                Nlc = "123456",
+                Name = "New location",
+                IsActive = false
+            };
+            data.Update(tiploc);
+
+            var location = data.LocationsByTiploc["NOTFOUND"];
+            Assert.Equal("123456", location.Nlc);
+            Assert.Equal("New location", location.Name);
+            
+            Assert.False(data.Locations.ContainsKey("NOTFOUND"));
         }
 
         [Theory]

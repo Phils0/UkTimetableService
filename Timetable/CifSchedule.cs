@@ -124,6 +124,12 @@ namespace Timetable
 
         public ScheduleStop Origin => Locations.FirstOrDefault() as ScheduleStop;
         public ScheduleStop Destination => Locations.LastOrDefault() as ScheduleStop;
+
+        public bool IsPublicSchedule()
+        {
+            // Test has false positives for Sleepers so assume they are ok.
+            return (Departures.Any() && Arrivals.Any()) || IsCancelled() || IsSleeper();
+        }
         
         public override string ToString()
         {
