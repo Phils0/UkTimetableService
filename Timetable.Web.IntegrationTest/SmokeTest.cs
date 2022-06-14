@@ -1,4 +1,6 @@
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
@@ -29,7 +31,12 @@ namespace Timetable.Web.IntegrationTest
                 $"/api/Timetable/departures/{origin}/{TestDate}?to={destination}&fullDay=true&includeStops=false&toc={toc}";
             var response = await client.GetAsync(url);
             
-            response.IsSuccessStatusCode.Should().BeTrue("{0} should be successful: {1}", url, response.StatusCode);
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.Warning("{toc} request failed. {0} should be successful: {1} Retrying including cancelled services", toc, url, response.StatusCode);
+                (response, url) = await RetryIncludingCancelledServices(client, url);
+            }
+            
             var responseString = await response.Content.ReadAsStringAsync();
             var departures = JsonConvert.DeserializeObject<Model.FoundSummaryResponse>(responseString);
             departures.Services.Should().NotBeEmpty("{0} should return values", url);
@@ -47,13 +54,26 @@ namespace Timetable.Web.IntegrationTest
             var client = Host.GetTestClient();
             var url = $"/api/Timetable/toc/{toc}/{TestDate}?includeStops=false";
             var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.Warning("{toc} request failed. {0} should be successful: {1} Retrying including cancelled services", toc, url, response.StatusCode);
+                (response, url) = await RetryIncludingCancelledServices(client, url);
+            }
             
-            response.IsSuccessStatusCode.Should().BeTrue("{0} should be successful: {1}", url, response.StatusCode);
             var responseString = await response.Content.ReadAsStringAsync();
             var services = JsonConvert.DeserializeObject<Model.ServiceSummary[]>(responseString);
             services.Should().NotBeEmpty("{0} should return values", url);
         }
-        
+
+        private static async Task<(HttpResponseMessage, string)> RetryIncludingCancelledServices(HttpClient client, string url)
+        {
+            url = $"{url}&returnCancelledServices=true";
+            var response = await client.GetAsync(url);
+            response.IsSuccessStatusCode.Should().BeTrue("{0} should be successful: {1}", url, response.StatusCode);
+            return (response, url);
+        }
+
         [Theory]
         [InlineData("CS1002")]
         public async void MakeRetailServiceIdRequest(string rsid)

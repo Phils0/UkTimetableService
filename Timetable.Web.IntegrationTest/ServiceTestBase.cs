@@ -1,16 +1,20 @@
 using System;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace Timetable.Web.IntegrationTest
 {
     public abstract class ServiceTestBase
     {
-        protected IHost Host { get;}
+        private readonly WebServiceFixture _fixture;
+
+        protected IHost Host => _fixture.Host;
+        public ILogger Logger => _fixture.Logger;
 
         public ServiceTestBase(WebServiceFixture fixture)
         {
-            Host = fixture.Host;  
+            _fixture = fixture;  
         }
        
     }

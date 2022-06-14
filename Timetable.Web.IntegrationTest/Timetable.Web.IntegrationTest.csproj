@@ -31,7 +31,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <DataFiles Include="..\Timetable.Web\Data\*.*"/>
+        <DataFiles Include="..\Timetable.Web\Data\*.*" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="xunit.runner.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <Target Name="CopyData" AfterTargets="AfterBuild">
