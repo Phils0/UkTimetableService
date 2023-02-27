@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
+using Timetable.Web.Model;
 using Xunit;
 
 namespace Timetable.Web.IntegrationTest
@@ -49,21 +50,31 @@ namespace Timetable.Web.IntegrationTest
         [InlineData("GR")]
         [InlineData("GW")]
         [InlineData("CS")]
-        public async void MakeTocRequest(string toc)
+        [InlineData("EM")]
+        [InlineData("NT")]
+        public async void TocHasRunningService(string toc)
         {
-            var client = Host.GetTestClient();
+            var services = await MakeTocRequest(toc);
+            services.Should().NotBeEmpty("{0} should return values", toc);
+        }
+
+        private async Task<ServiceSummary[]> MakeTocRequest(string toc)
+        {
             var url = $"/api/Timetable/toc/{toc}/{TestDate}?includeStops=false";
+            Logger.Information("{toc}: Making request: {url}", toc, url);
+            var client = Host.GetTestClient();
             var response = await client.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
             {
-                Logger.Warning("{toc} request failed. {0} should be successful: {1} Retrying including cancelled services", toc, url, response.StatusCode);
-                (response, url) = await RetryIncludingCancelledServices(client, url);
+                Logger.Warning("{0} request failed. {1} should be successful: {2} Retrying including cancelled services", toc,
+                    url, response.StatusCode);
+                (response, _) = await RetryIncludingCancelledServices(client, url);
             }
-            
+
             var responseString = await response.Content.ReadAsStringAsync();
             var services = JsonConvert.DeserializeObject<Model.ServiceSummary[]>(responseString);
-            services.Should().NotBeEmpty("{0} should return values", url);
+            return services;
         }
 
         private static async Task<(HttpResponseMessage, string)> RetryIncludingCancelledServices(HttpClient client, string url)
@@ -75,9 +86,29 @@ namespace Timetable.Web.IntegrationTest
         }
 
         [Theory]
-        [InlineData("CS1002")]
-        public async void MakeRetailServiceIdRequest(string rsid)
+        [InlineData("CS")]
+        public async void MakeRetailServiceIdRequest(string toc)
         {
+            var tocServices = await MakeTocRequest(toc);
+            var rsid = tocServices[0].RetailServiceId;
+            
+            var client = Host.GetTestClient();
+            var url = $"/api/Timetable/retailService/{rsid}/{TestDate}";
+            var response = await client.GetAsync(url);
+            
+            response.IsSuccessStatusCode.Should().BeTrue("{0} should be successful: {1}", url, response.StatusCode);
+            var responseString = await response.Content.ReadAsStringAsync();
+            var services = JsonConvert.DeserializeObject<Model.Service[]>(responseString);
+            services.Should().NotBeEmpty("{0} should return values", url);
+        }
+        
+        [Theory]
+        [InlineData("CS")]
+        public async void MakeRetailServiceIdRequestWithNrsRsid(string toc)
+        {
+            var tocServices = await MakeTocRequest(toc);
+            var rsid = tocServices[0].NrsRetailServiceId;
+            
             var client = Host.GetTestClient();
             var url = $"/api/Timetable/retailService/{rsid}/{TestDate}";
             var response = await client.GetAsync(url);
