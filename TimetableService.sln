@@ -13,7 +13,6 @@ ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
 	LICENSE = LICENSE
 	README.md = README.md
-	azure-pipelines.yml = azure-pipelines.yml
 	GitVersion.yml = GitVersion.yml
 EndProjectSection
 EndProject
@@ -22,6 +21,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timetable.Web.IntegrationTest", "Timetable.Web.IntegrationTest\Timetable.Web.IntegrationTest.csproj", "{8B5822BB-5795-4A83-979C-E267B76ED6E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timetable.Web.Plugin", "Timetable.Web.Plugin\Timetable.Web.Plugin.csproj", "{73620FD3-51C4-419D-8F8C-42E290BF9C41}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6F04C7A5-C880-40E1-9FF2-926235E172C8}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{1413DD15-8EC6-4C5D-BB09-495E0D4F5C29}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build.yml = .github\workflows\build.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,5 +66,9 @@ Global
 		{73620FD3-51C4-419D-8F8C-42E290BF9C41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73620FD3-51C4-419D-8F8C-42E290BF9C41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73620FD3-51C4-419D-8F8C-42E290BF9C41}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6F04C7A5-C880-40E1-9FF2-926235E172C8} = {79794382-0F58-48AB-8DD1-59C8105FE308}
+		{1413DD15-8EC6-4C5D-BB09-495E0D4F5C29} = {6F04C7A5-C880-40E1-9FF2-926235E172C8}
 	EndGlobalSection
 EndGlobal
