@@ -6,8 +6,9 @@ using Serilog;
 
 namespace Timetable
 {
-    public interface ITocLookup : IEnumerable<Toc>, ILookup<string, Toc>
+    public interface ITocLookup : ILookup<string, Toc>
     {
+        IEnumerable<Toc> AsEnumerableToc();
     }
     
     public class TocLookup : ITocLookup
@@ -58,15 +59,10 @@ namespace Timetable
                 .GroupBy(k => k.Key, k => k.Value)
                 .GetEnumerator();
         }
-
-        public IEnumerator<Toc> GetEnumerator()
-        {
-            return _values.Values.GetEnumerator();
-        }
-
+        
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return AsEnumerableToc().GetEnumerator();
         }
 
         public bool Contains(string key)
@@ -77,5 +73,14 @@ namespace Timetable
         public int Count => _values.Count;
 
         public IEnumerable<Toc> this[string key] =>  new [] { _values[key] };
+        
+        /// <summary>
+        /// Provide tocs as a <see cref="IEnumerable{Toc}" />
+        /// </summary>
+        /// <remarks>Needed as <see cref="ILookup{TKey,TElement}" returns a clashing <see cref="IEnumerable{T}"/> definition/></remarks>
+        public IEnumerable<Toc> AsEnumerableToc()
+        {
+            return _values.Values;
+        }
     }
 }

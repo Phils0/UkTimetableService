@@ -7,27 +7,24 @@ namespace Timetable.Web.Mapping.Cif
     public class FromCifProfile : Profile
     {
         private const string PassengerAssociation = "P";
-        
+
         public FromCifProfile()
         {
-            CreateMap<CifParser.RdgRecords.Station, Timetable.Location>().
-                ForPath(d =>d.Coordinates.Eastings, o => o.MapFrom(s => s.East)).
-                ForPath(d => d.Coordinates.Northings, o => o.MapFrom(s => s.North)).
-                ForPath(d => d.Coordinates.IsEstimate, o => o.MapFrom(s => s.PositionIsEstimated)).
-                ForMember(d => d.Station, o => o.Ignore()).
-                ForMember(d => d.Nlc, o => o.Ignore()).
-                ForMember(d => d.IsActive, o => o.Ignore());
-            
-            CreateMap<CifParser.Records.TiplocInsertAmend, Timetable.Location>().
-                ForMember(d => d.Tiploc, o => o.MapFrom(s => s.Code)).
-                ForMember(d => d.ThreeLetterCode, o => o.MapFrom(s => s.ThreeLetterCode)).
-                ForMember(d => d.Nlc, o => o.MapFrom(s => s.Nalco)).
-                ForMember(d => d.Name, o => o.MapFrom(s => s.Description)).
-                ForMember(d => d.InterchangeStatus, o => o.Ignore()).
-                ForMember(d => d.Coordinates, o => o.Ignore()).
-                ForMember(d => d.Station, o => o.Ignore()).
-                ForMember(d => d.IsActive, o => o.MapFrom(s => false));
-                       
+            CreateMap<CifParser.RdgRecords.Station, Timetable.Location>()
+                .ForPath(d => d.Coordinates.Eastings, o => o.MapFrom(s => s.East))
+                .ForPath(d => d.Coordinates.Northings, o => o.MapFrom(s => s.North))
+                .ForPath(d => d.Coordinates.IsEstimate, o => o.MapFrom(s => s.PositionIsEstimated))
+                .ForMember(d => d.Station, o => o.Ignore()).ForMember(d => d.Nlc, o => o.Ignore())
+                .ForMember(d => d.IsActive, o => o.Ignore());
+
+            CreateMap<CifParser.Records.TiplocInsertAmend, Timetable.Location>()
+                .ForMember(d => d.Tiploc, o => o.MapFrom(s => s.Code))
+                .ForMember(d => d.ThreeLetterCode, o => o.MapFrom(s => s.ThreeLetterCode))
+                .ForMember(d => d.Nlc, o => o.MapFrom(s => s.Nalco))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Description))
+                .ForMember(d => d.InterchangeStatus, o => o.Ignore()).ForMember(d => d.Coordinates, o => o.Ignore())
+                .ForMember(d => d.Station, o => o.Ignore()).ForMember(d => d.IsActive, o => o.MapFrom(s => false));
+
             // Schedule records
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.CifSchedule>()
                 .DisableCtorValidation()
@@ -40,9 +37,21 @@ namespace Timetable.Web.Mapping.Cif
                 .ForMember(d => d.Departures, o => o.Ignore());
             CreateMap<CifParser.Records.ScheduleExtraData, Timetable.CifSchedule>()
                 .DisableCtorValidation()
+                .ForMember(d => d.TimetableUid, o => o.Ignore())
+                .ForMember(d => d.StpIndicator, o => o.Ignore())
+                .ForMember(d => d.TrainIdentity, o => o.Ignore())
+                .ForMember(d => d.SeatClass, o => o.Ignore())
+                .ForMember(d => d.SleeperClass, o => o.Ignore())
+                .ForMember(d => d.ReservationIndicator, o => o.Ignore())
+                .ForMember(d => d.Status, o => o.Ignore())
+                .ForMember(d => d.Category, o => o.Ignore())
+                .ForMember(d => d.Calendar, o => o.Ignore())
+                .ForMember(d => d.Service, o => o.Ignore())
                 .ForMember(d => d.RetailServiceId, o => o.MapFrom(s => s.RetailServiceId))
                 .ForMember(d => d.Operator, o => o.ConvertUsing(new TocConverter(), s => s.Toc))
-                .ForAllOtherMembers(o => o.Ignore());
+                .ForMember(d => d.Locations, o => o.Ignore())
+                .ForMember(d => d.Arrivals, o => o.Ignore())
+                .ForMember(d => d.Departures, o => o.Ignore());
 
             var locationConverter = new LocationsConverter();
             CreateMap<CifParser.Records.Association, Association>()
@@ -52,13 +61,14 @@ namespace Timetable.Web.Mapping.Cif
                 .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
                 .ForMember(d => d.AtLocation, o => o.ConvertUsing(locationConverter, s => s.Location))
                 .ForMember(d => d.Category, o => o.MapFrom(s => AssociationConverter.ConvertCategory(s.Category)))
-                .ForMember(d => d.DateIndicator, o => o.MapFrom(s => AssociationConverter.ConvertDateIndicator(s.DateIndicator)))
+                .ForMember(d => d.DateIndicator,
+                    o => o.MapFrom(s => AssociationConverter.ConvertDateIndicator(s.DateIndicator)))
                 .ForMember(d => d.IsPassenger, o => o.MapFrom(s => PassengerAssociation.Equals(s.AssociationType)))
                 .AfterMap((o, d) => AssociationConverter.SetServiceLocations(d));
-            
+
             CreateMap<TimeSpan, Time>()
                 .ConvertUsing(t => new Time(t));
-            
+
             var activitiesConverter = new ActivitiesConverter();
             // Schedule location records
             CreateMap<CifParser.Records.OriginLocation, ScheduleStop>()
@@ -97,8 +107,7 @@ namespace Timetable.Web.Mapping.Cif
 
             var scheduleConverter = new ScheduleConverter(Log.Logger);
             CreateMap<CifParser.Schedule, Timetable.CifSchedule>()
-                .ConvertUsing(scheduleConverter);            
+                .ConvertUsing(scheduleConverter);
         }
-
     }
 }

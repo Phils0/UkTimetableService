@@ -95,7 +95,7 @@ namespace Timetable.Web.Controllers
         {
             try
             {
-                var model = _mapper.Map<IEnumerable<Timetable.Toc>, Model.Toc[]>(_data.Tocs);
+                var model = _mapper.Map<IEnumerable<Timetable.Toc>, Model.Toc[]>(_data.Tocs.AsEnumerableToc());
                 if (model.Any())
                     return await Task.FromResult(Ok(model));
 
