@@ -26,5 +26,5 @@ jobs:
 
       - name: Unit Test
         run: |
-          dotnet test **/Timetable.Test/Timetable.Test.csproj --configuration Release
-          dotnet test **/Timetable.Web.Test/Timetable.Web.Test.csproj --configuration Release
+          dotnet test Timetable.Test/Timetable.Test.csproj --configuration Release
+          dotnet test Timetable.Web.Test/Timetable.Web.Test.csproj --configuration Release
