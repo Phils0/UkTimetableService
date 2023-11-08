@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
-    <PackageReference Include="CifParser" Version="1.0.16" />
+    <PackageReference Include="CifParser" Version="1.0.18" />
     <PackageReference Include="DarwinClient" Version="0.1.22" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.13" />
     <PackageReference Include="NreKnowledgebaseClient" Version="0.1.9" />
