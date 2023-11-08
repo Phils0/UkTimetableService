@@ -21,10 +21,10 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
-    <PackageReference Include="CifParser" Version="1.0.16" />
-    <PackageReference Include="DarwinClient" Version="0.1.22" />
+    <PackageReference Include="CifParser" Version="1.0.18" />
+    <PackageReference Include="DarwinClient" Version="0.1.26" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.13" />
-    <PackageReference Include="NreKnowledgebaseClient" Version="0.1.9" />
+    <PackageReference Include="NreKnowledgebaseClient" Version="0.1.17" />
     <PackageReference Include="prometheus-net" Version="8.1.0" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="8.1.0" />
     <PackageReference Include="prometheus-net.AspNetCore.HealthChecks" Version="8.1.0" />
