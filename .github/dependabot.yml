@@ -2,17 +2,20 @@
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
-updates:
+
+registries:
+  github-nuget:
+    type: "nuget-feed"
+    url: "https://nuget.pkg.github.com/Phils0/index.json"
+    token: "${{secrets.GITHUB_TOKEN}}"
+updates:  
   - package-ecosystem: "nuget"
     directory: "/" # Location of .csproj or packages.config file
+    registries:
+      - github-nuget
     schedule:
       interval: "daily"
-    registries:
-      github:
-        type: "nuget-feed"
-        url: "https://nuget.pkg.github.com/Phils0/index.json"
-        token: "${{secrets.GITHUB_TOKEN}}"
-  - package-ecosystem: "github-actions"
+  - package-ecosystem: "github-actions" 
     directory: "/"
     schedule:
       interval: "daily"
