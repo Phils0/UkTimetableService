@@ -129,7 +129,7 @@ namespace Timetable.Web.Loaders
 
             if (dodgySchedules.Any())
             {
-                _logger.Warning("Dodgy schedules loaded: {count} {schedules}", dodgySchedules.Count, dodgySchedules);
+                _logger.Warning("Dodgy non-public schedules loaded: {count} {schedules}", dodgySchedules.Count, dodgySchedules);
             }
             
             

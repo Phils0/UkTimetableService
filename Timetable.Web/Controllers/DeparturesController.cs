@@ -86,7 +86,7 @@ namespace Timetable.Web.Controllers
             return await Process(request, tocFilter, async () =>
             {
                 var config = CreateGatherConfig(request, tocFilter);
-                var result = _timetable.FindDepartures(request.Location, at, config);
+                var result = Timetable.FindDepartures(request.Location, at, config);
                 return await Task.FromResult(result);
             }, includeStops, returnCancelledServices);
         }
@@ -98,14 +98,14 @@ namespace Timetable.Web.Controllers
             {
                 var boundary = Time.Parse(dayBoundary);
                 var filter = CreateFilter(request, tocFilter);
-                var result = _timetable.AllDepartures(request.Location, onDate, filter, boundary);
+                var result = Timetable.AllDepartures(request.Location, onDate, filter, boundary);
                 return await Task.FromResult(result);
             }, includeStops, returnCancelledServices);
         }
         
         protected override GatherConfiguration.GatherFilter CreateFilter(Station station)
         {
-            return _filters.DeparturesGoTo(station);
+            return Filters.DeparturesGoTo(station);
         }
     }
 }
