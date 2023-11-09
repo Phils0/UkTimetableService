@@ -86,7 +86,7 @@ namespace Timetable.Web.Controllers
         /// <response code="400">Bad Request</response>
         /// <response code="404">Not Found</response>
         /// <response code="500">Internal Server error</response>
-        [ProducesResponseType(200, Type = typeof(Model.Station[])), 
+        [ProducesResponseType(200, Type = typeof(Model.Toc[])), 
          ProducesResponseType(400, Type = typeof(Model.ReferenceError)),
          ProducesResponseType(404, Type = typeof(Model.ReferenceError)), 
          ProducesResponseType(500, Type = typeof(Model.ReferenceError)), 
@@ -95,7 +95,7 @@ namespace Timetable.Web.Controllers
         {
             try
             {
-                var model = _mapper.Map<IEnumerable<Timetable.Toc>, Model.Toc[]>(_data.Tocs);
+                var model = _mapper.Map<IEnumerable<Timetable.Toc>, Model.Toc[]>(_data.Tocs.AsEnumerableToc());
                 if (model.Any())
                     return await Task.FromResult(Ok(model));
 

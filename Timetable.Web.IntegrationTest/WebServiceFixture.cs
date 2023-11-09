@@ -11,19 +11,19 @@ namespace Timetable.Web.IntegrationTest
 {
     public class WebServiceFixture : IDisposable 
     {
-        private readonly ILogger _logging;
         public static TimeSpan Timeout = new TimeSpan(0, 0, 10);
         
+        public ILogger Logger { get; }
         public IHost Host { get; private set; }
 
         public WebServiceFixture(IMessageSink logging)
         {
-            _logging = new LoggerConfiguration()
+            Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.TestOutput(logging, LogEventLevel.Verbose)
                 .CreateLogger();
             
-            _logging.Debug("Creating Host");
+            Logger.Debug("Creating Host");
             var hostBuilder = CreateBuilder();
             Host = StartTestServer(hostBuilder);
 
@@ -65,13 +65,13 @@ namespace Timetable.Web.IntegrationTest
         {
             if (Host != null)
             {
-                _logging.Debug("Disposing Host");
+                Logger.Debug("Disposing Host");
                 var cancellation = new CancellationTokenSource();
                 var task = Host.StopAsync(cancellation.Token);
                 var shutdown = task.Wait(Timeout);
                 if (!shutdown)
                 {
-                    _logging.Debug("Disposing Host: Cancelling");
+                    Logger.Debug("Disposing Host: Cancelling");
                     cancellation.Cancel();
                     shutdown = task.Wait(Timeout);
                 }
@@ -79,7 +79,7 @@ namespace Timetable.Web.IntegrationTest
                     throw new Exception("Failed to shutdown web host");
 
                 Host = null;
-                _logging.Debug("Disposed Host");
+                Logger.Debug("Disposed Host");
             }
         }
     }
