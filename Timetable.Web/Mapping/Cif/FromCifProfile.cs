@@ -6,6 +6,9 @@ namespace Timetable.Web.Mapping.Cif
 {
     public class FromCifProfile : Profile
     {
+        private readonly CalendarConverter _calendarConverter = new CalendarConverter();
+        private readonly TocConverter _tocConverter = new TocConverter();
+
         private const string PassengerAssociation = "P";
 
         public FromCifProfile()
@@ -30,30 +33,15 @@ namespace Timetable.Web.Mapping.Cif
             // Schedule records
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.CifSchedule>()
                 .DisableCtorValidation()
-                .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
+                .ForMember(d => d.Calendar, o => o.ConvertUsing(_calendarConverter, s => s))
                 .ForMember(d => d.Service, o => o.Ignore())
                 .ForMember(d => d.Properties, o => o.Ignore())
                 .ForMember(d => d.Operator, o => o.Ignore())
                 .ForMember(d => d.Locations, o => o.Ignore())
                 .ForMember(d => d.Arrivals, o => o.Ignore())
                 .ForMember(d => d.Departures, o => o.Ignore());
-            CreateMap<CifParser.Records.ScheduleExtraData, Timetable.CifSchedule>()
-                .DisableCtorValidation()
-                .ForMember(d => d.TimetableUid, o => o.Ignore())
-                .ForMember(d => d.StpIndicator, o => o.Ignore())
-                .ForMember(d => d.TrainIdentity, o => o.Ignore())
-                .ForMember(d => d.SeatClass, o => o.Ignore())
-                .ForMember(d => d.SleeperClass, o => o.Ignore())
-                .ForMember(d => d.ReservationIndicator, o => o.Ignore())
-                .ForMember(d => d.Status, o => o.Ignore())
-                .ForMember(d => d.Category, o => o.Ignore())
-                .ForMember(d => d.Calendar, o => o.Ignore())
-                .ForMember(d => d.Service, o => o.Ignore())
-                .ForMember(d => d.RetailServiceId, o => o.MapFrom(s => s.RetailServiceId))
-                .ForMember(d => d.Operator, o => o.ConvertUsing(new TocConverter(), s => s.Toc))
-                .ForMember(d => d.Locations, o => o.Ignore())
-                .ForMember(d => d.Arrivals, o => o.Ignore())
-                .ForMember(d => d.Departures, o => o.Ignore());
+            
+            var cateringConverter = new CateringConverter(Log.Logger);
             CreateMap<CifParser.Records.ScheduleDetails, Timetable.CifScheduleProperties>()
                 .DisableCtorValidation()
                 .ForMember(d => d.Catering, o => o.ConvertUsing(cateringConverter))
@@ -64,7 +52,7 @@ namespace Timetable.Web.Mapping.Cif
                 .ConstructUsing(a => new Association(Log.Logger))
                 .ForMember(d => d.Main, o => o.MapFrom(s => AssociationConverter.ConvertMain(s)))
                 .ForMember(d => d.Associated, o => o.MapFrom(s => AssociationConverter.ConvertAssociated(s)))
-                .ForMember(d => d.Calendar, o => o.ConvertUsing(new CalendarConverter(), s => s))
+                .ForMember(d => d.Calendar, o => o.ConvertUsing(_calendarConverter, s => s))
                 .ForMember(d => d.AtLocation, o => o.ConvertUsing(locationConverter, s => s.Location))
                 .ForMember(d => d.Category, o => o.MapFrom(s => AssociationConverter.ConvertCategory(s.Category)))
                 .ForMember(d => d.DateIndicator,
@@ -111,7 +99,7 @@ namespace Timetable.Web.Mapping.Cif
                 .ForMember(d => d.Schedule, o => o.Ignore())
                 .ForMember(d => d.Id, o => o.Ignore());
 
-            var scheduleConverter = new ScheduleConverter(Log.Logger);
+            var scheduleConverter = new ScheduleConverter(_tocConverter, Log.Logger);
             CreateMap<CifParser.Schedule, Timetable.CifSchedule>()
                 .ConvertUsing(scheduleConverter);
         }
