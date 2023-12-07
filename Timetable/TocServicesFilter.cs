@@ -14,15 +14,29 @@ namespace Timetable
             _filters = filters;
         }
         
-        public ITimetableLookup.GetServicesByToc GetServicesByToc(bool returnCancelled)
+        public (LookupStatus status, ResolvedService[] services) GetServicesByToc(string toc, DateTime date, Time dayBoundary, bool returnCancelled)
         {
-            return (string toc, DateTime date, Time dayBoundary) =>
-            {
-                var services = _timetable.GetSchedulesByToc(toc, date, dayBoundary);
-                var filtered = _filters.Filter(services.services, returnCancelled);
-                var reason = filtered.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
-                return (reason, filtered);;
-            };
+            var filtered = GetFilteredTocServices(toc, date, dayBoundary, returnCancelled);
+            return (reason: Status(filtered), filtered);;
+        }
+
+        private static LookupStatus Status(ResolvedService[] filtered)
+        {
+            return filtered.Any() ? LookupStatus.Success : LookupStatus.ServiceNotFound;
+        }
+
+        private ResolvedService[] GetFilteredTocServices(string toc, DateTime date, Time dayBoundary, bool returnCancelled)
+        {
+            var services = _timetable.GetSchedulesByToc(toc, date, dayBoundary);
+            var filtered = _filters.Filter(services.services, returnCancelled);
+            return filtered;
+        }
+
+        public (LookupStatus status, ResolvedService[] services) GetServicesByTrainIdentity(string toc, DateTime date, string TrainIdentity, Time dayBoundary, bool returnCancelled)
+        {
+            var services = GetFilteredTocServices(toc, date, dayBoundary, returnCancelled);
+            var filtered = services.Where(s => s.Details.TrainIdentity == TrainIdentity).ToArray();
+            return (reason: Status(filtered), filtered);;
         }
     }
 }
