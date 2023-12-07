@@ -17,6 +17,20 @@ namespace Timetable.Test
         }
         
         [Fact]
+        public void OnlyReturnsTocServices()
+        {
+            var timetable = CreateTimetable();           
+
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, retailServiceId: "VT123400");
+            var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "C98765", retailServiceId: "XC987600");
+
+            var filter = new TocServicesFilter(timetable, Filters);
+            var found = filter.GetServicesByToc("VT", MondayAugust12, Time.Midnight, false);
+
+            Assert.All(found.services, s => Assert.True(s.OperatedBy("VT")));
+        }
+        
+        [Fact]
         public void DoesNotReturnCancelledSchedulesRunningOnDate()
         {
             var timetable = CreateTimetable();           
@@ -26,7 +40,8 @@ namespace Timetable.Test
             schedule2.StpIndicator = StpIndicator.Cancelled;
 
             var filter = new TocServicesFilter(timetable, Filters);
-            var found = filter.GetServicesByToc(false)("VT", MondayAugust12, Time.Midnight);
+            var found = filter.GetServicesByToc("VT", MondayAugust12, Time.Midnight, false);
+            
             Assert.Empty(found.services);
         }
 
@@ -42,12 +57,29 @@ namespace Timetable.Test
             schedule2.StpIndicator = StpIndicator.Cancelled;
            
             var filter = new TocServicesFilter(timetable, Filters);
-            var found = filter.GetServicesByToc(true)("VT", MondayAugust12, Time.Midnight);
+            var found = filter.GetServicesByToc("VT", MondayAugust12, Time.Midnight, true);
+            
             var service = found.services[0];
             Assert.True(service.IsCancelled);
             Assert.Equal(MondayAugust12, service.On);
             Assert.Equal(schedule, service.Details);
         }
 
+        [Fact]
+        public void OnlyReturnsTrainIdentityServices()
+        {
+            var timetable = CreateTimetable();           
+
+            var schedule = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A12345");
+            var schedule2 = TestSchedules.CreateScheduleInTimetable(timetable, timetableId: "A98765");
+            schedule2.StpIndicator = StpIndicator.Cancelled;
+
+            var filter = new TocServicesFilter(timetable, Filters);
+            var found = filter.GetServicesByTrainIdentity("VT", MondayAugust12, "9Z12", Time.Midnight, false);
+
+            var service = found.services[0];
+            Assert.Equal(MondayAugust12, service.On);
+            Assert.Equal(schedule, service.Details);
+        }
     }
 }

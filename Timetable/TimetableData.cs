@@ -17,8 +17,6 @@ namespace Timetable
     
     public interface ITimetableLookup
     {
-        delegate (LookupStatus status, ResolvedService[] services) GetServicesByToc(string toc, DateTime date, Time dayBoundary);
-        
         (LookupStatus status, ResolvedService service) GetScheduleByTimetableUid(string timetableUid, DateTime date);
         (LookupStatus status, ResolvedService[] services) GetScheduleByRetailServiceId(string retailServiceId, DateTime date);
         (LookupStatus status, ResolvedService[] services) GetSchedulesByToc(string toc, DateTime date, Time dayBoundary);
@@ -33,7 +31,6 @@ namespace Timetable
 
         private Dictionary<string, IService> _timetableUidMap { get; } = new Dictionary<string, IService>(400000);
         private Dictionary<string, IList<IService>> _retailServiceIdMap { get; } = new Dictionary<string, IList<IService>>(400000);
-
         
         public TimetableData(ServiceFilters filters, ILogger logger)
         {

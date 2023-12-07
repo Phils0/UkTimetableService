@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -47,7 +49,8 @@ namespace Timetable.Web.Controllers
                 var service = _timetable.GetScheduleByTimetableUid(serviceId, @on);
                 if (service.status == LookupStatus.Success)
                 {
-                    var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service, InitialiseContext);
+                    var model = _mapper.Map<Timetable.ResolvedService, Model.Service>(service.service,
+                        InitialiseContext);
                     return await Task.FromResult(Ok(model));
                 }
 
@@ -65,7 +68,8 @@ namespace Timetable.Web.Controllers
             opts.Items["Dummy"] = "";
         }
 
-        private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string id, DateTime date, string searchType = "Service")
+        private ObjectResult CreateNoServiceResponse(LookupStatus serviceStatus, string id, DateTime date,
+            string searchType = "Service")
         {
             var reason = "";
             switch (serviceStatus)
@@ -118,7 +122,8 @@ namespace Timetable.Web.Controllers
                 var service = _timetable.GetScheduleByRetailServiceId(serviceId, @on);
                 if (service.status == LookupStatus.Success)
                 {
-                    var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services, InitialiseContext);
+                    var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services,
+                        InitialiseContext);
                     return await Task.FromResult(Ok(model));
                 }
 
@@ -148,24 +153,21 @@ namespace Timetable.Web.Controllers
         [ProducesResponseType(404, Type = typeof(Model.ServiceNotFound))]
         [Route("toc/{toc}/{on}")]
         [HttpGet]
-        public async Task<IActionResult> GetTocServices(string toc, DateTime @on, [FromQuery] string dayBoundary = "00:00", [FromQuery] bool includeStops = false, [FromQuery] bool returnCancelledServices = false)
+        public async Task<IActionResult> GetTocServices(string toc, DateTime @on,
+            [FromQuery] string dayBoundary = "00:00", [FromQuery] bool includeStops = false,
+            [FromQuery] bool returnCancelledServices = false)
         {
             try
             {
                 var boundary = Time.Parse(dayBoundary);
-                var service = _timetable.CreateTocFilter().GetServicesByToc(returnCancelledServices)(toc, @on, boundary);
+                var service = _timetable
+                    .CreateTocFilter()
+                    .GetServicesByToc(toc, @on, boundary, returnCancelledServices);
+                
                 if (service.status == LookupStatus.Success)
                 {
-                    if (includeStops)
-                    {
-                        var model = _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(service.services, InitialiseContext);
-                        return await Task.FromResult(Ok(model));
-                    }
-                    else
-                    {
-                        var model = _mapper.Map<Timetable.ResolvedService[], Model.ServiceSummary[]>(service.services, InitialiseContext);
-                        return await Task.FromResult(Ok(model));
-                    }
+                    var model = ToResponse(service.services, includeStops);
+                    return await Task.FromResult(Ok(model));
                 }
 
                 return await Task.FromResult(CreateNoServiceResponse(service.status, toc, @on, "Toc"));
@@ -174,6 +176,60 @@ namespace Timetable.Web.Controllers
             {
                 _logger.Error(e, "Error when processing : {toc} on {on}", toc, on.ToYMD());
                 return CreateNoServiceResponse(LookupStatus.Error, toc, @on, "Toc");
+            }
+        }
+
+        [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
+        private ServiceBase[] ToResponse(Timetable.ResolvedService[] services, bool includeStops)
+        {
+            return includeStops
+                ? (ServiceBase[]) _mapper.Map<Timetable.ResolvedService[], Model.Service[]>(services, InitialiseContext)
+                : (ServiceBase[]) _mapper.Map<Timetable.ResolvedService[], Model.ServiceSummary[]>(services,
+                    InitialiseContext);
+        }
+
+
+        /// <summary>
+        /// Returns all Toc services with a particular train identifer on a particular day
+        /// </summary>
+        /// <param name="toc">Two letter TOC code</param>
+        /// <param name="trainIdentity">4 alphanumeric Train Identity code</param>
+        /// <param name="on">date</param>
+        /// <param name="dayBoundary">Time to start a day, use 24hr clock, format HH:mm.  The rail day is generally considered to start at 02:30  Default uses calendar day i.e. boundary is midnight</param>
+        /// <param name="includeStops">Whether to return a full schedule</param>
+        /// <param name="returnCancelledServices">Whether to return cancelled scheduled services</param>
+        /// <returns>Set of services</returns>
+        /// <response code="200">Ok</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="500">Internal Server error</response>
+        [ProducesResponseType(200, Type = typeof(Model.Service[]))]
+        [ProducesResponseType(200, Type = typeof(Model.ServiceSummary[]))]
+        [ProducesResponseType(404, Type = typeof(Model.ServiceNotFound))]
+        [Route("toc/{toc}/train/{trainIdentity}/{on}")]
+        [HttpGet]
+        public async Task<IActionResult> GetTrainIdentifierServices(string toc, string trainIdentity, DateTime @on,
+            [FromQuery] string dayBoundary = "00:00", [FromQuery] bool includeStops = false,
+            [FromQuery] bool returnCancelledServices = false)
+        {
+            try
+            {
+                var boundary = Time.Parse(dayBoundary);
+                var service = _timetable
+                    .CreateTocFilter()
+                    .GetServicesByTrainIdentity(toc, @on, trainIdentity, boundary, returnCancelledServices);
+                
+                if (service.status == LookupStatus.Success)
+                {
+                    var model = ToResponse(service.services, includeStops);
+                    return await Task.FromResult(Ok(model));
+                }
+
+                return await Task.FromResult(CreateNoServiceResponse(service.status, toc, @on, "Toc-TrainIdentifier"));
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Error when processing : {toc} on {on}", toc, on.ToYMD());
+                return CreateNoServiceResponse(LookupStatus.Error, toc, @on, "Toc-TrainIdentifier");
             }
         }
     }

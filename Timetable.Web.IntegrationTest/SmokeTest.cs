@@ -118,5 +118,32 @@ namespace Timetable.Web.IntegrationTest
             var services = JsonConvert.DeserializeObject<Model.Service[]>(responseString);
             services.Should().NotBeEmpty("{0} should return values", url);
         }
+        
+        [Theory]
+        [InlineData("XC", "1S47")]
+        public async void TrainIdentityHasRunningService(string toc, string trainIdentity)
+        {
+            var services = await MakeTrainIdentityRequest(toc, trainIdentity);
+            services.Should().NotBeEmpty("{0} should return values", toc);
+        }
+
+        private async Task<ServiceSummary[]> MakeTrainIdentityRequest(string toc, string trainIdentity)
+        {
+            var url = $"/api/Timetable/toc/{toc}/train/{trainIdentity}/{TestDate}?includeStops=false";
+            Logger.Information("{toc}: Making request: {url}", toc, url);
+            var client = Host.GetTestClient();
+            var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.Warning("{0} request failed. {1} should be successful: {2} Retrying including cancelled services", toc,
+                    url, response.StatusCode);
+                (response, _) = await RetryIncludingCancelledServices(client, url);
+            }
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            var services = JsonConvert.DeserializeObject<Model.ServiceSummary[]>(responseString);
+            return services;
+        }
     }
 }
