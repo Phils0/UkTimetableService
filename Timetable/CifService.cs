@@ -166,5 +166,48 @@ namespace Timetable
         {
             return HasAssociations() ? $"{TimetableUid} +{_associations.Count}" : TimetableUid;
         }
+        
+        internal DaysFlag GetDays()
+        {
+            if (HasSingleSchedule)
+                return (_schedule.Calendar as CifCalendar).DayMask;
+
+            return _multipleSchedules.Values
+                .Where(s => s.StpIndicator != StpIndicator.Cancelled)
+                .Aggregate(
+                    DaysFlag.None, 
+                    (current, schedule) => current | (schedule.Calendar as CifCalendar).DayMask);
+        }
+        
+        internal string GetCategory()
+        {
+            if (HasSingleSchedule)
+                return _schedule.Category;
+
+            var categories = _multipleSchedules.Values
+                .Where(s => s.StpIndicator != StpIndicator.Cancelled)
+                .Aggregate(
+                    "", 
+                    (current, s) => current.Contains(s.Category) ? current : $"{current}{s.Category},");
+            return categories.TrimEnd(',');
+        }
+        
+        internal string GetTrainClass()
+        {
+            if (HasSingleSchedule)
+                return _schedule.SeatClass.ToString();
+
+            var trainClass = _multipleSchedules.Values
+                .Where(s => s.StpIndicator != StpIndicator.Cancelled)
+                .Aggregate(
+                    "", 
+                    (current, s) => current.Contains(s.SeatClass.ToString()) ? current : Concat(current, s));
+            return trainClass.TrimEnd(',');
+
+            string Concat(string current, CifSchedule s)
+            {
+                return $"{current}{s.SeatClass.ToString()},";
+            }
+        }
     }
 }

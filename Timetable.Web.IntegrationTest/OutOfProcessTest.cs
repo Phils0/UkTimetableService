@@ -34,7 +34,7 @@
 //             }
 //         }
 //
-//         private static readonly DateTime Start = new DateTime(2023, 10, 23);
+//         private static readonly DateTime Start = new DateTime(2024, 02, 01);
 //         
 //         private static readonly string[] Days = Enumerable.Range(0, 14)
 //             .Select(offset => Start.AddDays(offset).ToString("yyyy-MM-dd"))
@@ -72,7 +72,7 @@
 //                 response.EnsureSuccessStatusCode();
 //                 var responseString = await response.Content.ReadAsStringAsync();
 //                 var services = JsonConvert.DeserializeObject<Model.ServiceSummary[]>(responseString);
-//                 var message = $"{toc.Code},{toc.Name},{date},{services.Length},{services.Count(s => !s.IsCancelled && (HasFirstClassSeat(s) || HasFirstClassBerth(s)))}";
+//                 var message = $"{toc.Code},{toc.Name},{date},{services.Length},{services.Count(s => !s.IsCancelled && IsExpressService(s) && (HasFirstClassSeat(s) || HasFirstClassBerth(s)))}";
 //                 output.WriteLine(message);
 //             }
 //             catch (Exception e)
@@ -82,15 +82,19 @@
 //
 //             bool HasFirstClassSeat(ServiceSummary s)
 //             {
-//                 return s.SeatClass == "Both" || s.SeatClass == "First";
+//                 return s.SeatClass is "Both" or "First";
 //             }
 //             
 //             bool HasFirstClassBerth(ServiceSummary s)
 //             {
-//                 return s.SleeperClass == "Both" || s.SleeperClass == "First";
+//                 return s.SleeperClass is "Both" or "First";
+//             }
+//             bool IsExpressService(ServiceSummary serviceSummary)
+//             {
+//                 return serviceSummary.Category is "XX" or "XZ";
 //             }
 //         }
-//         
+//
 //         [Fact]
 //         public async void GetServiceCountForSpecificToc()
 //         {
@@ -105,8 +109,8 @@
 //             {
 //                 new Model.Toc()
 //                 {
-//                     Code = "XC",
-//                     Name = "Cross Country"
+//                     Code = "EM",
+//                     Name = "East Midland Railway"
 //                 }
 //             };
 //
