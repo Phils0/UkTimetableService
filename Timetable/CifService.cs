@@ -81,15 +81,12 @@ namespace Timetable
                 return _schedule.RunsOn(date) ? CreateResolvedService(_schedule, _schedule.IsCancelled()) : null;
 
             var isCancelled = false;
-            foreach (var schedule in _multipleSchedules.Values)
+            foreach (var schedule in _multipleSchedules.Values.Where(s => s.RunsOn(date)))
             {
-                if (schedule.RunsOn(date))
-                {
-                    if (schedule.IsCancelled())
-                        isCancelled = true;
-                    else
-                        return CreateResolvedService(schedule, isCancelled);
-                }
+                if (schedule.IsCancelled())
+                    isCancelled = true;
+                else
+                    return CreateResolvedService(schedule, isCancelled);
             }
 
             return null;
@@ -167,47 +164,9 @@ namespace Timetable
             return HasAssociations() ? $"{TimetableUid} +{_associations.Count}" : TimetableUid;
         }
         
-        internal DaysFlag GetDays()
+        internal CifServiceAnalyser CreateAnalyser()
         {
-            if (HasSingleSchedule)
-                return (_schedule.Calendar as CifCalendar).DayMask;
-
-            return _multipleSchedules.Values
-                .Where(s => s.StpIndicator != StpIndicator.Cancelled)
-                .Aggregate(
-                    DaysFlag.None, 
-                    (current, schedule) => current | (schedule.Calendar as CifCalendar).DayMask);
-        }
-        
-        internal string GetCategory()
-        {
-            if (HasSingleSchedule)
-                return _schedule.Category;
-
-            var categories = _multipleSchedules.Values
-                .Where(s => s.StpIndicator != StpIndicator.Cancelled)
-                .Aggregate(
-                    "", 
-                    (current, s) => current.Contains(s.Category) ? current : $"{current}{s.Category},");
-            return categories.TrimEnd(',');
-        }
-        
-        internal string GetTrainClass()
-        {
-            if (HasSingleSchedule)
-                return _schedule.SeatClass.ToString();
-
-            var trainClass = _multipleSchedules.Values
-                .Where(s => s.StpIndicator != StpIndicator.Cancelled)
-                .Aggregate(
-                    "", 
-                    (current, s) => current.Contains(s.SeatClass.ToString()) ? current : Concat(current, s));
-            return trainClass.TrimEnd(',');
-
-            string Concat(string current, CifSchedule s)
-            {
-                return $"{current}{s.SeatClass.ToString()},";
-            }
+            return HasSingleSchedule ? new CifServiceAnalyser(this, _schedule) : new CifServiceAnalyser(this, _multipleSchedules);
         }
     }
 }

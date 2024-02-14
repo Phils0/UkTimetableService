@@ -12,6 +12,7 @@
 //     {
 //         public string TrainClass { get; init; }
 //         public string Category { get; init; }
+//         public string Route { get; init; }
 //     }
 //     
 //     public record DaysForServiceType : ServiceType
@@ -57,19 +58,21 @@
 //             foreach (var s in kv.Value)
 //             {
 //                 var service = s as CifService;
+//                 var analyser = service.CreateAnalyser();
 //                 var serviceType = new ServiceType()
 //                 {
-//                     TrainClass = service.GetTrainClass(),
-//                     Category = service.GetCategory()
+//                     TrainClass = analyser.TrainClasses,
+//                     Category = analyser.Categories,
+//                     Route = analyser.GetRoutes()
 //                 };
 //
 //                 if (serviceTypes.ContainsKey(serviceType))
 //                 {
-//                     serviceTypes[serviceType] |= service.GetDays();
+//                     serviceTypes[serviceType] |= analyser.Days;
 //                 }
 //                 else
 //                 {
-//                     serviceTypes.Add(serviceType, service.GetDays());
+//                     serviceTypes.Add(serviceType, analyser.Days);
 //                 }
 //             }
 //
@@ -80,6 +83,7 @@
 //                 {
 //                     TrainClass = kv.Key.TrainClass,
 //                     Category = kv.Key.Category,
+//                     Route = kv.Key.Route,
 //                     Days = kv.Value.ToIsoDays()
 //                 }).ToList()
 //             };
