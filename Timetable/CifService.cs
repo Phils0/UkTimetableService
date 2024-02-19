@@ -81,15 +81,12 @@ namespace Timetable
                 return _schedule.RunsOn(date) ? CreateResolvedService(_schedule, _schedule.IsCancelled()) : null;
 
             var isCancelled = false;
-            foreach (var schedule in _multipleSchedules.Values)
+            foreach (var schedule in _multipleSchedules.Values.Where(s => s.RunsOn(date)))
             {
-                if (schedule.RunsOn(date))
-                {
-                    if (schedule.IsCancelled())
-                        isCancelled = true;
-                    else
-                        return CreateResolvedService(schedule, isCancelled);
-                }
+                if (schedule.IsCancelled())
+                    isCancelled = true;
+                else
+                    return CreateResolvedService(schedule, isCancelled);
             }
 
             return null;
@@ -165,6 +162,11 @@ namespace Timetable
         public override string ToString()
         {
             return HasAssociations() ? $"{TimetableUid} +{_associations.Count}" : TimetableUid;
+        }
+        
+        internal CifServiceAnalyser CreateAnalyser()
+        {
+            return HasSingleSchedule ? new CifServiceAnalyser(this, _schedule) : new CifServiceAnalyser(this, _multipleSchedules);
         }
     }
 }

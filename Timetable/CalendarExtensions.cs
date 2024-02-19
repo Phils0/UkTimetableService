@@ -65,5 +65,27 @@ namespace Timetable
                     throw new ArgumentOutOfRangeException($"Unhandled day {day.DayOfWeek} - {day}");
             }
         }
+        
+        public static string ToIsoDays(this DaysFlag flag)
+        {
+            var s = new StringBuilder();
+
+            if (flag.HasFlag(DaysFlag.Monday))
+                s.Append("1,");
+            if (flag.HasFlag(DaysFlag.Tuesday))
+                s.Append("2,");
+            if (flag.HasFlag(DaysFlag.Wednesday))
+                s.Append("3,");
+            if (flag.HasFlag(DaysFlag.Thursday))
+                s.Append("4,");
+            if (flag.HasFlag(DaysFlag.Friday))
+                s.Append("5,");
+            if (flag.HasFlag(DaysFlag.Saturday))
+                s.Append("6,");
+            if (flag.HasFlag(DaysFlag.Sunday))
+                s.Append("7,");
+            
+            return s.ToString().TrimEnd(',');
+        }
     }
 }
