@@ -61,5 +61,20 @@ namespace Timetable.Test
             Assert.Equal(expected,  DaysFlag.Weekend.IsActiveOnDay(day));
         }
 
+        [Theory]
+        [InlineData(DaysFlag.Monday, "1")]
+        [InlineData(DaysFlag.Tuesday, "2")]
+        [InlineData(DaysFlag.Wednesday, "3")]
+        [InlineData(DaysFlag.Thursday, "4")]
+        [InlineData(DaysFlag.Friday, "5")]
+        [InlineData(DaysFlag.Saturday, "6")]
+        [InlineData(DaysFlag.Sunday, "7")]
+        [InlineData(DaysFlag.None, "")]
+        [InlineData(DaysFlag.Weekdays, "1,2,3,4,5")]
+        [InlineData(DaysFlag.Monday | DaysFlag.Wednesday, "1,3")]
+        public void DaysFlagToIsoDays(DaysFlag days, string expected)
+        {
+            Assert.Equal(expected, days.ToIsoDays());
+        }
     }
 }

@@ -47,7 +47,7 @@ public class CifServiceAnalyser
 
     public string Categories => GetAggregatedString(s => s.Category);
 
-    public string TrainClasses => GetAggregatedString(s => s.SeatClass.ToString());
+    public string SeatClasses => GetAggregatedString(s => s.SeatClass.ToString());
     
     public string Origins => GetAggregatedString(s => s.Origin.Location.ThreeLetterCode);
 
