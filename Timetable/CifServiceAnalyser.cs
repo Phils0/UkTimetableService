@@ -34,7 +34,7 @@ public class CifServiceAnalyser
             DaysFlag.None, 
             (current, schedule) => current | (schedule.Calendar as CifCalendar).DayMask);
 
-    private IEnumerable<CifSchedule> ActiveSchedules => Schedules.Values
+    public IEnumerable<CifSchedule> ActiveSchedules => Schedules.Values
                 .Where(s => s.StpIndicator != StpIndicator.Cancelled);
     
     private string GetAggregatedString(Func<CifSchedule, string> selector)
