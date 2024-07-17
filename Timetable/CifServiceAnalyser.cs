@@ -62,4 +62,13 @@ public class CifServiceAnalyser
             return $"{s.Origin.Location.ThreeLetterCode}-{s.Destination.Location.ThreeLetterCode}";
         }
     }
+
+    public bool StopsAt(Station location)
+    {
+        return ActiveSchedules.Any(
+            s => s.Locations
+                .OfType<ScheduleStop>()
+                .Any(l => l.IsStopAt(location))
+            );
+    }
 }

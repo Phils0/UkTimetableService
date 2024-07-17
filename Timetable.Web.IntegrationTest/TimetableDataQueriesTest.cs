@@ -34,7 +34,7 @@
 //         }
 //
 //         [Theory]
-//         [InlineData("GW")]
+//         [InlineData("TP")]
 //         public async void GetAllRetailServiceIds(string toc)
 //         {
 //             var data = Host.Services.GetService(typeof(Timetable.Data)) as Timetable.Data;
@@ -87,6 +87,50 @@
 //                     Days = kv.Value.ToIsoDays()
 //                 }).ToList()
 //             };
+//         }
+//
+//         public static TheoryData<string, string[]> Routes =>
+//             new TheoryData<string, string[]>()
+//             {
+//                 {"TP", ["YRK", "ALM"]},
+//             };
+//         
+//         [Theory]
+//         [MemberData(nameof(Routes))]
+//         public async void GetRouteRetailServiceIds(string toc, string[] includes)
+//         {
+//             var data = Host.Services.GetService(typeof(Timetable.Data)) as Timetable.Data;
+//
+//             var locations = data.Locations.Locations;
+//             var includeStations = includes.Select(l => locations[l]).ToArray();
+//             
+//             var timetable = data.Timetable.AsDynamic();
+//             var rsidLookup = timetable._retailServiceIdMap.RealObject as Dictionary<string, IList<IService>>;
+//             
+//             var tocServices = rsidLookup
+//                 .Where(kv => kv.Key.StartsWith(toc) && IncludesStops(kv.Value, includeStations))
+//                 .Select(ToRetailService)
+//                 .OrderBy(r => r.RetailServiceId)
+//                 .ToArray();
+//             
+//             var json = JsonConvert.SerializeObject(tocServices);
+//             await File.WriteAllTextAsync($"C:\\tmp\\{toc}{includes.Aggregate("_", (a,s) => $"{a}_{s}")}.json", json);
+//         }
+//
+//         private bool IncludesStops(IList<IService> services, Station[] includes)
+//         {
+//             
+//             foreach (var s in services)
+//             {
+//                 var service = ((CifService) s).CreateAnalyser();
+//
+//                 if (includes.All(s => service.StopsAt(s)))
+//                 {
+//                     return true;
+//                 }
+//             }
+//
+//             return false;
 //         }
 //     }
 // }
