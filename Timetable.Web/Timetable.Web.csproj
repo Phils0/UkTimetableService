@@ -42,8 +42,4 @@
     <ProjectReference Include="..\Timetable.Web.Plugin\Timetable.Web.Plugin.csproj" />
     <ProjectReference Include="..\Timetable\Timetable.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\" />
-  </ItemGroup>
 </Project>
