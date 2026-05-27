@@ -83,7 +83,7 @@ namespace Timetable
 
         public override int GetHashCode()
         {
-            return Main.GetHashCode();
+            return ThreeLetterCode.GetHashCode();
         }
 
         /// <summary>
