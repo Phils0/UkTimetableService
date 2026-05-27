@@ -1,4 +1,5 @@
 using System;
+using Timetable.Test.Data;
 using Xunit;
 
 namespace Timetable.Test
@@ -8,28 +9,30 @@ namespace Timetable.Test
         [Fact]
         public void ConstructsWithCodeMembersAndPriorities()
         {
-            var group = new StationGroup("GB@MA", new[] { "MAN", "MCV", "MCO" }, new[] { "MAN" });
+            var manchester = TestStations.Create("MAN");
+            var group = new StationGroup("GB@MA",
+                new[] { manchester, TestStations.Create("MCV"), TestStations.Create("MCO") },
+                new[] { manchester });
 
             Assert.Equal("GB@MA", group.Code);
             Assert.Equal(3, group.Members.Count);
             Assert.Single(group.Priorities!);
-            Assert.Equal("MAN", group.Priorities![0]);
+            Assert.Equal(manchester, group.Priorities![0]);
         }
 
         [Fact]
-        public void MembersAreCaseInsensitive()
+        public void MembersAreComparedByStationIdentity()
         {
-            var group = new StationGroup("GB@MA", new[] { "MAN", "MCV" });
+            var group = new StationGroup("GB@MA", new[] { TestStations.Create("MAN"), TestStations.Create("MCV") });
 
-            Assert.Contains("man", group.Members);
-            Assert.Contains("MCV", group.Members);
-            Assert.DoesNotContain("XXX", group.Members);
+            Assert.Contains(TestStations.Create("MAN"), group.Members);
+            Assert.DoesNotContain(TestStations.Create("XXX"), group.Members);
         }
 
         [Fact]
         public void PrioritiesAreNullWhenNotSupplied()
         {
-            var group = new StationGroup("GB@MA", new[] { "MAN" });
+            var group = new StationGroup("GB@MA", new[] { TestStations.Create("MAN") });
 
             Assert.Null(group.Priorities);
         }
@@ -37,7 +40,7 @@ namespace Timetable.Test
         [Fact]
         public void EmptyPrioritiesCollapseToNull()
         {
-            var group = new StationGroup("GB@MA", new[] { "MAN" }, Array.Empty<string>());
+            var group = new StationGroup("GB@MA", new[] { TestStations.Create("MAN") }, Array.Empty<Station>());
 
             Assert.Null(group.Priorities);
         }
@@ -48,7 +51,7 @@ namespace Timetable.Test
         [InlineData("   ")]
         public void RejectsMissingCode(string code)
         {
-            Assert.Throws<ArgumentException>(() => new StationGroup(code, new[] { "MAN" }));
+            Assert.Throws<ArgumentException>(() => new StationGroup(code, new[] { TestStations.Create("MAN") }));
         }
 
         [Fact]
@@ -60,20 +63,24 @@ namespace Timetable.Test
         [Fact]
         public void RejectsEmptyMembers()
         {
-            Assert.Throws<ArgumentException>(() => new StationGroup("GB@MA", Array.Empty<string>()));
+            Assert.Throws<ArgumentException>(() => new StationGroup("GB@MA", Array.Empty<Station>()));
         }
 
         [Fact]
         public void RejectsPriorityThatIsNotAMember()
         {
             Assert.Throws<ArgumentException>(() =>
-                new StationGroup("GB@MA", new[] { "MAN", "MCV" }, new[] { "MCO" }));
+                new StationGroup("GB@MA",
+                    new[] { TestStations.Create("MAN"), TestStations.Create("MCV") },
+                    new[] { TestStations.Create("MCO") }));
         }
 
         [Fact]
         public void AcceptsPrioritiesThatAreAllMembers()
         {
-            var group = new StationGroup("GB@MA", new[] { "MAN", "MCV", "MCO" }, new[] { "MCV", "man" });
+            var group = new StationGroup("GB@MA",
+                new[] { TestStations.Create("MAN"), TestStations.Create("MCV"), TestStations.Create("MCO") },
+                new[] { TestStations.Create("MCV"), TestStations.Create("MAN") });
 
             Assert.Equal(2, group.Priorities!.Count);
         }

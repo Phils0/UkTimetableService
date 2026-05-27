@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NSubstitute;
 using Serilog;
 using Timetable.Test.Data;
@@ -10,22 +11,15 @@ namespace Timetable.Test
     public class StationGroupStopOptimiserTest
     {
         // Manchester (destination) and London (origin) station fixtures, defined locally so the test
-        // schedules can model the real groups discussed in planning, even though the test services' routes and
+        // schedules can model the real-world groups even though the test services' routes and
         // the test groups' priorities are contrived: GB@LO and GB@MA.
         // Each access returns a fresh Station to avoid LocationTimetable state leaking across tests.
-        private static Station Euston              => MakeStation("EUS");
-        private static Station KingsCross          => MakeStation("KGX");
-        private static Station StPancras           => MakeStation("STP");
-        private static Station ManchesterPiccadilly => MakeStation("MAN");
-        private static Station ManchesterVictoria  => MakeStation("MCV");
-        private static Station ManchesterOxfordRoad => MakeStation("MCO");
-
-        private static Station MakeStation(string crs)
-        {
-            var s = new Station();
-            s.AddMasterStationLocation(new Location { Tiploc = crs, ThreeLetterCode = crs });
-            return s;
-        }
+        private static Station Euston              => TestStations.Create("EUS");
+        private static Station KingsCross          => TestStations.Create("KGX");
+        private static Station StPancras           => TestStations.Create("STP");
+        private static Station ManchesterPiccadilly => TestStations.Create("MAN");
+        private static Station ManchesterVictoria  => TestStations.Create("MCV");
+        private static Station ManchesterOxfordRoad => TestStations.Create("MCO");
 
         private static StationGroupStopOptimiser Optimiser(JourneyHeuristic heuristic) =>
             new(heuristic, Substitute.For<ILogger>());
@@ -33,10 +27,13 @@ namespace Timetable.Test
         // EUS is a member that the test services never call at — handy for exercising the "priority is a valid
         // member but this service doesn't stop there" fallback path.
         private static StationGroup LondonOriginGroup(params string[] priorities) =>
-            new("GB@LO", new[] { "KGX", "STP", "EUS" }, priorities.Length == 0 ? null : priorities);
+            new("GB@LO", new[] { KingsCross, StPancras, Euston }, ToPriorities(priorities));
 
         private static StationGroup ManchesterDestGroup(params string[] priorities) =>
-            new("GB@MA", new[] { "MAN", "MCV", "MCO" }, priorities.Length == 0 ? null : priorities);
+            new("GB@MA", new[] { ManchesterPiccadilly, ManchesterVictoria, ManchesterOxfordRoad }, ToPriorities(priorities));
+        
+        private static IReadOnlyList<Station>? ToPriorities(params string[] priorities) =>
+            priorities.Length == 0 ? null : priorities.Select(TestStations.Create).ToArray();
 
         // Euston (10:00) -> MCO (11:00) -> MCV (11:10) -> Manchester Piccadilly (11:20, destination)
         private static ResolvedService EustonToManchesterAll(string uid = "M12345")

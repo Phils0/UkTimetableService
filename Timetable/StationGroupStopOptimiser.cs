@@ -125,16 +125,16 @@ namespace Timetable
         // member; no membership re-check is needed here.
         private static ResolvedStop? FindDeparturesDestinationByPriority(
             ResolvedServiceStop candidate,
-            IReadOnlyList<string>? priorities)
+            IReadOnlyList<Station>? priorities)
         {
             if (priorities is not { Count: > 0 }) return null;
             var departureTime = DepartureTimeAtStop(candidate);
-            foreach (var crs in priorities)
+            foreach (var priority in priorities)
             {
                 foreach (var arrival in candidate.Service.Details.Arrivals)
                 {
                     if (arrival.Time.IsBefore(departureTime)) continue;
-                    if (CrsMatches(arrival.Station, crs))
+                    if (priority.Equals(arrival.Station))
                         return ToResolvedStop(candidate, arrival);
                 }
             }
@@ -153,7 +153,7 @@ namespace Timetable
             foreach (var arrival in candidate.Service.Details.Arrivals)
             {
                 if (arrival.Time.IsBefore(departureTime)) continue;
-                if (destinationGroup.Members.Contains(arrival.Station.ThreeLetterCode))
+                if (destinationGroup.Members.Contains(arrival.Station))
                     return ToResolvedStop(candidate, arrival);
             }
             return null;
@@ -190,16 +190,16 @@ namespace Timetable
         // member; no membership re-check is needed here.
         private static ResolvedStop? FindArrivalsOriginByPriority(
             ResolvedServiceStop candidate,
-            IReadOnlyList<string>? priorities)
+            IReadOnlyList<Station>? priorities)
         {
             if (priorities is not { Count: > 0 }) return null;
             var arrivalTime = ArrivalTimeAtStop(candidate);
-            foreach (var crs in priorities)
+            foreach (var priority in priorities)
             {
                 foreach (var departure in candidate.Service.Details.Departures)
                 {
                     if (arrivalTime.IsBefore(departure.Time)) break;
-                    if (CrsMatches(departure.Station, crs))
+                    if (priority.Equals(departure.Station))
                         return ToResolvedStop(candidate, departure);
                 }
             }
@@ -218,7 +218,7 @@ namespace Timetable
             foreach (var departure in candidate.Service.Details.Departures.Reverse())
             {
                 if (arrivalTime.IsBefore(departure.Time)) continue;
-                if (originGroup.Members.Contains(departure.Station.ThreeLetterCode))
+                if (originGroup.Members.Contains(departure.Station))
                     return ToResolvedStop(candidate, departure);
             }
             return null;
@@ -226,14 +226,14 @@ namespace Timetable
 
         private static ResolvedServiceStop? ChooseByPriority(
             IReadOnlyList<ResolvedServiceStop> candidates,
-            IReadOnlyList<string>? priorities)
+            IReadOnlyList<Station>? priorities)
         {
             if (priorities is not { Count: > 0 }) return null;
-            foreach (var crs in priorities)
+            foreach (var priority in priorities)
             {
                 foreach (var candidate in candidates)
                 {
-                    if (CrsMatches(candidate.Stop.Stop.Station, crs))
+                    if (priority.Equals(candidate.Stop.Stop.Station))
                         return candidate;
                 }
             }
@@ -245,8 +245,5 @@ namespace Timetable
 
         private static ResolvedStop ToResolvedStop(ResolvedServiceStop candidate, IStop stop) =>
             new ResolvedStop((ScheduleLocation)stop, candidate.Service.On);
-
-        private static bool CrsMatches(Station station, string crs) =>
-            StringComparer.OrdinalIgnoreCase.Equals(station.ThreeLetterCode, crs);
     }
 }
