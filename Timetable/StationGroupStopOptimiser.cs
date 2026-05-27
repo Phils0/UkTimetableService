@@ -59,7 +59,9 @@ namespace Timetable
             Func<IReadOnlyList<ResolvedServiceStop>, ResolvedServiceStop?> chooseOne)
         {
             var picked = new List<ResolvedServiceStop>();
-            foreach (var sameService in candidates.GroupBy(c => (c.Service.Details.RetailServiceId, c.Service.On)))
+            // TimetableUid + running date is the genuine identity of one physical service run: it is never
+            // empty (unlike RetailServiceId) and stays distinct across split portions that share an RSID.
+            foreach (var sameService in candidates.GroupBy(c => (c.Service.TimetableUid, c.Service.On)))
             {
                 var chosen = chooseOne(sameService.ToList());
                 if (chosen != null) picked.Add(chosen);
@@ -85,9 +87,17 @@ namespace Timetable
         {
             var stop = FindDeparturesDestinationByPriority(candidate, destinationGroup.Priorities)
                        ?? FindDeparturesDestinationByHeuristic(candidate, destinationGroup);
-            if (stop != null) candidate.FoundToStop = stop;
+            if (stop != null)
+            {
+                candidate.FoundToStop = stop;
+                // The override always selects a stop on the main service, so any association the filter
+                // recorded (e.g. a join/split portion that reached a member) no longer applies.
+                candidate.Association = IncludedAssociation.NoAssociation;
+            }
         }
 
+        // Priorities are guaranteed in-group by the StationGroup constructor, so a matched stop is always a
+        // member; no membership re-check is needed here.
         private static ResolvedStop? FindDeparturesDestinationByPriority(
             ResolvedServiceStop candidate,
             IReadOnlyList<string>? priorities)
@@ -142,9 +152,17 @@ namespace Timetable
         {
             var stop = FindArrivalsOriginByPriority(candidate, originGroup.Priorities)
                        ?? FindArrivalsOriginByHeuristic(candidate, originGroup);
-            if (stop != null) candidate.FoundFromStop = stop;
+            if (stop != null)
+            {
+                candidate.FoundFromStop = stop;
+                // The override always selects a stop on the main service, so any association the filter
+                // recorded (e.g. a join/split portion that reached a member) no longer applies.
+                candidate.Association = IncludedAssociation.NoAssociation;
+            }
         }
 
+        // Priorities are guaranteed in-group by the StationGroup constructor, so a matched stop is always a
+        // member; no membership re-check is needed here.
         private static ResolvedStop? FindArrivalsOriginByPriority(
             ResolvedServiceStop candidate,
             IReadOnlyList<string>? priorities)

@@ -13,7 +13,7 @@ namespace Timetable
         public ResolvedStop FoundToStop { get; internal set; } = null;
         public ResolvedStop FoundFromStop { get; internal set; } = null;
 
-        public IncludedAssociation Association { get; private set; } = IncludedAssociation.NoAssociation;
+        public IncludedAssociation Association { get; internal set; } = IncludedAssociation.NoAssociation;
         
         public DateTime On => Service.On;
 

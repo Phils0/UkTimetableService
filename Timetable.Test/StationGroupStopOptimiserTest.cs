@@ -25,8 +25,10 @@ namespace Timetable.Test
             return s;
         }
 
+        // EUS is a member that the test services never call at — handy for exercising the "priority is a valid
+        // member but this service doesn't stop there" fallback path.
         private static StationGroup LondonOriginGroup(params string[] priorities) =>
-            new("GB@LO", new[] { "KGX", "STP" }, priorities.Length == 0 ? null : priorities);
+            new("GB@LO", new[] { "KGX", "STP", "EUS" }, priorities.Length == 0 ? null : priorities);
 
         private static StationGroup ManchesterDestGroup(params string[] priorities) =>
             new("GB@MA", new[] { "MAN", "MCV", "MCO" }, priorities.Length == 0 ? null : priorities);
@@ -131,7 +133,8 @@ namespace Timetable.Test
         [Fact]
         public void Departures_OriginPriorityMiss_FallsBackToHeuristic()
         {
-            // Priority "EUS" is not an origin in this service; fall back to Longest -> KGX.
+            // EUS is a valid group member but this service never departs there, so no candidate matches the
+            // priority; fall back to Longest -> KGX.
             var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
             var (atKgx, atStp) = CreateLondonOriginCandidates();
 
@@ -354,6 +357,24 @@ namespace Timetable.Test
             var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
             var serviceA = LondonAllToManchesterPiccadilly(uid: "L11111");
             var serviceB = LondonAllToManchesterPiccadilly(uid: "L22222");
+            var atKgxA = new ResolvedServiceStop(serviceA, serviceA.Details.Locations[0]);
+            var atKgxB = new ResolvedServiceStop(serviceB, serviceB.Details.Locations[0]);
+
+            var result = optimiser.OptimiseDepartures(new[] { atKgxA, atKgxB }, LondonOriginGroup(), null);
+
+            Assert.Equal(2, result.Length);
+        }
+
+        [Fact]
+        public void SameRetailServiceIdDifferentTimetableUid_AreKeptSeparate()
+        {
+            // Two distinct runs (different TimetableUid) that share a RetailServiceId - e.g. split portions.
+            // They must NOT be collapsed: identity is TimetableUid + date, not RetailServiceId.
+            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var serviceA = LondonAllToManchesterPiccadilly(uid: "A11111");
+            var serviceB = LondonAllToManchesterPiccadilly(uid: "B22222");
+            ((CifSchedule)serviceA.Details).RetailServiceId = "VT9999";
+            ((CifSchedule)serviceB.Details).RetailServiceId = "VT9999";
             var atKgxA = new ResolvedServiceStop(serviceA, serviceA.Details.Locations[0]);
             var atKgxB = new ResolvedServiceStop(serviceB, serviceB.Details.Locations[0]);
 

@@ -29,6 +29,14 @@ namespace Timetable
                 throw new ArgumentException($"Group {code} must have at least one member", nameof(members));
 
             Priorities = priorities is { Count: > 0 } ? priorities : null;
+
+            // Priorities must be a subset of Members. Enforcing it here means the optimiser can trust that a
+            // priority CRS is always in-group, so it never needs to re-check membership when overriding stops.
+            if (Priorities != null)
+                foreach (var priority in Priorities)
+                    if (!Members.Contains(priority))
+                        throw new ArgumentException(
+                            $"Group {code} priority '{priority}' is not one of its members", nameof(priorities));
         }
     }
 }

@@ -62,5 +62,20 @@ namespace Timetable.Test
         {
             Assert.Throws<ArgumentException>(() => new StationGroup("GB@MA", Array.Empty<string>()));
         }
+
+        [Fact]
+        public void RejectsPriorityThatIsNotAMember()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                new StationGroup("GB@MA", new[] { "MAN", "MCV" }, new[] { "MCO" }));
+        }
+
+        [Fact]
+        public void AcceptsPrioritiesThatAreAllMembers()
+        {
+            var group = new StationGroup("GB@MA", new[] { "MAN", "MCV", "MCO" }, new[] { "MCV", "man" });
+
+            Assert.Equal(2, group.Priorities!.Count);
+        }
     }
 }
