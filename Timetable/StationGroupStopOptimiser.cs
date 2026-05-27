@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 
 namespace Timetable
 {
@@ -19,8 +20,13 @@ namespace Timetable
     public class StationGroupStopOptimiser : IStationGroupStopOptimiser
     {
         private readonly JourneyHeuristic _heuristic;
+        private readonly ILogger _logger;
 
-        public StationGroupStopOptimiser(JourneyHeuristic heuristic) => _heuristic = heuristic;
+        public StationGroupStopOptimiser(JourneyHeuristic heuristic, ILogger logger)
+        {
+            _heuristic = heuristic;
+            _logger = logger;
+        }
 
         public ResolvedServiceStop[] OptimiseDepartures(
             IEnumerable<ResolvedServiceStop> candidates,
@@ -29,13 +35,17 @@ namespace Timetable
         {
             if (candidates == null) throw new ArgumentNullException(nameof(candidates));
 
-            return PickOnePerService(candidates, sameService =>
+            var input = candidates.ToList();
+            var result = PickOnePerService(input, sameService =>
             {
                 var canonical = ChooseDeparturesOrigin(sameService, originGroup);
                 if (canonical != null && destinationGroup != null)
                     ApplyDeparturesDestinationOverride(canonical, destinationGroup);
                 return canonical;
             });
+
+            LogOptimisation("departures", input.Count, result.Length, originGroup, destinationGroup);
+            return result;
         }
 
         public ResolvedServiceStop[] OptimiseArrivals(
@@ -45,13 +55,28 @@ namespace Timetable
         {
             if (candidates == null) throw new ArgumentNullException(nameof(candidates));
 
-            return PickOnePerService(candidates, sameService =>
+            var input = candidates.ToList();
+            var result = PickOnePerService(input, sameService =>
             {
                 var canonical = ChooseArrivalsDestination(sameService, destinationGroup);
                 if (canonical != null && originGroup != null)
                     ApplyArrivalsOriginOverride(canonical, originGroup);
                 return canonical;
             });
+
+            LogOptimisation("arrivals", input.Count, result.Length, originGroup, destinationGroup);
+            return result;
+        }
+
+        private void LogOptimisation(
+            string direction, int candidateCount, int serviceCount,
+            StationGroup? originGroup, StationGroup? destinationGroup)
+        {
+            _logger.Debug(
+                "Station-group {Direction}: {Candidates} candidates collapsed to {Services} services " +
+                "(origin {OriginGroup}, destination {DestinationGroup}, heuristic {Heuristic})",
+                direction, candidateCount, serviceCount,
+                originGroup?.Code ?? "(none)", destinationGroup?.Code ?? "(none)", _heuristic);
         }
 
         private static ResolvedServiceStop[] PickOnePerService(

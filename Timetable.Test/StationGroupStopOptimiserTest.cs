@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using NSubstitute;
+using Serilog;
 using Timetable.Test.Data;
 using Xunit;
 
@@ -24,6 +26,9 @@ namespace Timetable.Test
             s.AddMasterStationLocation(new Location { Tiploc = crs, ThreeLetterCode = crs });
             return s;
         }
+
+        private static StationGroupStopOptimiser Optimiser(JourneyHeuristic heuristic) =>
+            new(heuristic, Substitute.For<ILogger>());
 
         // EUS is a member that the test services never call at — handy for exercising the "priority is a valid
         // member but this service doesn't stop there" fallback path.
@@ -83,7 +88,7 @@ namespace Timetable.Test
         [Fact]
         public void Departures_SingleCandidatePassesThrough()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var service = EustonToManchesterAll();
             var stop = new ResolvedServiceStop(service, service.Details.Locations[0]); // Euston
 
@@ -96,7 +101,7 @@ namespace Timetable.Test
         [Fact]
         public void Departures_OriginGroupPicksEarliestDeparture_WithLongestHeuristic()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var (atKgx, atStp) = CreateLondonOriginCandidates();
 
             var result = optimiser.OptimiseDepartures(new[] { atStp, atKgx }, LondonOriginGroup(), null);
@@ -108,7 +113,7 @@ namespace Timetable.Test
         [Fact]
         public void Departures_OriginGroupPicksLatestDeparture_WithShortestHeuristic()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Shortest);
+            var optimiser = Optimiser(JourneyHeuristic.Shortest);
             var (atKgx, atStp) = CreateLondonOriginCandidates();
 
             var result = optimiser.OptimiseDepartures(new[] { atKgx, atStp }, LondonOriginGroup(), null);
@@ -121,7 +126,7 @@ namespace Timetable.Test
         public void Departures_OriginPriority_WinsOverHeuristic()
         {
             // Longest alone would pick KGX (earliest); priorities=["STP"] forces St Pancras.
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var (atKgx, atStp) = CreateLondonOriginCandidates();
 
             var result = optimiser.OptimiseDepartures(new[] { atKgx, atStp }, LondonOriginGroup("STP"), null);
@@ -135,7 +140,7 @@ namespace Timetable.Test
         {
             // EUS is a valid group member but this service never departs there, so no candidate matches the
             // priority; fall back to Longest -> KGX.
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var (atKgx, atStp) = CreateLondonOriginCandidates();
 
             var result = optimiser.OptimiseDepartures(new[] { atKgx, atStp }, LondonOriginGroup("EUS"), null);
@@ -149,7 +154,7 @@ namespace Timetable.Test
         {
             // The filter's natural backward scan picks MAN (latest Manchester arrival).
             // priorities=["MCV"] must override that to Manchester Victoria.
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var service = EustonToManchesterAll();
             var stop = new ResolvedServiceStop(service, service.Details.Locations[0]);
             stop.GoesTo(ManchesterPiccadilly); // simulate filter
@@ -163,7 +168,7 @@ namespace Timetable.Test
         [Fact]
         public void Departures_DestinationOverrideShortest_PicksEarliestArrival()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Shortest);
+            var optimiser = Optimiser(JourneyHeuristic.Shortest);
             var service = EustonToManchesterAll();
             var stop = new ResolvedServiceStop(service, service.Details.Locations[0]);
             stop.GoesTo(ManchesterPiccadilly);
@@ -177,7 +182,7 @@ namespace Timetable.Test
         [Fact]
         public void Departures_DestinationOverrideIsNoOp_ForLongestWithoutPriorities()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var service = EustonToManchesterAll();
             var stop = new ResolvedServiceStop(service, service.Details.Locations[0]);
             stop.GoesTo(ManchesterPiccadilly);
@@ -193,7 +198,7 @@ namespace Timetable.Test
         [Fact]
         public void Arrivals_DestinationGroupPicksLatestArrival_WithLongestHeuristic()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var (atMco, atMcv, atMan) = CreateManchesterDestinationCandidates();
 
             var result = optimiser.OptimiseArrivals(new[] { atMco, atMcv, atMan }, null, ManchesterDestGroup());
@@ -205,7 +210,7 @@ namespace Timetable.Test
         [Fact]
         public void Arrivals_DestinationGroupPicksEarliestArrival_WithShortestHeuristic()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Shortest);
+            var optimiser = Optimiser(JourneyHeuristic.Shortest);
             var (atMco, atMcv, atMan) = CreateManchesterDestinationCandidates();
 
             var result = optimiser.OptimiseArrivals(new[] { atMan, atMcv, atMco }, null, ManchesterDestGroup());
@@ -218,7 +223,7 @@ namespace Timetable.Test
         public void Arrivals_DestinationPriority_WinsOverHeuristic()
         {
             // Longest alone would pick MAN; priorities=["MCV"] forces Manchester Victoria.
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var (atMco, atMcv, atMan) = CreateManchesterDestinationCandidates();
 
             var result = optimiser.OptimiseArrivals(new[] { atMco, atMcv, atMan }, null, ManchesterDestGroup("MCV"));
@@ -232,7 +237,7 @@ namespace Timetable.Test
         {
             // Single candidate arriving at Manchester from London. Filter's natural pick (Longest = earliest
             // departure) would be KGX; priorities=["STP"] must override to St Pancras.
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var service = LondonAllToManchesterPiccadilly();
             var stop = new ResolvedServiceStop(service, service.Details.Locations[2]); // Manchester
             stop.ComesFrom(KingsCross);
@@ -246,7 +251,7 @@ namespace Timetable.Test
         [Fact]
         public void Arrivals_OriginOverride_ShortestPicksLatestDeparture()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Shortest);
+            var optimiser = Optimiser(JourneyHeuristic.Shortest);
             var service = LondonAllToManchesterPiccadilly();
             var stop = new ResolvedServiceStop(service, service.Details.Locations[2]);
             stop.ComesFrom(KingsCross);
@@ -262,7 +267,7 @@ namespace Timetable.Test
         [Fact]
         public void Departures_BothGroups_LongestSelectsEarliestOriginAndKeepsLatestDestination()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var (atKgx, atStp) = CreateLondonToManchesterOriginCandidates();
 
             var result = optimiser.OptimiseDepartures(new[] { atStp, atKgx }, LondonOriginGroup(), ManchesterDestGroup());
@@ -275,7 +280,7 @@ namespace Timetable.Test
         [Fact]
         public void Arrivals_BothGroups_LongestSelectsLatestDestinationAndKeepsEarliestOrigin()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var (atMco, atMcv, atMan) = CreateLondonToManchesterDestinationCandidates();
 
             var result = optimiser.OptimiseArrivals(new[] { atMco, atMcv, atMan }, LondonOriginGroup(), ManchesterDestGroup());
@@ -288,7 +293,7 @@ namespace Timetable.Test
         [Fact]
         public void Departures_BothGroups_ShortestSelectsLatestOriginAndEarliestDestination()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Shortest);
+            var optimiser = Optimiser(JourneyHeuristic.Shortest);
             var (atKgx, atStp) = CreateLondonToManchesterOriginCandidates();
 
             var result = optimiser.OptimiseDepartures(new[] { atKgx, atStp }, LondonOriginGroup(), ManchesterDestGroup());
@@ -301,7 +306,7 @@ namespace Timetable.Test
         [Fact]
         public void Arrivals_BothGroups_ShortestSelectsEarliestDestinationAndLatestOrigin()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Shortest);
+            var optimiser = Optimiser(JourneyHeuristic.Shortest);
             var (atMco, atMcv, atMan) = CreateLondonToManchesterDestinationCandidates();
 
             var result = optimiser.OptimiseArrivals(new[] { atMco, atMcv, atMan }, LondonOriginGroup(), ManchesterDestGroup());
@@ -314,7 +319,7 @@ namespace Timetable.Test
         [Fact]
         public void Departures_BothGroups_AppliesOriginAndDestinationPriorities()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var (atKgx, atStp) = CreateLondonToManchesterOriginCandidates();
 
             var result = optimiser.OptimiseDepartures(
@@ -328,7 +333,7 @@ namespace Timetable.Test
         [Fact]
         public void Arrivals_BothGroups_AppliesDestinationAndOriginPriorities()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var (atMco, atMcv, atMan) = CreateLondonToManchesterDestinationCandidates();
 
             var result = optimiser.OptimiseArrivals(
@@ -344,7 +349,7 @@ namespace Timetable.Test
         [Fact]
         public void EmptyInput_ReturnsEmpty()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
 
             var result = optimiser.OptimiseDepartures(Array.Empty<ResolvedServiceStop>(), LondonOriginGroup(), null);
 
@@ -354,7 +359,7 @@ namespace Timetable.Test
         [Fact]
         public void DifferentServices_AreKeptSeparate()
         {
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var serviceA = LondonAllToManchesterPiccadilly(uid: "L11111");
             var serviceB = LondonAllToManchesterPiccadilly(uid: "L22222");
             var atKgxA = new ResolvedServiceStop(serviceA, serviceA.Details.Locations[0]);
@@ -370,7 +375,7 @@ namespace Timetable.Test
         {
             // Two distinct runs (different TimetableUid) that share a RetailServiceId - e.g. split portions.
             // They must NOT be collapsed: identity is TimetableUid + date, not RetailServiceId.
-            var optimiser = new StationGroupStopOptimiser(JourneyHeuristic.Longest);
+            var optimiser = Optimiser(JourneyHeuristic.Longest);
             var serviceA = LondonAllToManchesterPiccadilly(uid: "A11111");
             var serviceB = LondonAllToManchesterPiccadilly(uid: "B22222");
             ((CifSchedule)serviceA.Details).RetailServiceId = "VT9999";
