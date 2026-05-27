@@ -61,7 +61,31 @@ namespace Timetable.Test
             var filter = Factory.DeparturesGoTo(TestStations.Vauxhall);
 
             var results = filter(source).ToArray();
-            
+
+            Assert.Empty(results);
+        }
+
+        [Fact]
+        public void FilterGoesToAnyOf()
+        {
+            var source = Source;
+            var destinations = new HashSet<Station> { TestStations.ClaphamJunction, TestStations.Waterloo };
+            var filter = Factory.DeparturesGoTo(destinations);
+
+            var results = filter(source).ToArray();
+
+            Assert.Equal(4, results.Length);
+        }
+
+        [Fact]
+        public void FilterGoesToAnyOfExcludesWhenNoMatch()
+        {
+            var source = Source;
+            var destinations = new HashSet<Station> { TestStations.Vauxhall, TestStations.Woking };
+            var filter = Factory.DeparturesGoTo(destinations);
+
+            var results = filter(source).ToArray();
+
             Assert.Empty(results);
         }
         
@@ -115,7 +139,31 @@ namespace Timetable.Test
             var filter = Factory.ArrivalsComeFrom(TestStations.Vauxhall);
 
             var results = filter(source).ToArray();
-            
+
+            Assert.Empty(results);
+        }
+
+        [Fact]
+        public void FilterComesFromAnyOf()
+        {
+            var source = ComesFromSource;
+            var origins = new HashSet<Station> { TestStations.ClaphamJunction, TestStations.Surbiton };
+            var filter = Factory.ArrivalsComeFrom(origins);
+
+            var results = filter(source).ToArray();
+
+            Assert.Equal(4, results.Length);
+        }
+
+        [Fact]
+        public void FilterComesFromAnyOfExcludesWhenNoMatch()
+        {
+            var source = ComesFromSource;
+            var origins = new HashSet<Station> { TestStations.Vauxhall, TestStations.Woking };
+            var filter = Factory.ArrivalsComeFrom(origins);
+
+            var results = filter(source).ToArray();
+
             Assert.Empty(results);
         }
         
