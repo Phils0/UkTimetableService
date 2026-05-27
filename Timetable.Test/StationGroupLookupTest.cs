@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Timetable.Test
 {
-    public class StationGroupMapperTest
+    public class StationGroupLookupTest
     {
         private static StationGroup London => new("GB@LO", new[] { "EUS", "KGX", "LST" });
         private static StationGroup Manchester => new("GB@MA", new[] { "MAN", "MCV", "MCO" }, new[] { "MAN" });
@@ -12,7 +12,7 @@ namespace Timetable.Test
         [Fact]
         public void TryGetFindsKnownGroup()
         {
-            var mapper = new StationGroupMapper(new[] { London, Manchester });
+            var mapper = new StationGroupLookup(new[] { London, Manchester });
 
             Assert.True(mapper.TryGet("GB@LO", out var group));
             Assert.Equal("GB@LO", group.Code);
@@ -24,7 +24,7 @@ namespace Timetable.Test
         [InlineData("GB@LO")]
         public void TryGetIsCaseInsensitive(string code)
         {
-            var mapper = new StationGroupMapper(new[] { London });
+            var mapper = new StationGroupLookup(new[] { London });
 
             Assert.True(mapper.TryGet(code, out var group));
             Assert.Equal("GB@LO", group.Code);
@@ -33,7 +33,7 @@ namespace Timetable.Test
         [Fact]
         public void TryGetReturnsFalseForUnknownCode()
         {
-            var mapper = new StationGroupMapper(new[] { London });
+            var mapper = new StationGroupLookup(new[] { London });
 
             Assert.False(mapper.TryGet("GB@ZZ", out var group));
             Assert.Null(group);
@@ -44,7 +44,7 @@ namespace Timetable.Test
         [InlineData("")]
         public void TryGetReturnsFalseForNullOrEmptyCode(string code)
         {
-            var mapper = new StationGroupMapper(new[] { London });
+            var mapper = new StationGroupLookup(new[] { London });
 
             Assert.False(mapper.TryGet(code, out var group));
             Assert.Null(group);
@@ -53,7 +53,7 @@ namespace Timetable.Test
         [Fact]
         public void EmptyMapperAlwaysReturnsFalse()
         {
-            var mapper = new StationGroupMapper(Array.Empty<StationGroup>());
+            var mapper = new StationGroupLookup(Array.Empty<StationGroup>());
 
             Assert.False(mapper.TryGet("GB@LO", out _));
         }
@@ -63,7 +63,7 @@ namespace Timetable.Test
         {
             var duplicate = new StationGroup("GB@LO", new[] { "PAD" });
 
-            Assert.Throws<ArgumentException>(() => new StationGroupMapper(new[] { London, duplicate }));
+            Assert.Throws<ArgumentException>(() => new StationGroupLookup(new[] { London, duplicate }));
         }
 
         [Fact]
@@ -71,13 +71,13 @@ namespace Timetable.Test
         {
             var lowercase = new StationGroup("gb@lo", new[] { "PAD" });
 
-            Assert.Throws<ArgumentException>(() => new StationGroupMapper(new[] { London, lowercase }));
+            Assert.Throws<ArgumentException>(() => new StationGroupLookup(new[] { London, lowercase }));
         }
 
         [Fact]
         public void RejectsNullGroups()
         {
-            Assert.Throws<ArgumentNullException>(() => new StationGroupMapper(null!));
+            Assert.Throws<ArgumentNullException>(() => new StationGroupLookup(null!));
         }
     }
 }

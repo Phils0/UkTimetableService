@@ -4,12 +4,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Timetable
 {
-    /// <inheritdoc />
-    public class StationGroupMapper : IStationGroupMapper
+    /// <summary>
+    /// Maintains an in-memory IReadOnlyDictionary of known <see cref="StationGroup"/>s.
+    /// Provides a lookup method to retrieve a single <see cref="StationGroup"/> by code.
+    /// </summary>
+    public class StationGroupLookup
     {
         private readonly IReadOnlyDictionary<string, StationGroup> _groups;
 
-        public StationGroupMapper(IEnumerable<StationGroup> groups)
+        public StationGroupLookup(IEnumerable<StationGroup> groups)
         {
             if (groups == null)
                 throw new ArgumentNullException(nameof(groups));
@@ -25,7 +28,13 @@ namespace Timetable
             _groups = map;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Attempts to look up a <see cref="StationGroup"/> by its group code.
+        /// Lookup is case-insensitive and unknown codes return false.
+        /// </summary>
+        /// <param name="code">Station group code (e.g. <c>GB@LO</c>)</param>
+        /// <param name="group">The resulting <see cref="StationGroup"/> from the dictionary</param>
+        /// <returns></returns>
         public bool TryGet(string code, [NotNullWhen(true)] out StationGroup? group)
         {
             if (string.IsNullOrEmpty(code))
