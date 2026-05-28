@@ -112,5 +112,34 @@ namespace Timetable.Web.Test
             
             Assert.Equal(expected,  config.DarwinDate);
         }
+
+        [Fact]
+        public void GetStationGroupsFileFromAppSettings()
+        {
+            var appSettings = Substitute.For<IConfiguration>();
+            appSettings["StationGroupsFile"].Returns("station-groups.json");
+
+            var config = new Configuration(appSettings, Substitute.For<ILogger>());
+
+            Assert.Matches(new Regex("station-groups.json$"), config.StationGroupsFile);
+        }
+
+        [Fact]
+        public void StationGroupsFileIsNullWhenNoConfigValue()
+        {
+            var config = new Configuration(Substitute.For<IConfiguration>(), Substitute.For<ILogger>());
+
+            Assert.Null(config.StationGroupsFile);
+        }
+
+        public static TheoryData<string, JourneyHeuristic> OptimisationStrategyCheck =>
+            new TheoryData<string, JourneyHeuristic>()
+            {
+                {"Longest", JourneyHeuristic.Longest},
+                {"Shortest", JourneyHeuristic.Shortest},
+                {"shortest", JourneyHeuristic.Shortest},
+                {"LONGEST", JourneyHeuristic.Longest},
+            };
+
     }
 }

@@ -33,19 +33,22 @@ namespace Timetable.Web.Test
             }
         }
 
-        private Web.Loaders.DataLoader CreateLoader(IArchive archive = null, 
-            ICifParser cifParser = null, 
+        private Web.Loaders.DataLoader CreateLoader(IArchive archive = null,
+            ICifParser cifParser = null,
             IDataEnricher knowledgebase = null,
-            IDataEnricher darwin = null)
+            IDataEnricher darwin = null,
+            IStationGroupsLoader stationGroups = null)
         {
             archive = CreateMockArchive(archive, cifParser);
             darwin ??= new NopLoader();
             knowledgebase ??= new KnowledgebaseLoader(Substitute.For<IKnowledgebaseAsync>(), Substitute.For<ILogger>());
-            
+            stationGroups ??= new StationGroupsLoader(null, Substitute.For<ILogger>());
+
             return Factory.CreateLoader(
-                archive, 
-                darwin, 
-                knowledgebase, 
+                archive,
+                darwin,
+                knowledgebase,
+                stationGroups,
                 Substitute.For<ILogger>(),
                 Timetable.Test.Data.Filters.Instance) as Web.Loaders.DataLoader;
         }
@@ -228,8 +231,22 @@ namespace Timetable.Web.Test
         {
             var loader = CreateLoader();
             var data = await loader.LoadAsync(CancellationToken.None);
-            
+
             Assert.NotNull(data.Tocs);
+        }
+
+        [Fact]
+        public async Task LoadSetsStationGroups()
+        {
+            var lookup = new StationGroupLookup(Enumerable.Empty<StationGroup>());
+            var stationGroups = Substitute.For<IStationGroupsLoader>();
+            stationGroups.LoadAsync(Arg.Any<ILocationData>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult(lookup));
+
+            var loader = CreateLoader(stationGroups: stationGroups);
+            var data = await loader.LoadAsync(CancellationToken.None);
+
+            Assert.Same(lookup, data.StationGroups);
         }
     }
 }

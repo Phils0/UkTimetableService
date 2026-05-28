@@ -11,7 +11,11 @@ namespace Timetable
         
         public RealtimeData Darwin { get; set; }
 
-        public bool IsLoaded => (Locations?.IsLoaded ?? false) 
+        // Optional station-group reference data. Defaults to an empty lookup so the feature is simply
+        // inert (group lookups return false) when the file is absent, rather than the property being null.
+        public StationGroupLookup StationGroups { get; set; } = new (Enumerable.Empty<StationGroup>());
+
+        public bool IsLoaded => (Locations?.IsLoaded ?? false)
             && (Timetable?.IsLoaded ?? false);
     }
 }

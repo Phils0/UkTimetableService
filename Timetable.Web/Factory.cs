@@ -63,7 +63,13 @@ namespace Timetable.Web
             var darwin = await CreateDarwinLoader(config, logger);
             var knowledgebase = CreateKnowledgebase(config, logger);
             var filters = CreateFilters(config, logger);
-            return CreateLoader(archive, darwin, knowledgebase, logger, filters);
+            var stationGroups = CreateStationGroupsLoader(config, logger);
+            return CreateLoader(archive, darwin, knowledgebase, stationGroups, logger, filters);
+        }
+
+        internal static IStationGroupsLoader CreateStationGroupsLoader(Configuration config, ILogger logger)
+        {
+            return new StationGroupsLoader(config.StationGroupsFile, logger.ForContext<StationGroupsLoader>());
         }
 
         internal static ServiceFilters CreateFilters(Configuration config, ILogger logger)
@@ -71,10 +77,10 @@ namespace Timetable.Web
             return new ServiceFilters(config.EnableDebugResponses, logger);
         }
         
-        internal static IDataLoader CreateLoader(IArchive archive, IDataEnricher darwin, IDataEnricher knowledgebase, ILogger logger, ServiceFilters filters)
+        internal static IDataLoader CreateLoader(IArchive archive, IDataEnricher darwin, IDataEnricher knowledgebase, IStationGroupsLoader stationGroups, ILogger logger, ServiceFilters filters)
         {
             var cifLoader = CreateCifLoader(archive, logger, filters);
-            return new Loaders.DataLoader(cifLoader, darwin, knowledgebase, logger);
+            return new Loaders.DataLoader(cifLoader, darwin, knowledgebase, stationGroups, logger);
         }
         
         internal static CifLoader CreateCifLoader(IArchive archive, ILogger logger, ServiceFilters filters)

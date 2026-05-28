@@ -75,5 +75,27 @@ namespace Timetable.Web
             }
         }
 
+        /// <summary>
+        /// Full path to the optional station-groups reference file. Null when the key is unset, in which case
+        /// station group search is disabled (the loader treats a missing path the same as a missing file).
+        /// </summary>
+        public string? StationGroupsFile
+        {
+            get
+            {
+                var fileName = _config["StationGroupsFile"];
+                
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    _logger.Debug("Config StationGroupsFile: <not set>");
+                    return null;
+                }
+
+                var path = Path.Combine(DataDirectory, fileName);
+                _logger.Debug("Config StationGroupsFile: {path}", path);
+                
+                return new FileInfo(path).FullName;
+            }
+        }
     }
 }
