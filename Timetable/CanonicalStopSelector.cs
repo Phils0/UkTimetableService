@@ -67,12 +67,7 @@ namespace Timetable
             var stop = FindDeparturesDestinationByPriority(candidate, destinationGroup.Priorities)
                        ?? FindDeparturesDestinationByHeuristic(candidate, destinationGroup);
             if (stop != null)
-            {
-                candidate.FoundToStop = stop;
-                // The override always selects a stop on the main service, so any association the filter
-                // recorded (e.g. a join/split portion that reached a member) no longer applies.
-                candidate.Association = IncludedAssociation.NoAssociation;
-            }
+                candidate.OverrideFoundToStop(stop);
         }
 
         // Priorities are guaranteed in-group by the StationGroup constructor, so a matched stop is always a
@@ -132,12 +127,7 @@ namespace Timetable
             var stop = FindArrivalsOriginByPriority(candidate, originGroup.Priorities)
                        ?? FindArrivalsOriginByHeuristic(candidate, originGroup);
             if (stop != null)
-            {
-                candidate.FoundFromStop = stop;
-                // The override always selects a stop on the main service, so any association the filter
-                // recorded (e.g. a join/split portion that reached a member) no longer applies.
-                candidate.Association = IncludedAssociation.NoAssociation;
-            }
+                candidate.OverrideFoundFromStop(stop);
         }
 
         // Priorities are guaranteed in-group by the StationGroup constructor, so a matched stop is always a

@@ -8,12 +8,28 @@ namespace Timetable
     {
         public ResolvedService Service { get; }
         public ResolvedStop Stop { get; }
-        // Settable within the assembly so the station-group stop optimiser can override
-        // the natural filter-time selection when priorities / heuristic require it.
-        public ResolvedStop FoundToStop { get; internal set; } = null;
-        public ResolvedStop FoundFromStop { get; internal set; } = null;
+        public ResolvedStop FoundToStop { get; private set; } = null;
+        public ResolvedStop FoundFromStop { get; private set; } = null;
 
-        public IncludedAssociation Association { get; internal set; } = IncludedAssociation.NoAssociation;
+        public IncludedAssociation Association { get; private set; } = IncludedAssociation.NoAssociation;
+
+        /// <summary>
+        /// Replaces the destination stop a filter recorded with one chosen by station-group optimisation, and
+        /// clears any recorded <see cref="Association"/>: an override always picks a stop on the main service,
+        /// so a join/split portion the filter may have reached no longer applies.
+        /// </summary>
+        internal void OverrideFoundToStop(ResolvedStop stop)
+        {
+            FoundToStop = stop;
+            Association = IncludedAssociation.NoAssociation;
+        }
+
+        /// <summary>Mirror of <see cref="OverrideFoundToStop"/> for arrival results.</summary>
+        internal void OverrideFoundFromStop(ResolvedStop stop)
+        {
+            FoundFromStop = stop;
+            Association = IncludedAssociation.NoAssociation;
+        }
         
         public DateTime On => Service.On;
 
@@ -53,15 +69,12 @@ namespace Timetable
         private ResolvedStop ResolveStop(IArrival location) => new ResolvedStop((ScheduleLocation) location, On);
         private ResolvedStop ResolveStop(IDeparture location) => new ResolvedStop((ScheduleLocation) location, On);
         
-        public bool GoesTo(Station destination)
-        {
-            return GoesToWhere(s => destination.Equals(s));
-        }
+        public bool GoesTo(Station destination) => GoesToWhere(s => destination.Equals(s));
 
         /// <summary>
         /// Does this service go to ANY of the supplied destination stations after the current stop's departure?
         /// On match, sets <see cref="FoundToStop"/> to the first matching arrival encountered while scanning
-        /// backwards from the service's final stop i.e. the latest arrival within the destination set.
+        /// backwards from the service's final stop, i.e. the latest arrival within the destination set.
         /// </summary>
         public bool GoesToAnyOf(IReadOnlySet<Station> destinations)
         {
@@ -124,40 +137,40 @@ namespace Timetable
                     var foundInAssociated = SplitGoesTo(association);
                     if (foundInAssociated.success)
                         return foundInAssociated;
-                }
+                }                 
             }
             return (false, null, IncludedAssociation.NoAssociation);
-
-
+            
+            
             (bool success, ResolvedStop to, IncludedAssociation association) JoinGoesTo(ResolvedAssociation association)
             {
                 if (association.IsMain(Service.TimetableUid))
                     return (false, null, null);  // We're on the main, fail as join not possible
-
+                
                 var main = association.Details.Main;
                 var joinStop = association.AssociatedService.GetStop(main.AtLocation, main.Sequence);
                 var joinDeparture = joinStop.StopDeparture;
                 var (success, to) = joinStop.GoesToScan(matches, joinDeparture.Time);
-                return (success,
-                    to,
+                return (success, 
+                    to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
             }
-
+            
             (bool success, ResolvedStop to, IncludedAssociation association) SplitGoesTo(ResolvedAssociation association)
             {
                 if (!association.IsMain(Service.TimetableUid))
                     return (false, null, null);  // We're already on the split so cannot go to the main
-
+                
                 var main = association.Details.Main;
                 var splitStop = Service.GetStop(main.AtLocation, main.Sequence);
                 if( splitStop.IsBefore(departureTime, true))
                     return (false, null, null);  // We're past the split stop
-
+                
                 var firstStop = association.AssociatedService.Origin;
                 var splitDeparture = firstStop.StopDeparture;
                 var (success, to) = firstStop.GoesToScan(matches, splitDeparture.Time);
-                return (success,
-                    to,
+                return (success, 
+                    to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
             }
         }
@@ -168,15 +181,12 @@ namespace Timetable
             return thisTime.IsBefore(time);
         }
         
-        public bool ComesFrom(Station origin)
-        {
-            return ComesFromWhere(s => origin.Equals(s));
-        }
+        public bool ComesFrom(Station origin) => ComesFromWhere(s => origin.Equals(s));
 
         /// <summary>
         /// Does this service come from ANY of the supplied origin stations before the current stop's arrival?
         /// On match, sets <see cref="FoundFromStop"/> to the first matching departure encountered while scanning
-        /// forwards from the service's first stop &mdash; i.e. the earliest departure within the origin set.
+        /// forwards from the service's first stop, i.e. the earliest departure within the origin set.
         /// </summary>
         public bool ComesFromAnyOf(IReadOnlySet<Station> origins)
         {
@@ -222,7 +232,7 @@ namespace Timetable
 
             return (false, null);
         }
-
+        
         private (bool success, ResolvedStop to, IncludedAssociation association) AssociationComesFrom(Func<Station, bool> matches, Time arrivalTime, ResolvedServiceWithAssociations service)
         {
             foreach (var association in service.Associations.Where(a => !a.IsCancelled))
@@ -239,39 +249,39 @@ namespace Timetable
                     var foundInAssociated = SplitComesFrom(association);
                     if (foundInAssociated.success)
                         return foundInAssociated;
-                }
+                }                 
             }
             return (false, null, IncludedAssociation.NoAssociation);
-
+            
             (bool success, ResolvedStop to, IncludedAssociation association) JoinComesFrom(ResolvedAssociation association)
             {
                 if (association.IsAssociated(Service.TimetableUid))
                     return (false, null, null);  // We're already on the join so cannot come from main
-
+                
                 var main = association.Details.Main;
                 var joinStop = Service.GetStop(main.AtLocation, main.Sequence);
                 if( joinStop.IsAfter(arrivalTime, true))
                     return (false, null, null);  // We're past the join stop
-
+                
                 var lastStop = association.AssociatedService.Destination;
                 var joinArrives = lastStop.StopArrival;
                 var (success, to) = lastStop.ComesFromScan(matches, joinArrives.Time);
-                return (success,
-                    to,
+                return (success, 
+                    to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
             }
-
+            
             (bool success, ResolvedStop to, IncludedAssociation association) SplitComesFrom(ResolvedAssociation association)
             {
                 if (association.IsMain(Service.TimetableUid))
                     return (false, null, null);  // We're on the main, fail as split not possible
-
+                
                 var main = association.Details.Main;
                 var splitStop = association.AssociatedService.GetStop(main.AtLocation, main.Sequence);
                 var splitArrival = splitStop.StopArrival;
                 var (success, to) = splitStop.ComesFromScan(matches, splitArrival.Time);
-                return (success,
-                    to,
+                return (success, 
+                    to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
             }
         }
