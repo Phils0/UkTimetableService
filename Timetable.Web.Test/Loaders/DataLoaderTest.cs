@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -238,7 +237,7 @@ namespace Timetable.Web.Test
         [Fact]
         public async Task LoadSetsStationGroups()
         {
-            var lookup = new StationGroupLookup(Enumerable.Empty<StationGroup>());
+            var lookup = new StationGroupLookup(new Dictionary<string, StationGroup>());
             var stationGroups = Substitute.For<IStationGroupsLoader>();
             stationGroups.LoadAsync(Arg.Any<ILocationData>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromResult(lookup));
