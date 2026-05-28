@@ -4,7 +4,19 @@ namespace Timetable.Test.Data
 {
     public static class TestStations
     {
-        private readonly static Toc SWR = new Toc("SW", "South Western Railway"); 
+        private readonly static Toc SWR = new Toc("SW", "South Western Railway");
+
+        /// <summary>
+        /// Creates a minimal <see cref="Station"/> for the given CRS code, with a single master-station
+        /// location whose Tiploc and CRS are both that code. For tests that only care about station identity
+        /// (e.g. station-group membership) rather than full reference data.
+        /// </summary>
+        public static Station Create(string crs)
+        {
+            var station = new Station();
+            station.AddMasterStationLocation(new Location { Tiploc = crs, ThreeLetterCode = crs });
+            return station;
+        }
 
         public static Station Surbiton
         {

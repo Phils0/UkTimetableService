@@ -12,6 +12,24 @@ namespace Timetable
         public ResolvedStop FoundFromStop { get; private set; } = null;
 
         public IncludedAssociation Association { get; private set; } = IncludedAssociation.NoAssociation;
+
+        /// <summary>
+        /// Replaces the destination stop a filter recorded with one chosen by station-group optimisation, and
+        /// clears any recorded <see cref="Association"/>: an override always picks a stop on the main service,
+        /// so a join/split portion the filter may have reached no longer applies.
+        /// </summary>
+        internal void OverrideFoundToStop(ResolvedStop stop)
+        {
+            FoundToStop = stop;
+            Association = IncludedAssociation.NoAssociation;
+        }
+
+        /// <summary>Mirror of <see cref="OverrideFoundToStop"/> for arrival results.</summary>
+        internal void OverrideFoundFromStop(ResolvedStop stop)
+        {
+            FoundFromStop = stop;
+            Association = IncludedAssociation.NoAssociation;
+        }
         
         public DateTime On => Service.On;
 
@@ -51,28 +69,42 @@ namespace Timetable
         private ResolvedStop ResolveStop(IArrival location) => new ResolvedStop((ScheduleLocation) location, On);
         private ResolvedStop ResolveStop(IDeparture location) => new ResolvedStop((ScheduleLocation) location, On);
         
-        public bool GoesTo(Station destination)
+        public bool GoesTo(Station destination) => GoesToWhere(s => destination.Equals(s));
+
+        /// <summary>
+        /// Does this service go to ANY of the supplied destination stations after the current stop's departure?
+        /// On match, sets <see cref="FoundToStop"/> to the first matching arrival encountered while scanning
+        /// backwards from the service's final stop, i.e. the latest arrival within the destination set.
+        /// </summary>
+        public bool GoesToAnyOf(IReadOnlySet<Station> destinations)
+        {
+            if (destinations.Count == 0)
+                return false;
+            return GoesToWhere(destinations.Contains);
+        }
+
+        private bool GoesToWhere(Func<Station, bool> matches)
         {
             bool found;
             ResolvedStop to;
             IncludedAssociation association = IncludedAssociation.NoAssociation;
             var departureTime = StopDeparture.Time;
-            
-            (found, to) = GoesTo(destination, departureTime);  // Check our service
-            
+
+            (found, to) = GoesToScan(matches, departureTime);  // Check our service
+
             if (!found && Service is ResolvedServiceWithAssociations withAssociations)
-                (found, to, association) = AssociationGoesTo(destination, departureTime, withAssociations);    // Check associations
+                (found, to, association) = AssociationGoesTo(matches, departureTime, withAssociations);    // Check associations
 
             if (found)
             {
                 FoundToStop = to;
                 Association = association;
             }
-            
+
             return found;
         }
-        
-        private (bool success, ResolvedStop to) GoesTo(Station destination, Time departureTime)
+
+        private (bool success, ResolvedStop to) GoesToScan(Func<Station, bool> matches, Time departureTime)
         {
             foreach (var arrival in  Service.Details.Arrivals.Reverse())
             {
@@ -80,7 +112,7 @@ namespace Timetable
                 if (arrival.Time.IsBefore(departureTime))
                     return (false, null);
 
-                if (destination.Equals(arrival.Station))
+                if (matches(arrival.Station))
                 {
                     return (true, ResolveStop(arrival));
                 }
@@ -89,7 +121,7 @@ namespace Timetable
             return (false, null);
         }
 
-        private (bool success, ResolvedStop to, IncludedAssociation association) AssociationGoesTo(Station destination, Time departureTime, ResolvedServiceWithAssociations service)
+        private (bool success, ResolvedStop to, IncludedAssociation association) AssociationGoesTo(Func<Station, bool> matches, Time departureTime, ResolvedServiceWithAssociations service)
         {
             foreach (var association in service.Associations.Where(a => !a.IsCancelled))
             {
@@ -118,7 +150,7 @@ namespace Timetable
                 var main = association.Details.Main;
                 var joinStop = association.AssociatedService.GetStop(main.AtLocation, main.Sequence);
                 var joinDeparture = joinStop.StopDeparture;
-                var (success, to) = joinStop.GoesTo(destination, joinDeparture.Time);
+                var (success, to) = joinStop.GoesToScan(matches, joinDeparture.Time);
                 return (success, 
                     to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
@@ -136,7 +168,7 @@ namespace Timetable
                 
                 var firstStop = association.AssociatedService.Origin;
                 var splitDeparture = firstStop.StopDeparture;
-                var (success, to) = firstStop.GoesTo(destination, splitDeparture.Time);
+                var (success, to) = firstStop.GoesToScan(matches, splitDeparture.Time);
                 return (success, 
                     to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
@@ -149,28 +181,42 @@ namespace Timetable
             return thisTime.IsBefore(time);
         }
         
-        public bool ComesFrom(Station origin)
+        public bool ComesFrom(Station origin) => ComesFromWhere(s => origin.Equals(s));
+
+        /// <summary>
+        /// Does this service come from ANY of the supplied origin stations before the current stop's arrival?
+        /// On match, sets <see cref="FoundFromStop"/> to the first matching departure encountered while scanning
+        /// forwards from the service's first stop, i.e. the earliest departure within the origin set.
+        /// </summary>
+        public bool ComesFromAnyOf(IReadOnlySet<Station> origins)
+        {
+            if (origins.Count == 0)
+                return false;
+            return ComesFromWhere(origins.Contains);
+        }
+
+        private bool ComesFromWhere(Func<Station, bool> matches)
         {
             bool found;
             ResolvedStop from;
             IncludedAssociation association = IncludedAssociation.NoAssociation;
             var arrivalTime = StopArrival.Time;
-            
-            (found, from) = ComesFrom(origin, arrivalTime);  // Check our service
-            
+
+            (found, from) = ComesFromScan(matches, arrivalTime);  // Check our service
+
             if (!found && Service is ResolvedServiceWithAssociations withAssociations)
-                (found, from, association) = AssociationComesFrom(origin, arrivalTime, withAssociations);    // Check associations
+                (found, from, association) = AssociationComesFrom(matches, arrivalTime, withAssociations);    // Check associations
 
             if (found)
             {
                 FoundFromStop = from;
                 Association = association;
             }
-            
+
             return found;
         }
-        
-        private (bool success, ResolvedStop to) ComesFrom(Station origin, Time arrivalTime)
+
+        private (bool success, ResolvedStop to) ComesFromScan(Func<Station, bool> matches, Time arrivalTime)
         {
             foreach (var departure in  Service.Details.Departures)
             {
@@ -178,7 +224,7 @@ namespace Timetable
                 if (arrivalTime.IsBefore(departure.Time))
                     return (false, null);
 
-                if (origin.Equals(departure.Station))
+                if (matches(departure.Station))
                 {
                     return (true, ResolveStop(departure));
                 }
@@ -187,7 +233,7 @@ namespace Timetable
             return (false, null);
         }
         
-        private (bool success, ResolvedStop to, IncludedAssociation association) AssociationComesFrom(Station origin, Time arrivalTime, ResolvedServiceWithAssociations service)
+        private (bool success, ResolvedStop to, IncludedAssociation association) AssociationComesFrom(Func<Station, bool> matches, Time arrivalTime, ResolvedServiceWithAssociations service)
         {
             foreach (var association in service.Associations.Where(a => !a.IsCancelled))
             {
@@ -219,7 +265,7 @@ namespace Timetable
                 
                 var lastStop = association.AssociatedService.Destination;
                 var joinArrives = lastStop.StopArrival;
-                var (success, to) = lastStop.ComesFrom(origin, joinArrives.Time);
+                var (success, to) = lastStop.ComesFromScan(matches, joinArrives.Time);
                 return (success, 
                     to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
@@ -233,7 +279,7 @@ namespace Timetable
                 var main = association.Details.Main;
                 var splitStop = association.AssociatedService.GetStop(main.AtLocation, main.Sequence);
                 var splitArrival = splitStop.StopArrival;
-                var (success, to) = splitStop.ComesFrom(origin, splitArrival.Time);
+                var (success, to) = splitStop.ComesFromScan(matches, splitArrival.Time);
                 return (success, 
                     to, 
                     success ? new IncludedAssociation(association.AssociatedService.TimetableUid)  : IncludedAssociation.NoAssociation);
