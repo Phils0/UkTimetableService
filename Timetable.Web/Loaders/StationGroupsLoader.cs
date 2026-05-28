@@ -42,8 +42,8 @@ namespace Timetable.Web.Loaders
                 return Empty();
             }
 
-            var file = await ReadFileAsync(_filePath, token).ConfigureAwait(false);
-            if (file == null)
+            var (success, file) = await TryReadFileAsync(_filePath, token).ConfigureAwait(false);
+            if (!success || file == null)
                 return Empty();
 
             var report = new LoadReport();
@@ -56,18 +56,19 @@ namespace Timetable.Web.Loaders
 
             return new StationGroupLookup(groups);
         }
-
-        private async Task<StationGroupsFile?> ReadFileAsync(string path, CancellationToken token)
+        
+        private async Task<(bool success, StationGroupsFile? file)> TryReadFileAsync(string path, CancellationToken token)
         {
             try
             {
                 var json = await File.ReadAllTextAsync(path, token).ConfigureAwait(false);
-                return JsonSerializer.Deserialize<StationGroupsFile>(json, SerializerOptions);
+                var file = JsonSerializer.Deserialize<StationGroupsFile>(json, SerializerOptions);
+                return (file != null, file);
             }
             catch (JsonException e)
             {
                 _logger.Error(e, "station-groups file at {Path} is malformed - station group search disabled", path);
-                return null;
+                return (false, null);
             }
         }
 
