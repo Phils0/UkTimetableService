@@ -87,7 +87,7 @@ namespace Timetable.Web
                 
                 if (string.IsNullOrEmpty(fileName))
                 {
-                    _logger.Debug("Config StationGroupsFile: <not set>");
+                    _logger.Information("Config StationGroupsFile: <not set>");
                     return null;
                 }
 
