@@ -97,5 +97,38 @@ namespace Timetable.Web
                 return new FileInfo(path).FullName;
             }
         }
+
+        /// <summary>
+        /// The journey heuristic the station-group optimiser uses when a service calls at several members of a
+        /// group. Defaults to <see cref="JourneyHeuristic.Longest"/> when unset or unrecognised.
+        /// </summary>
+        public JourneyHeuristic StationGroupOptimisationStrategy
+        {
+            get
+            {
+                var configValue = _config["StationGroupOptimisationStrategy"];
+                
+                // Enum.TryParse alone accepts integers outside the defined range (e.g. "42" becomes
+                // (JourneyHeuristic)42, which silently falls into the Shortest branch in the optimiser).
+                // Guard with Enum.IsDefined so only named values pass through.
+                if (!string.IsNullOrEmpty(configValue) &&
+                    Enum.TryParse<JourneyHeuristic>(configValue, ignoreCase: true, out var heuristic) &&
+                    Enum.IsDefined(typeof(JourneyHeuristic), heuristic)) {
+                    _logger.Debug("Config StationGroupOptimisationStrategy: {configValue}", configValue);
+                    return heuristic;
+                }
+
+                if (string.IsNullOrEmpty(configValue))
+                    _logger.Information(
+                        "StationGroupOptimisationStrategy not set; defaulting to {Default}",
+                        JourneyHeuristic.Longest);
+                else
+                    _logger.Warning(
+                        "StationGroupOptimisationStrategy '{configValue}' not recognised; defaulting to {Default}",
+                        configValue, JourneyHeuristic.Longest);
+
+                return JourneyHeuristic.Longest;
+            }
+        }
     }
 }

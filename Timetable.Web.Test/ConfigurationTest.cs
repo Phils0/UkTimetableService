@@ -141,5 +141,38 @@ namespace Timetable.Web.Test
                 {"LONGEST", JourneyHeuristic.Longest},
             };
 
+        [Theory]
+        [MemberData(nameof(OptimisationStrategyCheck))]
+        public void GetStationGroupOptimisationStrategyFromAppSettings(string configValue, JourneyHeuristic expected)
+        {
+            var appSettings = Substitute.For<IConfiguration>();
+            appSettings["StationGroupOptimisationStrategy"].Returns(configValue);
+
+            var config = new Configuration(appSettings, Substitute.For<ILogger>());
+
+            Assert.Equal(expected, config.StationGroupOptimisationStrategy);
+        }
+
+        public static TheoryData<string> OptimisationStrategyDefaultCheck =>
+            new TheoryData<string>()
+            {
+                "nonsense",
+                "",
+                null,
+                "42",  // numeric outside the enum range: TryParse accepts it as (JourneyHeuristic)42; the
+                       // Enum.IsDefined guard must reject it so it doesn't silently fall into Shortest.
+            };
+
+        [Theory]
+        [MemberData(nameof(OptimisationStrategyDefaultCheck))]
+        public void StationGroupOptimisationStrategyDefaultsToLongestWhenMissingOrUnparseable(string configValue)
+        {
+            var appSettings = Substitute.For<IConfiguration>();
+            appSettings["StationGroupOptimisationStrategy"].Returns(configValue);
+
+            var config = new Configuration(appSettings, Substitute.For<ILogger>());
+
+            Assert.Equal(JourneyHeuristic.Longest, config.StationGroupOptimisationStrategy);
+        }
     }
 }
