@@ -5,32 +5,24 @@ using System.Diagnostics.CodeAnalysis;
 namespace Timetable
 {
     /// <summary>
-    /// Maintains an in-memory IReadOnlyDictionary of known <see cref="StationGroup"/>s.
+    /// Maintains an in-memory dictionary of known <see cref="StationGroup"/>s, keyed by group code.
     /// Provides a lookup method to retrieve a single <see cref="StationGroup"/> by code.
     /// </summary>
+    /// <remarks>
+    /// Case-sensitivity follows the comparer the supplied dictionary was built with. The production
+    /// builder (<c>StationGroupsLoader</c>) uses <see cref="StringComparer.OrdinalIgnoreCase"/>.
+    /// </remarks>
     public class StationGroupLookup
     {
         private readonly IReadOnlyDictionary<string, StationGroup> _groups;
 
-        public StationGroupLookup(IEnumerable<StationGroup> groups)
+        public StationGroupLookup(IReadOnlyDictionary<string, StationGroup> groups)
         {
-            if (groups == null)
-                throw new ArgumentNullException(nameof(groups));
-
-            var map = new Dictionary<string, StationGroup>(StringComparer.OrdinalIgnoreCase);
-            foreach (var group in groups)
-            {
-                if (map.ContainsKey(group.Code))
-                    throw new ArgumentException($"Duplicate group code: {group.Code}", nameof(groups));
-                map.Add(group.Code, group);
-            }
-
-            _groups = map;
+            _groups = groups ?? throw new ArgumentNullException(nameof(groups));
         }
 
         /// <summary>
-        /// Attempts to look up a <see cref="StationGroup"/> by its group code.
-        /// Lookup is case-insensitive and unknown codes return false.
+        /// Attempts to look up a <see cref="StationGroup"/> by its group code. Unknown codes return false.
         /// </summary>
         /// <param name="code">Station group code (e.g. <c>GB@LO</c>)</param>
         /// <param name="group">The resulting <see cref="StationGroup"/> from the dictionary</param>

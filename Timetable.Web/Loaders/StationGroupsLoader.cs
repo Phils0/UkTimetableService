@@ -71,13 +71,13 @@ namespace Timetable.Web.Loaders
             }
         }
 
-        private IReadOnlyList<StationGroup> BuildGroups(IReadOnlyList<StationGroupJsonDefinition>? definitions, ILocationData locations, LoadReport report)
+        private IReadOnlyDictionary<string, StationGroup> BuildGroups(
+            IReadOnlyList<StationGroupJsonDefinition>? definitions, ILocationData locations, LoadReport report)
         {
-            var groups = new List<StationGroup>();
+            var groups = new Dictionary<string, StationGroup>(StringComparer.OrdinalIgnoreCase);
             if (definitions == null)
                 return groups;
 
-            var seenCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var definition in definitions)
             {
                 var members = ResolveMembers(definition.Members, locations, definition.Code, report);
@@ -92,20 +92,21 @@ namespace Timetable.Web.Loaders
 
                 // Dedup AFTER member resolution: a valid second entry shouldn't be rejected as a "duplicate"
                 // of an earlier entry that itself got dropped for having no resolvable members.
-                if (!string.IsNullOrEmpty(definition.Code) && !seenCodes.Add(definition.Code))
+                if (!string.IsNullOrEmpty(definition.Code) && groups.ContainsKey(definition.Code))
                 {
                     _logger.Warning("Skipping duplicate station group code {Code}", definition.Code);
                     report.GroupsSkipped++;
                     continue;
                 }
-                
+
                 var priorities = definition.Priorities is { Count: > 0 }
                     ? ResolvePriorities(definition.Priorities, members, definition.Code, report)
                     : null;
 
                 try
                 {
-                    groups.Add(new StationGroup(definition.Code, members, priorities));
+                    var group = new StationGroup(definition.Code, members, priorities);
+                    groups.Add(group.Code, group);
                 }
                 catch (ArgumentException e)
                 {
@@ -189,7 +190,8 @@ namespace Timetable.Web.Loaders
             return resolved;
         }
 
-        private static StationGroupLookup Empty() => new StationGroupLookup(Array.Empty<StationGroup>());
+        private static StationGroupLookup Empty() =>
+            new StationGroupLookup(new Dictionary<string, StationGroup>(StringComparer.OrdinalIgnoreCase));
 
         private sealed class StationGroupsFile
         {
