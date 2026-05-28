@@ -38,14 +38,13 @@ namespace Timetable.Web.Loaders
         {
             if (string.IsNullOrEmpty(_filePath) || !File.Exists(_filePath))
             {
-                _logger.Information(
-                    "station-groups file not found at {Path} - station group search disabled", _filePath);
+                _logger.Information("station-groups file not found at {Path} - station group search disabled", _filePath);
                 return Empty();
             }
 
             var file = await ReadFileAsync(_filePath, token).ConfigureAwait(false);
             if (file == null)
-                return Empty(); // ReadFileAsync already logged the malformed-file error.
+                return Empty();
 
             var report = new LoadReport();
             var groups = BuildGroups(file.Groups, locations, report);
@@ -72,8 +71,7 @@ namespace Timetable.Web.Loaders
             }
         }
 
-        private IReadOnlyList<StationGroup> BuildGroups(
-            IReadOnlyList<StationGroupJsonDefinition>? definitions, ILocationData locations, LoadReport report)
+        private IReadOnlyList<StationGroup> BuildGroups(IReadOnlyList<StationGroupJsonDefinition>? definitions, ILocationData locations, LoadReport report)
         {
             var groups = new List<StationGroup>();
             if (definitions == null)
@@ -100,10 +98,7 @@ namespace Timetable.Web.Loaders
                     report.GroupsSkipped++;
                     continue;
                 }
-
-                // Priorities are a subset of members by file contract, so look them up against the
-                // already-resolved members rather than via locations again. A priority CRS that isn't one of
-                // the resolved members is treated as a JSON typo and skipped with a warning.
+                
                 var priorities = definition.Priorities is { Count: > 0 }
                     ? ResolvePriorities(definition.Priorities, members, definition.Code, report)
                     : null;
@@ -154,8 +149,8 @@ namespace Timetable.Web.Loaders
             return resolved;
         }
 
-        // Resolves priority CRS codes against the already-resolved members. A priority that isn't one of the
-        // members (or that duplicates one already added) is skipped with a warning.
+        // Resolves priority CRS codes against the already-resolved members because by contract they should be a subset.
+        // A priority that isn't one of the members (or that duplicates one already added) is skipped with a warning.
         private List<Station> ResolvePriorities(
             IReadOnlyList<string> priorityCodes, IReadOnlyList<Station> members, string groupCode, LoadReport report)
         {
@@ -171,6 +166,7 @@ namespace Timetable.Web.Loaders
                 }
                 var member = members.FirstOrDefault(m =>
                     StringComparer.OrdinalIgnoreCase.Equals(m.ThreeLetterCode, crs));
+                
                 if (member == null)
                 {
                     _logger.Warning(
@@ -179,6 +175,7 @@ namespace Timetable.Web.Loaders
                     report.PrioritiesSkipped++;
                     continue;
                 }
+                
                 if (!seen.Add(member))
                 {
                     _logger.Warning(
