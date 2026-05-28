@@ -156,7 +156,6 @@ namespace Timetable.Web.Loaders
             IReadOnlyList<string> priorityCodes, IReadOnlyList<Station> members, string groupCode, LoadReport report)
         {
             var resolved = new List<Station>();
-            var seen = new HashSet<Station>();
             foreach (var crs in priorityCodes)
             {
                 if (string.IsNullOrEmpty(crs))
@@ -167,7 +166,7 @@ namespace Timetable.Web.Loaders
                 }
                 var member = members.FirstOrDefault(m =>
                     StringComparer.OrdinalIgnoreCase.Equals(m.ThreeLetterCode, crs));
-                
+
                 if (member == null)
                 {
                     _logger.Warning(
@@ -177,7 +176,7 @@ namespace Timetable.Web.Loaders
                     continue;
                 }
                 
-                if (!seen.Add(member))
+                if (resolved.Contains(member))
                 {
                     _logger.Warning(
                         "Skipping duplicate priority {Crs} of station group {Code}",
