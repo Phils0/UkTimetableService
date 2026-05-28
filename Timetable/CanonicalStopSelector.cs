@@ -70,8 +70,8 @@ namespace Timetable
                 candidate.OverrideFoundToStop(stop);
         }
 
-        // Priorities are guaranteed in-group by the StationGroup constructor, so a matched stop is always a
-        // member; no membership re-check is needed here.
+        // Priorities are guaranteed in-group by the loader, so a matched stop is always a member;
+        // no membership re-check is needed here.
         private static ResolvedStop? FindDeparturesDestinationByPriority(
             ResolvedServiceStop candidate,
             IReadOnlyList<Station>? priorities)
@@ -130,8 +130,8 @@ namespace Timetable
                 candidate.OverrideFoundFromStop(stop);
         }
 
-        // Priorities are guaranteed in-group by the StationGroup constructor, so a matched stop is always a
-        // member; no membership re-check is needed here.
+        // Priorities are guaranteed in-group by the loader, so a matched stop is always a member;
+        // no membership re-check is needed here.
         private static ResolvedStop? FindArrivalsOriginByPriority(
             ResolvedServiceStop candidate,
             IReadOnlyList<Station>? priorities)
