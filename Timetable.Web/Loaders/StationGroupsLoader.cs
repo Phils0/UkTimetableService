@@ -12,7 +12,7 @@ namespace Timetable.Web.Loaders
     /// <inheritdoc />
     /// <remarks>
     /// Reads a small vendor-neutral JSON file of the shape
-    /// <c>{ "groups": [ { "code": "GB@LO", "members": ["EUS","KGX"], "priorities": ["EUS"] } ] }</c>.
+    /// <c>{ "groups": [ { "code": "GB@LO", "members": ["EUS","KGX"], "priorities": [{ "crs": "EUS", "priority": 0 }] } ] }</c>.
     /// All failure modes degrade gracefully (consistent with the other optional reference-data loaders):
     /// an absent or malformed file disables the feature with a single log line, and a single invalid group,
     /// member or priority is skipped with a warning rather than taking the rest of the file down. A summary
@@ -153,35 +153,36 @@ namespace Timetable.Web.Loaders
 
         // Resolves priority CRS codes against the already-resolved members because by contract they should be a subset.
         // A priority that isn't one of the members (or that duplicates one already added) is skipped with a warning.
+        // Entries are sorted by their explicit Priority field so the returned list is in preference order.
         private List<Station> ResolvePriorities(
-            IReadOnlyList<string> priorityCodes, IReadOnlyList<Station> members, string groupCode, LoadReport report)
+            IReadOnlyList<PriorityJsonEntry> priorityEntries, IReadOnlyList<Station> members, string groupCode, LoadReport report)
         {
             var resolved = new List<Station>();
-            foreach (var crs in priorityCodes)
+            foreach (var entry in priorityEntries.OrderBy(e => e.Priority))
             {
-                if (string.IsNullOrEmpty(crs))
+                if (string.IsNullOrEmpty(entry.Crs))
                 {
                     _logger.Warning("Skipping empty priority entry in station group {Code}", groupCode);
                     report.PrioritiesSkipped++;
                     continue;
                 }
                 var member = members.FirstOrDefault(m =>
-                    StringComparer.OrdinalIgnoreCase.Equals(m.ThreeLetterCode, crs));
+                    StringComparer.OrdinalIgnoreCase.Equals(m.ThreeLetterCode, entry.Crs));
 
                 if (member == null)
                 {
                     _logger.Warning(
                         "Skipping priority {Crs} of station group {Code} - not one of its members",
-                        crs, groupCode);
+                        entry.Crs, groupCode);
                     report.PrioritiesSkipped++;
                     continue;
                 }
-                
+
                 if (resolved.Contains(member))
                 {
                     _logger.Warning(
                         "Skipping duplicate priority {Crs} of station group {Code}",
-                        crs, groupCode);
+                        entry.Crs, groupCode);
                     report.PrioritiesSkipped++;
                     continue;
                 }
@@ -202,7 +203,13 @@ namespace Timetable.Web.Loaders
         {
             public string Code { get; set; } = string.Empty;
             public List<string>? Members { get; set; }
-            public List<string>? Priorities { get; set; }
+            public List<PriorityJsonEntry>? Priorities { get; set; }
+        }
+
+        private sealed class PriorityJsonEntry
+        {
+            public string Crs { get; set; } = string.Empty;
+            public int Priority { get; set; }
         }
 
         private sealed class LoadReport

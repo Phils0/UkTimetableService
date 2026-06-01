@@ -182,14 +182,17 @@ namespace Timetable.Web.Test
             // loaded LocationData and the result lands on Data.StationGroups - the integration of the file-
             // loaded path that the unit tests cover with mocked locations.
             //
-            // Priorities are deliberately non-alphabetical so that accidental loss of ordering (e.g. if Priorities
-            // ever switched to a HashSet) shows up here.
+            // Priority entries are deliberately listed in reverse priority order in JSON so that the loader's
+            // sort-by-Priority is observable from the assertion below.
             var path = Path.Combine(Path.GetTempPath(), $"integration-station-groups-{Guid.NewGuid():N}.json");
             File.WriteAllText(path,
                 @"{ ""groups"": [
                     { ""code"": ""GB@TEST"",
                       ""members"": [""EUS"", ""KGX"", ""LST"", ""PAD"", ""WAT""],
-                      ""priorities"": [""WAT"", ""EUS""] }
+                      ""priorities"": [
+                          { ""crs"": ""EUS"", ""priority"": 1 },
+                          { ""crs"": ""WAT"", ""priority"": 0 }
+                      ] }
                 ] }");
             try
             {

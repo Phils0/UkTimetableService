@@ -61,7 +61,7 @@ namespace Timetable.Web.Test.Loaders
         public async Task LoadsGroupsFromValidFile()
         {
             var path = WriteTempFile(@"{ ""groups"": [
-                { ""code"": ""GB@MA"", ""members"": [""MAN"", ""MCV"", ""MCO""], ""priorities"": [""MAN""] },
+                { ""code"": ""GB@MA"", ""members"": [""MAN"", ""MCV"", ""MCO""], ""priorities"": [{ ""crs"": ""MAN"", ""priority"": 0 }] },
                 { ""code"": ""GB#RE"", ""members"": [""RDG"", ""RDW""] }
             ] }");
             var locations = LocationsWith("MAN", "MCV", "MCO", "RDG", "RDW");
@@ -159,7 +159,7 @@ namespace Timetable.Web.Test.Loaders
         {
             var logger = Substitute.For<ILogger>();
             var path = WriteTempFile(@"{ ""groups"": [
-                { ""code"": ""GB@MA"", ""members"": [""MAN"", ""MCV""], ""priorities"": [""MAN"", ""MAN""] }
+                { ""code"": ""GB@MA"", ""members"": [""MAN"", ""MCV""], ""priorities"": [{ ""crs"": ""MAN"", ""priority"": 0 }, { ""crs"": ""MAN"", ""priority"": 1 }] }
             ] }");
             var locations = LocationsWith("MAN", "MCV");
 
@@ -191,7 +191,7 @@ namespace Timetable.Web.Test.Loaders
         {
             var logger = Substitute.For<ILogger>();
             var path = WriteTempFile(@"{ ""groups"": [
-                { ""code"": ""GB@MA"", ""members"": [""MAN""], ""priorities"": [""MAN"", """"] }
+                { ""code"": ""GB@MA"", ""members"": [""MAN""], ""priorities"": [{ ""crs"": ""MAN"", ""priority"": 0 }, { ""crs"": """", ""priority"": 1 }] }
             ] }");
             var locations = LocationsWith("MAN");
 
@@ -261,7 +261,7 @@ namespace Timetable.Web.Test.Loaders
             // skips just the priority; the group survives with its valid members and a null Priorities list.
             var logger = Substitute.For<ILogger>();
             var path = WriteTempFile(@"{ ""groups"": [
-                { ""code"": ""GB@BAD"", ""members"": [""AAA"", ""BBB""], ""priorities"": [""ZZZ""] }
+                { ""code"": ""GB@BAD"", ""members"": [""AAA"", ""BBB""], ""priorities"": [{ ""crs"": ""ZZZ"", ""priority"": 0 }] }
             ] }");
             var locations = LocationsWith("AAA", "BBB", "ZZZ");
 

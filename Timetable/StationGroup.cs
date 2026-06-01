@@ -7,13 +7,8 @@ namespace Timetable
     /// A named group of stations sharing a common code (e.g. <c>GB@LO</c> for "London (all)").
     /// The optional <see cref="Priorities"/> list defines a strict preference ordering used by the
     /// station-group optimiser when compiling search results; if null, the optimiser falls back to its
-    /// configured <see cref="JourneyHeuristic"/>.
+    /// configured <see cref="JourneyHeuristic"/>. The list is supplied in priority order by the loader.
     /// </summary>
-    /// <remarks>
-    /// Members and priorities are <see cref="Station"/>s rather than CRS strings: stations are created exactly
-    /// once in the master location data, so holding the resolved instances lets the optimiser compare stops by
-    /// station identity and avoids re-resolving codes on every comparison.
-    /// </remarks>
     public class StationGroup
     {
         public string Code { get; }
