@@ -18,7 +18,7 @@ namespace Timetable
     public interface IStationGroupStopOptimiser
     {
         /// <summary>
-        /// Returns one canonical <see cref="ResolvedServiceStop"/> per (RetailServiceId, running date)
+        /// Returns one canonical <see cref="ResolvedServiceStop"/> per (TimetableUid, running date)
         /// for the /departures endpoint. Either group may be <c>null</c> when that side was a single CRS.
         /// </summary>
         ResolvedServiceStop[] OptimiseDepartures(
@@ -27,7 +27,7 @@ namespace Timetable
             StationGroup? destinationGroup);
 
         /// <summary>
-        /// Returns one canonical <see cref="ResolvedServiceStop"/> per (RetailServiceId, running date)
+        /// Returns one canonical <see cref="ResolvedServiceStop"/> per (TimetableUid, running date)
         /// for the /arrivals endpoint. Either group may be <c>null</c> when that side was a single CRS.
         /// </summary>
         ResolvedServiceStop[] OptimiseArrivals(
