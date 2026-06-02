@@ -22,12 +22,10 @@ namespace Timetable.Web.Test.Controllers
         private static readonly DateTime Aug12 = new DateTime(2019, 8, 12);
         private static readonly DateTime Aug12AtTen = Aug12.AddHours(10);
 
-        // No station groups loaded: the group code path never engages and the optimiser is never invoked, so these
+        // StationGroupLookup.Empty: the group code path never engages and the optimiser is never invoked, so these
         // tests continue to assert the unchanged plain-CRS behaviour.
-        private static readonly StationGroupLookup EmptyGroups = new StationGroupLookup(new Dictionary<string, StationGroup>());
-
         private static DeparturesController CreateController(ILocationData data, IFilterFactory filters) =>
-            new DeparturesController(data, filters, EmptyGroups, Substitute.For<IStationGroupStopOptimiser>(),
+            new DeparturesController(data, filters, StationGroupLookup.Empty, Substitute.For<IStationGroupStopOptimiser>(),
                 _config.CreateMapper(), Substitute.For<ILogger>());
 
         [Theory]

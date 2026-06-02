@@ -39,12 +39,12 @@ namespace Timetable.Web.Loaders
             if (string.IsNullOrEmpty(_filePath) || !File.Exists(_filePath))
             {
                 _logger.Information("station-groups file not found at {Path} - station group search disabled", _filePath);
-                return Empty();
+                return StationGroupLookup.Empty;
             }
 
             var (success, file) = await TryReadFileAsync(_filePath, token).ConfigureAwait(false);
             if (!success || file == null)
-                return Empty();
+                return StationGroupLookup.Empty;
 
             var report = new LoadReport();
             var groups = BuildGroups(file.Groups, locations, report);
@@ -190,9 +190,6 @@ namespace Timetable.Web.Loaders
             }
             return resolved;
         }
-
-        private static StationGroupLookup Empty() =>
-            new StationGroupLookup(new Dictionary<string, StationGroup>(StringComparer.OrdinalIgnoreCase));
 
         private sealed class StationGroupsFile
         {
