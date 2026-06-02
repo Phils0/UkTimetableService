@@ -81,6 +81,15 @@ namespace Timetable.Web.Test.ServiceConfiguration
             var dataDescription = descriptors.Single(d => d.ServiceType.Equals(typeof(Model.Configuration)));
             dataDescription.ImplementationInstance.Should().NotBeNull();
         }
+
+        [Fact]
+        public void AddStationGroups()
+        {
+            var descriptors = ConfigureServices();
+
+            var dataDescription = descriptors.Single(d => d.ServiceType.Equals(typeof(StationGroupLookup)));
+            dataDescription.ImplementationInstance.Should().NotBeNull();
+        }
         
         [Fact]
         public void HasLoadedData()

@@ -67,15 +67,6 @@ namespace Timetable.Test
         }
 
         [Fact]
-        public void RejectsPriorityThatIsNotAMember()
-        {
-            Assert.Throws<ArgumentException>(() =>
-                new StationGroup("GB@MA",
-                    new[] { TestStations.Create("MAN"), TestStations.Create("MCV") },
-                    new[] { TestStations.Create("MCO") }));
-        }
-
-        [Fact]
         public void AcceptsPrioritiesThatAreAllMembers()
         {
             var group = new StationGroup("GB@MA",

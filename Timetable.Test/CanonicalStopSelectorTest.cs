@@ -19,9 +19,11 @@ namespace Timetable.Test
             new("GB@MA", new[] { ManchesterPiccadilly, ManchesterVictoria, ManchesterOxfordRoad }, ToPriorities(priorities));
 
         // Priority CRS codes resolve to stations the same way members do, so each priority compares equal to
-        // its member by station identity.
+        // its member by station identity. The list is supplied to StationGroup in the order the test wants.
         private static IReadOnlyList<Station>? ToPriorities(params string[] priorities) =>
-            priorities.Length == 0 ? null : priorities.Select(TestStations.Create).ToArray();
+            priorities.Length == 0
+                ? null
+                : priorities.Select(TestStations.Create).ToArray();
 
         // ---------- ChooseDeparture ----------
 

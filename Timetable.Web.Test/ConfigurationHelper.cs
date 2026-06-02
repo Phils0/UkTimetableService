@@ -18,7 +18,8 @@ namespace Timetable.Web.Test
                     Substitute.For<ILogger>());
         }
         internal static IConfigurationRoot GetConfiguration(
-            string enableCustomPlugins = "false", string enablePrometheus = "true", string darwinDate = null, string enableDebugResponses = "false")
+            string enableCustomPlugins = "false", string enablePrometheus = "true", string darwinDate = null,
+            string enableDebugResponses = "false", string stationGroupsFile = null)
         {
             var appSettings = Substitute.For<IConfigurationRoot>();
             appSettings["TimetableArchive"].Returns("ttis144.zip");
@@ -29,7 +30,9 @@ namespace Timetable.Web.Test
             appSettings["EnableCustomPlugins"].Returns(enableCustomPlugins);
             appSettings["EnablePrometheusMonitoring"].Returns(enablePrometheus);
             appSettings["EnableDebugResponses"].Returns(enableDebugResponses);
-            
+            if(!string.IsNullOrEmpty(stationGroupsFile))
+                appSettings["StationGroupsFile"].Returns(stationGroupsFile);
+
             return appSettings;
         }
     }

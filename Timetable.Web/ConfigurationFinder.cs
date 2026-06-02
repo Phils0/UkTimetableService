@@ -37,7 +37,7 @@ namespace Timetable.Web
                 var loader = Factory.CreateLoader(config, logger).Result;
                 var addData = new SetData(loader, logger);
                 
-                configurations.Add(new Singletons());
+                configurations.Add(new Singletons(config));
                 configurations.Add(addData);
                 if(config.EnablePrometheusMonitoring)
                     configurations.Add(new ServiceConfiguration.Prometheus());

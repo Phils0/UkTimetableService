@@ -34,6 +34,7 @@ namespace Timetable.Web.ServiceConfiguration
                 .AddSingleton<ILocationData>(data.Locations)
                 .AddSingleton<ITimetableLookup>(data.Timetable)
                 .AddSingleton<Timetable.Data>(data)
+                .AddSingleton<StationGroupLookup>(data.StationGroups)
                 .AddSingleton<Model.Configuration>(Factory.CreateConfigurationResponse(data.Archive));
         }
 

@@ -12,24 +12,28 @@ namespace Timetable.Web.Loaders
         private readonly ICifLoader _cif;
         private readonly IDataEnricher _darwin;
         private readonly IDataEnricher _knowledgebase;
+        private readonly IStationGroupsLoader _stationGroups;
         private readonly ILogger _logger;
 
-        public DataLoader(ICifLoader cif, IDataEnricher darwin, IDataEnricher knowledgebase, ILogger logger)
+        public DataLoader(ICifLoader cif, IDataEnricher darwin, IDataEnricher knowledgebase, IStationGroupsLoader stationGroups, ILogger logger)
         {
             _cif = cif;
             _darwin = darwin;
             _knowledgebase = knowledgebase;
+            _stationGroups = stationGroups;
             _logger = logger;
         }
        
         public async Task<Data> LoadAsync(CancellationToken token)
         {
             var tocs = new TocLookup(_logger);
+            var locations = await LoadLocationsAsync(tocs, token).ConfigureAwait(false);
             Data data = new Data()
             {
                 Archive = _cif.ArchiveFile,
                 Tocs = tocs,
-                Locations = await LoadLocationsAsync(tocs, token).ConfigureAwait(false)
+                Locations = locations,
+                StationGroups = await _stationGroups.LoadAsync(locations, token).ConfigureAwait(false)
             };
 
             var enrichRefDataTask = Task.Run(async () =>
