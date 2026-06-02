@@ -1,0 +1,13 @@
+{
+  "groups": [
+    {
+      "code": "GB@LO",
+      "members": ["EUS", "KGX", "STP", "PAD", "WAT", "LST", "VIC", "CHX", "MYB", "BFR", "LBG", "CST"]
+    },
+    {
+      "code": "GB@MA",
+      "members": ["MAN", "MCV", "MCO"],
+      "priorities": [{ "crs": "MAN", "priority": 0 }]
+    }
+  ]
+}

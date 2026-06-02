@@ -42,7 +42,49 @@ namespace Timetable.Web.IntegrationTest
             var departures = JsonConvert.DeserializeObject<Model.FoundSummaryResponse>(responseString);
             departures.Services.Should().NotBeEmpty("{0} should return values", url);
         }
-        
+
+        // Group codes are percent-encoded (the @ becomes %40) exactly as a real client must encode them; the test fixture
+        // Data/station-groups.json defines GB@LO (London terminals) and GB@MA (Manchester) for these to resolve.
+        [Theory]
+        [InlineData("GB@LO", "GB@MA")]
+        public async void MakeDeparturesRequestUsingGroups(string originGroup, string destinationGroup)
+        {
+            var client = Host.GetTestClient();
+            var url =
+                $"/api/Timetable/departures/{Uri.EscapeDataString(originGroup)}/{TestDate}?to={Uri.EscapeDataString(destinationGroup)}&fullDay=true&includeStops=false";
+            var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.Warning("Group request failed. {0} should be successful: {1} Retrying including cancelled services", url, response.StatusCode);
+                (response, url) = await RetryIncludingCancelledServices(client, url);
+            }
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            var departures = JsonConvert.DeserializeObject<Model.FoundSummaryResponse>(responseString);
+            departures.Services.Should().NotBeEmpty("{0} should return values", url);
+        }
+
+        [Theory]
+        [InlineData("GB@LO", "GB@MA")]
+        public async void MakeArrivalsRequestUsingGroups(string destinationGroup, string originGroup)
+        {
+            var client = Host.GetTestClient();
+            var url =
+                $"/api/Timetable/arrivals/{Uri.EscapeDataString(destinationGroup)}/{TestDate}?from={Uri.EscapeDataString(originGroup)}&fullDay=true&includeStops=false";
+            var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.Warning("Group request failed. {0} should be successful: {1} Retrying including cancelled services", url, response.StatusCode);
+                (response, url) = await RetryIncludingCancelledServices(client, url);
+            }
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            var arrivals = JsonConvert.DeserializeObject<Model.FoundSummaryResponse>(responseString);
+            arrivals.Services.Should().NotBeEmpty("{0} should return values", url);
+        }
+
         [Theory]
         [InlineData("TP")]
         [InlineData("XC")]
