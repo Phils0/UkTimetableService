@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +13,9 @@ namespace Timetable.Web.Controllers
     [ApiController]
     public class ArrivalsController : ArrivalDeparturesControllerBase
     {
-        public ArrivalsController(ILocationData data, IFilterFactory filters, IMapper mapper, ILogger logger) :
-            base(data, filters, mapper, logger)
+        public ArrivalsController(ILocationData data, IFilterFactory filters,
+            StationGroupLookup groups, IStationGroupStopOptimiser optimiser, IMapper mapper, ILogger logger) :
+            base(data, filters, groups, optimiser, mapper, logger)
         {
         }
 
@@ -78,31 +80,57 @@ namespace Timetable.Web.Controllers
             var tocFilter = new TocFilter(toc);
             if (fullDay)
                 return await FullDayArrivals(location, at.Date, from, includeStops, tocFilter, returnCancelledServices, dayBoundary);
-            
+
             var request = CreateRequest(location, at, from, before, after, SearchRequest.ARRIVALS, tocFilter);
+            // For arrivals the path parameter is the destination and the ?from= query parameter is the origin.
+            var (filter, originGroup) = ResolveQueryFilter(request, tocFilter);
+            TryResolveGroupOrStation(location, out _, out var destGroup);
+
             return await Process(request, tocFilter, async () =>
             {
-                var config = CreateGatherConfig(request, tocFilter);
-                var result =  _timetable.FindArrivals(request.Location, at, config);
-                return await Task.FromResult(result);
-            }, includeStops, returnCancelledServices);
+                var config = new GatherConfiguration(before, after, false, filter);
+                if (destGroup != null)
+                    return await Task.FromResult(GatherAcrossGroupMembers(destGroup,
+                        member => _timetable.FindArrivals(member, at, config)));
+
+                return await Task.FromResult(_timetable.FindArrivals(request.Location, at, config));
+            }, includeStops, returnCancelledServices,
+                BuildGroupOptimise(originGroup, destGroup, pathGroup: destGroup, pivot: new Time(at.TimeOfDay), before, after));
         }
-        
+
         private async Task<IActionResult> FullDayArrivals(string location, DateTime onDate, string from, bool includeStops, TocFilter tocFilter, bool returnCancelledServices,  string dayBoundary)
         {
             var request = CreateFullDayRequest(location, onDate, @from, SearchRequest.ARRIVALS, tocFilter, dayBoundary);
+            var (filter, originGroup) = ResolveQueryFilter(request, tocFilter);
+            TryResolveGroupOrStation(location, out _, out var destGroup);
+            var boundary = Time.Parse(dayBoundary);
+
             return await Process(request, tocFilter, async () =>
             {
-                var boundary = Time.Parse(dayBoundary);
-                var filter = CreateFilter(request, tocFilter);
-                var result = _timetable.AllArrivals(request.Location, onDate, filter, boundary);
-                return await Task.FromResult(result);
-            }, includeStops, returnCancelledServices);
+                if (destGroup != null)
+                    return await Task.FromResult(GatherAcrossGroupMembers(destGroup,
+                        member => _timetable.AllArrivals(member, onDate, filter, boundary)));
+
+                return await Task.FromResult(_timetable.AllArrivals(request.Location, onDate, filter, boundary));
+            }, includeStops, returnCancelledServices,
+                BuildGroupOptimise(originGroup, destGroup, pathGroup: destGroup, pivot: null, before: 0, after: 0));
         }
-        
+
+        protected override ResolvedServiceStop[] Optimise(ResolvedServiceStop[] candidates, StationGroup? originGroup, StationGroup? destinationGroup)
+        {
+            return _optimiser.OptimiseArrivals(candidates, originGroup, destinationGroup);
+        }
+
+        protected override Time TimeAtFoundStop(ResolvedServiceStop stop) => ((IArrival)stop.Stop.Stop).Time;
+
         protected override GatherConfiguration.GatherFilter CreateFilter(Station station)
         {
             return _filters.ArrivalsComeFrom(station);
+        }
+
+        protected override GatherConfiguration.GatherFilter CreateFilter(IReadOnlySet<Station> stations)
+        {
+            return _filters.ArrivalsComeFrom(stations);
         }
     }
 }
