@@ -1,0 +1,104 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Serilog;
+
+namespace Timetable.Web.Controllers
+{
+    /// <summary>
+    /// Owns the station-group search mechanics that sit between the controllers (HTTP shell) and the
+    /// <see cref="IStationGroupStopOptimiser"/> (collapse policy): gathering across a group's members, building the
+    /// post-dedup collapse-and-re-window transform, and re-windowing a merged board back around the request time.
+    /// Direction (departures vs arrivals) is supplied by the injected <see cref="IGroupSearchDirection"/>.
+    /// </summary>
+    public class GroupSearchOrchestrator
+    {
+        private static readonly Func<ResolvedServiceStop[], ResolvedServiceStop[]> NoOptimisation = stops => stops;
+
+        private readonly IGroupSearchDirection _direction;
+        private readonly ILogger _logger;
+
+        public GroupSearchOrchestrator(IGroupSearchDirection direction, ILogger logger)
+        {
+            _direction = direction;
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Gathers results across every member of a path-side group, concatenating the per-member finds. The status is
+        /// Success if any member returned services. A member with no matching services is expected (its trains just
+        /// don't match this window/filter) and stays silent; a member the timetable can no longer find is logged as a
+        /// warning, since the loader resolved every member against master data at startup - a later miss means the
+        /// group definition is stale relative to the loaded timetable.
+        /// </summary>
+        public (FindStatus status, ResolvedServiceStop[] services) GatherAcrossGroupMembers(
+            StationGroup group, Func<string, (FindStatus status, ResolvedServiceStop[] services)> findAtMember)
+        {
+            var all = new List<ResolvedServiceStop>();
+            var anySuccess = false;
+            foreach (var member in group.Members)
+            {
+                var (status, services) = findAtMember(member.ThreeLetterCode);
+                switch (status)
+                {
+                    case FindStatus.Success:
+                        all.AddRange(services);
+                        anySuccess = true;
+                        break;
+                    case FindStatus.NoServicesForLocation:
+                        break; // expected: this member simply has no matching services in the window/filter
+                    default:
+                        _logger.Warning(
+                            "Station group {Group} member {Member} could not be found in the timetable ({Status}); " +
+                            "the group definition may be stale relative to the loaded data",
+                            group.Code, member.ThreeLetterCode, status);
+                        break;
+                }
+            }
+
+            return anySuccess
+                ? (FindStatus.Success, all.ToArray())
+                : (FindStatus.NoServicesForLocation, Array.Empty<ResolvedServiceStop>());
+        }
+
+        /// <summary>
+        /// Returns the post-dedup transform the controller hands to its Process pipeline: collapse a service's
+        /// member-stops to one canonical row via the direction's optimiser, then - when the path side was a group and
+        /// so over-gathered one window per member (<paramref name="pathGroup"/> non-null, <paramref name="pivot"/>
+        /// non-null = windowed mode) - re-window the merged set back around the request time. When neither side is a
+        /// group the transform is the identity, so the plain-CRS path is byte-for-byte unchanged.
+        /// </summary>
+        public Func<ResolvedServiceStop[], ResolvedServiceStop[]> BuildOptimise(
+            StationGroup? pathGroup, StationGroup? queryGroup, DateTime? pivot, ushort before, ushort after)
+        {
+            if (pathGroup == null && queryGroup == null)
+                return NoOptimisation;
+
+            return stops =>
+            {
+                var optimised = _direction.Optimise(stops, pathGroup, queryGroup);
+                return pathGroup != null && pivot != null
+                    ? ReWindow(optimised, pivot.Value, before, after)
+                    : optimised;
+            };
+        }
+
+        /// <summary>
+        /// Trims a merged board back to the windowed contract: up to <paramref name="before"/> services before the
+        /// pivot and up to <paramref name="after"/> at/after it. Orders and partitions by the absolute instant
+        /// (running date + stop time) so a window that crosses midnight - where a stop's time-of-day alone is
+        /// ambiguous - stays correct regardless of whether a next-day stop is held as 24:10 or as next-day 00:10.
+        /// </summary>
+        private ResolvedServiceStop[] ReWindow(IEnumerable<ResolvedServiceStop> stops, DateTime pivot, int before, int after)
+        {
+            if (before == 0 && after == 0) after = 1; // mirror GatherConfiguration's "always return at least one"
+
+            DateTime InstantOf(ResolvedServiceStop stop) => stop.Stop.On.Add(_direction.TimeAtFoundStop(stop).Value);
+
+            var ordered = stops.OrderBy(InstantOf).ToList();
+            var beforePivot = ordered.Where(s => InstantOf(s) < pivot).TakeLast(before);
+            var fromPivot = ordered.Where(s => InstantOf(s) >= pivot).Take(after);
+            return beforePivot.Concat(fromPivot).ToArray();
+        }
+    }
+}

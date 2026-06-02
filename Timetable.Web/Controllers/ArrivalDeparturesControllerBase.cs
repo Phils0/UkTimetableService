@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -15,110 +14,76 @@ namespace Timetable.Web.Controllers
         protected readonly ILocationData _timetable;
         protected readonly IFilterFactory _filters;
         protected readonly StationGroupLookup _groups;
-        protected readonly IStationGroupStopOptimiser _optimiser;
+        protected readonly GroupSearchOrchestrator _orchestrator;
         protected readonly IMapper _mapper;
         protected readonly ILogger _logger;
 
         protected ArrivalDeparturesControllerBase(ILocationData data, IFilterFactory filters,
-            StationGroupLookup groups, IStationGroupStopOptimiser optimiser, IMapper mapper, ILogger logger)
+            StationGroupLookup groups, GroupSearchOrchestrator orchestrator, IMapper mapper, ILogger logger)
         {
             _timetable = data;
             _filters = filters;
             _groups = groups;
-            _optimiser = optimiser;
+            _orchestrator = orchestrator;
             _mapper = mapper;
             _logger = logger;
         }
+
+        /// <summary>The resolved group/filter context for one request: the to/from filter plus the query-side and
+        /// path-side groups (null when that side was a plain CRS). The path side is the one iterated across members.</summary>
+        protected readonly record struct ResolvedGroupRequest(
+            GatherConfiguration.GatherFilter Filter, StationGroup? QueryGroup, StationGroup? PathGroup);
 
         protected abstract GatherConfiguration.GatherFilter CreateFilter(Station station);
 
         protected abstract GatherConfiguration.GatherFilter CreateFilter(IReadOnlySet<Station> stations);
 
         /// <summary>
-        /// Collapses one service's gathered member-stops to a single canonical row. Departures and arrivals differ
-        /// only in which optimiser entry-point they call and how they map the origin/destination groups.
-        /// </summary>
-        protected abstract ResolvedServiceStop[] Optimise(ResolvedServiceStop[] candidates, StationGroup? originGroup, StationGroup? destinationGroup);
-
-        /// <summary>
-        /// The time of the canonical found stop used to order and re-window results: the departure time at the origin
-        /// for /departures, the arrival time at the destination for /arrivals.
-        /// </summary>
-        protected abstract Time TimeAtFoundStop(ResolvedServiceStop stop);
-
-        /// <summary>
-        /// Gathers results across every member of a path-side group, concatenating the per-member finds. The status is
-        /// Success if any member returned services; the optimiser later collapses a service calling at several members
-        /// down to one canonical row.
-        /// </summary>
-        protected (FindStatus status, ResolvedServiceStop[] services) GatherAcrossGroupMembers(
-            StationGroup group, Func<string, (FindStatus status, ResolvedServiceStop[] services)> findAtMember)
-        {
-            var all = new List<ResolvedServiceStop>();
-            var anySuccess = false;
-            foreach (var member in group.Members)
-            {
-                var (status, services) = findAtMember(member.ThreeLetterCode);
-                if (status == FindStatus.Success)
-                {
-                    all.AddRange(services);
-                    anySuccess = true;
-                }
-            }
-
-            return anySuccess
-                ? (FindStatus.Success, all.ToArray())
-                : (FindStatus.NoServicesForLocation, Array.Empty<ResolvedServiceStop>());
-        }
-
-        /// <summary>
-        /// Builds the post-dedup transform handed to <see cref="Process"/>: collapse member-stops via
-        /// <see cref="Optimise"/>, then - in windowed mode only, when the path side was a group and so over-gathered
-        /// one window per member (<paramref name="pathGroup"/> non-null, <paramref name="pivot"/> non-null) - re-window
-        /// the merged set back around the requested time. Returns null when neither side is a group, leaving the
-        /// plain-CRS path byte-for-byte unchanged.
-        /// </summary>
-        protected Func<ResolvedServiceStop[], ResolvedServiceStop[]>? BuildGroupOptimise(
-            StationGroup? originGroup, StationGroup? destinationGroup, StationGroup? pathGroup,
-            Time? pivot, ushort before, ushort after)
-        {
-            if (originGroup == null && destinationGroup == null)
-                return null;
-
-            return stops =>
-            {
-                var optimised = Optimise(stops, originGroup, destinationGroup);
-                return pathGroup != null && pivot != null
-                    ? ReWindow(optimised, pivot.Value, before, after)
-                    : optimised;
-            };
-        }
-
-        private ResolvedServiceStop[] ReWindow(IEnumerable<ResolvedServiceStop> stops, Time pivot, int before, int after)
-        {
-            if (before == 0 && after == 0) after = 1; // mirror GatherConfiguration's "always return at least one"
-            var ordered = stops.OrderBy(TimeAtFoundStop, Time.EarlierLaterComparer).ToList();
-            var beforePivot = ordered.Where(s => TimeAtFoundStop(s).IsBefore(pivot)).TakeLast(before);
-            var fromPivot = ordered.Where(s => !TimeAtFoundStop(s).IsBefore(pivot)).Take(after);
-            return beforePivot.Concat(fromPivot).ToArray();
-        }
-
-        /// <summary>
         /// Resolves an inbound location code (case-insensitive) to either a single <see cref="Station"/> or a
-        /// <see cref="StationGroup"/>. CRS is tried first, then the group lookup. Returns false when neither matches.
+        /// <see cref="StationGroup"/>, trying CRS first then the group lookup. Both members are null when neither
+        /// matches; at most one is ever non-null, so the caller discriminates on <c>group != null</c>.
         /// </summary>
-        protected bool TryResolveGroupOrStation(string code, out Station station, out StationGroup? group)
+        protected (Station? station, StationGroup? group) ResolveGroupOrStation(string code)
         {
-            group = null;
-            station = Station.NotSet;
             if (string.IsNullOrEmpty(code))
-                return false;
+                return (null, null);
 
             var normalised = code.ToUpperInvariant();
-            if (_timetable.TryGetStation(normalised, out station))
-                return true;
+            if (_timetable.TryGetStation(normalised, out var station))
+                return (station, null);
 
-            return _groups.TryGet(normalised, out group);
+            return _groups.TryGet(normalised, out var group) ? (null, group) : (null, null);
+        }
+
+        /// <summary>
+        /// Resolves the per-request group context shared by both windowed and full-day actions: the to/from filter
+        /// (plus its query-side group) and the path-side group. Keeps the dispatch prologue in one place.
+        /// </summary>
+        protected ResolvedGroupRequest ResolveGroupRequest(SearchRequest request, TocFilter tocFilter)
+        {
+            var (filter, queryGroup) = ResolveQueryFilter(request, tocFilter);
+            var (_, pathGroup) = ResolveGroupOrStation(request.Location);
+            return new ResolvedGroupRequest(filter, queryGroup, pathGroup);
+        }
+
+        /// <summary>
+        /// Runs a (possibly group) search and maps the response. When the path is a group it gathers across every
+        /// member via <paramref name="findAtMember"/>, otherwise it finds at the single location; either way the
+        /// gathered candidates are deduped (in <see cref="Process"/>) then collapsed/re-windowed. Windowing is taken
+        /// from the request: full-day requests skip the re-window, windowed requests re-window around their pivot time.
+        /// </summary>
+        protected Task<IActionResult> RunSearch(SearchRequest request, TocFilter tocFilter, ResolvedGroupRequest resolved,
+            Func<string, (FindStatus status, ResolvedServiceStop[] services)> findAtMember, bool includeStops, bool returnCancelled)
+        {
+            Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find = () => Task.FromResult(
+                resolved.PathGroup != null
+                    ? _orchestrator.GatherAcrossGroupMembers(resolved.PathGroup, findAtMember)
+                    : findAtMember(request.Location));
+
+            var pivot = request.At.FullDay ? (DateTime?)null : request.At.At;
+            var optimise = _orchestrator.BuildOptimise(resolved.PathGroup, resolved.QueryGroup, pivot, request.At.Before, request.At.After);
+
+            return Process(request, tocFilter, find, includeStops, returnCancelled, optimise);
         }
 
         protected SearchRequest CreateRequest(string location, DateTime at, string toFrom, ushort before, ushort after, string requestType, TocFilter tocs)
@@ -150,7 +115,7 @@ namespace Timetable.Web.Controllers
             return CreateRequest(location, at, toFrom, 0, 0, requestType, tocs, true, dayBoundary);
         }
         
-        protected async Task<IActionResult> Process(SearchRequest request, TocFilter tocFilter, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find, bool includeStops, bool returnCancelled, Func<ResolvedServiceStop[], ResolvedServiceStop[]>? optimise = null)
+        protected async Task<IActionResult> Process(SearchRequest request, TocFilter tocFilter, Func<Task<(FindStatus status, ResolvedServiceStop[] services)>> find, bool includeStops, bool returnCancelled, Func<ResolvedServiceStop[], ResolvedServiceStop[]> optimise)
         {
             using (LogContext.PushProperty("Request", request, true))
             {
@@ -176,11 +141,11 @@ namespace Timetable.Web.Controllers
                         var (findStatusAfterFilter, services) = _timetable.Filters.Filter(found, returnCancelled);
                         if (findStatusAfterFilter == FindStatus.Success)
                         {
-                            // Station-group searches collapse a service's multiple member-stops to one canonical
-                            // row here - AFTER the cancelled/STP-overlay dedup above, so the optimiser only ever
-                            // sees one row per (TimetableUid, On) per member. Null for plain CRS searches.
-                            if (optimise != null)
-                                services = optimise(services);
+                            // Station-group searches collapse a service's multiple member-stops to one canonical row
+                            // here - AFTER the cancelled/STP-overlay dedup above, so the optimiser only ever sees one
+                            // row per (TimetableUid, On) per member. The transform is the identity for plain CRS
+                            // searches, leaving their behaviour byte-for-byte unchanged.
+                            services = optimise(services);
                             return MapSuccessResponse(request, includeStops, services);
                         }
 
@@ -239,10 +204,15 @@ namespace Timetable.Web.Controllers
             StationGroup? queryGroup = null;
             if (!string.IsNullOrEmpty(request.ComingFromGoingTo))
             {
-                if (TryResolveGroupOrStation(request.ComingFromGoingTo, out var station, out var group))
+                var (station, group) = ResolveGroupOrStation(request.ComingFromGoingTo);
+                if (group != null)
                 {
-                    filter = group != null ? CreateFilter(group.Members) : CreateFilter(station);
+                    filter = CreateFilter(group.Members);
                     queryGroup = group;
+                }
+                else if (station != null)
+                {
+                    filter = CreateFilter(station);
                 }
                 else
                 {

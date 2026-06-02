@@ -18,7 +18,7 @@ namespace Timetable.Web.Controllers
     {
         public DeparturesController(ILocationData data, IFilterFactory filters,
             StationGroupLookup groups, IStationGroupStopOptimiser optimiser, IMapper mapper, ILogger logger) :
-            base(data, filters, groups, optimiser, mapper, logger)
+            base(data, filters, groups, new GroupSearchOrchestrator(new DeparturesDirection(optimiser), logger), mapper, logger)
         {
         }
 
@@ -84,46 +84,24 @@ namespace Timetable.Web.Controllers
             if (fullDay)
                 return await FullDayDepartures(location, at.Date, to, includeStops, tocFilter, returnCancelledServices, dayBoundary);
 
+            // Path parameter is the origin; ?to= is the destination filter.
             var request = CreateRequest(location, at, to, before, after, SearchRequest.DEPARTURES, tocFilter);
-            var (filter, destGroup) = ResolveQueryFilter(request, tocFilter);
-            TryResolveGroupOrStation(location, out _, out var originGroup);
+            var resolved = ResolveGroupRequest(request, tocFilter);
+            var config = new GatherConfiguration(before, after, false, resolved.Filter);
 
-            return await Process(request, tocFilter, async () =>
-            {
-                var config = new GatherConfiguration(before, after, false, filter);
-                if (originGroup != null)
-                    return await Task.FromResult(GatherAcrossGroupMembers(originGroup,
-                        member => _timetable.FindDepartures(member, at, config)));
-
-                return await Task.FromResult(_timetable.FindDepartures(request.Location, at, config));
-            }, includeStops, returnCancelledServices,
-                BuildGroupOptimise(originGroup, destGroup, pathGroup: originGroup, pivot: new Time(at.TimeOfDay), before, after));
+            return await RunSearch(request, tocFilter, resolved,
+                member => _timetable.FindDepartures(member, at, config), includeStops, returnCancelledServices);
         }
 
         private async Task<IActionResult> FullDayDepartures(string location, DateTime onDate, string to, bool includeStops, TocFilter tocFilter, bool returnCancelledServices, string dayBoundary)
         {
             var request = CreateFullDayRequest(location, onDate, to, SearchRequest.DEPARTURES, tocFilter, dayBoundary);
-            var (filter, destGroup) = ResolveQueryFilter(request, tocFilter);
-            TryResolveGroupOrStation(location, out _, out var originGroup);
+            var resolved = ResolveGroupRequest(request, tocFilter);
             var boundary = Time.Parse(dayBoundary);
 
-            return await Process(request, tocFilter, async () =>
-            {
-                if (originGroup != null)
-                    return await Task.FromResult(GatherAcrossGroupMembers(originGroup,
-                        member => _timetable.AllDepartures(member, onDate, filter, boundary)));
-
-                return await Task.FromResult(_timetable.AllDepartures(request.Location, onDate, filter, boundary));
-            }, includeStops, returnCancelledServices,
-                BuildGroupOptimise(originGroup, destGroup, pathGroup: originGroup, pivot: null, before: 0, after: 0));
+            return await RunSearch(request, tocFilter, resolved,
+                member => _timetable.AllDepartures(member, onDate, resolved.Filter, boundary), includeStops, returnCancelledServices);
         }
-
-        protected override ResolvedServiceStop[] Optimise(ResolvedServiceStop[] candidates, StationGroup? originGroup, StationGroup? destinationGroup)
-        {
-            return _optimiser.OptimiseDepartures(candidates, originGroup, destinationGroup);
-        }
-
-        protected override Time TimeAtFoundStop(ResolvedServiceStop stop) => ((IDeparture)stop.Stop.Stop).Time;
 
         protected override GatherConfiguration.GatherFilter CreateFilter(Station station)
         {

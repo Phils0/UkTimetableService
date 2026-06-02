@@ -115,7 +115,8 @@ namespace Timetable.Web.Test.Controllers
         public async Task SetsToFilter(string location, bool hasFilter)
         {
             var data = CreateStubDataWithFindDepartures();
-            data.TryGetStation("WAT", out Arg.Any<Station>()).Returns(true);
+            // Honour the TryGetStation contract: a hit yields a non-null station (the resolver discriminates on it).
+            data.TryGetStation("WAT", out Arg.Any<Station>()).Returns(x => { x[1] = TestStations.Waterloo; return true; });
 
             var filterFactory = Substitute.For<IFilterFactory>();
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
