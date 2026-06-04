@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Timetable.Web.Model;
 using Xunit;
@@ -43,12 +44,17 @@ namespace Timetable.Web.IntegrationTest
             departures.Services.Should().NotBeEmpty("{0} should return values", url);
         }
 
-        // Group codes are percent-encoded (the @ becomes %40) exactly as a real client must encode them; the test fixture
-        // Data/station-groups.json defines GB@LO (London terminals) and GB@MA (Manchester) for these to resolve.
-        [Theory]
+        // Like the other smoke tests, this relies on runner-supplied data: station groups are provisioned by the
+        // runner (core ships no station-groups.json), so when none are loaded the test skips rather than fails.
+        // Group codes are percent-encoded (the @ becomes %40) exactly as a real client must encode them.
+        [SkippableTheory]
         [InlineData("GB@LO", "GB@MA")]
         public async void MakeDeparturesRequestUsingGroups(string originGroup, string destinationGroup)
         {
+            var groups = Host.Services.GetRequiredService<StationGroupLookup>();
+            Skip.IfNot(groups.TryGet(originGroup, out _) && groups.TryGet(destinationGroup, out _),
+                "No station groups loaded - supply a station-groups.json defining these groups to run this smoke test.");
+
             var client = Host.GetTestClient();
             var url =
                 $"/api/Timetable/departures/{Uri.EscapeDataString(originGroup)}/{TestDate}?to={Uri.EscapeDataString(destinationGroup)}&fullDay=true&includeStops=false";
@@ -65,10 +71,14 @@ namespace Timetable.Web.IntegrationTest
             departures.Services.Should().NotBeEmpty("{0} should return values", url);
         }
 
-        [Theory]
+        [SkippableTheory]
         [InlineData("GB@LO", "GB@MA")]
         public async void MakeArrivalsRequestUsingGroups(string destinationGroup, string originGroup)
         {
+            var groups = Host.Services.GetRequiredService<StationGroupLookup>();
+            Skip.IfNot(groups.TryGet(originGroup, out _) && groups.TryGet(destinationGroup, out _),
+                "No station groups loaded - supply a station-groups.json defining these groups to run this smoke test.");
+
             var client = Host.GetTestClient();
             var url =
                 $"/api/Timetable/arrivals/{Uri.EscapeDataString(destinationGroup)}/{TestDate}?from={Uri.EscapeDataString(originGroup)}&fullDay=true&includeStops=false";
