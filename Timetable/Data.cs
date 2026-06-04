@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Timetable
 {
     public class Data
@@ -13,7 +11,7 @@ namespace Timetable
 
         // Optional station-group reference data. Defaults to an empty lookup so the feature is simply
         // inert (group lookups return false) when the file is absent, rather than the property being null.
-        public StationGroupLookup StationGroups { get; set; } = new (new Dictionary<string, StationGroup>());
+        public StationGroupLookup StationGroups { get; set; } = StationGroupLookup.Empty;
 
         public bool IsLoaded => (Locations?.IsLoaded ?? false)
             && (Timetable?.IsLoaded ?? false);
