@@ -9,18 +9,17 @@ namespace Timetable.Web.Controllers
     /// Owns the station-group search mechanics that sit between the controllers (HTTP shell) and the
     /// <see cref="IStationGroupStopOptimiser"/> (collapse policy): gathering across a group's members, building the
     /// post-dedup collapse-and-re-window transform, and re-windowing a merged board back around the request time.
-    /// Direction (departures vs arrivals) is supplied by the injected <see cref="IGroupSearchDirection"/>.
+    /// Stateless and direction-neutral: the per-request <see cref="IGroupSearchDirection"/> (the calling controller)
+    /// is passed in to <see cref="BuildOptimise"/>, so this is registered as a single shared singleton.
     /// </summary>
     public class GroupSearchOrchestrator
     {
         private static readonly Func<ResolvedServiceStop[], ResolvedServiceStop[]> NoOptimisation = stops => stops;
 
-        private readonly IGroupSearchDirection _direction;
         private readonly ILogger _logger;
 
-        public GroupSearchOrchestrator(IGroupSearchDirection direction, ILogger logger)
+        public GroupSearchOrchestrator(ILogger logger)
         {
-            _direction = direction;
             _logger = logger;
         }
 
@@ -83,16 +82,16 @@ namespace Timetable.Web.Controllers
         /// group the transform is the identity, so the plain-CRS path is byte-for-byte unchanged.
         /// </summary>
         public Func<ResolvedServiceStop[], ResolvedServiceStop[]> BuildOptimise(
-            StationGroup? pathGroup, StationGroup? queryGroup, DateTime? pivot, ushort before, ushort after)
+            IGroupSearchDirection direction, StationGroup? pathGroup, StationGroup? queryGroup, DateTime? pivot, ushort before, ushort after)
         {
             if (pathGroup == null && queryGroup == null)
                 return NoOptimisation;
 
             return stops =>
             {
-                var optimised = _direction.Optimise(stops, pathGroup, queryGroup);
+                var optimised = direction.Optimise(stops, pathGroup, queryGroup);
                 return pathGroup != null && pivot != null
-                    ? ReWindow(optimised, pivot.Value, before, after)
+                    ? ReWindow(direction, optimised, pivot.Value, before, after)
                     : optimised;
             };
         }
@@ -103,11 +102,12 @@ namespace Timetable.Web.Controllers
         /// (running date + stop time) so a window that crosses midnight - where a stop's time-of-day alone is
         /// ambiguous - stays correct regardless of whether a next-day stop is held as 24:10 or as next-day 00:10.
         /// </summary>
-        private ResolvedServiceStop[] ReWindow(IEnumerable<ResolvedServiceStop> stops, DateTime pivot, int before, int after)
+        private static ResolvedServiceStop[] ReWindow(
+            IGroupSearchDirection direction, IEnumerable<ResolvedServiceStop> stops, DateTime pivot, int before, int after)
         {
             if (before == 0 && after == 0) after = 1; // mirror GatherConfiguration's "always return at least one"
 
-            DateTime InstantOf(ResolvedServiceStop stop) => stop.Stop.On.Add(_direction.TimeAtFoundStop(stop).Value);
+            DateTime InstantOf(ResolvedServiceStop stop) => stop.Stop.On.Add(direction.TimeAtFoundStop(stop).Value);
 
             var ordered = stops.OrderBy(InstantOf).ToList();
             var beforePivot = ordered.Where(s => InstantOf(s) < pivot).TakeLast(before);

@@ -25,8 +25,8 @@ namespace Timetable.Web.Test.Controllers
         // StationGroupLookup.Empty: the group code path never engages and the optimiser is never invoked, so these
         // tests continue to assert the unchanged plain-CRS behaviour.
         private static DeparturesController CreateController(ILocationData data, IFilterFactory filters) =>
-            new DeparturesController(data, filters, StationGroupLookup.Empty, Substitute.For<IStationGroupStopOptimiser>(),
-                _config.CreateMapper(), Substitute.For<ILogger>());
+            new DeparturesController(data, filters, StationGroupLookup.Empty, new GroupSearchOrchestrator(Substitute.For<ILogger>()),
+                Substitute.For<IStationGroupStopOptimiser>(), _config.CreateMapper(), Substitute.For<ILogger>());
 
         [Theory]
         [InlineData("SUR")]

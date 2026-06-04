@@ -9,7 +9,7 @@ using Timetable.Web.Model;
 
 namespace Timetable.Web.Controllers
 {
-    public abstract class ArrivalDeparturesControllerBase : ControllerBase
+    public abstract class ArrivalDeparturesControllerBase : ControllerBase, IGroupSearchDirection
     {
         protected readonly ILocationData _timetable;
         protected readonly IFilterFactory _filters;
@@ -37,6 +37,19 @@ namespace Timetable.Web.Controllers
         protected abstract GatherConfiguration.GatherFilter CreateFilter(Station station);
 
         protected abstract GatherConfiguration.GatherFilter CreateFilter(IReadOnlySet<Station> stations);
+
+        // The direction-specific halves of IGroupSearchDirection: which optimiser entry-point to call (mapping the
+        // path/query groups onto its origin/destination) and which stop time orders results. Kept protected (not
+        // public) so MVC doesn't surface them as routable actions; the explicit interface members below adapt them
+        // for the orchestrator. The controller "is" its own direction - the same shape as the CreateFilter overrides.
+        protected abstract ResolvedServiceStop[] Optimise(ResolvedServiceStop[] candidates, StationGroup? pathGroup, StationGroup? queryGroup);
+
+        protected abstract Time TimeAtFoundStop(ResolvedServiceStop stop);
+
+        ResolvedServiceStop[] IGroupSearchDirection.Optimise(ResolvedServiceStop[] candidates, StationGroup? pathGroup, StationGroup? queryGroup) =>
+            Optimise(candidates, pathGroup, queryGroup);
+
+        Time IGroupSearchDirection.TimeAtFoundStop(ResolvedServiceStop stop) => TimeAtFoundStop(stop);
 
         /// <summary>
         /// Resolves an inbound location code (case-insensitive) to either a single <see cref="Station"/> or a
@@ -81,7 +94,7 @@ namespace Timetable.Web.Controllers
                     : findAtMember(request.Location));
 
             var pivot = request.At.FullDay ? (DateTime?)null : request.At.At;
-            var optimise = _orchestrator.BuildOptimise(resolved.PathGroup, resolved.QueryGroup, pivot, request.At.Before, request.At.After);
+            var optimise = _orchestrator.BuildOptimise(this, resolved.PathGroup, resolved.QueryGroup, pivot, request.At.Before, request.At.After);
 
             return Process(request, tocFilter, find, includeStops, returnCancelled, optimise);
         }

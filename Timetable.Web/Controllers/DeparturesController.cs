@@ -16,10 +16,13 @@ namespace Timetable.Web.Controllers
     [ApiController]
     public class DeparturesController : ArrivalDeparturesControllerBase
     {
-        public DeparturesController(ILocationData data, IFilterFactory filters,
-            StationGroupLookup groups, IStationGroupStopOptimiser optimiser, IMapper mapper, ILogger logger) :
-            base(data, filters, groups, new GroupSearchOrchestrator(new DeparturesDirection(optimiser), logger), mapper, logger)
+        private readonly IStationGroupStopOptimiser _optimiser;
+
+        public DeparturesController(ILocationData data, IFilterFactory filters, StationGroupLookup groups,
+            GroupSearchOrchestrator orchestrator, IStationGroupStopOptimiser optimiser, IMapper mapper, ILogger logger) :
+            base(data, filters, groups, orchestrator, mapper, logger)
         {
+            _optimiser = optimiser;
         }
 
         /// <summary>
@@ -102,6 +105,12 @@ namespace Timetable.Web.Controllers
             return await RunSearch(request, tocFilter, resolved,
                 member => _timetable.AllDepartures(member, onDate, resolved.Filter, boundary), includeStops, returnCancelledServices);
         }
+
+        // For /departures the path parameter is the origin and ?to= is the destination.
+        protected override ResolvedServiceStop[] Optimise(ResolvedServiceStop[] candidates, StationGroup? pathGroup, StationGroup? queryGroup) =>
+            _optimiser.OptimiseDepartures(candidates, originGroup: pathGroup, destinationGroup: queryGroup);
+
+        protected override Time TimeAtFoundStop(ResolvedServiceStop stop) => ((IDeparture)stop.Stop.Stop).Time;
 
         protected override GatherConfiguration.GatherFilter CreateFilter(Station station)
         {

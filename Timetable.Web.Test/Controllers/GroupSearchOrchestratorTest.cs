@@ -87,15 +87,15 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public void BuildOptimiseIsTheIdentityWhenNeitherSideIsAGroup()
         {
-            var optimiser = PassThroughOptimiser();
-            var orchestrator = new GroupSearchOrchestrator(new DeparturesDirection(optimiser), Substitute.For<ILogger>());
+            var direction = Substitute.For<IGroupSearchDirection>();
+            var orchestrator = new GroupSearchOrchestrator(Substitute.For<ILogger>());
             var stops = new[] { DepartingAt("X10001", 10, 10) };
 
-            var result = orchestrator.BuildOptimise(pathGroup: null, queryGroup: null,
+            var result = orchestrator.BuildOptimise(direction, pathGroup: null, queryGroup: null,
                 pivot: Aug12AtTen, before: 1, after: 1)(stops);
 
             Assert.Same(stops, result);
-            optimiser.DidNotReceive().OptimiseDepartures(Arg.Any<IEnumerable<ResolvedServiceStop>>(), Arg.Any<StationGroup>(), Arg.Any<StationGroup>());
+            direction.DidNotReceive().Optimise(Arg.Any<ResolvedServiceStop[]>(), Arg.Any<StationGroup>(), Arg.Any<StationGroup>());
         }
 
         // ----- GatherAcrossGroupMembers -----
@@ -104,7 +104,7 @@ namespace Timetable.Web.Test.Controllers
         public void GatherCollectsSuccessfulMembersAndWarnsOnAMemberTheTimetableCannotFind()
         {
             var logger = Substitute.For<ILogger>();
-            var orchestrator = new GroupSearchOrchestrator(new DeparturesDirection(PassThroughOptimiser()), logger);
+            var orchestrator = new GroupSearchOrchestrator(logger);
             var group = new StationGroup("GB@MA", new[] { TestStations.Create("MAN"), TestStations.Create("MCV"), TestStations.Create("MCO") });
 
             var (status, services) = orchestrator.GatherAcrossGroupMembers(group, member => member switch
@@ -124,7 +124,7 @@ namespace Timetable.Web.Test.Controllers
         public void GatherReturnsNoServicesAndStaysSilentWhenEveryMemberIsSimplyEmpty()
         {
             var logger = Substitute.For<ILogger>();
-            var orchestrator = new GroupSearchOrchestrator(new DeparturesDirection(PassThroughOptimiser()), logger);
+            var orchestrator = new GroupSearchOrchestrator(logger);
             var group = new StationGroup("GB@MA", new[] { TestStations.Create("MAN"), TestStations.Create("MCV") });
 
             var (status, services) = orchestrator.GatherAcrossGroupMembers(group,
@@ -140,7 +140,7 @@ namespace Timetable.Web.Test.Controllers
         {
             // No member has services, but one errored: return Error (-> 500) rather than masking it as a 404
             // NoServicesForLocation. Error outranks the other members' statuses.
-            var orchestrator = new GroupSearchOrchestrator(new DeparturesDirection(PassThroughOptimiser()), Substitute.For<ILogger>());
+            var orchestrator = new GroupSearchOrchestrator(Substitute.For<ILogger>());
             var group = new StationGroup("GB@MA", new[] { TestStations.Create("MAN"), TestStations.Create("MCV") });
 
             var (status, _) = orchestrator.GatherAcrossGroupMembers(group, member => member switch
@@ -155,7 +155,7 @@ namespace Timetable.Web.Test.Controllers
         [Fact]
         public void GatherPrefersLocationNotFoundOverNoServicesWhenNoneSucceed()
         {
-            var orchestrator = new GroupSearchOrchestrator(new DeparturesDirection(PassThroughOptimiser()), Substitute.For<ILogger>());
+            var orchestrator = new GroupSearchOrchestrator(Substitute.For<ILogger>());
             var group = new StationGroup("GB@MA", new[] { TestStations.Create("MAN"), TestStations.Create("MCV") });
 
             var (status, _) = orchestrator.GatherAcrossGroupMembers(group, member => member switch
@@ -172,8 +172,16 @@ namespace Timetable.Web.Test.Controllers
         // The transform for a path-side (origin) group departures search, ordered/windowed by origin departure time.
         private static Func<ResolvedServiceStop[], ResolvedServiceStop[]> WindowedDepartures(DateTime pivot, ushort before, ushort after)
         {
-            var orchestrator = new GroupSearchOrchestrator(new DeparturesDirection(PassThroughOptimiser()), Substitute.For<ILogger>());
-            return orchestrator.BuildOptimise(pathGroup: London, queryGroup: null, pivot: pivot, before, after);
+            var orchestrator = new GroupSearchOrchestrator(Substitute.For<ILogger>());
+            return orchestrator.BuildOptimise(new PassThroughDeparturesDirection(), pathGroup: London, queryGroup: null, pivot: pivot, before, after);
+        }
+
+        // Stands in for a real controller: Optimise returns its input untouched (so ReWindow operates on exactly the
+        // supplied stops), and the found-stop time is the departure time - mirroring DeparturesController.
+        private sealed class PassThroughDeparturesDirection : IGroupSearchDirection
+        {
+            public ResolvedServiceStop[] Optimise(ResolvedServiceStop[] candidates, StationGroup? pathGroup, StationGroup? queryGroup) => candidates;
+            public Time TimeAtFoundStop(ResolvedServiceStop stop) => ((IDeparture)stop.Stop.Stop).Time;
         }
 
         // A departure stop whose origin (Surbiton) departs at the given time-of-day on the test date; hours >= 24 land

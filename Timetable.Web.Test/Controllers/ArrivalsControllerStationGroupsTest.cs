@@ -195,6 +195,6 @@ namespace Timetable.Web.Test.Controllers
 
         private static ArrivalsController CreateController(ILocationData data, StationGroupLookup groups,
             IStationGroupStopOptimiser optimiser, IFilterFactory? filters = null) =>
-            new ArrivalsController(data, filters ?? FilterFactory, groups, optimiser, Mapper, Substitute.For<ILogger>());
+            new ArrivalsController(data, filters ?? FilterFactory, groups, new GroupSearchOrchestrator(Substitute.For<ILogger>()), optimiser, Mapper, Substitute.For<ILogger>());
     }
 }
