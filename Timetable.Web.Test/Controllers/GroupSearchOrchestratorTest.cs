@@ -135,6 +135,38 @@ namespace Timetable.Web.Test.Controllers
             logger.DidNotReceive().Warning(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<FindStatus>());
         }
 
+        [Fact]
+        public void GatherSurfacesAnErrorMemberAsErrorWhenNoneSucceed()
+        {
+            // No member has services, but one errored: return Error (-> 500) rather than masking it as a 404
+            // NoServicesForLocation. Error outranks the other members' statuses.
+            var orchestrator = new GroupSearchOrchestrator(new DeparturesDirection(PassThroughOptimiser()), Substitute.For<ILogger>());
+            var group = new StationGroup("GB@MA", new[] { TestStations.Create("MAN"), TestStations.Create("MCV") });
+
+            var (status, _) = orchestrator.GatherAcrossGroupMembers(group, member => member switch
+            {
+                "MAN" => (FindStatus.Error, Array.Empty<ResolvedServiceStop>()),
+                _ => (FindStatus.NoServicesForLocation, Array.Empty<ResolvedServiceStop>()),
+            });
+
+            Assert.Equal(FindStatus.Error, status);
+        }
+
+        [Fact]
+        public void GatherPrefersLocationNotFoundOverNoServicesWhenNoneSucceed()
+        {
+            var orchestrator = new GroupSearchOrchestrator(new DeparturesDirection(PassThroughOptimiser()), Substitute.For<ILogger>());
+            var group = new StationGroup("GB@MA", new[] { TestStations.Create("MAN"), TestStations.Create("MCV") });
+
+            var (status, _) = orchestrator.GatherAcrossGroupMembers(group, member => member switch
+            {
+                "MAN" => (FindStatus.LocationNotFound, Array.Empty<ResolvedServiceStop>()),
+                _ => (FindStatus.NoServicesForLocation, Array.Empty<ResolvedServiceStop>()),
+            });
+
+            Assert.Equal(FindStatus.LocationNotFound, status);
+        }
+
         // ----- helpers -----
 
         // The transform for a path-side (origin) group departures search, ordered/windowed by origin departure time.

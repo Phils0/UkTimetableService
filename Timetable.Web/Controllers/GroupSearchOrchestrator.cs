@@ -27,15 +27,16 @@ namespace Timetable.Web.Controllers
         /// <summary>
         /// Gathers results across every member of a path-side group, concatenating the per-member finds. The status is
         /// Success if any member returned services. A member with no matching services is expected (its trains just
-        /// don't match this window/filter) and stays silent; a member the timetable can no longer find is logged as a
-        /// warning, since the loader resolved every member against master data at startup - a later miss means the
-        /// group definition is stale relative to the loaded timetable.
+        /// don't match this window/filter) and stays silent. Any other per-member status is logged and dropped from
+        /// the merged result, and - when no member succeeded - the most severe such status is returned rather than
+        /// masking it as NoServicesForLocation, so an Error surfaces as 500 (not 404).
         /// </summary>
         public (FindStatus status, ResolvedServiceStop[] services) GatherAcrossGroupMembers(
             StationGroup group, Func<string, (FindStatus status, ResolvedServiceStop[] services)> findAtMember)
         {
             var all = new List<ResolvedServiceStop>();
             var anySuccess = false;
+            var failure = FindStatus.NoServicesForLocation;
             foreach (var member in group.Members)
             {
                 var (status, services) = findAtMember(member.ThreeLetterCode);
@@ -49,16 +50,29 @@ namespace Timetable.Web.Controllers
                         break; // expected: this member simply has no matching services in the window/filter
                     default:
                         _logger.Warning(
-                            "Station group {Group} member {Member} could not be found in the timetable ({Status}); " +
-                            "the group definition may be stale relative to the loaded data",
+                            "Station group {Group} member {Member} returned {Status}; dropping it from the merged result",
                             group.Code, member.ThreeLetterCode, status);
+                        failure = MoreSevereStatus(failure, status);
                         break;
                 }
             }
 
             return anySuccess
                 ? (FindStatus.Success, all.ToArray())
-                : (FindStatus.NoServicesForLocation, Array.Empty<ResolvedServiceStop>());
+                : (failure, Array.Empty<ResolvedServiceStop>());
+        }
+
+        // Failure precedence when no member returned services: Error (500) beats LocationNotFound (404) beats the
+        // default NoServicesForLocation (404), so a genuine server error isn't hidden behind a "no services" 404.
+        private static FindStatus MoreSevereStatus(FindStatus current, FindStatus candidate)
+        {
+            if (current == FindStatus.Error || candidate == FindStatus.Error)
+                return FindStatus.Error;
+
+            if (current == FindStatus.LocationNotFound || candidate == FindStatus.LocationNotFound)
+                return FindStatus.LocationNotFound;
+
+            return FindStatus.NoServicesForLocation;
         }
 
         /// <summary>
