@@ -81,7 +81,7 @@ namespace Timetable.Web.Loaders
 
             foreach (var definition in definitions)
             {
-                var members = ResolveMembers(definition.Members, locations, definition.Code, report);
+                var members = ResolveMembers(definition.Members, locations, definition.Code);
                 if (members.Count == 0)
                 {
                     _logger.Warning(
@@ -108,6 +108,9 @@ namespace Timetable.Web.Loaders
                 {
                     var group = new StationGroup(definition.Code, members, priorities);
                     groups.Add(group.Code, group);
+                    // Count member-skips only for a group we keep; a fully-dropped group's members are already
+                    // reflected in GroupsSkipped, so counting them here too would overstate MembersSkipped.
+                    report.MembersSkipped += (definition.Members?.Count ?? 0) - members.Count;
                 }
                 catch (ArgumentException e)
                 {
@@ -122,9 +125,10 @@ namespace Timetable.Web.Loaders
         }
 
         // Resolves member CRS codes to Stations via the master station data. CRS not in the data, and empty
-        // entries, are logged and skipped - the caller decides whether the remaining set is sufficient.
+        // entries, are logged and skipped. Counting the skips is the caller's job (only for groups it keeps), so
+        // members of an entirely-dropped group aren't counted twice - once here and again via GroupsSkipped.
         private List<Station> ResolveMembers(
-            IReadOnlyList<string>? memberCodes, ILocationData locations, string groupCode, LoadReport report)
+            IReadOnlyList<string>? memberCodes, ILocationData locations, string groupCode)
         {
             var resolved = new List<Station>();
             if (memberCodes == null)
@@ -134,19 +138,15 @@ namespace Timetable.Web.Loaders
                 if (string.IsNullOrEmpty(crs))
                 {
                     _logger.Warning("Skipping empty member entry in station group {Code}", groupCode);
-                    report.MembersSkipped++;
                     continue;
                 }
-                
+
                 if (locations.TryGetStation(crs.ToUpperInvariant(), out var station))
                     resolved.Add(station);
                 else
-                {
                     _logger.Warning(
                         "Skipping member {Crs} of station group {Code} - not found in master station data",
                         crs, groupCode);
-                    report.MembersSkipped++;
-                }
             }
             return resolved;
         }
