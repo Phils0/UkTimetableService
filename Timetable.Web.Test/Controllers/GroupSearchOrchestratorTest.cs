@@ -92,7 +92,7 @@ namespace Timetable.Web.Test.Controllers
             var stops = new[] { DepartingAt("X10001", 10, 10) };
 
             var result = orchestrator.BuildOptimise(direction, pathGroup: null, queryGroup: null,
-                pivot: Aug12AtTen, before: 1, after: 1)(stops);
+                pivot: Aug12AtTen, new ResultWindow(1, 1))(stops);
 
             Assert.Same(stops, result);
             direction.DidNotReceive().Optimise(Arg.Any<ResolvedServiceStop[]>(), Arg.Any<StationGroup>(), Arg.Any<StationGroup>());
@@ -173,7 +173,7 @@ namespace Timetable.Web.Test.Controllers
         private static Func<ResolvedServiceStop[], ResolvedServiceStop[]> WindowedDepartures(DateTime pivot, ushort before, ushort after)
         {
             var orchestrator = new GroupSearchOrchestrator(Substitute.For<ILogger>());
-            return orchestrator.BuildOptimise(new PassThroughDeparturesDirection(), pathGroup: London, queryGroup: null, pivot: pivot, before, after);
+            return orchestrator.BuildOptimise(new PassThroughDeparturesDirection(), pathGroup: London, queryGroup: null, pivot: pivot, new ResultWindow(before, after));
         }
 
         // Stands in for a real controller: Optimise returns its input untouched (so ReWindow operates on exactly the

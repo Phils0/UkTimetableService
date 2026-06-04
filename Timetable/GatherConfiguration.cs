@@ -12,15 +12,15 @@ namespace Timetable
         public bool All { get; }
         
         public GatherConfiguration(ushort before, ushort after, bool all, GatherFilter filter)
+            : this(new ResultWindow(before, after), all, filter)
+        {
+        }
+
+        public GatherConfiguration(ResultWindow window, bool all, GatherFilter filter)
         {
             Filter = filter;
-            
-            // Ensure return at least one service
-            if (before == 0 && after == 0)
-                after = 1;
-            
-            ServicesBefore = before;
-            ServicesAfter = after;
+            ServicesBefore = window.Before;
+            ServicesAfter = window.After;
             All = all;
         }
         

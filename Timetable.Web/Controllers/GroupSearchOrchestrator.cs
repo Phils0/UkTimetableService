@@ -82,7 +82,7 @@ namespace Timetable.Web.Controllers
         /// group the transform is the identity, so the plain-CRS path is byte-for-byte unchanged.
         /// </summary>
         public Func<ResolvedServiceStop[], ResolvedServiceStop[]> BuildOptimise(
-            IGroupSearchDirection direction, StationGroup? pathGroup, StationGroup? queryGroup, DateTime? pivot, ushort before, ushort after)
+            IGroupSearchDirection direction, StationGroup? pathGroup, StationGroup? queryGroup, DateTime? pivot, ResultWindow window)
         {
             if (pathGroup == null && queryGroup == null)
                 return NoOptimisation;
@@ -91,27 +91,25 @@ namespace Timetable.Web.Controllers
             {
                 var optimised = direction.Optimise(stops, pathGroup, queryGroup);
                 return pathGroup != null && pivot != null
-                    ? ReWindow(direction, optimised, pivot.Value, before, after)
+                    ? ReWindow(direction, optimised, pivot.Value, window)
                     : optimised;
             };
         }
 
         /// <summary>
-        /// Trims a merged board back to the windowed contract: up to <paramref name="before"/> services before the
-        /// pivot and up to <paramref name="after"/> at/after it. Orders and partitions by the absolute instant
-        /// (running date + stop time) so a window that crosses midnight - where a stop's time-of-day alone is
-        /// ambiguous - stays correct regardless of whether a next-day stop is held as 24:10 or as next-day 00:10.
+        /// Trims a merged board back to the windowed contract: up to <paramref name="window"/>'s before/after counts
+        /// either side of the pivot. Orders and partitions by the absolute instant (running date + stop time) so a
+        /// window that crosses midnight - where a stop's time-of-day alone is ambiguous - stays correct regardless of
+        /// whether a next-day stop is held as 24:10 or as next-day 00:10.
         /// </summary>
         private static ResolvedServiceStop[] ReWindow(
-            IGroupSearchDirection direction, IEnumerable<ResolvedServiceStop> stops, DateTime pivot, int before, int after)
+            IGroupSearchDirection direction, IEnumerable<ResolvedServiceStop> stops, DateTime pivot, ResultWindow window)
         {
-            if (before == 0 && after == 0) after = 1; // mirror GatherConfiguration's "always return at least one"
-
             DateTime InstantOf(ResolvedServiceStop stop) => stop.Stop.On.Add(direction.TimeAtFoundStop(stop).Value);
 
             var ordered = stops.OrderBy(InstantOf).ToList();
-            var beforePivot = ordered.Where(s => InstantOf(s) < pivot).TakeLast(before);
-            var fromPivot = ordered.Where(s => InstantOf(s) >= pivot).Take(after);
+            var beforePivot = ordered.Where(s => InstantOf(s) < pivot).TakeLast(window.Before);
+            var fromPivot = ordered.Where(s => InstantOf(s) >= pivot).Take(window.After);
             return beforePivot.Concat(fromPivot).ToArray();
         }
     }

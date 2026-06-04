@@ -94,7 +94,8 @@ namespace Timetable.Web.Controllers
                     : findAtMember(request.Location));
 
             var pivot = request.At.FullDay ? (DateTime?)null : request.At.At;
-            var optimise = _orchestrator.BuildOptimise(this, resolved.PathGroup, resolved.QueryGroup, pivot, request.At.Before, request.At.After);
+            var window = new ResultWindow(request.At.Before, request.At.After);
+            var optimise = _orchestrator.BuildOptimise(this, resolved.PathGroup, resolved.QueryGroup, pivot, window);
 
             return Process(request, tocFilter, find, includeStops, returnCancelled, optimise);
         }
