@@ -27,6 +27,7 @@ namespace Timetable.Web.ServiceConfiguration
             var heuristic = _config.StationGroupOptimisationStrategy;
             var selector = new CanonicalStopSelector(heuristic);
             services.AddSingleton<IStationGroupStopOptimiser>(new StationGroupStopOptimiser(selector, Logger));
+            services.AddSingleton<Controllers.GroupSearchOrchestrator>(new Controllers.GroupSearchOrchestrator(Logger));
             Logger.Information("Registered station group stop optimiser using the {Heuristic} journey heuristic", heuristic);
 
             var mapperConfiguration = new MapperConfiguration(

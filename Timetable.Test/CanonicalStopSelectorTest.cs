@@ -59,6 +59,21 @@ namespace Timetable.Test
         }
 
         [Fact]
+        public void Departure_OriginGroupOrdersAcrossMidnight_WithLongestHeuristic()
+        {
+            // King's Cross departs 23:55, St Pancras 00:05 the next day (Value > 24h). Longest = earliest real
+            // departure = King's Cross; a day-ignoring comparison would rank the 00:05 stop as earliest and pick
+            // St Pancras. Candidates passed St-Pancras-first so a broken ordering can't pass by accident.
+            var service = LondonAllToManchesterOverMidnight();
+            var atKgx = new ResolvedServiceStop(service, service.Details.Locations[0]);
+            var atStp = new ResolvedServiceStop(service, service.Details.Locations[1]);
+
+            var result = Selector(JourneyHeuristic.Longest).ChooseDeparture(new[] { atStp, atKgx }, LondonOriginGroup(), null);
+
+            Assert.Equal(KingsCross, result!.Stop.Stop.Station);
+        }
+
+        [Fact]
         public void Departure_OriginPriority_WinsOverHeuristic()
         {
             // Longest alone would pick KGX (earliest); priorities=["STP"] forces St Pancras.
@@ -140,6 +155,22 @@ namespace Timetable.Test
             var result = Selector(JourneyHeuristic.Shortest).ChooseArrival(new[] { atMan, atMcv, atMco }, null, ManchesterDestGroup());
 
             Assert.Equal(ManchesterOxfordRoad, result!.Stop.Stop.Station);
+        }
+
+        [Fact]
+        public void Arrival_DestinationGroupOrdersAcrossMidnight_WithLongestHeuristic()
+        {
+            // MCO arrives 23:50, MCV 00:00, Manchester Piccadilly 00:10 next day (Value > 24h). Longest = latest
+            // real arrival = Manchester Piccadilly; a day-ignoring comparison would rank the 23:50 stop as latest
+            // and pick MCO. Candidates passed MCO-first so a broken ordering can't pass by accident.
+            var service = EustonToManchesterAllOverMidnight();
+            var atMco = new ResolvedServiceStop(service, service.Details.Locations[1]);
+            var atMcv = new ResolvedServiceStop(service, service.Details.Locations[2]);
+            var atMan = new ResolvedServiceStop(service, service.Details.Locations[3]);
+
+            var result = Selector(JourneyHeuristic.Longest).ChooseArrival(new[] { atMco, atMcv, atMan }, null, ManchesterDestGroup());
+
+            Assert.Equal(ManchesterPiccadilly, result!.Stop.Stop.Station);
         }
 
         [Fact]

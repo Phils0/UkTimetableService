@@ -1,3 +1,4 @@
+using System;
 using Timetable.Test.Data;
 
 namespace Timetable.Test
@@ -59,6 +60,37 @@ namespace Timetable.Test
                 TestScheduleLocations.CreateStop(ManchesterOxfordRoad, ten.AddMinutes(60)),
                 TestScheduleLocations.CreateStop(ManchesterVictoria, ten.AddMinutes(70)),
                 TestScheduleLocations.CreateDestination(ManchesterPiccadilly, ten.AddMinutes(80))
+            };
+            return TestSchedules.CreateService(timetableId: uid, stops: stops);
+        }
+
+        // King's Cross (23:55) -> St Pancras (00:05 next day) -> Manchester Piccadilly (01:20 next day, destination).
+        // The origin members straddle midnight, so St Pancras's departure carries Value > 24h - day-aware ordering
+        // must still rank King's Cross (23:55) as the earlier origin.
+        public static ResolvedService LondonAllToManchesterOverMidnight(string uid = "N12345")
+        {
+            var kgxDeparture = new Time(new TimeSpan(23, 55, 0));
+            var stops = new[]
+            {
+                (ScheduleLocation)TestScheduleLocations.CreateOrigin(KingsCross, kgxDeparture),
+                TestScheduleLocations.CreateStop(StPancras, kgxDeparture.AddMinutes(10)),               // 00:05 next day
+                TestScheduleLocations.CreateDestination(ManchesterPiccadilly, kgxDeparture.AddMinutes(85)) // 01:20 next day
+            };
+            return TestSchedules.CreateService(timetableId: uid, stops: stops);
+        }
+
+        // Euston (21:00) -> MCO (23:50) -> MCV (00:00 next day) -> Manchester Piccadilly (00:10 next day, destination).
+        // The destination members straddle midnight, so the later arrivals carry Value > 24h - day-aware ordering
+        // must still rank Manchester Piccadilly (00:10) as the latest arrival.
+        public static ResolvedService EustonToManchesterAllOverMidnight(string uid = "O12345")
+        {
+            var eustonDeparture = new Time(new TimeSpan(21, 0, 0));
+            var stops = new[]
+            {
+                (ScheduleLocation)TestScheduleLocations.CreateOrigin(Euston, eustonDeparture),
+                TestScheduleLocations.CreateStop(ManchesterOxfordRoad, eustonDeparture.AddMinutes(170)),   // 23:50
+                TestScheduleLocations.CreateStop(ManchesterVictoria, eustonDeparture.AddMinutes(180)),     // 00:00 next day
+                TestScheduleLocations.CreateDestination(ManchesterPiccadilly, eustonDeparture.AddMinutes(190)) // 00:10 next day
             };
             return TestSchedules.CreateService(timetableId: uid, stops: stops);
         }

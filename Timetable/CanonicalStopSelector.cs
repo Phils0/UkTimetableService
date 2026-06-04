@@ -57,10 +57,13 @@ namespace Timetable
                 ?? ChooseDeparturesOriginByHeuristic(candidates);
         }
 
+        // Order by the raw Time.Value (TimeSpan), not Time.EarlierLaterComparer: these candidates share one
+        // (TimetableUid, On), so a stop after midnight carries Value > 24h and must sort after a 23:xx stop. The
+        // comparer reads the 0-23 hour component and would wrongly rank a next-day 00:10 stop before a 23:50 one.
         private ResolvedServiceStop ChooseDeparturesOriginByHeuristic(IReadOnlyList<ResolvedServiceStop> candidates) =>
             _heuristic == JourneyHeuristic.Longest
-                ? candidates.OrderBy(DepartureTimeAtStop, Time.EarlierLaterComparer).First()  // earliest departure -> longest journey within the group
-                : candidates.OrderBy(DepartureTimeAtStop, Time.LaterEarlierComparer).First();
+                ? candidates.OrderBy(c => DepartureTimeAtStop(c).Value).First()             // earliest departure -> longest journey within the group
+                : candidates.OrderByDescending(c => DepartureTimeAtStop(c).Value).First();  // latest departure -> shortest journey within the group
 
         private void ApplyDeparturesDestinationOverride(ResolvedServiceStop candidate, StationGroup destinationGroup)
         {
@@ -117,10 +120,12 @@ namespace Timetable
                 ?? ChooseArrivalsDestinationByHeuristic(candidates);
         }
 
+        // See ChooseDeparturesOriginByHeuristic: order by raw Time.Value so a next-day arrival (Value > 24h) sorts
+        // after a 23:xx one, rather than the day-ignoring comparer ranking it as if it were early-morning.
         private ResolvedServiceStop ChooseArrivalsDestinationByHeuristic(IReadOnlyList<ResolvedServiceStop> candidates) =>
             _heuristic == JourneyHeuristic.Longest
-                ? candidates.OrderBy(ArrivalTimeAtStop, Time.LaterEarlierComparer).First()    // latest arrival -> longest journey within the group
-                : candidates.OrderBy(ArrivalTimeAtStop, Time.EarlierLaterComparer).First();
+                ? candidates.OrderByDescending(c => ArrivalTimeAtStop(c).Value).First()  // latest arrival -> longest journey within the group
+                : candidates.OrderBy(c => ArrivalTimeAtStop(c).Value).First();           // earliest arrival -> shortest journey within the group
 
         private void ApplyArrivalsOriginOverride(ResolvedServiceStop candidate, StationGroup originGroup)
         {

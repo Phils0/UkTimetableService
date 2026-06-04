@@ -14,6 +14,12 @@ namespace Timetable
     /// </remarks>
     public class StationGroupLookup
     {
+        /// <summary>
+        /// An empty lookup: every <see cref="TryGet"/> misses. The natural "station groups disabled" state
+        /// (no data file), and a safe default wherever a lookup is required but none has been built.
+        /// </summary>
+        public static readonly StationGroupLookup Empty = new(new Dictionary<string, StationGroup>(StringComparer.OrdinalIgnoreCase));
+
         private readonly IReadOnlyDictionary<string, StationGroup> _groups;
 
         public StationGroupLookup(IReadOnlyDictionary<string, StationGroup> groups)

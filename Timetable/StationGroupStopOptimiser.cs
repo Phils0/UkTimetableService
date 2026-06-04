@@ -56,7 +56,7 @@ namespace Timetable
             string direction, int candidateCount, int serviceCount,
             StationGroup? originGroup, StationGroup? destinationGroup)
         {
-            _logger.Debug(
+            _logger.Information(
                 "Station-group {Direction}: {Candidates} candidates collapsed to {Services} services " +
                 "(origin {OriginGroup}, destination {DestinationGroup})",
                 direction, candidateCount, serviceCount,

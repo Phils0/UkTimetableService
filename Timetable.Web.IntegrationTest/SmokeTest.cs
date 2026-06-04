@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Timetable.Web.Model;
 using Xunit;
@@ -42,7 +43,58 @@ namespace Timetable.Web.IntegrationTest
             var departures = JsonConvert.DeserializeObject<Model.FoundSummaryResponse>(responseString);
             departures.Services.Should().NotBeEmpty("{0} should return values", url);
         }
-        
+
+        // Like the other smoke tests, this relies on runner-supplied data: station groups are provisioned by the
+        // runner (core ships no station-groups.json), so when none are loaded the test skips rather than fails.
+        // Group codes are percent-encoded (the @ becomes %40) exactly as a real client must encode them.
+        [SkippableTheory]
+        [InlineData("GB@LO", "GB@MA")]
+        public async void MakeDeparturesRequestUsingGroups(string originGroup, string destinationGroup)
+        {
+            var groups = Host.Services.GetRequiredService<StationGroupLookup>();
+            Skip.IfNot(groups.TryGet(originGroup, out _) && groups.TryGet(destinationGroup, out _),
+                "No station groups loaded - supply a station-groups.json defining these groups to run this smoke test.");
+
+            var client = Host.GetTestClient();
+            var url =
+                $"/api/Timetable/departures/{Uri.EscapeDataString(originGroup)}/{TestDate}?to={Uri.EscapeDataString(destinationGroup)}&fullDay=true&includeStops=false";
+            var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.Warning("Group request failed. {0} should be successful: {1} Retrying including cancelled services", url, response.StatusCode);
+                (response, url) = await RetryIncludingCancelledServices(client, url);
+            }
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            var departures = JsonConvert.DeserializeObject<Model.FoundSummaryResponse>(responseString);
+            departures.Services.Should().NotBeEmpty("{0} should return values", url);
+        }
+
+        [SkippableTheory]
+        [InlineData("GB@LO", "GB@MA")]
+        public async void MakeArrivalsRequestUsingGroups(string destinationGroup, string originGroup)
+        {
+            var groups = Host.Services.GetRequiredService<StationGroupLookup>();
+            Skip.IfNot(groups.TryGet(originGroup, out _) && groups.TryGet(destinationGroup, out _),
+                "No station groups loaded - supply a station-groups.json defining these groups to run this smoke test.");
+
+            var client = Host.GetTestClient();
+            var url =
+                $"/api/Timetable/arrivals/{Uri.EscapeDataString(destinationGroup)}/{TestDate}?from={Uri.EscapeDataString(originGroup)}&fullDay=true&includeStops=false";
+            var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.Warning("Group request failed. {0} should be successful: {1} Retrying including cancelled services", url, response.StatusCode);
+                (response, url) = await RetryIncludingCancelledServices(client, url);
+            }
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            var arrivals = JsonConvert.DeserializeObject<Model.FoundSummaryResponse>(responseString);
+            arrivals.Services.Should().NotBeEmpty("{0} should return values", url);
+        }
+
         [Theory]
         [InlineData("TP")]
         [InlineData("XC")]

@@ -22,14 +22,20 @@ namespace Timetable.Web.Test.Controllers
 
         private static readonly DateTime Aug12 = new DateTime(2019, 8, 12, 0, 0, 0);
         private static readonly DateTime Aug12AtTenFifteen = new DateTime(2019, 8, 12, 10, 15, 0);
-        
+
+        // StationGroupLookup.Empty: the group code path never engages and the optimiser is never invoked, so these
+        // tests continue to assert the unchanged plain-CRS behaviour.
+        private static ArrivalsController CreateController(ILocationData data, IFilterFactory filters) =>
+            new ArrivalsController(data, filters, StationGroupLookup.Empty, new GroupSearchOrchestrator(Substitute.For<ILogger>()),
+                Substitute.For<IStationGroupStopOptimiser>(), _config.CreateMapper(), Substitute.For<ILogger>());
+
         [Theory]
         [InlineData("CLJ")]
         [InlineData("clj")]
         public async Task ArrivalsReturnsServices(string clapham)
         {
             var data = CreateStubDataWithFindArrivals("CLJ", Aug12AtTenFifteen);
-            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals(clapham, Aug12AtTenFifteen) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -79,7 +85,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ArrivalsReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
             var data = CreateStubDataWithFindArrivals(returnedStatus: status, returnedStops:  new ResolvedServiceStop[0]);
-            var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;
             
             Assert.Equal(404, response.StatusCode);
@@ -96,7 +102,7 @@ namespace Timetable.Web.Test.Controllers
             data.FindArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration>())
                 .Throws(new Exception("Something went wrong"));
 
-            var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen) as ObjectResult;
             
             Assert.Equal(500, response.StatusCode);
@@ -114,13 +120,14 @@ namespace Timetable.Web.Test.Controllers
         public async Task SetsFromFilter(string location, bool hasFilter)
         {
             var data = CreateStubDataWithFindArrivals();
-            data.TryGetStation("SUR", out Arg.Any<Station>()).Returns(true);
+            // Honour the TryGetStation contract: a hit yields a non-null station (the resolver discriminates on it).
+            data.TryGetStation("SUR", out Arg.Any<Station>()).Returns(x => { x[1] = TestStations.Surbiton; return true; });
 
             var filterFactory = Substitute.For<IFilterFactory>();
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
             filterFactory.ArrivalsComeFrom(Arg.Any<Station>()).Returns(GatherFilterFactory.NoFilter);
             
-            var controller = new ArrivalsController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, filterFactory);
             var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen, location) as ObjectResult;;
 
             if (hasFilter)
@@ -138,7 +145,7 @@ namespace Timetable.Web.Test.Controllers
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
             filterFactory.ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter).Returns(filter);
             
-            var controller = new ArrivalsController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, filterFactory);
             var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen, toc: new [] {"VT"}) as ObjectResult;
             
             filterFactory.Received().ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter);
@@ -153,7 +160,7 @@ namespace Timetable.Web.Test.Controllers
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
             filterFactory.ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter).Returns(filter);
             
-            var controller = new ArrivalsController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, filterFactory);
             var response = await controller.Arrivals("CLJ",  toc: new [] {"VT"}) as ObjectResult;
             
             filterFactory.Received().ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter);
@@ -164,7 +171,7 @@ namespace Timetable.Web.Test.Controllers
         {
             var returnedStop = CreateClaphamResolvedStop(true);
             var data = CreateStubDataWithFindArrivals(returnedStops:  new [] { returnedStop });
-            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen, returnCancelledServices: true) as ObjectResult;
             
             Assert.Equal(200, response.StatusCode);
@@ -178,7 +185,7 @@ namespace Timetable.Web.Test.Controllers
         {
             var returnedStop = CreateClaphamResolvedStop(true);
             var data = CreateStubDataWithFindArrivals(returnedStops:  new [] { returnedStop });
-            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals("CLJ", returnCancelledServices: true) as ObjectResult;
             
             Assert.Equal(200, response.StatusCode);
@@ -193,7 +200,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task FullDayArrivalsReturnsServices(string clapham)
         {
             var data = CreateStubDataWithAllArrivals("CLJ", Aug12);
-            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals(clapham, Aug12, fullDay: true) as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -223,7 +230,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task FullRailDayArrivalsReturnsServices()
         {
             var data = CreateStubDataWithAllArrivals("CLJ", Aug12, boundary: Time.StartRailDay);
-            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals("CLJ", Aug12, fullDay: true, dayBoundary:"02:30") as ObjectResult;;
             
             Assert.Equal(200, response.StatusCode);
@@ -239,7 +246,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ArrivalsForDayReturnsNotFoundWithReason(FindStatus status, string expectedReason)
         {
             var data = CreateStubDataWithAllArrivals(returnedStatus: status, returnedStops: new ResolvedServiceStop[0]);
-            var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals("CLJ", Aug12, fullDay: true) as ObjectResult;
             
             Assert.Equal(404, response.StatusCode);
@@ -256,7 +263,7 @@ namespace Timetable.Web.Test.Controllers
             data.AllArrivals(Arg.Any<string>(), Arg.Any<DateTime>(), Arg.Any<GatherConfiguration.GatherFilter>(), Arg.Any<Time>())
                 .Throws(new Exception("Something went wrong"));
 
-            var controller = new ArrivalsController(data, FilterFactory, _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals("CLJ", Aug12, fullDay: true) as ObjectResult;
             
             Assert.Equal(500, response.StatusCode);
@@ -280,7 +287,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ReturnsServicesWithStops(bool includeStops, Type expected)
         {
             var data = CreateStubDataWithFindArrivals();
-            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals("CLJ", Aug12AtTenFifteen, includeStops: includeStops) as ObjectResult;
             Assert.IsType(expected, response.Value);
         }
@@ -290,7 +297,7 @@ namespace Timetable.Web.Test.Controllers
         public async Task ArrivalsNowReturnsServicesWithStops(bool includeStops, Type expected)
         {
             var data = CreateStubDataWithFindArrivals();
-            var controller = new ArrivalsController(data,  FilterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, FilterFactory);
             var response = await controller.Arrivals("CLJ", includeStops: includeStops) as ObjectResult;
             Assert.IsType(expected, response.Value);
         }
@@ -304,7 +311,7 @@ namespace Timetable.Web.Test.Controllers
             filterFactory.NoFilter.Returns(GatherFilterFactory.NoFilter);
             filterFactory.ProvidedByToc(Arg.Any<TocFilter>(), GatherFilterFactory.NoFilter).Returns(filter);
             
-            var controller = new ArrivalsController(data,  filterFactory,  _config.CreateMapper(), Substitute.For<ILogger>());
+            var controller = CreateController(data, filterFactory);
             var response = await controller.Arrivals("CLJ",  toc: new [] {"VT", "SWR"}) as ObjectResult;
             
             Assert.Equal(400, response.StatusCode);
