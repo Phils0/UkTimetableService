@@ -205,6 +205,40 @@ namespace Timetable.Test
             return TestSchedules.CreateScheduleWithService(stops: stops);
         }
 
+        private static readonly Time TwentyFourOhOne = new Time(new TimeSpan(24, 1, 0));
+        private static readonly Time TwentyFourOhFour = new Time(new TimeSpan(24, 4, 0));
+
+        // An overnight service whose after-midnight Clapham departure differs by a few minutes
+        // between consecutive days (24:01 on the Monday run, 24:04 on the Tuesday run). The Monday
+        // run's 24:01 departure must still resolve when searched on the day it departs (the
+        // Tuesday), falling back past the Tuesday run - whose time there doesn't match - to the
+        // originating Monday.
+        [Fact]
+        public void NextDayStopWhoseTimeDiffersAcrossDaysResolvesOnItsOriginatingDay()
+        {
+            var monday = TestSchedules.CreateScheduleWithService(
+                calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Monday),
+                stops: CreateOvernightClaphamSchedule(TwentyFourOhOne));
+            var service = monday.Service;
+            TestSchedules.CreateSchedule(
+                calendar: TestSchedules.CreateAugust2019Calendar(DaysFlag.Tuesday),
+                stops: CreateOvernightClaphamSchedule(TwentyFourOhFour),
+                service: service);
+
+            var find = CreateFindSpec(TwentyFourOhOne, MondayAugust12.AddDays(1));
+
+            Assert.True(service.TryFindScheduledStop(find, out var found));
+            Assert.Equal(MondayAugust12, found.On);
+        }
+
+        // Clapham departs at the given next-day time; the origin and destination just bracket it.
+        private static ScheduleLocation[] CreateOvernightClaphamSchedule(Time claphamDeparture) => new[]
+        {
+            (ScheduleLocation) TestScheduleLocations.CreateOrigin(TestStations.Surbiton, new Time(new TimeSpan(23, 50, 0))),
+            TestScheduleLocations.CreateStop(TestStations.ClaphamJunction, claphamDeparture.AddMinutes(-1)),
+            TestScheduleLocations.CreateDestination(TestStations.Waterloo, claphamDeparture.AddMinutes(29))
+        };
+
         public static TheoryData<Time, Time, bool> StartsBeforeData =>
             new TheoryData<Time, Time, bool>()
             {
