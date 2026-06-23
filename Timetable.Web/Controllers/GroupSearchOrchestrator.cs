@@ -96,7 +96,7 @@ namespace Timetable.Web.Controllers
 
                 return pivot != null
                     ? ReWindow(direction, optimised, pivot.Value, window)
-                    : OrderByInstant(direction, optimised);
+                    : OrderChronologically(direction, optimised);
             };
         }
 
@@ -109,19 +109,19 @@ namespace Timetable.Web.Controllers
         private static ResolvedServiceStop[] ReWindow(
             IGroupSearchDirection direction, IEnumerable<ResolvedServiceStop> stops, DateTime pivot, ResultWindow window)
         {
-            var ordered = OrderByInstant(direction, stops);
-            var beforePivot = ordered.Where(s => InstantOf(direction, s) < pivot).TakeLast(window.Before);
-            var fromPivot = ordered.Where(s => InstantOf(direction, s) >= pivot).Take(window.After);
+            var ordered = OrderChronologically(direction, stops);
+            var beforePivot = ordered.Where(s => DateTimeAtFoundStop(direction, s) < pivot).TakeLast(window.Before);
+            var fromPivot = ordered.Where(s => DateTimeAtFoundStop(direction, s) >= pivot).Take(window.After);
             return beforePivot.Concat(fromPivot).ToArray();
         }
 
         // Orders a merged board chronologically by the absolute instant (running date + stop time), so next-day
         // stops held as 24:10 sort after the same evening's 23:50 rather than ahead of it as a bare 00:10 would.
-        private static ResolvedServiceStop[] OrderByInstant(
+        private static ResolvedServiceStop[] OrderChronologically(
             IGroupSearchDirection direction, IEnumerable<ResolvedServiceStop> stops) =>
-            stops.OrderBy(s => InstantOf(direction, s)).ToArray();
+            stops.OrderBy(s => DateTimeAtFoundStop(direction, s)).ToArray();
 
-        private static DateTime InstantOf(IGroupSearchDirection direction, ResolvedServiceStop stop) =>
+        private static DateTime DateTimeAtFoundStop(IGroupSearchDirection direction, ResolvedServiceStop stop) =>
             stop.Stop.On.Add(direction.TimeAtFoundStop(stop).Value);
     }
 }
