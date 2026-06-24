@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ReflectionMagic;
 
 namespace Timetable.Test
@@ -29,8 +30,8 @@ namespace Timetable.Test
 
         internal static IService[] GetServices(this PublicSchedule schedule, Time time)
         {
-            var services = (SortedList<Time, IService[]>) schedule.AsDynamic()._services.RealObject;
-            return services.TryGetValue(time, out var found) ? found : new IService[0];
+            var serviceTimes = (SortedList<Time, IServiceTime[]>) schedule.AsDynamic()._serviceTimes.RealObject;
+            return serviceTimes.TryGetValue(time, out var found) ? found.Select(s => s.Service).ToArray() : new IService[0];
         }
         
         internal static PublicSchedule GetDepartureTimes(this LocationTimetable timetable)
