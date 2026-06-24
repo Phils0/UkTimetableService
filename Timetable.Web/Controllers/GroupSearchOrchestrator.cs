@@ -76,10 +76,11 @@ namespace Timetable.Web.Controllers
 
         /// <summary>
         /// Returns the post-dedup transform the controller hands to its Process pipeline: collapse a service's
-        /// member-stops to one canonical row via the direction's optimiser, then - when the path side was a group and
-        /// so over-gathered one window per member (<paramref name="pathGroup"/> non-null, <paramref name="pivot"/>
-        /// non-null = windowed mode) - re-window the merged set back around the request time. When neither side is a
-        /// group the transform is the identity, so the plain-CRS path is byte-for-byte unchanged.
+        /// member-stops to one canonical row via the direction's optimiser. When the path side was a group the
+        /// per-member boards were gathered and concatenated, so the merged set is re-ordered by time: windowed
+        /// (<paramref name="pivot"/> non-null) re-windows around the request time, full-day sorts chronologically.
+        /// When the path side is a plain CRS (single, already-ordered board) the order is left as-is, so the
+        /// plain-CRS path is byte-for-byte unchanged.
         /// </summary>
         public Func<ResolvedServiceStop[], ResolvedServiceStop[]> BuildOptimise(
             IGroupSearchDirection direction, StationGroup? pathGroup, StationGroup? queryGroup, DateTime? pivot, ResultWindow window)
@@ -90,9 +91,12 @@ namespace Timetable.Web.Controllers
             return stops =>
             {
                 var optimised = direction.Optimise(stops, pathGroup, queryGroup);
-                return pathGroup != null && pivot != null
+                if (pathGroup == null)
+                    return optimised;
+
+                return pivot != null
                     ? ReWindow(direction, optimised, pivot.Value, window)
-                    : optimised;
+                    : OrderChronologically(direction, optimised);
             };
         }
 
@@ -105,12 +109,19 @@ namespace Timetable.Web.Controllers
         private static ResolvedServiceStop[] ReWindow(
             IGroupSearchDirection direction, IEnumerable<ResolvedServiceStop> stops, DateTime pivot, ResultWindow window)
         {
-            DateTime InstantOf(ResolvedServiceStop stop) => stop.Stop.On.Add(direction.TimeAtFoundStop(stop).Value);
-
-            var ordered = stops.OrderBy(InstantOf).ToList();
-            var beforePivot = ordered.Where(s => InstantOf(s) < pivot).TakeLast(window.Before);
-            var fromPivot = ordered.Where(s => InstantOf(s) >= pivot).Take(window.After);
+            var ordered = OrderChronologically(direction, stops);
+            var beforePivot = ordered.Where(s => DateTimeAtFoundStop(direction, s) < pivot).TakeLast(window.Before);
+            var fromPivot = ordered.Where(s => DateTimeAtFoundStop(direction, s) >= pivot).Take(window.After);
             return beforePivot.Concat(fromPivot).ToArray();
         }
+
+        // Orders a merged board chronologically by the absolute instant (running date + stop time), so next-day
+        // stops held as 24:10 sort after the same evening's 23:50 rather than ahead of it as a bare 00:10 would.
+        private static ResolvedServiceStop[] OrderChronologically(
+            IGroupSearchDirection direction, IEnumerable<ResolvedServiceStop> stops) =>
+            stops.OrderBy(s => DateTimeAtFoundStop(direction, s)).ToArray();
+
+        private static DateTime DateTimeAtFoundStop(IGroupSearchDirection direction, ResolvedServiceStop stop) =>
+            stop.Stop.On.Add(direction.TimeAtFoundStop(stop).Value);
     }
 }
