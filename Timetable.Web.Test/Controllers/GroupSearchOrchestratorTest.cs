@@ -98,6 +98,48 @@ namespace Timetable.Web.Test.Controllers
             direction.DidNotReceive().Optimise(Arg.Any<ResolvedServiceStop[]>(), Arg.Any<StationGroup>(), Arg.Any<StationGroup>());
         }
 
+        // ----- full-day ordering (via the built transform) -----
+
+        [Fact]
+        public void FullDayOrdersTheMergedBoardChronologically()
+        {
+            // The path-side gather concatenates each member's individually-ordered board, so the merged input
+            // is not globally sorted. Full-day must return it as one chronological board.
+            var stops = new[]
+            {
+                DepartingAt("X10003", 10, 10), DepartingAt("X10001", 6, 40),
+                DepartingAt("X10004", 23, 30), DepartingAt("X10002", 8, 20),
+            };
+
+            var result = FullDayDepartures()(stops);
+
+            Assert.Equal(new[] { "X10001", "X10002", "X10003", "X10004" }, Uids(result));
+        }
+
+        [Fact]
+        public void FullDayPlacesAPastMidnightServiceAfterTheSameEvening()
+        {
+            // 00:10 held as 24:10 is the next day, so it sorts after 23:30 - not ahead of everything as a bare 00:10 would.
+            var stops = new[] { DepartingAt("X10002", 24, 10), DepartingAt("X10001", 23, 30) };
+
+            var result = FullDayDepartures()(stops);
+
+            Assert.Equal(new[] { "X10001", "X10002" }, Uids(result));
+        }
+
+        [Fact]
+        public void FullDayLeavesOrderUntouchedWhenOnlyTheQuerySideIsAGroup()
+        {
+            // Path side is a plain CRS: a single, already-ordered board - nothing to merge, so don't reorder it.
+            var orchestrator = new GroupSearchOrchestrator(Substitute.For<ILogger>());
+            var stops = new[] { DepartingAt("X10002", 10, 10), DepartingAt("X10001", 9, 40) };
+
+            var result = orchestrator.BuildOptimise(new PassThroughDeparturesDirection(),
+                pathGroup: null, queryGroup: London, pivot: null, new ResultWindow(0, 0))(stops);
+
+            Assert.Equal(new[] { "X10002", "X10001" }, Uids(result));
+        }
+
         // ----- GatherAcrossGroupMembers -----
 
         [Fact]
@@ -174,6 +216,13 @@ namespace Timetable.Web.Test.Controllers
         {
             var orchestrator = new GroupSearchOrchestrator(Substitute.For<ILogger>());
             return orchestrator.BuildOptimise(new PassThroughDeparturesDirection(), pathGroup: London, queryGroup: null, pivot: pivot, new ResultWindow(before, after));
+        }
+
+        // The transform for a full-day path-side (origin) group departures search: merged board, no windowing.
+        private static Func<ResolvedServiceStop[], ResolvedServiceStop[]> FullDayDepartures()
+        {
+            var orchestrator = new GroupSearchOrchestrator(Substitute.For<ILogger>());
+            return orchestrator.BuildOptimise(new PassThroughDeparturesDirection(), pathGroup: London, queryGroup: null, pivot: null, new ResultWindow(0, 0));
         }
 
         // Stands in for a real controller: Optimise returns its input untouched (so ReWindow operates on exactly the
