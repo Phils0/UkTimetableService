@@ -7,10 +7,10 @@ namespace Timetable
     public interface IGathererScheduleData
     {
         Station Location { get; }
-        (Time time, IService[] services) ValuesAt(int index);
+        (Time time, IServiceTime[] serviceTimes) ValuesAt(int index);
         int Count { get; }
-        IEnumerable<KeyValuePair<Time, IService[]>> GetValuesBefore(int index);
-        IEnumerable<KeyValuePair<Time, IService[]>> GetValuesAtAndAfter(int index);
+        IEnumerable<KeyValuePair<Time, IServiceTime[]>> GetValuesBefore(int index);
+        IEnumerable<KeyValuePair<Time, IServiceTime[]>> GetValuesAtAndAfter(int index);
     }
     
     internal class ScheduleGatherer
@@ -76,7 +76,7 @@ namespace Timetable
                     while (keepSearching && idx >= 0)
                     {
                         var pair = _schedule.ValuesAt(idx);
-                        foreach (var stop in ResolveServices(pair.services, pair.time, resolveDate))
+                        foreach (var stop in ResolveServices(pair.serviceTimes, resolveDate))
                         {
                             found++;
                             keepSearching = (found < quantity);
@@ -97,18 +97,20 @@ namespace Timetable
 
         private int LastIdx => _schedule.Count - 1;
 
-        private IEnumerable<ResolvedServiceStop> ResolveServices(IService[] services, Time atTime, DateTime onDate)
+        private IEnumerable<ResolvedServiceStop> ResolveServices(IServiceTime[] serviceTimes, DateTime onDate)
         {
             var source = MatchServiceStop();
             return FilterFoundServices(source);
-            
+
             IEnumerable<ResolvedServiceStop> MatchServiceStop()
             {
-                foreach (var service in services)
+                foreach (var serviceTime in serviceTimes)
                 {
-                    var find = new StopSpecification(_schedule.Location, atTime, onDate, _arrivalsOrDestinations);
-                    if (service.TryFindScheduledStop(find, out var stop))
-                        yield return stop;
+                    // Use each entry's own time, not the shared slot key: a same-day 00:xx and a next-day
+                    // 24:xx collapse into one day-ignoring slot, so the key may belong to a different service.
+                    var find = new StopSpecification(_schedule.Location, serviceTime.Time, onDate, _arrivalsOrDestinations);
+                    if (serviceTime.Service.TryFindScheduledStop(find, out var resolved))
+                        yield return resolved;
                 }
             }
         }
@@ -137,7 +139,7 @@ namespace Timetable
                     while (keepSearching && idx < _schedule.Count)
                     {
                         var pair = _schedule.ValuesAt(idx);
-                        foreach (var stop in ResolveServices(pair.services, pair.time, resolveDate))
+                        foreach (var stop in ResolveServices(pair.serviceTimes, resolveDate))
                         {
                             found++;
                             keepSearching = (found < quantity);
@@ -160,14 +162,14 @@ namespace Timetable
         {
             foreach (var pair  in _schedule.GetValuesAtAndAfter(startIdx))
             {
-                foreach (var stop in ResolveServices(pair.Value, pair.Key, date))
+                foreach (var stop in ResolveServices(pair.Value, date))
                     yield return stop;
             }
 
             var nextDay = date.AddDays(1);
             foreach (var pair in _schedule.GetValuesBefore(startIdx))
             {
-                foreach (var stop in ResolveServices(pair.Value, pair.Key, nextDay))
+                foreach (var stop in ResolveServices(pair.Value, nextDay))
                     yield return stop;
             }
         }

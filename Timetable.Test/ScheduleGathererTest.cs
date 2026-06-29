@@ -24,7 +24,7 @@ namespace Timetable.Test
             Assert.Equal(TestSchedules.TenFifteen, stop.Departure);
         }
 
-        private IGathererScheduleData CreateMockSchedule((int idx, (Time, CifService[]) services)[] responses = null, ICalendar calendar = null)
+        private IGathererScheduleData CreateMockSchedule((int idx, (Time, IServiceTime[]) services)[] responses = null, ICalendar calendar = null)
         {
             responses = responses ?? (new []
             {
@@ -45,15 +45,18 @@ namespace Timetable.Test
             return schedule;
         }
 
-        private (Time, CifService[]) CreateTimeEntry(Time time, ICalendar calendar = null)
+        private (Time, IServiceTime[]) CreateTimeEntry(Time time, ICalendar calendar = null)
+        {
+            return (time, new[] { CreateDeparture(time, calendar) });
+        }
+
+        // A departures-board entry (service + its own departure time at the location), as the real board holds.
+        private static IServiceTime CreateDeparture(Time time, ICalendar calendar = null, string timetableId = "X12345")
         {
             calendar = calendar ?? TestSchedules.EverydayAugust2019;
-            return (time, new[]
-            {
-                TestSchedules.CreateScheduleWithService(
-                    calendar: calendar,
-                    stops: TestSchedules.CreateThreeStopSchedule(time)).Service
-            });
+            var stops = TestSchedules.CreateThreeStopSchedule(time);
+            TestSchedules.CreateScheduleWithService(timetableId: timetableId, calendar: calendar, stops: stops);
+            return new DepartureServiceTime((IDeparture) stops[0]);
         }
 
         [Fact]
@@ -173,8 +176,8 @@ namespace Timetable.Test
                 (idx: 1, services: CreateTimeEntry(TestSchedules.Ten)), 
                 (idx: 2, services: (TestSchedules.TenFifteen, new[]
                 {
-                    TestSchedules.CreateScheduleWithService(stops: TestSchedules.CreateThreeStopSchedule(TestSchedules.TenFifteen)).Service,
-                    TestSchedules.CreateScheduleWithService(timetableId: "Y999999", stops: TestSchedules.CreateThreeStopSchedule(TestSchedules.TenFifteen)).Service
+                    CreateDeparture(TestSchedules.TenFifteen),
+                    CreateDeparture(TestSchedules.TenFifteen, timetableId: "Y999999")
                 })),
                 (idx: 3, services: CreateTimeEntry(TestSchedules.TenThirty))
             };

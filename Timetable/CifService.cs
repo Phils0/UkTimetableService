@@ -102,6 +102,11 @@ namespace Timetable
                 return TryFindStopOn(find, out stop);
             }
 
+            // Next-day stop (24:xx) not matched on the search-date run: resolve the originating
+            // previous day directly (its time at this stop can differ across the day boundary).
+            if (!found && find.Time.IsNextDay)
+                return TryFindStopOn(find.MoveToPreviousDay(), out stop);
+
             return found;
         }
 

@@ -62,7 +62,7 @@ namespace Timetable.Test
 
             var pair = schedule.ValuesAt(1);
             Assert.Equal(TestSchedules.TenThirty, pair.time);
-            Assert.Equal(stop2.Service, pair.services.Single());
+            Assert.Equal(stop2.Service, pair.serviceTimes.Single().Service);
         }
         
         [Fact]
@@ -266,7 +266,27 @@ namespace Timetable.Test
                 s => { Assert.Equal(Aug4, s.On);},
                 s => { Assert.Equal(Aug5, s.On); });
         }
-        
+
+        [Fact]
+        public void DoesNotLeakASameDayServiceSharingASlotWithAnOvernightStop()
+        {
+            // A genuine overnight stop (24:09) and an ordinary same-day stop (00:09) collapse into one
+            // day-ignoring slot, seeded here by the overnight one. The same-day service runs only the day
+            // before the search, so its 00:09 belongs to that previous day - it must not be pulled onto
+            // the search-date board just because its slot's key happens to be next-day.
+            var overnight = CreateScheduleStop(new Time(new TimeSpan(24, 9, 0)), "Overnight");
+            var sameDay = CreateScheduleStop(new Time(new TimeSpan(0, 9, 0)), "SameDay",
+                TestSchedules.CreateAugust2019Calendar(DaysFlag.Sunday)); // Aug4 only; search date Aug5 is a Monday
+
+            var schedule = new PublicSchedule(TestStations.Surbiton, TimesToUse.Arrivals, Time.EarlierLaterComparer);
+            schedule.AddService(CreateServiceTime(overnight)); // inserted first, so the slot key is 24:09
+            schedule.AddService(CreateServiceTime(sameDay));
+
+            var found = schedule.AllServices(Aug5, GatherFilterFactory.NoFilter, Time.Midnight);
+
+            Assert.DoesNotContain(found, s => s.Service.TimetableUid == "SameDay");
+        }
+
         [Fact]
         public void GatherAll()
         {

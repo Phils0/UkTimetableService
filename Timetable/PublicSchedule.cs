@@ -6,7 +6,7 @@ namespace Timetable
 { 
     public interface IPublicSchedule
     {
-        void AddService(IServiceTime stop);
+        void AddService(IServiceTime serviceTime);
         ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config);
         ResolvedServiceStop[] AllServices(DateTime onDate, GatherConfiguration.GatherFilter filter, Time dayBoundary);
     }
@@ -19,7 +19,9 @@ namespace Timetable
     {
         public Station Location { get; }
 
-        private readonly SortedList<Time, IService[]> _services;
+        // The slot key stays day-ignoring (ordering relies on it), but each entry keeps its own stop time so
+        // the gatherer doesn't substitute the shared key for every service that shares the slot.
+        private readonly SortedList<Time, IServiceTime[]> _serviceTimes;
         private readonly TimesToUse _arrivalsOrDepartures;
         private readonly IComparer<Time> _comparer;
 
@@ -28,36 +30,38 @@ namespace Timetable
             Location = at;
             _arrivalsOrDepartures = arrivalsOrDepartures;
             _comparer = comparer;
-            _services = new SortedList<Time, IService[]>(comparer);
+            _serviceTimes = new SortedList<Time, IServiceTime[]>(comparer);
         }
 
-        public void AddService(IServiceTime stop)
+        public void AddService(IServiceTime serviceTime)
         {
-            var time = stop.Time;
-            if (!_services.ContainsKey(time))
-                _services.Add(time, new[] {stop.Service});
+            var time = serviceTime.Time;
+            if (!_serviceTimes.ContainsKey(time))
+                _serviceTimes.Add(time, new[] {serviceTime});
             else
             {
-                var services = _services[time];
-                if (!services.Any(s => s.Equals(stop.Service)))
+                var existing = _serviceTimes[time];
+                // Dedup on service AND exact time: a service's own 00:xx and 24:xx are different stops in one
+                // day-ignoring slot and must both survive; only a true (same service, same time) repeat is dropped.
+                if (!existing.Any(s => s.Service.Equals(serviceTime.Service) && s.Time.Equals(serviceTime.Time)))
                 {
-                    var length = services.Length;
-                    Array.Resize(ref services, length + 1);
-                    services[length] = stop.Service;
-                    _services[time] = services;
+                    var length = existing.Length;
+                    Array.Resize(ref existing, length + 1);
+                    existing[length] = serviceTime;
+                    _serviceTimes[time] = existing;
                 }
             }
         }
-        
-        public (Time time, IService[] services) ValuesAt(int index)
+
+        public (Time time, IServiceTime[] serviceTimes) ValuesAt(int index)
         {
-            return (_services.Keys[index], _services.Values[index]);
+            return (_serviceTimes.Keys[index], _serviceTimes.Values[index]);
         }
 
-        public IEnumerable<KeyValuePair<Time, IService[]>> GetValuesBefore(int index) => _services.Take(index);
-        public IEnumerable<KeyValuePair<Time, IService[]>> GetValuesAtAndAfter(int index) => _services.Skip(index);
+        public IEnumerable<KeyValuePair<Time, IServiceTime[]>> GetValuesBefore(int index) => _serviceTimes.Take(index);
+        public IEnumerable<KeyValuePair<Time, IServiceTime[]>> GetValuesAtAndAfter(int index) => _serviceTimes.Skip(index);
        
-        public int Count => _services.Count;
+        public int Count => _serviceTimes.Count;
 
         public ResolvedServiceStop[] FindServices(DateTime at, GatherConfiguration config)
         {
@@ -91,14 +95,14 @@ namespace Timetable
 
         private bool EqualsTime(int idx, Time time)
         {
-            return time.Equals(_services.Keys[idx]);
+            return time.Equals(_serviceTimes.Keys[idx]);
         }
 
         private (int index, bool changeDay) FindNearestTime(Time time)
         {
-            for (int i = 0; i < _services.Count; i++)
+            for (int i = 0; i < _serviceTimes.Count; i++)
             {
-                if (_comparer.Compare(_services.Keys[i], time) >= 0) //  Point when changes from being less to more
+                if (_comparer.Compare(_serviceTimes.Keys[i], time) >= 0) //  Point when changes from being less to more
                     return (i, false);
             }
 
